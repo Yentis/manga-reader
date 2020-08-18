@@ -3,25 +3,19 @@ import { SiteType } from '../siteType'
 import { BaseSite } from './baseSite'
 
 export class WebToons extends BaseSite {
-    chapterUrl: Element | undefined;
+    chapterUrl: Cheerio | undefined;
 
-    constructor (chapter: Element | undefined, chapterUrl: Element | undefined, image: Element | undefined, title: Element | undefined) {
+    constructor (chapter: Cheerio | undefined, chapterUrl: Cheerio | undefined, image: Cheerio | undefined, title: Cheerio | undefined) {
       super(chapter, image, title)
       this.chapterUrl = chapterUrl
     }
 
     getChapterUrl (): string {
-      if (!this.chapterUrl) return ''
-
-      const chapterUrl = this.chapterUrl as HTMLAnchorElement
-      return chapterUrl.href ? chapterUrl.href : ''
+      return this.chapterUrl?.attr('href') || ''
     }
 
     getImage (): string {
-      if (!this.image) return ''
-
-      const image = this.image as HTMLMetaElement
-      return image.content ? image.content : ''
+      return this.image?.attr('content') || ''
     }
 
     buildManga (url: string): Manga {

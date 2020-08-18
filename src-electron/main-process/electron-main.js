@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron'
+import { app, BrowserWindow, nativeTheme, session } from 'electron'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -36,6 +36,12 @@ function createWindow () {
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
       // preload: path.resolve(__dirname, 'electron-preload.js')
     }
+  })
+
+  session.defaultSession.cookies.set({
+    url: 'https://www.webtoons.com/',
+    name: 'ageGatePass',
+    value: 'true'
   })
 
   mainWindow.loadURL(process.env.APP_URL).then().catch(error => console.error(error))

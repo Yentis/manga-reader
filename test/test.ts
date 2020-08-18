@@ -16,6 +16,10 @@ describe('sites', () => {
     return testWebtoons()
   })
 
+  it(`m.${SiteType.WebToons}`, () => {
+    return testWebtoonsMobile()
+  })
+
   it(SiteType.HatigarmScanz, () => {
     return testHatigarmscanz()
   })
@@ -78,6 +82,22 @@ function testWebtoons (): Promise<void> {
       else if (mangaInfo.image !== 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'The Wolf & Red Riding Hood') reject(Error('Title did not match'))
       else if (mangaInfo.chapterUrl !== 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/episode-16/viewer?title_no=2142&episode_no=16') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
+function testWebtoonsMobile (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://m.webtoons.com/en/super-hero/xinker/list?title_no=541', SiteType.WebToons).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.WebToons) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'Epilogue') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://swebtoon-phinf.pstatic.net/20150914_105/1442197929184ASdSX_JPEG/_EB9AA1EB80AB_E293A4EABCB9__EB84BD_EB90A3EB80AB_EC86BDE.jpg?type=crop540_540') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'XINK3R') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://m.webtoons.com/en/super-hero/xinker/epilogue/viewer?title_no=541&episode_no=223') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
       else resolve()

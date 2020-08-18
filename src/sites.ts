@@ -23,17 +23,19 @@ import {
   WordPress
 } from './classes/sites/wordpress'
 import axios from 'axios'
+import cheerio from 'cheerio'
 import { Platform } from 'quasar'
+
+const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
 
 function readManganelo (url: string): Promise < Manga > {
   return new Promise((resolve, reject) => {
     axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+      const $ = cheerio.load(response.data)
       const site = new Manganelo(
-        doc.querySelectorAll('.chapter-name')[0],
-        doc.querySelectorAll('.info-image img')[0],
-        doc.querySelectorAll('.story-info-right h1')[0]
+        $('.chapter-name').first(),
+        $('.info-image img').first(),
+        $('.story-info-right h1').first()
       )
 
       resolve(site.buildManga(url))
@@ -44,12 +46,11 @@ function readManganelo (url: string): Promise < Manga > {
 function readGenkan (url: string, siteType: SiteType): Promise < Manga > {
   return new Promise((resolve, reject) => {
     axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+      const $ = cheerio.load(response.data)
       const site = new Genkan(
-        doc.querySelectorAll('.list-item.col-sm-3 a')[0],
-        doc.querySelectorAll('.media-content')[0],
-        doc.querySelectorAll('.text-highlight')[0],
+        $('.list-item.col-sm-3 a').first(),
+        $('.media-content').first(),
+        $('.text-highlight').first(),
         siteType
       )
 
@@ -60,24 +61,30 @@ function readGenkan (url: string, siteType: SiteType): Promise < Manga > {
 
 function readWebtoons (url: string): Promise < Manga > {
   return new Promise((resolve, reject) => {
-    axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+    const mobile = url.includes('//m.' + SiteType.WebToons)
+    const headers = mobile && Platform.is?.mobile !== true ? {
+      common: {
+        'User-Agent': MOBILE_USER_AGENT
+      }
+    } : null
+
+    axios.get(url, { headers }).then(response => {
+      const $ = cheerio.load(response.data)
 
       let site: WebToons
-      if (Platform.is.mobile) {
+      if (mobile || Platform.is?.mobile === true) {
         site = new WebToons(
-          doc.querySelectorAll('.sub_title span')[0],
-          doc.querySelectorAll('li[data-episode-no] a')[0],
-          doc.querySelectorAll('meta[property="og:image"]')[0],
-          doc.querySelectorAll('._btnInfo .subj')[0]
+          $('.sub_title span').first(),
+          $('li[data-episode-no] a').first(),
+          $('meta[property="og:image"]').first(),
+          $('._btnInfo .subj').first()
         )
       } else {
         site = new WebToons(
-          doc.querySelectorAll('#_listUl .subj span')[0],
-          doc.querySelectorAll('#_listUl a')[0],
-          doc.querySelectorAll('meta[property="og:image"]')[0],
-          doc.querySelectorAll('.info .subj')[0]
+          $('#_listUl .subj span').first(),
+          $('#_listUl a').first(),
+          $('meta[property="og:image"]').first(),
+          $('.info .subj').first()
         )
       }
 
@@ -89,12 +96,11 @@ function readWebtoons (url: string): Promise < Manga > {
 function readWordPress (url: string, siteType: SiteType): Promise < Manga > {
   return new Promise((resolve, reject) => {
     axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+      const $ = cheerio.load(response.data)
       const site = new WordPress(
-        doc.querySelectorAll('.wp-manga-chapter a')[0],
-        doc.querySelectorAll('.summary_image img')[0],
-        doc.querySelectorAll('.post-title')[0],
+        $('.wp-manga-chapter a').first(),
+        $('.summary_image img').first(),
+        $('.post-title').first(),
         siteType
       )
 
@@ -106,12 +112,11 @@ function readWordPress (url: string, siteType: SiteType): Promise < Manga > {
 function readMangakakalot (url: string): Promise < Manga > {
   return new Promise((resolve, reject) => {
     axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+      const $ = cheerio.load(response.data)
       const site = new MangaKakalot(
-        doc.querySelectorAll('.chapter-list a')[0],
-        doc.querySelectorAll('.manga-info-pic img')[0],
-        doc.querySelectorAll('.manga-info-text h1')[0]
+        $('.chapter-list a').first(),
+        $('.manga-info-pic img').first(),
+        $('.manga-info-text h1').first()
       )
 
       resolve(site.buildManga(url))
@@ -122,12 +127,11 @@ function readMangakakalot (url: string): Promise < Manga > {
 function readMangadex (url: string): Promise < Manga > {
   return new Promise((resolve, reject) => {
     axios.get(url).then(response => {
-      const doc = document.createElement('div')
-      doc.innerHTML = response.data as string
+      const $ = cheerio.load(response.data)
       const site = new MangaDex(
-        doc.querySelectorAll('.chapter-row a')[0],
-        doc.querySelectorAll('.row img')[0],
-        doc.querySelectorAll('.card-header .mx-1')[0]
+        $('.chapter-row a').first(),
+        $('.row img').first(),
+        $('.card-header .mx-1').first()
       )
 
       resolve(site.buildManga(url))

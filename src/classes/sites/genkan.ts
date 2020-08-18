@@ -5,16 +5,13 @@ import { BaseSite } from './baseSite'
 export class Genkan extends BaseSite {
     site: SiteType;
 
-    constructor (chapter: Element | undefined, image: Element | undefined, title: Element | undefined, site: SiteType) {
+    constructor (chapter: Cheerio | undefined, image: Cheerio | undefined, title: Cheerio | undefined, site: SiteType) {
       super(chapter, image, title)
       this.site = site
     }
 
     getImage (): string {
-      if (!this.image) return ''
-
-      const image = this.image as HTMLAnchorElement
-      return image.style?.backgroundImage ? image.style.backgroundImage.replace(new RegExp('url\\("?', 'g'), 'https://' + this.site).replace(new RegExp('"?\\)', 'g'), '') : ''
+      return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), 'https://' + this.site).replace(new RegExp('"?\\)', 'g'), '') || ''
     }
 
     buildManga (url: string): Manga {

@@ -209,10 +209,17 @@ export default defineComponent({
           this.mangaList[i].chapterUrl = result.chapterUrl
         }
 
+        this.mangaList.sort(mangaSort)
         LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
         this.loading = false
       }).catch(error => this.showError(error))
     }
+  },
+  mounted () {
+    this.$q.cookies.set('ageGatePass', 'true', {
+      path: '/',
+      domain: '.webtoons.com'
+    })
   }
 })
 </script>

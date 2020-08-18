@@ -4,17 +4,15 @@ import { BaseSite } from './baseSite'
 
 export class MangaDex extends BaseSite {
   getChapter (): string {
-    return this.chapter?.textContent ? this.chapter.textContent.replace(/ +(?= )/g, '') : 'Unknown'
+    return this.chapter?.text().replace(/ +(?= )/g, '') || 'Unknown'
   }
 
   getChapterUrl (): string {
-    if (!this.chapter) return ''
-
-    const chapter = this.chapter as HTMLAnchorElement
-    if (!chapter.href.startsWith('https://')) {
-      return chapter.href ? 'https://' + SiteType.MangaDex + chapter.href : ''
+    const href = this.chapter?.attr('href') || ''
+    if (href && !href.startsWith('https://')) {
+      return 'https://' + SiteType.MangaDex + href.replace('file//', '') || ''
     } else {
-      return chapter.href ? chapter.href : ''
+      return href
     }
   }
 
