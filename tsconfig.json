@@ -2,6 +2,10 @@
   "extends": "@quasar/app/tsconfig-preset",
   "compilerOptions": {
     "baseUrl": ".",
-    "module": "commonjs"
+    "module": "commonjs",
+    "typeRoots": [
+      "node_modules/@types",
+      "src/typings"
+    ]
   }
 }

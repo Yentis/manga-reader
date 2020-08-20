@@ -1,30 +1,88 @@
 import { Manga } from '../manga'
-import { SiteType } from '../siteType'
+import { SiteType } from '../../enums/siteEnum'
 import { BaseSite } from './baseSite'
+import { Platform } from 'quasar'
+import axios from 'axios'
+import cheerio from 'cheerio'
 
-export class WebToons extends BaseSite {
-    chapterUrl: Cheerio | undefined;
+const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
 
-    constructor (chapter: Cheerio | undefined, chapterUrl: Cheerio | undefined, image: Cheerio | undefined, title: Cheerio | undefined) {
-      super(chapter, image, title)
-      this.chapterUrl = chapterUrl
-    }
+export class Webtoons extends BaseSite {
+  chapterUrl: Cheerio | undefined
+  siteType = SiteType.Webtoons
 
-    getChapterUrl (): string {
-      return this.chapterUrl?.attr('href') || ''
-    }
+  getUrl (): string {
+    return `https://www.${this.siteType}`
+  }
 
-    getImage (): string {
-      return this.image?.attr('content') || ''
-    }
+  getLoginUrl (): string {
+    return this.getUrl()
+  }
 
-    buildManga (url: string): Manga {
-      const manga = new Manga(url, SiteType.WebToons)
-      manga.chapter = this.getChapter()
-      manga.chapterUrl = this.getChapterUrl()
-      manga.image = this.getImage()
-      manga.title = this.getTitle()
+  getChapterUrl (): string {
+    return this.chapterUrl?.attr('href') || ''
+  }
 
-      return manga
-    }
+  getImage (): string {
+    return this.image?.attr('content') || ''
+  }
+
+  readUrl (url: string): Promise<Manga> {
+    return new Promise((resolve, reject) => {
+      const mobile = url.includes('//m.' + this.siteType)
+      const headers = mobile && Platform.is?.mobile !== true ? {
+        common: {
+          'User-Agent': MOBILE_USER_AGENT
+        }
+      } : null
+
+      axios.get(url, { headers }).then(response => {
+        const $ = cheerio.load(response.data)
+
+        if (mobile || Platform.is?.mobile === true) {
+          this.chapter = $('.sub_title span').first()
+          this.chapterUrl = $('li[data-episode-no] a').first()
+          this.image = $('meta[property="og:image"]').first()
+          this.title = $('._btnInfo .subj').first()
+        } else {
+          this.chapter = $('#_listUl .subj span').first()
+          this.chapterUrl = $('#_listUl a').first()
+          this.image = $('meta[property="og:image"]').first()
+          this.title = $('.info .subj').first()
+        }
+
+        resolve(this.buildManga(url))
+      }).catch(error => reject(error))
+    })
+  }
+
+  search (query: string): Promise<Error | Manga[]> {
+    return new Promise(resolve => {
+      axios.get(`https://ac.${this.siteType}/ac`, {
+        params: {
+          q: `en^${query}`,
+          st: 1
+        }
+      }).then(response => {
+        const searchData = response.data as WebtoonsSearch
+        const promises: Promise<Manga>[] = []
+
+        for (const firstIndent of searchData.items) {
+          for (const item of firstIndent) {
+            const url = `${this.getUrl()}/episodeList?titleNo=${item[3][0]}`
+            promises.push(this.readUrl(url))
+          }
+        }
+
+        Promise.all(promises)
+          .then(mangaList => resolve(mangaList))
+          .catch(error => resolve(error))
+      }).catch(error => resolve(error))
+    })
+  }
+}
+
+interface WebtoonsSearch {
+  query: Array<string>;
+  items: Array<Array<Array<Array<string>>>>
 }

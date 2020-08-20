@@ -1,45 +1,98 @@
 import 'mocha'
 import 'jsdom-global'
-import { getMangaInfo } from '../src/sites'
-import { SiteType } from '../src/classes/siteType'
+import { getMangaInfo, searchManga } from '../src/services/siteService'
+import { SiteType } from '../src/enums/siteEnum'
 
-describe('sites', () => {
-  it(SiteType.Manganelo, () => {
-    return testManganelo()
+const DEV = false
+
+if (DEV) {
+  describe('Dev', () => {
+    it(SiteType.Webtoons, () => {
+      return testSearchWebtoons()
+    })
+  })
+} else {
+  describe('Read url', () => {
+    beforeEach(function () {
+      this.timeout(5000)
+    })
+
+    it(SiteType.Manganelo, () => {
+      return testManganelo()
+    })
+
+    it(SiteType.KKJScans, () => {
+      return testKKJScans()
+    })
+
+    it(SiteType.Webtoons, () => {
+      return testWebtoons()
+    })
+
+    it(`m.${SiteType.Webtoons}`, () => {
+      return testWebtoonsMobile()
+    })
+
+    it(SiteType.HatigarmScans, () => {
+      return testHatigarmScans()
+    })
+
+    it(SiteType.FirstKissManga, () => {
+      return testFirstkissmanga()
+    })
+
+    it(SiteType.Mangakakalot, () => {
+      return testMangakakalot()
+    })
+
+    it(SiteType.MangaDex, () => {
+      return testMangadex()
+    })
+
+    it(SiteType.MangaKomi, () => {
+      return testMangakomi()
+    })
   })
 
-  it(SiteType.KkjScans, () => {
-    return testKkjscans()
-  })
+  describe('Search query', () => {
+    beforeEach(function () {
+      this.timeout(5000)
+    })
 
-  it(SiteType.WebToons, () => {
-    return testWebtoons()
-  })
+    it(SiteType.Manganelo, () => {
+      return testSearchManganelo()
+    })
 
-  it(`m.${SiteType.WebToons}`, () => {
-    return testWebtoonsMobile()
-  })
+    it(SiteType.KKJScans, () => {
+      return testSearchKKJScans()
+    })
 
-  it(SiteType.HatigarmScanz, () => {
-    return testHatigarmscanz()
-  })
+    it(SiteType.Webtoons, () => {
+      return testSearchWebtoons()
+    })
 
-  it(SiteType.FirstKissManga, () => {
-    return testFirstkissmanga()
-  })
+    it(SiteType.HatigarmScans, () => {
+      return testSearchHatigarmScans()
+    })
 
-  it(SiteType.MangaKakalot, () => {
-    return testMangakakalot()
-  })
+    it(SiteType.Mangakakalot, () => {
+      return testSearchMangakakalot()
+    })
 
-  it(SiteType.MangaDex, () => {
-    return testMangadex()
-  })
+    // Doesn't work, need session token
+    /* it(SiteType.MangaDex, () => {
+      return testSearchMangaDex()
+    }) */
 
-  it(SiteType.MangaKomi, () => {
-    return testMangakomi()
+    it(SiteType.FirstKissManga, () => {
+      return testSearchFirstKissManga()
+    })
+
+    it(SiteType.MangaKomi, () => {
+      return testSearchMangaKomi()
+    })
   })
-})
+}
 
 function testManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -57,11 +110,11 @@ function testManganelo (): Promise<void> {
   })
 }
 
-function testKkjscans (): Promise<void> {
+function testKKJScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://kkjscans.co/comics/797735-saurus', SiteType.KkjScans).then(mangaInfo => {
+    getMangaInfo('https://kkjscans.co/comics/797735-saurus', SiteType.KKJScans).then(mangaInfo => {
       if (mangaInfo.url !== 'https://kkjscans.co/comics/797735-saurus') reject(Error('URL did not match'))
-      else if (mangaInfo.site !== SiteType.KkjScans) reject(Error('Site did not match'))
+      else if (mangaInfo.site !== SiteType.KKJScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 14') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://kkjscans.co/storage/comics/B7AD2700758EE59D14ACDD75FDDE17D89207950A708C11A6/glM9WH3FZjnxtyx7BOBHOCDQckd6CI9MFz5PH1Jm.png') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'Saurus') reject(Error('Title did not match'))
@@ -75,9 +128,9 @@ function testKkjscans (): Promise<void> {
 
 function testWebtoons (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142', SiteType.WebToons).then(mangaInfo => {
+    getMangaInfo('https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142', SiteType.Webtoons).then(mangaInfo => {
       if (mangaInfo.url !== 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142') reject(Error('URL did not match'))
-      else if (mangaInfo.site !== SiteType.WebToons) reject(Error('Site did not match'))
+      else if (mangaInfo.site !== SiteType.Webtoons) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Episode 16') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'The Wolf & Red Riding Hood') reject(Error('Title did not match'))
@@ -91,9 +144,9 @@ function testWebtoons (): Promise<void> {
 
 function testWebtoonsMobile (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://m.webtoons.com/en/super-hero/xinker/list?title_no=541', SiteType.WebToons).then(mangaInfo => {
+    getMangaInfo('https://m.webtoons.com/en/super-hero/xinker/list?title_no=541', SiteType.Webtoons).then(mangaInfo => {
       if (mangaInfo.url !== 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541') reject(Error('URL did not match'))
-      else if (mangaInfo.site !== SiteType.WebToons) reject(Error('Site did not match'))
+      else if (mangaInfo.site !== SiteType.Webtoons) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Epilogue') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
       else if (mangaInfo.image !== 'https://swebtoon-phinf.pstatic.net/20150914_105/1442197929184ASdSX_JPEG/_EB9AA1EB80AB_E293A4EABCB9__EB84BD_EB90A3EB80AB_EC86BDE.jpg?type=crop540_540') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'XINK3R') reject(Error('Title did not match'))
@@ -105,11 +158,11 @@ function testWebtoonsMobile (): Promise<void> {
   })
 }
 
-function testHatigarmscanz (): Promise<void> {
+function testHatigarmScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai', SiteType.HatigarmScanz).then(mangaInfo => {
+    getMangaInfo('https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai', SiteType.HatigarmScans).then(mangaInfo => {
       if (mangaInfo.url !== 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai') reject(Error('URL did not match'))
-      else if (mangaInfo.site !== SiteType.HatigarmScanz) reject(Error('Site did not match'))
+      else if (mangaInfo.site !== SiteType.HatigarmScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 5') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://hatigarmscanz.net/storage/comics/0136EED9F0042F701F86C0B47B925F5255FC39FB87F336DB/bhK9esSCI5sZgJOO9dw5gcLNfwne47H69XOxQHs1.jpeg') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'Ichizu de Bitch na Kouhai') reject(Error('Title did not match'))
@@ -139,9 +192,9 @@ function testFirstkissmanga (): Promise<void> {
 
 function testMangakakalot (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://mangakakalot.com/manga/ui921789', SiteType.MangaKakalot).then(mangaInfo => {
+    getMangaInfo('https://mangakakalot.com/manga/ui921789', SiteType.Mangakakalot).then(mangaInfo => {
       if (mangaInfo.url !== 'https://mangakakalot.com/manga/ui921789') reject(Error('URL did not match'))
-      else if (mangaInfo.site !== SiteType.MangaKakalot) reject(Error('Site did not match'))
+      else if (mangaInfo.site !== SiteType.Mangakakalot) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Vol.3 Chapter 19: The Great Tehonbiki Gamble, Part 6') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'Legend of the End-of-Century Gambling Wolf Saga') reject(Error('Title did not match'))
@@ -182,5 +235,141 @@ function testMangakomi (): Promise<void> {
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
       else resolve()
     }).catch((error) => reject(error))
+  })
+}
+
+function testSearchManganelo (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('together with the rain', SiteType.Manganelo).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.Manganelo &&
+              manga.title === 'together with the rain' &&
+              manga.image === 'https://avt.mkklcdnv6.com/48/l/21-1597329685.jpg' &&
+              manga.chapter === 'Chapter 2: That’s what\'s unfair about you! [END]' &&
+              manga.url === 'https://manganelo.com/manga/pg923760'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchKKJScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('saurus', SiteType.KKJScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.KKJScans &&
+              manga.title === 'Saurus' &&
+              manga.image === 'https://kkjscans.co/storage/comics/B7AD2700758EE59D14ACDD75FDDE17D89207950A708C11A6/glM9WH3FZjnxtyx7BOBHOCDQckd6CI9MFz5PH1Jm.png' &&
+              manga.chapter === 'Chapter 14' &&
+              manga.url === 'https://kkjscans.co/comics/797735-saurus'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchWebtoons (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('the wolf & red riding hood', SiteType.Webtoons).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.Webtoons &&
+              manga.title === 'The Wolf & Red Riding Hood' &&
+              manga.image === 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540' &&
+              manga.chapter === 'Episode 16' &&
+              manga.url === 'https://www.webtoons.com/episodeList?titleNo=2142'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchHatigarmScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('ichizu de bitch na kouhai', SiteType.HatigarmScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.HatigarmScans &&
+              manga.title === 'Ichizu de Bitch na Kouhai' &&
+              manga.image === 'https://hatigarmscanz.net/storage/comics/0136EED9F0042F701F86C0B47B925F5255FC39FB87F336DB/bhK9esSCI5sZgJOO9dw5gcLNfwne47H69XOxQHs1.jpeg' &&
+              manga.chapter === 'Chapter 5' &&
+              manga.url === 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchMangakakalot (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('together with the rain', SiteType.Mangakakalot).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.Mangakakalot &&
+              manga.title === 'together with the rain' &&
+              manga.image === 'https://avt.mkklcdnv6.com/48/l/21-1597329685.jpg' &&
+              manga.chapter === 'Chapter 2: That’s What\'s Unfair About You! [END]' &&
+              manga.url === 'https://mangakakalot.com/manga/pg923760'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+/* function testSearchMangaDex (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('together with the rain', SiteType.MangaDex).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.MangaDex &&
+              manga.title === 'Together with the Rain' &&
+              manga.image === 'https://mangadex.org/images/manga/52590.jpg?1596841158' &&
+              manga.chapter === 'Ch. 2 - That’s what\'s unfair about you!' &&
+              manga.url === 'https://mangadex.org/title/52590/together-with-the-rain'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+} */
+
+function testSearchFirstKissManga (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('cajole a childe into being my boyfriend', SiteType.FirstKissManga).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.FirstKissManga &&
+              manga.title === 'Cajole a Childe Into Being My Boyfriend' &&
+              manga.image === 'https://1stkissmanga.com/wp-content/uploads/2019/12/Cajole-a-Childe-Into-Being-My-Boyfriend-193x278.jpg' &&
+              manga.chapter === 'Chapter 155' &&
+              manga.url === 'https://1stkissmanga.com/manga/cajole-a-childe-into-being-my-boyfriend/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchMangaKomi (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('nanatsu no taizai', SiteType.MangaKomi).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.MangaKomi &&
+              manga.title === 'Nanatsu no Taizai' &&
+              manga.image === 'https://mangakomi.com/wp-content/uploads/2020/03/thumb_5e5c4904a9158-193x278.jpg' &&
+              manga.chapter === 'Chapter 346.6 - The rain forest invites the beginning - Omake' &&
+              manga.url === 'https://mangakomi.com/manga/nanatsu-no-taizai/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
   })
 }

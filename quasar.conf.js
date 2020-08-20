@@ -25,15 +25,11 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
-      'composition-api',
-      'lazyload'
+      'composition-api'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: [
-      'app.css',
-      'bulma.min.css'
-    ],
+    css: [],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -111,7 +107,9 @@ module.exports = configure(function (ctx) {
       // Quasar plugins
       plugins: [
         'LocalStorage',
-        'Cookies'
+        'Cookies',
+        'Notify',
+        'Loading'
       ]
     },
 
