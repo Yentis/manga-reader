@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, session } from 'electron'
+import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -17,6 +17,27 @@ if (process.env.PROD) {
 let mainWindow
 
 function createWindow () {
+  const menu = Menu.buildFromTemplate([{
+    label: '<',
+    click: (_item, window) => {
+      window.webContents.goBack()
+    }
+  }, {
+    label: '>',
+    click: (_item, window) => {
+      window.webContents.goForward()
+    }
+  }, {
+    label: 'Manga list',
+    click: (_item, window) => {
+      window.webContents.goToIndex(0)
+    }
+  }, {
+    label: '',
+    role: "toggleDevTools",
+    visible: false
+  }])
+
   /**
    * Initial window options
    */
@@ -25,7 +46,6 @@ function createWindow () {
     height: 800,
     minWidth: 900,
     title: 'Manga Reader',
-    autoHideMenuBar: true,
     useContentSize: true,
     webPreferences: {
       // Change from /quasar.conf.js > electron > nodeIntegration;
@@ -38,6 +58,7 @@ function createWindow () {
     }
   })
 
+  mainWindow.setMenu(menu)
   session.defaultSession.cookies.set({
     url: 'https://www.webtoons.com/',
     name: 'ageGatePass',

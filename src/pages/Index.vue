@@ -1,77 +1,143 @@
 <template>
-  <q-page class="mx-2 my-2">
-    <div class="columns is-vcentered is-mobile">
-      <div class="column is-narrow">
-        <button class="button is-primary" @click="addModalShown = true">Add manga</button>
+  <q-page class="q-ma-sm">
+    <div class="header">
+      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
+        <q-btn color="primary q-mr-sm" label="Add manga" @click="onAddManga()" />
+        <q-btn color="secondary" label="Refresh manga" @click="onRefreshAllManga" />
       </div>
-      <div class="column is-narrow">
-        <button class="button is-success" @click="onRefreshManga">Refresh manga</button>
-      </div>
-      <div v-if="!this.$q.platform.is.mobile" class="column has-text-right">
-        <label class="checkbox">
-          <input type="checkbox" v-model="openBrowser" @change="saveOpenBrowser">
-          Open in browser
-        </label>
+      <div class="flex-column-between">
+        <q-checkbox v-model="openBrowser" label="Open in browser" @input="saveOpenBrowser" />
+        <q-checkbox v-model="darkMode" label="Dark mode" @input="saveDarkMode" />
       </div>
     </div>
 
-    <div v-if="notificationShown" class="notification mt-2 is-danger">
-      <button class="delete" @click="notificationShown = false"></button>
-      {{ notificationText }}
+    <q-linear-progress v-if="loading" indeterminate size="xl" class="q-mt-sm"></q-linear-progress>
+
+    <div class="manga-container q-mt-sm full-width">
+      <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in mangaList" :key="manga.url">
+        <q-card :class="{ 'card-container': manga.chapter !== manga.read }">
+          <q-card-section horizontal>
+            <q-img contain class="manga-image q-ma-sm" :src="manga.image" @error="showLoadImageFailed">
+              <template v-slot:error>
+                <div class="error-image bg-negative">
+                  <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
+                </div>
+              </template>
+            </q-img>
+
+            <q-card-section class="q-pb-none flex-column-between">
+              <div>
+                <div class="text-h6">
+                  <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
+                </div>
+                <div class="text-body2">
+                  Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
+                  <span v-else>{{ manga.read }}</span>
+                </div>
+                <div class="text-body2">
+                  Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
+                  <span v-else>{{ manga.chapter }}</span>
+                </div>
+              </div>
+              <div class="text-subtitle1">
+                {{ siteNames[manga.site] }}
+              </div>
+            </q-card-section>
+
+            <q-space />
+
+            <q-card-actions vertical>
+              <q-btn
+                flat
+                icon="close"
+                @click="onDeleteClick(index)" />
+
+              <q-space />
+
+              <q-btn
+                v-if="manga.chapter !== manga.read"
+                color="secondary"
+                icon="done"
+                @click="onReadClick(index)" />
+            </q-card-actions>
+          </q-card-section>
+        </q-card>
+      </q-intersection>
     </div>
 
-    <progress v-if="loading" class="progress is-large is-info mt-2"></progress>
+    <q-dialog v-model="addModalShown">
+      <q-card>
+        <q-toolbar class="bg-primary text-white">
+          <q-toolbar-title>Add manga</q-toolbar-title>
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-toolbar>
 
-    <div class="mt-2">
-      <div v-for="(manga, index) in mangaList" :key="manga.url" class="columns is-mobile" :style="{ 'background-color': manga.chapter !== manga.read ? 'lightgrey' : '' }">
-        <div class="column is-narrow">
-          <img style="width: 96px" v-lazy="manga.image">
-          <br>
-          <button v-if="manga.chapter !== manga.read" class="button is-success mb-2 mr-2" @click="onReadClick(index)">
-            <q-icon name="done"></q-icon>
-          </button>
-          <button class="button is-danger" @click="onDeleteClick(index)">
-            <q-icon name="delete"></q-icon>
-          </button>
-        </div>
-        <div class="column">
-          <span class="title is-5">
-            <a :href="manga.url" @click="onLinkClick($event, index)">{{ manga.title }}</a>
-          </span>
-          <br>
-          <span class="subtitle is-6" style="text-overflow: ">
-            Read: <a v-if="manga.readUrl" :href="manga.readUrl" @click="onLinkClick($event, index)">{{ manga.read }}</a>
-            <span v-else>{{ manga.read }}</span>
-          </span>
-          <br>
-          <span class="subtitle is-6">
-            Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click="onLinkClick($event, index)">{{ manga.chapter }}</a>
-            <span v-else>{{ manga.chapter }}</span>
-          </span>
-        </div>
-      </div>
-    </div>
+        <q-card-section>
+          <q-input v-model="search" placeholder="Search for a manga" @keydown.enter="searchManga">
+            <template v-if="search" v-slot:append>
+              <q-icon name="cancel" @click.stop="search = ''; searchResults = []" class="cursor-pointer"></q-icon>
+            </template>
 
-    <div :class="{ modal: true, 'is-active': addModalShown }">
-      <div class="modal-background" @click="addModalShown = false"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Add manga</p>
-          <button class="delete" aria-label="close" @click="addModalShown = false"></button>
-        </header>
-        <section class="modal-card-body">
-          <input class="input mb-2" type="text" placeholder="Enter manga url here" v-model="url">
-          <span><b>Supported sites:</b></span>
-          <ul>
-            <li v-for="site in siteTypes" :key="site">{{ site }}</li>
-          </ul>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-success" @click="addManga">Add</button>
-          <button class="button" @click="addModalShown = false">Cancel</button>
-        </footer>
-      </div>
-    </div>
+            <template v-slot:after>
+              <q-btn round dense flat icon="send" @click="searchManga"></q-btn>
+            </template>
+          </q-input>
+
+          <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="title || 'Selected manga'">
+            <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
+              <q-list>
+                <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
+                  <q-item-section avatar>
+                    <q-img contain class="manga-image-search" :src="manga.image"></q-img>
+                  </q-item-section>
+
+                  <q-item-section>
+                    <div class="text-subtitle2">{{ manga.title }}</div>
+                    <div class="text-body2">{{ manga.chapter }}</div>
+                    <div>{{ siteNames[manga.site] }}</div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+
+          <q-input v-if="searchResults.length === 0" v-model="url" placeholder="Or enter a manga url manually"></q-input>
+        </q-card-section>
+
+        <q-card-actions>
+          <q-btn color="secondary" label="Add" @click="addManga"></q-btn>
+          <q-btn label="Cancel" v-close-popup></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog
+      no-focus
+      no-refocus
+      seamless
+      :value="addModalShown && siteModalShown && (!$q.platform.is.mobile || searchResults.length === 0)"
+      :position="$q.platform.is.mobile ? 'bottom' : 'right'">
+      <q-card :class="{ 'mobile-site-dialog': $q.platform.is.mobile }">
+        <q-toolbar class="bg-primary text-white text-center">
+          <q-toolbar-title>Supported sites</q-toolbar-title>
+        </q-toolbar>
+        <q-card-section class="q-pa-none">
+          <q-list :class="{ 'text-center': $q.platform.is.mobile }">
+            <q-item
+              clickable
+              v-for="site in siteMap"
+              :key="site.siteType"
+              :class="{ 'bg-warning': !site.loggedIn, 'text-black': !site.loggedIn && $q.dark.isActive }"
+              @click="site.loggedIn ? onLinkClick(site.getUrl()) : openLogin(site.getLoginUrl())">
+              <q-item-section>
+                <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
+                <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Search disabled | Click to login</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -79,12 +145,24 @@
 import { defineComponent } from '@vue/composition-api'
 import { LocalStorage, openURL } from 'quasar'
 import { Manga } from 'src/classes/manga'
-import { SiteType } from 'src/classes/siteType'
-import { getMangaInfo } from 'src/sites'
+import { SiteType, SiteName } from 'src/enums/siteEnum'
+import { getMangaInfo, searchManga, getSiteMap, checkLogins } from 'src/services/siteService'
+import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
+import relevancy from 'relevancy'
+import { NotifyOptions } from 'src/classes/notifyOptions'
+import { BaseSite } from 'src/classes/sites/baseSite'
 
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
-let timeout: NodeJS.Timeout
+const DARK_MODE_KEY = 'dark_mode'
+// eslint-disable-next-line @typescript-eslint/ban-types
+let hidePersistentError: Function | undefined
+
+const mangaSearchSorter = new relevancy.Sorter({
+  comparator: (a: Manga, b: Manga) => {
+    return mangaSort(a, b)
+  }
+})
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -94,35 +172,79 @@ function mangaSort (a: Manga, b: Manga): number {
   }
 }
 
+function siteSort (a: BaseSite, b: BaseSite): number {
+  if (!a.loggedIn && b.loggedIn) {
+    return -1
+  } else if (!b.loggedIn && a.loggedIn) {
+    return 1
+  } else {
+    return SiteName[a.siteType] > SiteName[b.siteType] ? 1 : -1
+  }
+}
+
 export default defineComponent({
-  name: 'Index',
   data () {
-    let mangaList: Manga[] = []
-    const localMangaList: Manga[] | null = LocalStorage.getItem(MANGA_LIST_KEY)
-    if (localMangaList) {
-      mangaList = localMangaList
-    }
-
-    let openBrowser = false
-    const localOpenBrowser: boolean | null = LocalStorage.getItem(OPEN_BROWSER_KEY)
-    if (localOpenBrowser) {
-      openBrowser = localOpenBrowser
-    }
-
-    mangaList.sort(mangaSort)
-
     return {
       addModalShown: false,
-      notificationShown: false,
+      notificationShown: true,
+      windowSize: [] as Array<number>,
+      siteModalShown: true,
+      searchDropdownShown: true,
       loading: false,
       url: '',
+      title: '',
+      search: '',
+      searchResults: [] as Manga[],
       notificationText: '',
-      mangaList,
-      openBrowser,
-      siteTypes: SiteType
+      mangaList: [] as Manga[],
+      openBrowser: false,
+      darkMode: false,
+      siteMap: [] as BaseSite[],
+      siteNames: SiteName
+    }
+  },
+  watch: {
+    windowSize (value: Array<number>) {
+      if (value[0] <= 700 && !this.$q.platform.is.mobile) this.siteModalShown = false
+      else if (value[1] <= 500 && this.$q.platform.is.mobile) this.siteModalShown = false
+      else this.siteModalShown = true
     }
   },
   methods: {
+    resetState () {
+      this.loading = false
+      this.$q.loading.hide()
+    },
+    resetInput () {
+      this.url = ''
+      this.title = ''
+      this.search = ''
+      this.searchResults = []
+      this.searchDropdownShown = true
+    },
+    searchManga () {
+      if (!this.search) return
+      this.$q.loading.show({
+        delay: 100
+      })
+
+      searchManga(this.search).then(result => {
+        // Some websites return results from other websites...
+        const processedResults: string[] = []
+
+        const searchResults = result.filter(resultManga => {
+          const alreadyAdded = !this.mangaList.find(manga => resultManga.url === manga.url) && !processedResults.includes(resultManga.url)
+          processedResults.push(resultManga.url)
+
+          return alreadyAdded
+        })
+
+        this.searchResults = mangaSearchSorter.sort(searchResults, this.search, (obj, calc) => {
+          return calc(obj.title)
+        })
+        this.$q.loading.hide()
+      }).catch(error => this.showNotification(new NotifyOptions(error)))
+    },
     addManga () {
       this.loading = true
       this.addModalShown = false
@@ -133,19 +255,19 @@ export default defineComponent({
             manga.read = manga.chapter
             manga.readUrl = manga.chapterUrl
             this.saveManga(manga)
-          }).catch(error => this.showError(error))
+          }).catch(error => this.showNotification(new NotifyOptions(error)))
 
-          this.url = ''
+          this.resetInput()
           return
         }
       }
 
-      this.showError(Error('Valid site not found'))
+      this.showNotification(new NotifyOptions(Error('Valid site not found')))
     },
     saveManga (manga: Manga) {
       for (const entry of this.mangaList) {
         if (entry.url === manga.url) {
-          this.showError(Error('Manga already exists'))
+          this.showNotification(new NotifyOptions(Error('Manga already exists')))
           return
         }
       }
@@ -154,29 +276,75 @@ export default defineComponent({
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
       this.loading = false
     },
+    showLoadImageFailed () {
+      if (hidePersistentError) hidePersistentError()
+
+      const notifyOptions = new NotifyOptions('One or more images could not be loaded')
+      notifyOptions.timeout = 0
+      notifyOptions.position = 'top'
+      notifyOptions.actions = [{
+        label: 'Refresh manga',
+        handler: () => {
+          this.onRefreshAllManga()
+        },
+        color: 'white'
+      }, {
+        label: 'Dismiss',
+        color: 'white'
+      }]
+
+      hidePersistentError = this.showNotification(notifyOptions)
+    },
+    showUpdateAvailable (githubRelease: GithubRelease) {
+      const notifyOptions = new NotifyOptions(`Update available: ${githubRelease.tag_name}`)
+      notifyOptions.type = 'positive'
+      notifyOptions.position = 'bottom'
+      notifyOptions.actions = [{
+        label: 'Download',
+        handler: () => {
+          if (this.$q.platform.is.mobile) {
+            const apkAsset = getApkAsset(githubRelease)
+            if (!apkAsset) return
+            window.location.href = apkAsset.browser_download_url
+          } else {
+            const electronAsset = getElectronAsset(githubRelease)
+            if (!electronAsset) return
+            this.onLinkClick(electronAsset.browser_download_url)
+          }
+        },
+        color: 'white'
+      }]
+
+      hidePersistentError = this.showNotification(notifyOptions)
+    },
     saveOpenBrowser () {
       LocalStorage.set(OPEN_BROWSER_KEY, this.openBrowser)
     },
-    showError (error: Error) {
-      console.error(error)
-      if (timeout) {
-        clearTimeout(timeout)
+    saveDarkMode () {
+      this.$q.dark.set(this.darkMode)
+      LocalStorage.set(DARK_MODE_KEY, this.darkMode)
+    },
+    showNotification (notifyOptions: NotifyOptions) {
+      if (notifyOptions.message instanceof Error) {
+        console.error(notifyOptions.message)
       }
 
-      this.notificationText = error.message
-      this.notificationShown = true
-      this.loading = false
-      this.url = ''
+      this.resetState()
 
-      timeout = setTimeout(() => {
-        this.notificationShown = false
-      }, 3000)
+      return this.$q.notify(notifyOptions.getOptions())
     },
-    onLinkClick (e: MouseEvent, index: number) {
-      if (!this.openBrowser) return
-
-      e.preventDefault()
-      openURL(this.mangaList[index].url)
+    onAddManga () {
+      this.addModalShown = true
+      this.siteMap = Array.from(getSiteMap().values()).sort(siteSort)
+    },
+    onLinkClick (url: string) {
+      // Mobile will open the InAppBrowser when openURL is called
+      const openBrowser = this.$q.platform.is.mobile ? !this.openBrowser : this.openBrowser
+      if (openBrowser) {
+        openURL(url)
+      } else {
+        window.location.href = url
+      }
     },
     onReadClick (index: number) {
       const manga = this.mangaList[index]
@@ -190,7 +358,7 @@ export default defineComponent({
       this.mangaList.splice(index, 1)
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
     },
-    onRefreshManga () {
+    onRefreshAllManga () {
       if (this.loading) return
 
       this.loading = true
@@ -204,22 +372,131 @@ export default defineComponent({
       Promise.all(promises).then(results => {
         for (let i = 0; i < results.length; i++) {
           const result = results[i]
+          const read = this.mangaList[i].read
+          const readUrl = this.mangaList[i].readUrl
 
-          this.mangaList[i].chapter = result.chapter
-          this.mangaList[i].chapterUrl = result.chapterUrl
+          this.mangaList[i] = result
+          this.mangaList[i].read = read
+          this.mangaList[i].readUrl = readUrl
         }
 
         this.mangaList.sort(mangaSort)
         LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
         this.loading = false
-      }).catch(error => this.showError(error))
+      }).catch(error => this.showNotification(new NotifyOptions(error)))
+    },
+    openLogin (url: string) {
+      if (this.$q.platform.is.mobile) {
+        const browser = this.$q.cordova.InAppBrowser.open(url)
+
+        browser.addEventListener('exit', () => {
+          checkLogins()
+        })
+      } else {
+        window.location.href = url
+      }
     }
   },
   mounted () {
-    this.$q.cookies.set('ageGatePass', 'true', {
-      path: '/',
-      domain: '.webtoons.com'
+    this.windowSize = [window.innerWidth, window.innerHeight]
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowSize = [window.innerWidth, window.innerHeight]
+      })
     })
+
+    const mangaList: Manga[] = LocalStorage.getItem(MANGA_LIST_KEY) || []
+    mangaList.sort(mangaSort)
+    this.mangaList = mangaList
+
+    const openBrowser: boolean = LocalStorage.getItem(OPEN_BROWSER_KEY) || false
+    this.openBrowser = openBrowser
+
+    const darkMode: boolean = LocalStorage.getItem(DARK_MODE_KEY) || false
+    this.$q.dark.set(darkMode)
+    this.darkMode = darkMode
+
+    if (this.$q.platform.is.mobile) {
+      window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
+    }
+
+    checkUpdates().then(result => {
+      if (result) {
+        this.showUpdateAvailable(result)
+      }
+    }).catch(error => this.showNotification(new NotifyOptions(error)))
   }
 })
 </script>
+
+<style lang="scss">
+
+.body--light {
+  .card-container {
+    background-color: $grey-4;
+  }
+}
+
+.body--dark {
+  .card-container {
+    background-color: $grey-9;
+  }
+}
+
+.flex-column-between {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.flex-column-between button {
+  width: 100%;
+}
+
+.mobile-site-dialog {
+  height: 25vh;
+  min-height: 25vh;
+}
+
+a {
+  text-decoration: none;
+  color: $primary;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.manga-container {
+  display: inline-block;
+}
+
+.card-container a {
+  color: $secondary;
+}
+
+.manga-image {
+  min-width: 96px;
+  width: 96px;
+}
+
+.error-image {
+  min-width: 96px;
+  min-height: 96px;
+  width: 96px;
+  height: 96px;
+}
+
+.manga-image-search {
+  min-width: 48px;
+  width: 48px;
+}
+
+.manga-dropdown a {
+  color: black;
+  pointer-events: none;
+}
+
+</style>

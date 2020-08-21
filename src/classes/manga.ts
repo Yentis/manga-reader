@@ -1,4 +1,4 @@
-import { SiteType } from './siteType'
+import { SiteType } from '../enums/siteEnum'
 
 export class Manga {
     url: string;

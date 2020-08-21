@@ -1,14 +1,24 @@
 import { Manga } from '../manga'
+import { SiteType } from '../../enums/siteEnum'
 
 export abstract class BaseSite {
-    chapter: Cheerio | undefined;
-    image: Cheerio | undefined;
-    title: Cheerio | undefined;
+    abstract siteType: SiteType
 
-    constructor (chapter: Cheerio | undefined, image: Cheerio | undefined, title: Cheerio | undefined) {
-      this.chapter = chapter
-      this.image = image
-      this.title = title
+    chapter: Cheerio | undefined
+    image: Cheerio | undefined
+    title: Cheerio | undefined
+    loggedIn = true
+
+    checkLogin (): void {
+      // Do nothing
+    }
+
+    getUrl (): string {
+      return `https://${this.siteType}`
+    }
+
+    getLoginUrl (): string {
+      return `${this.getUrl()}/login`
     }
 
     getChapter (): string {
@@ -27,5 +37,16 @@ export abstract class BaseSite {
       return this.title?.text().trim() || 'Unknown'
     }
 
-    abstract buildManga(url: string): Manga;
+    buildManga (url: string): Manga {
+      const manga = new Manga(url, this.siteType)
+      manga.chapter = this.getChapter()
+      manga.chapterUrl = this.getChapterUrl()
+      manga.image = this.getImage()
+      manga.title = this.getTitle()
+
+      return manga
+    }
+
+    abstract readUrl(url: string): Promise<Manga>
+    abstract search(query: string): Promise<Error | Manga[]>
 }
