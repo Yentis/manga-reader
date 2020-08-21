@@ -9,6 +9,10 @@ export class MangaDex extends BaseSite {
 
   constructor () {
     super()
+    this.checkLogin()
+  }
+
+  checkLogin (): void {
     this.search('together with the rain').then(results => {
       this.loggedIn = !(results instanceof Error)
     }).catch(error => console.error(error))

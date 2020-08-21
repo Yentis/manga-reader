@@ -9,6 +9,10 @@ export abstract class BaseSite {
     title: Cheerio | undefined
     loggedIn = true
 
+    checkLogin (): void {
+      // Do nothing
+    }
+
     getUrl (): string {
       return `https://${this.siteType}`
     }

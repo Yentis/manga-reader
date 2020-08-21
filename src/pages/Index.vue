@@ -2,7 +2,7 @@
   <q-page class="q-ma-sm">
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn color="primary q-mr-sm" label="Add manga" @click="addModalShown = true; updateSiteMap()" />
+        <q-btn color="primary q-mr-sm" label="Add manga" @click="onAddManga()" />
         <q-btn color="secondary" label="Refresh manga" @click="onRefreshAllManga" />
       </div>
       <div class="flex-column-between">
@@ -17,10 +17,10 @@
       <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in mangaList" :key="manga.url">
         <q-card :class="{ 'card-container': manga.chapter !== manga.read }">
           <q-card-section horizontal>
-            <q-img class="manga-image q-ma-sm" :src="manga.image" @error="showLoadImageFailed">
+            <q-img contain class="manga-image q-ma-sm" :src="manga.image" @error="showLoadImageFailed">
               <template v-slot:error>
-                <div class="manga-image bg-negative">
-                  <q-icon class="full-width" size="xl" name="image_not_supported"></q-icon>
+                <div class="error-image bg-negative">
+                  <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
                 </div>
               </template>
             </q-img>
@@ -88,7 +88,7 @@
               <q-list>
                 <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
                   <q-item-section avatar>
-                    <q-img class="manga-image-search" :src="manga.image"></q-img>
+                    <q-img contain class="manga-image-search" :src="manga.image"></q-img>
                   </q-item-section>
 
                   <q-item-section>
@@ -111,7 +111,12 @@
       </q-card>
     </q-dialog>
 
-    <q-dialog seamless v-model="addModalShown" :position="$q.platform.is.mobile ? 'bottom' : 'right'">
+    <q-dialog
+      no-focus
+      no-refocus
+      seamless
+      :value="addModalShown && siteModalShown && (!$q.platform.is.mobile || searchResults.length === 0)"
+      :position="$q.platform.is.mobile ? 'bottom' : 'right'">
       <q-card :class="{ 'mobile-site-dialog': $q.platform.is.mobile }">
         <q-toolbar class="bg-primary text-white text-center">
           <q-toolbar-title>Supported sites</q-toolbar-title>
@@ -141,7 +146,7 @@ import { defineComponent } from '@vue/composition-api'
 import { LocalStorage, openURL } from 'quasar'
 import { Manga } from 'src/classes/manga'
 import { SiteType, SiteName } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga, getSiteMap } from 'src/services/siteService'
+import { getMangaInfo, searchManga, getSiteMap, checkLogins } from 'src/services/siteService'
 import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
 import relevancy from 'relevancy'
 import { NotifyOptions } from 'src/classes/notifyOptions'
@@ -182,6 +187,8 @@ export default defineComponent({
     return {
       addModalShown: false,
       notificationShown: true,
+      windowSize: [] as Array<number>,
+      siteModalShown: true,
       searchDropdownShown: true,
       loading: false,
       url: '',
@@ -196,10 +203,14 @@ export default defineComponent({
       siteNames: SiteName
     }
   },
+  watch: {
+    windowSize (value: Array<number>) {
+      if (value[0] <= 700 && !this.$q.platform.is.mobile) this.siteModalShown = false
+      else if (value[1] <= 500 && this.$q.platform.is.mobile) this.siteModalShown = false
+      else this.siteModalShown = true
+    }
+  },
   methods: {
-    updateSiteMap () {
-      this.siteMap = Array.from(getSiteMap().values()).sort(siteSort)
-    },
     resetState () {
       this.loading = false
       this.$q.loading.hide()
@@ -322,6 +333,10 @@ export default defineComponent({
 
       return this.$q.notify(notifyOptions.getOptions())
     },
+    onAddManga () {
+      this.addModalShown = true
+      this.siteMap = Array.from(getSiteMap().values()).sort(siteSort)
+    },
     onLinkClick (url: string) {
       // Mobile will open the InAppBrowser when openURL is called
       const openBrowser = this.$q.platform.is.mobile ? !this.openBrowser : this.openBrowser
@@ -372,13 +387,25 @@ export default defineComponent({
     },
     openLogin (url: string) {
       if (this.$q.platform.is.mobile) {
-        openURL(url)
+        const browser = this.$q.cordova.InAppBrowser.open(url)
+
+        browser.addEventListener('exit', () => {
+          checkLogins()
+        })
       } else {
         window.location.href = url
       }
     }
   },
   mounted () {
+    this.windowSize = [window.innerWidth, window.innerHeight]
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowSize = [window.innerWidth, window.innerHeight]
+      })
+    })
+
     const mangaList: Manga[] = LocalStorage.getItem(MANGA_LIST_KEY) || []
     mangaList.sort(mangaSort)
     this.mangaList = mangaList
@@ -390,10 +417,9 @@ export default defineComponent({
     this.$q.dark.set(darkMode)
     this.darkMode = darkMode
 
-    this.$q.cookies.set('ageGatePass', 'true', {
-      path: '/',
-      domain: `.${SiteType.Webtoons}`
-    })
+    if (this.$q.platform.is.mobile) {
+      window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
+    }
 
     checkUpdates().then(result => {
       if (result) {
@@ -454,6 +480,13 @@ a {
 .manga-image {
   min-width: 96px;
   width: 96px;
+}
+
+.error-image {
+  min-width: 96px;
+  min-height: 96px;
+  width: 96px;
+  height: 96px;
 }
 
 .manga-image-search {

@@ -35,6 +35,12 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.MangaDex, new MangaDex()]
 ])
 
+export function checkLogins (): void {
+  siteMap.forEach(site => {
+    site.checkLogin()
+  })
+}
+
 export function getMangaInfo (url: string, siteType: SiteType): Promise < Manga > {
   return siteMap.get(siteType)?.readUrl(url) || Promise.reject(Error('Invalid site type'))
 }
