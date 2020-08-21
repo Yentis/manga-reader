@@ -348,10 +348,10 @@ export default defineComponent({
     },
     onReadClick (index: number) {
       const manga = this.mangaList[index]
+      manga.read = manga.chapter
+      manga.readUrl = manga.chapterUrl
 
-      this.mangaList[index].read = manga.chapter
-      this.mangaList[index].readUrl = manga.chapterUrl
-
+      this.$set(this.mangaList, index, manga)
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
     },
     onDeleteClick (index: number) {
