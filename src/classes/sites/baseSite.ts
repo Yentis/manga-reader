@@ -9,6 +9,10 @@ export abstract class BaseSite {
     title: Cheerio | undefined
     loggedIn = true
 
+    canSearch (): boolean {
+      return true
+    }
+
     checkLogin (): void {
       // Do nothing
     }

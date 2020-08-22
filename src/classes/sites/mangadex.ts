@@ -12,6 +12,10 @@ export class MangaDex extends BaseSite {
     this.checkLogin()
   }
 
+  canSearch (): boolean {
+    return this.loggedIn
+  }
+
   checkLogin (): void {
     this.search('together with the rain').then(results => {
       this.loggedIn = !(results instanceof Error)

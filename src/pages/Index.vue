@@ -85,7 +85,7 @@
 
           <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="title || 'Selected manga'">
             <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
-              <q-list>
+              <q-list separator>
                 <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
                   <q-item-section avatar>
                     <q-img contain class="manga-image-search" :src="manga.image"></q-img>
@@ -122,16 +122,16 @@
           <q-toolbar-title>Supported sites</q-toolbar-title>
         </q-toolbar>
         <q-card-section class="q-pa-none">
-          <q-list :class="{ 'text-center': $q.platform.is.mobile }">
+          <q-list separator :class="{ 'text-center': $q.platform.is.mobile }">
             <q-item
               clickable
               v-for="site in siteMap"
               :key="site.siteType"
-              :class="{ 'bg-warning': !site.loggedIn, 'text-black': !site.loggedIn && $q.dark.isActive }"
+              :class="{ 'bg-warning': !site.canSearch(), 'text-black': !site.canSearch() && $q.dark.isActive }"
               @click="site.loggedIn ? onLinkClick(site.getUrl()) : openLogin(site.getLoginUrl())">
               <q-item-section>
                 <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
-                <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Search disabled | Click to login</q-item-label>
+                <q-item-label v-if="!site.canSearch()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Search disabled{{ !site.loggedIn ? ' | Click to login' : '' }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -173,7 +173,7 @@ function mangaSort (a: Manga, b: Manga): number {
 }
 
 function siteSort (a: BaseSite, b: BaseSite): number {
-  if (!a.loggedIn && b.loggedIn) {
+  if (!a.canSearch() && b.canSearch()) {
     return -1
   } else if (!b.loggedIn && a.loggedIn) {
     return 1

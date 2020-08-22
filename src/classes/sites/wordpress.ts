@@ -27,14 +27,48 @@ export class WordPress extends BaseSite {
 
   readUrl (url: string): Promise<Manga> {
     return new Promise((resolve, reject) => {
-      axios.get(url).then(response => {
+      axios.get(url).then(async response => {
         const $ = cheerio.load(response.data)
-        this.chapter = $('.wp-manga-chapter a').first()
+
+        if (this.siteType === SiteType.HiperDEX) {
+          const mangaId = $('.rating-post-id').first().attr('value') || ''
+          await this.readChapters(mangaId)
+        } else {
+          this.chapter = $('.wp-manga-chapter a').first()
+        }
         this.image = $('.summary_image img').first()
         this.title = $('.post-title').first()
 
         resolve(this.buildManga(url))
       }).catch(error => reject(error))
+    })
+  }
+
+  readChapters (mangaId: string): Promise<void> {
+    return new Promise(resolve => {
+      const data = qs.stringify({
+        action: 'manga_get_chapters',
+        manga: mangaId
+      })
+
+      const config: AxiosRequestConfig = {
+        method: 'post',
+        url: `${this.getUrl()}/wp-admin/admin-ajax.php`,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data
+      }
+
+      axios(config).then((response) => {
+        const $ = cheerio.load(response.data)
+        this.chapter = $('.wp-manga-chapter a').first()
+
+        resolve()
+      }).catch(error => {
+        console.error(error)
+        resolve()
+      })
     })
   }
 

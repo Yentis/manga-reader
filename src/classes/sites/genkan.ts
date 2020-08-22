@@ -12,6 +12,10 @@ export class Genkan extends BaseSite {
     this.siteType = siteType
   }
 
+  canSearch (): boolean {
+    return this.siteType !== SiteType.MethodScans
+  }
+
   getImage (): string {
     return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), this.getUrl()).replace(new RegExp('"?\\)', 'g'), '') || ''
   }

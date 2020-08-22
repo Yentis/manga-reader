@@ -6,16 +6,22 @@ export enum SiteType {
     FirstKissManga = '1stkissmanga.com',
     Mangakakalot = 'mangakakalot.com',
     MangaDex = 'mangadex.org',
-    MangaKomi = 'mangakomi.com'
+    MangaKomi = 'mangakomi.com',
+    MethodScans = 'methodscans.com',
+    LeviatanScans = 'leviatanscans.com',
+    HiperDEX = 'hiperdex.com'
 }
 
 export enum SiteName {
     'manganelo.com' = 'Manganelo',
-    'kkjscans.co' = 'KKJScans',
+    'kkjscans.co' = 'KKJ Scans',
     'webtoons.com' = 'Webtoons',
-    'hatigarmscanz.net' = 'HatigarmScans',
-    '1stkissmanga.com' = '1stKissManga',
+    'hatigarmscanz.net' = 'Hatigarm Scans',
+    '1stkissmanga.com' = '1st Kiss Manga',
     'mangakakalot.com' = 'Mangakakalot',
     'mangadex.org' = 'MangaDex',
-    'mangakomi.com' = 'MangaKomi'
+    'mangakomi.com' = 'Manga Komi',
+    'methodscans.com' = 'Method Scans',
+    'leviatanscans.com' = 'Leviatan Scans',
+    'hiperdex.com' = 'HiperDEX'
 }

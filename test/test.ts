@@ -7,8 +7,8 @@ const DEV = false
 
 if (DEV) {
   describe('Dev', () => {
-    it(SiteType.Webtoons, () => {
-      return testSearchWebtoons()
+    it(SiteType.HiperDEX, () => {
+      return testSearchHiperDEX()
     })
   })
 } else {
@@ -52,6 +52,18 @@ if (DEV) {
     it(SiteType.MangaKomi, () => {
       return testMangakomi()
     })
+
+    it(SiteType.MethodScans, () => {
+      return testMethodScans()
+    })
+
+    it(SiteType.LeviatanScans, () => {
+      return testLeviatanScans()
+    })
+
+    it(SiteType.HiperDEX, () => {
+      return testHiperDEX()
+    })
   })
 
   describe('Search query', () => {
@@ -91,6 +103,18 @@ if (DEV) {
     it(SiteType.MangaKomi, () => {
       return testSearchMangaKomi()
     })
+
+    it(SiteType.MethodScans, () => {
+      return testSearchMethodScans()
+    })
+
+    it(SiteType.LeviatanScans, () => {
+      return testSearchLeviatanScans()
+    })
+
+    it(SiteType.HiperDEX, () => {
+      return testSearchHiperDEX()
+    })
   })
 }
 
@@ -99,10 +123,10 @@ function testManganelo (): Promise<void> {
     getMangaInfo('https://manganelo.com/manga/ia919396', SiteType.Manganelo).then(mangaInfo => {
       if (mangaInfo.url !== 'https://manganelo.com/manga/ia919396') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Manganelo) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Chapter 84: Amor Fati 4') reject(Error('Chapter did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 85: A Desired Life 1') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://avt.mkklcdnv6.com/30/p/18-1583498266.jpg') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'The Eyes Of Sora') reject(Error('Title did not match'))
-      else if (mangaInfo.chapterUrl !== 'https://manganelo.com/chapter/ia919396/chapter_84') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://manganelo.com/chapter/ia919396/chapter_85') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
       else resolve()
@@ -238,6 +262,54 @@ function testMangakomi (): Promise<void> {
   })
 }
 
+function testMethodScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://methodscans.com/comics/773532-meng-shi-zai-shang', SiteType.MethodScans).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://methodscans.com/comics/773532-meng-shi-zai-shang') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.MethodScans) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'Yuan Yuan is as sharp as ever') reject(Error('Chapter did not match'))
+      else if (mangaInfo.image !== 'https://methodscans.com/storage/comics/32C023D5E17475B0A11F44D374454D1731B83F43D8576CF3/O7ExypuTakfFfImsojgiZqwd1dFTGevwYCKY2707.png') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'Meng Shi Zai Shang') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://methodscans.com/comics/773532-meng-shi-zai-shang/1/172') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
+function testLeviatanScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://leviatanscans.com/comics/909261-stresser', SiteType.LeviatanScans).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://leviatanscans.com/comics/909261-stresser') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.LeviatanScans) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 8') reject(Error('Chapter did not match'))
+      else if (mangaInfo.image !== 'https://leviatanscans.com/storage/comics/BCB5DC2B80EFE1F1AA0CD616E62D075313A91F7CD6FFDFFC/BFzN2G6vA89PxW15VHliJxTLNXUO185Srlyt0GAH.jpeg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'Stresser') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://leviatanscans.com/comics/909261-stresser/1/8') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
+function testHiperDEX (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://hiperdex.com/manga/arata-primal-the-new-primitive/', SiteType.HiperDEX).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://hiperdex.com/manga/arata-primal-the-new-primitive/') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.HiperDEX) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== '35 [END]') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://hiperdex.com/wp-content/uploads/2020/04/Arata-Primal-193x278.jpg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'Arata Primal') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://hiperdex.com/manga/arata-primal-the-new-primitive/35-end/') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
 function testSearchManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('together with the rain', SiteType.Manganelo).then(result => {
@@ -366,6 +438,47 @@ function testSearchMangaKomi (): Promise<void> {
               manga.image === 'https://mangakomi.com/wp-content/uploads/2020/03/thumb_5e5c4904a9158-193x278.jpg' &&
               manga.chapter === 'Chapter 346.6 - The rain forest invites the beginning - Omake' &&
               manga.url === 'https://mangakomi.com/manga/nanatsu-no-taizai/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchMethodScans (): Promise<void> {
+  // No search available
+  return new Promise(resolve => {
+    resolve()
+  })
+}
+
+function testSearchLeviatanScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('stresser', SiteType.LeviatanScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.LeviatanScans &&
+              manga.title === 'Stresser' &&
+              manga.image === 'https://leviatanscans.com/storage/comics/BCB5DC2B80EFE1F1AA0CD616E62D075313A91F7CD6FFDFFC/BFzN2G6vA89PxW15VHliJxTLNXUO185Srlyt0GAH.jpeg' &&
+              manga.chapter === 'Chapter 8' &&
+              manga.url === 'https://leviatanscans.com/comics/909261-stresser'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchHiperDEX (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('cabalist', SiteType.HiperDEX).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.HiperDEX &&
+              manga.title === 'Cabalist' &&
+              manga.image === 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg' &&
+              manga.chapter === '44 [END]' &&
+              manga.url === 'https://hiperdex.com/manga/cabalistin/'
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))

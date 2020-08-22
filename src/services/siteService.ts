@@ -32,7 +32,10 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
   [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.Mangakakalot, new Mangakakalot()],
-  [SiteType.MangaDex, new MangaDex()]
+  [SiteType.MangaDex, new MangaDex()],
+  [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
+  [SiteType.LeviatanScans, new Genkan(SiteType.LeviatanScans)],
+  [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)]
 ])
 
 export function checkLogins (): void {
