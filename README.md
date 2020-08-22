@@ -11,6 +11,9 @@ Currently supported sites:
 - mangakakalot.com
 - mangadex.org
 - mangakomi.com
+- methodscans.com
+- leviatanscans.com
+- hiperdex.com
 
 Supported platforms:
 - Windows
