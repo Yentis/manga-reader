@@ -12,10 +12,6 @@ export class Genkan extends BaseSite {
     this.siteType = siteType
   }
 
-  canSearch (): boolean {
-    return this.siteType !== SiteType.MethodScans
-  }
-
   getImage (): string {
     return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), this.getUrl()).replace(new RegExp('"?\\)', 'g'), '') || ''
   }
@@ -43,10 +39,27 @@ export class Genkan extends BaseSite {
         const $ = cheerio.load(response.data)
         const promises: Promise<Manga>[] = []
 
-        $('.list-item.rounded').each((_index, elem) => {
-          const url = $(elem).find('.media-content').first().attr('href') || ''
-          promises.push(this.readUrl(url))
-        })
+        if (this.siteType === SiteType.MethodScans) {
+          const words = query.split(' ')
+
+          $('.list-item.rounded').each((_index, elem) => {
+            const titleElem = $(elem).find('.list-body a').first()
+            const title = titleElem.html() || ''
+            const url = titleElem.attr('href') || ''
+
+            for (const word of words) {
+              if (title.toLowerCase().includes(word.toLowerCase()) && url) {
+                promises.push(this.readUrl(url))
+                return
+              }
+            }
+          })
+        } else {
+          $('.list-item.rounded').each((_index, elem) => {
+            const url = $(elem).find('.media-content').first().attr('href') || ''
+            promises.push(this.readUrl(url))
+          })
+        }
 
         Promise.all(promises)
           .then(mangaList => resolve(mangaList))

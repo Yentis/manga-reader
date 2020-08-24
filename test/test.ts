@@ -6,16 +6,16 @@ import { SiteType } from '../src/enums/siteEnum'
 const DEV = false
 
 if (DEV) {
-  describe('Dev', () => {
-    it(SiteType.HiperDEX, () => {
-      return testSearchHiperDEX()
+  describe('Dev', function () {
+    this.timeout(5000)
+
+    it(SiteType.MangaKomi, () => {
+      return testSearchMangaKomi()
     })
   })
 } else {
-  describe('Read url', () => {
-    beforeEach(function () {
-      this.timeout(5000)
-    })
+  describe('Read url', function () {
+    this.timeout(5000)
 
     it(SiteType.Manganelo, () => {
       return testManganelo()
@@ -64,12 +64,18 @@ if (DEV) {
     it(SiteType.HiperDEX, () => {
       return testHiperDEX()
     })
+
+    it(SiteType.ReaperScans, () => {
+      return testReaperScans()
+    })
+
+    it(SiteType.MangaDoDs, () => {
+      return testMangaDoDs()
+    })
   })
 
-  describe('Search query', () => {
-    beforeEach(function () {
-      this.timeout(5000)
-    })
+  describe('Search query', function () {
+    this.timeout(5000)
 
     it(SiteType.Manganelo, () => {
       return testSearchManganelo()
@@ -114,6 +120,14 @@ if (DEV) {
 
     it(SiteType.HiperDEX, () => {
       return testSearchHiperDEX()
+    })
+
+    it(SiteType.ReaperScans, () => {
+      return testSearchReaperScans()
+    })
+
+    it(SiteType.MangaDoDs, () => {
+      return testSearchMangaDoDs()
     })
   })
 }
@@ -310,6 +324,38 @@ function testHiperDEX (): Promise<void> {
   })
 }
 
+function testReaperScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://reaperscans.com/comics/621295-alpha', SiteType.ReaperScans).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://reaperscans.com/comics/621295-alpha') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.ReaperScans) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'End') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://reaperscans.com/storage/comics/EB4E79D4AF295DAFD75B2CE8C91E9B8CF209090AB259BE2A/rYXSCHcBgkjup3vxpqhg4RH7Q1LwhqLXS6hPGZIK.jpeg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'ALPHA') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://reaperscans.com/comics/621295-alpha/1/20') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
+function testMangaDoDs (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://www.mangadods.com/manga/flower-war/', SiteType.MangaDoDs).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://www.mangadods.com/manga/flower-war/') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.MangaDoDs) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== '22 END') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://www.mangadods.com/wp-content/uploads/2020/02/12-193x278.jpg') reject(Error(`Image ${mangaInfo.image} did not match`))
+      else if (mangaInfo.title !== 'Flower War') reject(Error(`Title ${mangaInfo.title} did not match`))
+      else if (mangaInfo.chapterUrl !== 'https://www.mangadods.com/manga/flower-war/22-end/') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
 function testSearchManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('together with the rain', SiteType.Manganelo).then(result => {
@@ -436,7 +482,7 @@ function testSearchMangaKomi (): Promise<void> {
         return manga.site === SiteType.MangaKomi &&
               manga.title === 'Nanatsu no Taizai' &&
               manga.image === 'https://mangakomi.com/wp-content/uploads/2020/03/thumb_5e5c4904a9158-193x278.jpg' &&
-              manga.chapter === 'Chapter 346.6 - The rain forest invites the beginning - Omake' &&
+              manga.chapter === 'Chapter 346.6' &&
               manga.url === 'https://mangakomi.com/manga/nanatsu-no-taizai/'
       })
 
@@ -479,6 +525,40 @@ function testSearchHiperDEX (): Promise<void> {
               manga.image === 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg' &&
               manga.chapter === '44 [END]' &&
               manga.url === 'https://hiperdex.com/manga/cabalistin/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchReaperScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('alpha', SiteType.ReaperScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.ReaperScans &&
+              manga.title === 'ALPHA' &&
+              manga.image === 'https://reaperscans.com/storage/comics/EB4E79D4AF295DAFD75B2CE8C91E9B8CF209090AB259BE2A/rYXSCHcBgkjup3vxpqhg4RH7Q1LwhqLXS6hPGZIK.jpeg' &&
+              manga.chapter === 'End' &&
+              manga.url === 'https://reaperscans.com/comics/621295-alpha'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchMangaDoDs (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('flower war', SiteType.MangaDoDs).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.MangaDoDs &&
+              manga.title === 'Flower War' &&
+              manga.image === 'https://www.mangadods.com/wp-content/uploads/2020/02/12-193x278.jpg' &&
+              manga.chapter === '22 END' &&
+              manga.url === 'https://www.mangadods.com/manga/flower-war/'
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))

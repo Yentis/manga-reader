@@ -22,7 +22,9 @@ import {
 import {
   WordPress
 } from '../classes/sites/wordpress'
-import { BaseSite } from '../classes/sites/baseSite'
+import {
+  BaseSite
+} from '../classes/sites/baseSite'
 
 const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
@@ -35,8 +37,18 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.MangaDex, new MangaDex()],
   [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
   [SiteType.LeviatanScans, new Genkan(SiteType.LeviatanScans)],
-  [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)]
+  [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
+  [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
+  [SiteType.MangaDoDs, new WordPress(SiteType.MangaDoDs)]
 ])
+
+function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
+  const timeoutPromise: Promise<Error | Manga[]> = new Promise(resolve => setTimeout(() => resolve(Error('Timed out')), 10000))
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ])
+}
 
 export function checkLogins (): void {
   siteMap.forEach(site => {
@@ -51,31 +63,23 @@ export function getMangaInfo (url: string, siteType: SiteType): Promise < Manga 
 export function searchManga (query: string, siteType: SiteType | undefined = undefined): Promise < Manga[] > {
   if (siteType) {
     return new Promise((resolve, reject) => {
-      siteMap.get(siteType)?.search(query).then(result => {
+      createRace(siteMap.get(siteType)?.search(query) || Promise.reject(Error('Invalid site type'))).then(result => {
         if (result instanceof Error) {
           reject(result)
         } else {
           resolve(result)
         }
-      }).catch(error => reject(error)) || Promise.reject(Error('Invalid site type'))
+      }).catch(error => reject(error))
     })
   } else {
     return new Promise((resolve, reject) => {
       const promises: Promise<Error | Manga[]>[] = []
 
       siteMap.forEach(site => {
-        promises.push(site.search(query))
+        promises.push(createRace(site.search(query)))
       })
 
-      Promise.race([
-        Promise.all(promises),
-        new Promise((resolve, reject) => setTimeout(() => reject(Error('Timed out')), 10000))
-      ]).then(results => {
-        if (!(results instanceof Array)) {
-          reject(Error('Invalid search results'))
-          return
-        }
-
+      Promise.all(promises).then(results => {
         let mangaResults: Manga[] = []
 
         for (const mangaList of results) {
