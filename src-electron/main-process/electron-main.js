@@ -16,6 +16,7 @@ if (process.env.PROD) {
 }
 
 let mainWindow
+let queryString
 
 function createWindow () {
   const menu = Menu.buildFromTemplate([{
@@ -69,11 +70,14 @@ function createWindow () {
   session.defaultSession.webRequest.onBeforeRequest({
     urls: ['http://localhost/redirect*']
   }, (details, callback) => {
-    const queryString = qs.parse(details.url.replace('http://localhost/redirect#', ''))
+    queryString = qs.parse(details.url.replace('http://localhost/redirect#', ''))
 
     callback({
-      redirectURL: process.env.APP_URL + `/#/redirect/${queryString.access_token}`
+      cancel: true
     })
+
+    mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
+    mainWindow.webContents.on('did-finish-load', onFinishLoad)
   })
 
   mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
@@ -81,6 +85,13 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+}
+
+function onFinishLoad() {
+  if (queryString) {
+    mainWindow.webContents.send('dropbox-token', queryString.access_token)
+  }
+  mainWindow.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 
 app.on('ready', createWindow)

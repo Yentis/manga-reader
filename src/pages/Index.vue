@@ -484,14 +484,17 @@ export default defineComponent({
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
     }
 
+    if (this.$q.platform.is.electron) {
+      this.$q.electron.ipcRenderer.on('dropbox-token', (event, token) => {
+        setAccessToken(token)
+      })
+    }
+
     checkUpdates().then(result => {
       if (result) {
         this.showUpdateAvailable(result)
       }
     }).catch(error => this.showNotification(new NotifyOptions(error)))
-
-    // Set Dropbox token if there is one
-    setAccessToken(this.$route.params.token)
   }
 })
 </script>

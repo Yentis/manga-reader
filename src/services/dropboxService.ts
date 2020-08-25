@@ -8,19 +8,17 @@ const MANGA_LIST_FILENAME = 'manga-reader.json'
 const CLIENT_ID = 'uoywjq0b8q2208f'
 const DROPBOX_TOKEN_KEY = 'dropbox_token'
 
-let accessToken: string
+let accessToken: string = LocalStorage.getItem(DROPBOX_TOKEN_KEY) || ''
 
 export function getAccessToken (): string {
   return accessToken
 }
 
 export function setAccessToken (token: string | undefined) {
-  if (!token) {
-    accessToken = LocalStorage.getItem(DROPBOX_TOKEN_KEY) || ''
-  } else {
-    accessToken = token
-    LocalStorage.set(DROPBOX_TOKEN_KEY, token)
-  }
+  if (!token) return
+
+  accessToken = token
+  LocalStorage.set(DROPBOX_TOKEN_KEY, token)
 }
 
 export function getAuthUrl () {
