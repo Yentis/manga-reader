@@ -3,7 +3,7 @@
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
         <q-btn color="primary q-mr-sm" label="Add manga" @click="onAddManga()" />
-        <q-btn color="secondary q-mr-sm" label="Refresh manga" @click="onRefreshAllManga" />
+        <q-btn color="secondary" label="Refresh manga" @click="onRefreshAllManga" />
       </div>
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
         <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
@@ -486,6 +486,9 @@ export default defineComponent({
 
     if (this.$q.platform.is.electron) {
       this.$q.electron.ipcRenderer.on('dropbox-token', (event, token) => {
+        const notifyOptions = new NotifyOptions('Logged in successfully!')
+        notifyOptions.type = 'positive'
+        this.showNotification(notifyOptions)
         setAccessToken(token)
       })
     }
