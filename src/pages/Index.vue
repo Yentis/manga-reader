@@ -3,7 +3,13 @@
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
         <q-btn color="primary q-mr-sm" label="Add manga" @click="onAddManga()" />
-        <q-btn color="secondary" label="Refresh manga" @click="onRefreshAllManga" />
+        <q-btn color="secondary q-mr-sm" label="Refresh manga" @click="onRefreshAllManga" />
+      </div>
+      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
+        <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
+        <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="exportList" />
+        <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
+        <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
       </div>
       <div class="flex-column-between">
         <q-checkbox v-model="openBrowser" label="Open in browser" @input="saveOpenBrowser" />
@@ -151,6 +157,7 @@ import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/
 import relevancy from 'relevancy'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { BaseSite } from 'src/classes/sites/baseSite'
+import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
@@ -191,6 +198,8 @@ export default defineComponent({
       siteModalShown: true,
       searchDropdownShown: true,
       loading: false,
+      importing: false,
+      exporting: false,
       url: '',
       title: '',
       search: '',
@@ -213,6 +222,8 @@ export default defineComponent({
   methods: {
     resetState () {
       this.loading = false
+      this.importing = false
+      this.exporting = false
       this.$q.loading.hide()
     },
     resetInput () {
@@ -395,6 +406,58 @@ export default defineComponent({
       } else {
         window.location.href = url
       }
+    },
+    exportList () {
+      this.exporting = true
+
+      if (!getAccessToken()) {
+        this.dropboxLogin()
+      } else {
+        saveList(this.mangaList).then(() => {
+          const notifyOptions = new NotifyOptions('Exported!')
+          notifyOptions.type = 'positive'
+          this.showNotification(notifyOptions)
+        }).catch((error: Error) => {
+          if (error.message === 'Unauthorized') {
+            this.dropboxLogin()
+          } else {
+            this.showNotification(new NotifyOptions(error))
+          }
+        })
+      }
+    },
+    importList () {
+      this.importing = true
+
+      if (!getAccessToken()) {
+        this.dropboxLogin()
+      } else {
+        readList().then(mangaList => {
+          const notifyOptions = new NotifyOptions('Imported!')
+          notifyOptions.type = 'positive'
+          this.showNotification(notifyOptions)
+          this.mangaList = mangaList
+          LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+        }).catch((error: Error) => {
+          if (error.message === 'Unauthorized') {
+            this.dropboxLogin()
+          } else {
+            this.showNotification(new NotifyOptions(error))
+          }
+        })
+      }
+    },
+    dropboxLogin () {
+      if (this.$q.platform.is.mobile) {
+        cordovaLogin().then(token => {
+          const notifyOptions = new NotifyOptions('Logged in successfully!')
+          notifyOptions.type = 'positive'
+          this.showNotification(notifyOptions)
+          setAccessToken(token)
+        }).catch(error => this.showNotification(new NotifyOptions(error)))
+      } else {
+        this.openLogin(getAuthUrl())
+      }
     }
   },
   mounted () {
@@ -426,6 +489,9 @@ export default defineComponent({
         this.showUpdateAvailable(result)
       }
     }).catch(error => this.showNotification(new NotifyOptions(error)))
+
+    // Set Dropbox token if there is one
+    setAccessToken(this.$route.params.token)
   }
 })
 </script>

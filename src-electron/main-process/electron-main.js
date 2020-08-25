@@ -1,4 +1,5 @@
 import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
+import qs from 'qs'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -65,7 +66,17 @@ function createWindow () {
     value: 'true'
   })
 
-  mainWindow.loadURL(process.env.APP_URL).then().catch(error => console.error(error))
+  session.defaultSession.webRequest.onBeforeRequest({
+    urls: ['http://localhost/redirect*']
+  }, (details, callback) => {
+    const queryString = qs.parse(details.url.replace('http://localhost/redirect#', ''))
+
+    callback({
+      redirectURL: process.env.APP_URL + `/#/redirect/${queryString.access_token}`
+    })
+  })
+
+  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
 
   mainWindow.on('closed', () => {
     mainWindow = null
