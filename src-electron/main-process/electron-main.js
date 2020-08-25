@@ -1,4 +1,5 @@
 import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
+import qs from 'qs'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -15,6 +16,7 @@ if (process.env.PROD) {
 }
 
 let mainWindow
+let queryString
 
 function createWindow () {
   const menu = Menu.buildFromTemplate([{
@@ -65,11 +67,31 @@ function createWindow () {
     value: 'true'
   })
 
-  mainWindow.loadURL(process.env.APP_URL).then().catch(error => console.error(error))
+  session.defaultSession.webRequest.onBeforeRequest({
+    urls: ['http://localhost/redirect*']
+  }, (details, callback) => {
+    queryString = qs.parse(details.url.replace('http://localhost/redirect#', ''))
+
+    callback({
+      cancel: true
+    })
+
+    mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
+    mainWindow.webContents.on('did-finish-load', onFinishLoad)
+  })
+
+  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
 
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+}
+
+function onFinishLoad() {
+  if (queryString) {
+    mainWindow.webContents.send('dropbox-token', queryString.access_token)
+  }
+  mainWindow.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 
 app.on('ready', createWindow)
