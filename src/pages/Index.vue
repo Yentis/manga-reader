@@ -2,8 +2,10 @@
   <q-page class="q-ma-sm">
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn color="primary q-mr-sm" label="Add manga" @click="onAddManga()" />
-        <q-btn color="secondary" label="Refresh manga" @click="onRefreshAllManga" />
+        <q-btn v-if="$q.platform.is.mobile" color="primary" label="Add" @click="onAddManga" />
+        <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
+        <q-btn v-if="$q.platform.is.mobile" color="secondary" label="Refresh" @click="onRefreshAllManga" />
+        <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
       </div>
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
         <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
@@ -231,7 +233,6 @@ export default defineComponent({
       this.title = ''
       this.search = ''
       this.searchResults = []
-      this.searchDropdownShown = true
     },
     searchManga () {
       if (!this.search) return
@@ -240,6 +241,8 @@ export default defineComponent({
       })
 
       searchManga(this.search).then(result => {
+        this.searchDropdownShown = true
+
         // Some websites return results from other websites...
         const processedResults: string[] = []
 
@@ -491,6 +494,8 @@ export default defineComponent({
         this.showNotification(notifyOptions)
         setAccessToken(token)
       })
+
+      window.StatusBar.hide()
     }
 
     checkUpdates().then(result => {

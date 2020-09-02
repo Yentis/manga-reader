@@ -21,19 +21,22 @@ export class WordPress extends BaseSite {
     return this.getImageSrc(this.image)
   }
 
+  getTitle (): string {
+    return this.title?.text().replace(this.title.find('span').text(), '').trim() || 'Unknown'
+  }
+
   readUrl (url: string): Promise<Manga> {
     return new Promise((resolve, reject) => {
       axios.get(url).then(async response => {
         const $ = cheerio.load(response.data)
 
-        if (this.siteType === SiteType.HiperDEX) {
+        this.chapter = $('.wp-manga-chapter a').first()
+        if (!this.chapter.html()) {
           const mangaId = $('.rating-post-id').first().attr('value') || ''
           await this.readChapters(mangaId)
-        } else {
-          this.chapter = $('.wp-manga-chapter a').first()
         }
         this.image = $('.summary_image img').first()
-        this.title = $('.rate-title').first()
+        this.title = $('.post-title').first()
 
         resolve(this.buildManga(url))
       }).catch(error => reject(error))

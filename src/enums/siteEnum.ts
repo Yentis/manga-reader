@@ -11,7 +11,9 @@ export enum SiteType {
     LeviatanScans = 'leviatanscans.com',
     HiperDEX = 'hiperdex.com',
     ReaperScans = 'reaperscans.com',
-    MangaDoDs = 'mangadods.com'
+    MangaDoDs = 'mangadods.com',
+    AsuraScans = 'asurascans.com',
+    ManhwaClub = 'manhwa.club'
 }
 
 export enum SiteName {
@@ -27,5 +29,7 @@ export enum SiteName {
     'leviatanscans.com' = 'Leviatan Scans',
     'hiperdex.com' = 'HiperDEX',
     'reaperscans.com' = 'Reaper Scans',
-    'mangadods.com' = 'MangaDoDs'
+    'mangadods.com' = 'MangaDoDs',
+    'asurascans.com' = 'Asura Scans',
+    'manhwa.club' = 'Manhwa Club'
 }

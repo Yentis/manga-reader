@@ -39,7 +39,9 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.LeviatanScans, new Genkan(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
-  [SiteType.MangaDoDs, new WordPress(SiteType.MangaDoDs)]
+  [SiteType.MangaDoDs, new WordPress(SiteType.MangaDoDs)],
+  [SiteType.AsuraScans, new WordPress(SiteType.AsuraScans)],
+  [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)]
 ])
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {

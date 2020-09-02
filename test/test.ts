@@ -7,15 +7,15 @@ const DEV = false
 
 if (DEV) {
   describe('Dev', function () {
-    this.timeout(5000)
+    this.timeout(10000)
 
-    it(SiteType.MangaKomi, () => {
-      return testSearchMangaKomi()
+    it(SiteType.AsuraScans, () => {
+      return testManhwaClub()
     })
   })
 } else {
   describe('Read url', function () {
-    this.timeout(5000)
+    this.timeout(10000)
 
     it(SiteType.Manganelo, () => {
       return testManganelo()
@@ -72,10 +72,18 @@ if (DEV) {
     it(SiteType.MangaDoDs, () => {
       return testMangaDoDs()
     })
+
+    it(SiteType.AsuraScans, () => {
+      return testAsuraScans()
+    })
+
+    it(SiteType.ManhwaClub, () => {
+      return testManhwaClub()
+    })
   })
 
   describe('Search query', function () {
-    this.timeout(5000)
+    this.timeout(10000)
 
     it(SiteType.Manganelo, () => {
       return testSearchManganelo()
@@ -129,18 +137,26 @@ if (DEV) {
     it(SiteType.MangaDoDs, () => {
       return testSearchMangaDoDs()
     })
+
+    it(SiteType.AsuraScans, () => {
+      return testSearchAsuraScans()
+    })
+
+    it(SiteType.ManhwaClub, () => {
+      return testSearchManhwaClub()
+    })
   })
 }
 
 function testManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://manganelo.com/manga/ia919396', SiteType.Manganelo).then(mangaInfo => {
-      if (mangaInfo.url !== 'https://manganelo.com/manga/ia919396') reject(Error('URL did not match'))
+    getMangaInfo('https://manganelo.com/manga/pu918807', SiteType.Manganelo).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://manganelo.com/manga/pu918807') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Manganelo) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Chapter 85: A Desired Life 1') reject(Error('Chapter did not match'))
-      else if (mangaInfo.image !== 'https://avt.mkklcdnv6.com/30/p/18-1583498266.jpg') reject(Error('Image did not match'))
-      else if (mangaInfo.title !== 'The Eyes Of Sora') reject(Error('Title did not match'))
-      else if (mangaInfo.chapterUrl !== 'https://manganelo.com/chapter/ia919396/chapter_85') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapter !== 'Vol.6 Chapter 57: The Final Chapter') reject(Error('Chapter did not match'))
+      else if (mangaInfo.image !== 'https://avt.mkklcdnv6.com/8/x/18-1583497426.jpg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'Kudan No Gotoshi') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://manganelo.com/chapter/pu918807/chapter_57') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
       else resolve()
@@ -267,7 +283,7 @@ function testMangakomi (): Promise<void> {
       else if (mangaInfo.site !== SiteType.MangaKomi) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 34 - The End') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://mangakomi.com/wp-content/uploads/2020/08/thumb_5f35bc951b432-193x278.png') reject(Error('Image did not match'))
-      else if (mangaInfo.title !== 'Good Night') reject(Error('Title did not match'))
+      else if (mangaInfo.title !== 'Good Night') reject(Error(`Title ${mangaInfo.title} did not match`))
       else if (mangaInfo.chapterUrl !== 'https://mangakomi.com/manga/good-night/chapter-34/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
@@ -356,6 +372,38 @@ function testMangaDoDs (): Promise<void> {
   })
 }
 
+function testAsuraScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://asurascans.com/manga/the-cycle-of-resentment/', SiteType.AsuraScans).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://asurascans.com/manga/the-cycle-of-resentment/') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.AsuraScans) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 2') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://asurascans.com/wp-content/uploads/2020/07/the-cycle-of-resentment-full-AACAQcW6DA0-193x278.jpg') reject(Error(`Image ${mangaInfo.image} did not match`))
+      else if (mangaInfo.title !== 'The Cycle of Resentment') reject(Error(`Title ${mangaInfo.title} did not match`))
+      else if (mangaInfo.chapterUrl !== 'https://asurascans.com/manga/the-cycle-of-resentment/chapter-2/') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
+function testManhwaClub (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getMangaInfo('https://manhwa.club/manhwa/settia/', SiteType.ManhwaClub).then(mangaInfo => {
+      if (mangaInfo.url !== 'https://manhwa.club/manhwa/settia/') reject(Error('URL did not match'))
+      else if (mangaInfo.site !== SiteType.ManhwaClub) reject(Error('Site did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 25') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://manhwa.club/wp-content/uploads/2020/04/Settia-193x278.jpg') reject(Error(`Image ${mangaInfo.image} did not match`))
+      else if (mangaInfo.title !== 'Settia') reject(Error(`Title ${mangaInfo.title} did not match`))
+      else if (mangaInfo.chapterUrl !== 'https://manhwa.club/manhwa/settia/chapter-25') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
+      else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
+      else resolve()
+    }).catch((error) => reject(error))
+  })
+}
+
 function testSearchManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('together with the rain', SiteType.Manganelo).then(result => {
@@ -368,6 +416,7 @@ function testSearchManganelo (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -385,6 +434,7 @@ function testSearchKKJScans (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -402,6 +452,7 @@ function testSearchWebtoons (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 2) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -419,6 +470,7 @@ function testSearchHatigarmScans (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -436,6 +488,7 @@ function testSearchMangakakalot (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -453,6 +506,7 @@ function testSearchMangakakalot (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -470,6 +524,7 @@ function testSearchFirstKissManga (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -487,15 +542,27 @@ function testSearchMangaKomi (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 2) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
 }
 
 function testSearchMethodScans (): Promise<void> {
-  // No search available
-  return new Promise(resolve => {
-    resolve()
+  return new Promise((resolve, reject) => {
+    searchManga('meng shi zai shang', SiteType.MethodScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.MethodScans &&
+              manga.title === 'Meng Shi Zai Shang' &&
+              manga.image === 'https://methodscans.com/storage/comics/32C023D5E17475B0A11F44D374454D1731B83F43D8576CF3/O7ExypuTakfFfImsojgiZqwd1dFTGevwYCKY2707.png' &&
+              manga.chapter === 'Yuan Yuan is as sharp as ever' &&
+              manga.url === 'https://methodscans.com/comics/773532-meng-shi-zai-shang'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      else resolve()
+    }).catch(error => reject(error))
   })
 }
 
@@ -511,6 +578,7 @@ function testSearchLeviatanScans (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -528,6 +596,7 @@ function testSearchHiperDEX (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -545,6 +614,7 @@ function testSearchReaperScans (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
@@ -562,6 +632,43 @@ function testSearchMangaDoDs (): Promise<void> {
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchAsuraScans (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('the cycle of resentment', SiteType.AsuraScans).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.AsuraScans &&
+              manga.title === 'The Cycle of Resentment' &&
+              manga.image === 'https://asurascans.com/wp-content/uploads/2020/07/the-cycle-of-resentment-full-AACAQcW6DA0-193x278.jpg' &&
+              manga.chapter === 'Chapter 2' &&
+              manga.url === 'https://asurascans.com/manga/the-cycle-of-resentment/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchManhwaClub (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('settia', SiteType.ManhwaClub).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.ManhwaClub &&
+              manga.title === 'Settia' &&
+              manga.image === 'https://manhwa.club/wp-content/uploads/2020/04/Settia-193x278.jpg' &&
+              manga.chapter === 'Chapter 25' &&
+              manga.url === 'https://manhwa.club/manhwa/settia/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
       else resolve()
     }).catch(error => reject(error))
   })
