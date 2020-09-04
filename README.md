@@ -1,6 +1,6 @@
 # Manga Reader
 Manga reader that scrapes manga sites for new chapters.  
-Allows you to read chapters inside the application using Electron.
+Allows you to read chapters inside the application using Electron or Cordova.
 
 Currently supported sites:  
 https://github.com/Yentis/manga-reader/blob/master/src/enums/siteEnum.ts
