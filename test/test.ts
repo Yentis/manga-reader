@@ -151,6 +151,8 @@ if (DEV) {
 function testManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://manganelo.com/manga/pu918807', SiteType.Manganelo).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://manganelo.com/manga/pu918807') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Manganelo) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Vol.6 Chapter 57: The Final Chapter') reject(Error('Chapter did not match'))
@@ -167,6 +169,8 @@ function testManganelo (): Promise<void> {
 function testKKJScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://kkjscans.co/comics/797735-saurus', SiteType.KKJScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://kkjscans.co/comics/797735-saurus') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.KKJScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 14') reject(Error('Chapter did not match'))
@@ -183,6 +187,8 @@ function testKKJScans (): Promise<void> {
 function testWebtoons (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142', SiteType.Webtoons).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Webtoons) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Episode 16') reject(Error('Chapter did not match'))
@@ -199,6 +205,8 @@ function testWebtoons (): Promise<void> {
 function testWebtoonsMobile (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://m.webtoons.com/en/super-hero/xinker/list?title_no=541', SiteType.Webtoons).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Webtoons) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Epilogue') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
@@ -215,6 +223,8 @@ function testWebtoonsMobile (): Promise<void> {
 function testHatigarmScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai', SiteType.HatigarmScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.HatigarmScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 5') reject(Error('Chapter did not match'))
@@ -231,6 +241,8 @@ function testHatigarmScans (): Promise<void> {
 function testFirstkissmanga (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://1stkissmanga.com/manga/ripples-of-love/', SiteType.FirstKissManga).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://1stkissmanga.com/manga/ripples-of-love/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.FirstKissManga) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 99') reject(Error('Chapter did not match'))
@@ -247,6 +259,8 @@ function testFirstkissmanga (): Promise<void> {
 function testMangakakalot (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://mangakakalot.com/manga/ui921789', SiteType.Mangakakalot).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://mangakakalot.com/manga/ui921789') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Mangakakalot) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Vol.3 Chapter 19: The Great Tehonbiki Gamble, Part 6') reject(Error('Chapter did not match'))
@@ -263,6 +277,8 @@ function testMangakakalot (): Promise<void> {
 function testMangadex (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored', SiteType.MangaDex).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.MangaDex) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Vol. 24 Ch. 95 - World of Stars and Stripes - Outro') reject(Error('Chapter did not match'))
@@ -279,6 +295,8 @@ function testMangadex (): Promise<void> {
 function testMangakomi (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://mangakomi.com/manga/good-night/', SiteType.MangaKomi).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://mangakomi.com/manga/good-night/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.MangaKomi) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 34 - The End') reject(Error('Chapter did not match'))
@@ -295,6 +313,8 @@ function testMangakomi (): Promise<void> {
 function testMethodScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://methodscans.com/comics/773532-meng-shi-zai-shang', SiteType.MethodScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://methodscans.com/comics/773532-meng-shi-zai-shang') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.MethodScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Yuan Yuan is as sharp as ever') reject(Error('Chapter did not match'))
@@ -311,6 +331,8 @@ function testMethodScans (): Promise<void> {
 function testLeviatanScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://leviatanscans.com/comics/909261-stresser', SiteType.LeviatanScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://leviatanscans.com/comics/909261-stresser') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.LeviatanScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 8') reject(Error('Chapter did not match'))
@@ -327,6 +349,8 @@ function testLeviatanScans (): Promise<void> {
 function testHiperDEX (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://hiperdex.com/manga/arata-primal-the-new-primitive/', SiteType.HiperDEX).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://hiperdex.com/manga/arata-primal-the-new-primitive/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.HiperDEX) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== '35 [END]') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
@@ -343,6 +367,8 @@ function testHiperDEX (): Promise<void> {
 function testReaperScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://reaperscans.com/comics/621295-alpha', SiteType.ReaperScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://reaperscans.com/comics/621295-alpha') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.ReaperScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'End') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
@@ -359,6 +385,8 @@ function testReaperScans (): Promise<void> {
 function testMangaDoDs (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://www.mangadods.com/manga/flower-war/', SiteType.MangaDoDs).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://www.mangadods.com/manga/flower-war/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.MangaDoDs) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== '22 END') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
@@ -375,6 +403,8 @@ function testMangaDoDs (): Promise<void> {
 function testAsuraScans (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://asurascans.com/manga/the-cycle-of-resentment/', SiteType.AsuraScans).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://asurascans.com/manga/the-cycle-of-resentment/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.AsuraScans) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 2') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
@@ -391,6 +421,8 @@ function testAsuraScans (): Promise<void> {
 function testManhwaClub (): Promise<void> {
   return new Promise((resolve, reject) => {
     getMangaInfo('https://manhwa.club/manhwa/settia/', SiteType.ManhwaClub).then(mangaInfo => {
+      if (mangaInfo instanceof Error) return reject(mangaInfo)
+
       if (mangaInfo.url !== 'https://manhwa.club/manhwa/settia/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.ManhwaClub) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 25') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))

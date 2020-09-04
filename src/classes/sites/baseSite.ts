@@ -51,6 +51,6 @@ export abstract class BaseSite {
       return manga
     }
 
-    abstract readUrl(url: string): Promise<Manga>
+    abstract readUrl(url: string): Promise<Error | Manga>
     abstract search(query: string): Promise<Error | Manga[]>
 }

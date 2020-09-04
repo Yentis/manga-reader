@@ -58,11 +58,11 @@ export function checkLogins (): void {
   })
 }
 
-export function getMangaInfo (url: string, siteType: SiteType): Promise < Manga > {
+export function getMangaInfo (url: string, siteType: SiteType): Promise <Error | Manga> {
   return siteMap.get(siteType)?.readUrl(url) || Promise.reject(Error('Invalid site type'))
 }
 
-export function searchManga (query: string, siteType: SiteType | undefined = undefined): Promise < Manga[] > {
+export function searchManga (query: string, siteType: SiteType | undefined = undefined): Promise <Manga[]> {
   if (siteType) {
     return new Promise((resolve, reject) => {
       createRace(siteMap.get(siteType)?.search(query) || Promise.reject(Error('Invalid site type'))).then(result => {

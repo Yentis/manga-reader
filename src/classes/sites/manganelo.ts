@@ -15,8 +15,8 @@ export class Manganelo extends BaseSite {
     return LOGIN_URL
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       axios.get(url).then(response => {
         const $ = cheerio.load(response.data)
         this.chapter = $('.chapter-name').first()
@@ -24,7 +24,7 @@ export class Manganelo extends BaseSite {
         this.title = $('.story-info-right h1').first()
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 

@@ -14,8 +14,8 @@ export class Mangakakalot extends BaseSite {
     return LOGIN_URL
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       axios.get(url).then(response => {
         const $ = cheerio.load(response.data)
         this.chapter = $('.chapter-list a').first()
@@ -23,7 +23,7 @@ export class Mangakakalot extends BaseSite {
         this.title = $('.manga-info-text h1').first()
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 

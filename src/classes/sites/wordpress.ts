@@ -25,8 +25,8 @@ export class WordPress extends BaseSite {
     return this.title?.text().replace(this.title.find('span').text(), '').trim() || 'Unknown'
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       axios.get(url).then(async response => {
         const $ = cheerio.load(response.data)
 
@@ -39,7 +39,7 @@ export class WordPress extends BaseSite {
         this.title = $('.post-title').first()
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 

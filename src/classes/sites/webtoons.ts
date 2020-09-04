@@ -27,8 +27,8 @@ export class Webtoons extends BaseSite {
     return this.image?.attr('content') || ''
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       const mobile = url.includes('//m.' + this.siteType)
       const headers = mobile && Platform.is?.mobile !== true ? {
         common: {
@@ -52,7 +52,7 @@ export class Webtoons extends BaseSite {
         }
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 
@@ -65,7 +65,7 @@ export class Webtoons extends BaseSite {
         }
       }).then(response => {
         const searchData = response.data as WebtoonsSearch
-        const promises: Promise<Manga>[] = []
+        const promises: Promise<Error | Manga>[] = []
 
         for (const firstIndent of searchData.items) {
           for (const item of firstIndent) {
@@ -75,7 +75,7 @@ export class Webtoons extends BaseSite {
         }
 
         Promise.all(promises)
-          .then(mangaList => resolve(mangaList))
+          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
           .catch(error => resolve(error))
       }).catch(error => resolve(error))
     })

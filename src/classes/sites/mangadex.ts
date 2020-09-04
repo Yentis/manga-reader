@@ -31,8 +31,8 @@ export class MangaDex extends BaseSite {
     return this.processUrl(href)
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       axios.get(url).then(response => {
         const $ = cheerio.load(response.data)
         this.chapter = $('.chapter-row a').first()
@@ -40,7 +40,7 @@ export class MangaDex extends BaseSite {
         this.title = $('.card-header .mx-1').first()
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 
@@ -58,7 +58,7 @@ export class MangaDex extends BaseSite {
           return
         }
 
-        const promises: Promise<Manga>[] = []
+        const promises: Promise<Error | Manga>[] = []
 
         $('.ml-1.manga_title').each((_index, elem) => {
           const url = $(elem).attr('href') || ''
@@ -66,7 +66,7 @@ export class MangaDex extends BaseSite {
         })
 
         Promise.all(promises)
-          .then(mangaList => resolve(mangaList))
+          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
           .catch(error => resolve(error))
       }).catch(error => resolve(error))
     })

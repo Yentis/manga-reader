@@ -16,8 +16,8 @@ export class Genkan extends BaseSite {
     return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), this.getUrl()).replace(new RegExp('"?\\)', 'g'), '') || ''
   }
 
-  readUrl (url: string): Promise<Manga> {
-    return new Promise((resolve, reject) => {
+  readUrl (url: string): Promise<Error | Manga> {
+    return new Promise(resolve => {
       axios.get(url).then(response => {
         const $ = cheerio.load(response.data)
         this.chapter = $('.list-item.col-sm-3 a').first()
@@ -25,7 +25,7 @@ export class Genkan extends BaseSite {
         this.title = $('.text-highlight').first()
 
         resolve(this.buildManga(url))
-      }).catch(error => reject(error))
+      }).catch(error => resolve(error))
     })
   }
 
@@ -37,7 +37,7 @@ export class Genkan extends BaseSite {
         }
       }).then(response => {
         const $ = cheerio.load(response.data)
-        const promises: Promise<Manga>[] = []
+        const promises: Promise<Error | Manga>[] = []
 
         if (this.siteType === SiteType.MethodScans) {
           const words = query.split(' ')
@@ -62,7 +62,7 @@ export class Genkan extends BaseSite {
         }
 
         Promise.all(promises)
-          .then(mangaList => resolve(mangaList))
+          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
           .catch(error => resolve(error))
       }).catch(error => resolve(error))
     })

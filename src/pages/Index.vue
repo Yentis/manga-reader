@@ -22,7 +22,7 @@
     <q-linear-progress v-if="loading" indeterminate size="xl" class="q-mt-sm"></q-linear-progress>
 
     <div class="manga-container q-mt-sm full-width">
-      <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in mangaList" :key="manga.url">
+      <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in sortedMangaList" :key="manga.url">
         <q-card :class="{ 'card-container': manga.chapter !== manga.read }">
           <q-card-section horizontal>
             <q-img contain class="manga-image q-ma-sm" :src="manga.image" @error="showLoadImageFailed">
@@ -221,6 +221,11 @@ export default defineComponent({
       else this.siteModalShown = true
     }
   },
+  computed: {
+    sortedMangaList: function (): Manga[] {
+      return this.mangaList.sort(mangaSort)
+    }
+  },
   methods: {
     resetState () {
       this.loading = false
@@ -266,9 +271,13 @@ export default defineComponent({
       for (const site of Object.values(SiteType)) {
         if (this.url.includes(site)) {
           getMangaInfo(this.url, site).then(manga => {
-            manga.read = manga.chapter
-            manga.readUrl = manga.chapterUrl
-            this.saveManga(manga)
+            if (manga instanceof Error) {
+              this.showNotification(new NotifyOptions(manga))
+            } else {
+              manga.read = manga.chapter
+              manga.readUrl = manga.chapterUrl
+              this.saveManga(manga)
+            }
           }).catch(error => this.showNotification(new NotifyOptions(error)))
 
           this.resetInput()
@@ -376,28 +385,38 @@ export default defineComponent({
       if (this.loading) return
 
       this.loading = true
-      const promises: Promise<Manga>[] = []
+      let finishedCount = 0
 
-      for (let i = 0; i < this.mangaList.length; i++) {
-        const manga = this.mangaList[i]
-        promises.push(getMangaInfo(manga.url, manga.site))
-      }
-
-      Promise.all(promises).then(results => {
-        for (let i = 0; i < results.length; i++) {
-          const result = results[i]
-          const read = this.mangaList[i].read
-          const readUrl = this.mangaList[i].readUrl
-
-          this.mangaList[i] = result
-          this.mangaList[i].read = read
-          this.mangaList[i].readUrl = readUrl
+      const mangaUrlList = this.mangaList.map(manga => {
+        return {
+          url: manga.url,
+          site: manga.site
         }
+      })
 
-        this.mangaList.sort(mangaSort)
-        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
-        this.loading = false
-      }).catch(error => this.showNotification(new NotifyOptions(error)))
+      mangaUrlList.forEach(manga => {
+        getMangaInfo(manga.url, manga.site).then(result => {
+          if (result instanceof Error) {
+            this.showNotification(new NotifyOptions(result))
+          } else {
+            const index = this.mangaList.findIndex(item => item.url === manga.url)
+            if (index === -1) return
+
+            const read = this.mangaList[index].read
+            const readUrl = this.mangaList[index].readUrl
+
+            result.read = read
+            result.readUrl = readUrl
+            this.$set(this.mangaList, index, result)
+          }
+
+          finishedCount++
+          if (finishedCount >= mangaUrlList.length) {
+            LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+            this.loading = false
+          }
+        }).catch(error => this.showNotification(new NotifyOptions(error)))
+      })
     },
     openLogin (url: string) {
       if (this.$q.platform.is.mobile) {
