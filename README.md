@@ -3,17 +3,7 @@ Manga reader that scrapes manga sites for new chapters.
 Allows you to read chapters inside the application using Electron.
 
 Currently supported sites:
-- manganelo.com
-- kkjscans.co
-- webtoons.com
-- hatigarmscanz.net
-- 1stkissmanga.com
-- mangakakalot.com
-- mangadex.org
-- mangakomi.com
-- methodscans.com
-- leviatanscans.com
-- hiperdex.com
+https://github.com/Yentis/manga-reader/blob/master/src/enums/siteEnum.ts
 
 Supported platforms:
 - Windows
