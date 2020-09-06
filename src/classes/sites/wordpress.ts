@@ -4,6 +4,7 @@ import { BaseSite } from './baseSite'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio from 'cheerio'
 import qs from 'qs'
+import moment from 'moment'
 
 export class WordPress extends BaseSite {
   siteType: SiteType;
@@ -15,6 +16,29 @@ export class WordPress extends BaseSite {
 
   getLoginUrl (): string {
     return this.getUrl()
+  }
+
+  getChapterDate (): string {
+    let format
+
+    switch (this.siteType) {
+      case SiteType.FirstKissManga:
+        format = 'Do MMMM YYYY'
+        break
+      case SiteType.MangaDoDs:
+        format = 'YYYY-MM-DD'
+        break
+      default:
+        format = 'MMMM DD, YYYY'
+        break
+    }
+
+    const chapterDate = moment(this.chapterDate?.text().trim(), format)
+    if (chapterDate.isValid()) {
+      return chapterDate.fromNow()
+    } else {
+      return ''
+    }
   }
 
   getImage (): string {
@@ -31,7 +55,8 @@ export class WordPress extends BaseSite {
         const $ = cheerio.load(response.data)
 
         this.chapter = $('.wp-manga-chapter a').first()
-        if (!this.chapter.html()) {
+        this.chapterDate = $('.chapter-release-date').first()
+        if (!this.chapter.html() || !this.chapterDate.html()) {
           const mangaId = $('.rating-post-id').first().attr('value') || ''
           await this.readChapters(mangaId)
         }
@@ -96,6 +121,7 @@ export class WordPress extends BaseSite {
       axios(config).then((response) => {
         const $ = cheerio.load(response.data)
         this.chapter = $('.wp-manga-chapter a').first()
+        this.chapterDate = $('.chapter-release-date').first()
 
         resolve()
       }).catch(error => {
