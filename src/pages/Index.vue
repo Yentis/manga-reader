@@ -513,8 +513,6 @@ export default defineComponent({
         this.showNotification(notifyOptions)
         setAccessToken(token)
       })
-
-      window.StatusBar.hide()
     }
 
     checkUpdates().then(result => {

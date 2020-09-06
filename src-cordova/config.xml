@@ -21,4 +21,5 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <allow-navigation href="about:*" />
+    <preference name="Fullscreen" value="true" />
 </widget>

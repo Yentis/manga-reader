@@ -1,5 +1,7 @@
 import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
+import { ElectronBlocker } from '@cliqz/adblocker-electron'
 import qs from 'qs'
+import fetch from 'isomorphic-fetch'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -61,6 +63,11 @@ function createWindow () {
   })
 
   mainWindow.setMenu(menu)
+
+  ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then(blocker => {
+    blocker.enableBlockingInSession(session.defaultSession)
+  })
+
   session.defaultSession.cookies.set({
     url: 'https://www.webtoons.com/',
     name: 'ageGatePass',
