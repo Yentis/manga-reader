@@ -38,6 +38,7 @@ export class MangaDex extends BaseSite {
         this.chapter = $('.chapter-row a').first()
         this.image = $('.row img').first()
         this.title = $('.card-header .mx-1').first()
+        this.chapterDate = $('.chapter-row div[title]').first()
 
         resolve(this.buildManga(url))
       }).catch(error => resolve(error))

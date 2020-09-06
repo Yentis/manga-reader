@@ -4,6 +4,7 @@ import { BaseSite } from './baseSite'
 import axios from 'axios'
 import cheerio from 'cheerio'
 import qs from 'qs'
+import moment from 'moment'
 
 const LOGIN_URL = 'https://user.manganelo.com/login?l=mangakakalot'
 
@@ -14,6 +15,15 @@ export class Mangakakalot extends BaseSite {
     return LOGIN_URL
   }
 
+  getChapterDate (): string {
+    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM-DD-YY')
+    if (chapterDate.isValid()) {
+      return chapterDate.fromNow()
+    } else {
+      return ''
+    }
+  }
+
   readUrl (url: string): Promise<Error | Manga> {
     return new Promise(resolve => {
       axios.get(url).then(response => {
@@ -21,6 +31,7 @@ export class Mangakakalot extends BaseSite {
         this.chapter = $('.chapter-list a').first()
         this.image = $('.manga-info-pic img').first()
         this.title = $('.manga-info-text h1').first()
+        this.chapterDate = $('.chapter-list .row').first().find('span').last()
 
         resolve(this.buildManga(url))
       }).catch(error => resolve(error))

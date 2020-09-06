@@ -20,9 +20,11 @@ export class Genkan extends BaseSite {
     return new Promise(resolve => {
       axios.get(url).then(response => {
         const $ = cheerio.load(response.data)
-        this.chapter = $('.list-item.col-sm-3 a').first()
+        const chapterElem = $('.list-item.col-sm-3 a')
+        this.chapter = chapterElem.first()
         this.image = $('.media-content').first()
         this.title = $('.text-highlight').first()
+        this.chapterDate = chapterElem.eq(1)
 
         resolve(this.buildManga(url))
       }).catch(error => resolve(error))

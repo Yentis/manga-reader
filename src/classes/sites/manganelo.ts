@@ -4,6 +4,7 @@ import { BaseSite } from './baseSite'
 import axios from 'axios'
 import cheerio from 'cheerio'
 import qs from 'qs'
+import moment from 'moment'
 
 const SITE_TYPE = SiteType.Manganelo
 const LOGIN_URL = `https://user.${SITE_TYPE}/login?l=manganelo`
@@ -15,6 +16,15 @@ export class Manganelo extends BaseSite {
     return LOGIN_URL
   }
 
+  getChapterDate (): string {
+    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM DD,YYYY hh:mm')
+    if (chapterDate.isValid()) {
+      return chapterDate.fromNow()
+    } else {
+      return ''
+    }
+  }
+
   readUrl (url: string): Promise<Error | Manga> {
     return new Promise(resolve => {
       axios.get(url).then(response => {
@@ -22,6 +32,7 @@ export class Manganelo extends BaseSite {
         this.chapter = $('.chapter-name').first()
         this.image = $('.info-image img').first()
         this.title = $('.story-info-right h1').first()
+        this.chapterDate = $('.chapter-time').first()
 
         resolve(this.buildManga(url))
       }).catch(error => resolve(error))

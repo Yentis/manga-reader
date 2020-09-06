@@ -34,7 +34,7 @@
             </q-img>
 
             <q-card-section class="q-pb-none flex-column-between">
-              <div>
+              <div class="q-mb-sm">
                 <div class="text-h6">
                   <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
                 </div>
@@ -45,6 +45,9 @@
                 <div class="text-body2">
                   Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
                   <span v-else>{{ manga.chapter }}</span>
+                </div>
+                <div class="text-body2" v-if="manga.chapterDate">
+                  {{ manga.chapterDate }}
                 </div>
               </div>
               <div class="text-subtitle1">
@@ -513,8 +516,6 @@ export default defineComponent({
         this.showNotification(notifyOptions)
         setAccessToken(token)
       })
-
-      window.StatusBar.hide()
     }
 
     checkUpdates().then(result => {
