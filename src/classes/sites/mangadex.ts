@@ -3,6 +3,7 @@ import { SiteType } from '../../enums/siteEnum'
 import { BaseSite } from './baseSite'
 import axios from 'axios'
 import cheerio from 'cheerio'
+import moment from 'moment'
 
 export class MangaDex extends BaseSite {
   siteType = SiteType.MangaDex
@@ -29,6 +30,15 @@ export class MangaDex extends BaseSite {
   getChapterUrl (): string {
     const href = this.chapter?.attr('href') || ''
     return this.processUrl(href)
+  }
+
+  getChapterDate (): string {
+    const chapterDate = moment.utc(this.chapterDate?.attr('title'), 'YYYY-MM-DD hh:mm:ss')
+    if (chapterDate.isValid()) {
+      return chapterDate.fromNow()
+    } else {
+      return ''
+    }
   }
 
   readUrl (url: string): Promise<Error | Manga> {

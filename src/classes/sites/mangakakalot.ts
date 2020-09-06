@@ -20,7 +20,7 @@ export class Mangakakalot extends BaseSite {
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return ''
+      return this.getDateFromNow(this.chapterDate?.attr('title'))
     }
   }
 

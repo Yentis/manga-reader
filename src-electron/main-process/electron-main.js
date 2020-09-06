@@ -2,6 +2,7 @@ import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
 import { ElectronBlocker } from '@cliqz/adblocker-electron'
 import qs from 'qs'
 import fetch from 'isomorphic-fetch'
+import moment from 'moment'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -72,6 +73,12 @@ function createWindow () {
     url: 'https://www.webtoons.com/',
     name: 'ageGatePass',
     value: 'true'
+  })
+  
+  session.defaultSession.cookies.set({
+    url: 'https://www.webtoons.com/',
+    name: 'timezoneOffset',
+    value: (moment().utcOffset() / 60).toString()
   })
 
   session.defaultSession.webRequest.onBeforeRequest({

@@ -163,6 +163,7 @@ import relevancy from 'relevancy'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
+import moment from 'moment'
 
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
@@ -507,6 +508,7 @@ export default defineComponent({
 
     if (this.$q.platform.is.mobile) {
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
+      window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'timezoneOffset', (moment().utcOffset() / 60).toString(), () => undefined, (error) => console.error(error))
     }
 
     if (this.$q.platform.is.electron) {

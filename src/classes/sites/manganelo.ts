@@ -11,15 +11,17 @@ const LOGIN_URL = `https://user.${SITE_TYPE}/login?l=manganelo`
 
 export class Manganelo extends BaseSite {
   siteType = SITE_TYPE
+  currentTime: Cheerio | undefined
 
   getLoginUrl (): string {
     return LOGIN_URL
   }
 
   getChapterDate (): string {
+    const curTime = moment(this.currentTime?.text(), '[Current Time is] MMM DD,YYYY - hh:mm:ss A')
     const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM DD,YYYY hh:mm')
     if (chapterDate.isValid()) {
-      return chapterDate.fromNow()
+      return chapterDate.from(curTime)
     } else {
       return ''
     }
@@ -33,6 +35,7 @@ export class Manganelo extends BaseSite {
         this.image = $('.info-image img').first()
         this.title = $('.story-info-right h1').first()
         this.chapterDate = $('.chapter-time').first()
+        this.currentTime = $('.pn-contacts p').first()
 
         resolve(this.buildManga(url))
       }).catch(error => resolve(error))

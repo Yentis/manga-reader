@@ -36,8 +36,12 @@ export abstract class BaseSite {
     }
 
     getChapterDate (): string {
+      return this.getDateFromNow(this.chapterDate?.text())
+    }
+
+    getDateFromNow (input: string | undefined): string {
       const date = moment()
-      const chapterDate = this.chapterDate?.text().trim().split(' ') || []
+      const chapterDate = input?.trim().split(' ') || []
       let amount = -1
 
       if (chapterDate[0]) {
@@ -46,9 +50,9 @@ export abstract class BaseSite {
 
       if (amount !== -1 && chapterDate[1]) {
         const durationUnit = chapterDate[1]
-        if (durationUnit.startsWith('second')) {
+        if (durationUnit.startsWith('sec')) {
           date.subtract(amount, 'second')
-        } else if (durationUnit.startsWith('minute')) {
+        } else if (durationUnit.startsWith('min')) {
           date.subtract(amount, 'minute')
         } else if (durationUnit.startsWith('hour')) {
           date.subtract(amount, 'hour')

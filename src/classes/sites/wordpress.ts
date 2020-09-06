@@ -37,7 +37,7 @@ export class WordPress extends BaseSite {
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return ''
+      return this.getDateFromNow(this.chapterDate?.text()) || this.getDateFromNow(this.chapterDate?.find('a').attr('title'))
     }
   }
 
