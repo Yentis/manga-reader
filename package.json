@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",

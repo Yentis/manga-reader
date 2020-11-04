@@ -2,7 +2,6 @@ import 'mocha'
 import 'jsdom-global'
 import { getMangaInfo, searchManga } from '../src/services/siteService'
 import { SiteType } from '../src/enums/siteEnum'
-import moment from 'moment'
 
 const DEV = false
 
@@ -11,7 +10,11 @@ if (DEV) {
     this.timeout(10000)
 
     it(SiteType.AsuraScans, () => {
-      return testManhwaClub()
+      return testAsuraScans()
+    })
+
+    it(SiteType.AsuraScans, () => {
+      return testSearchAsuraScans()
     })
   })
 } else {
@@ -102,6 +105,10 @@ if (DEV) {
       return testSearchHatigarmScans()
     })
 
+    it(SiteType.FirstKissManga, () => {
+      return testSearchFirstKissManga()
+    })
+
     it(SiteType.Mangakakalot, () => {
       return testSearchMangakakalot()
     })
@@ -110,10 +117,6 @@ if (DEV) {
     /* it(SiteType.MangaDex, () => {
       return testSearchMangaDex()
     }) */
-
-    it(SiteType.FirstKissManga, () => {
-      return testSearchFirstKissManga()
-    })
 
     it(SiteType.MangaKomi, () => {
       return testSearchMangaKomi()
@@ -162,7 +165,7 @@ function testManganelo (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://manganelo.com/chapter/pu918807/chapter_57') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-05-21').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -170,18 +173,18 @@ function testManganelo (): Promise<void> {
 
 function testKKJScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://kkjscans.co/comics/797735-saurus', SiteType.KKJScans).then(mangaInfo => {
+    getMangaInfo('https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard', SiteType.KKJScans).then(mangaInfo => {
       if (mangaInfo instanceof Error) return reject(mangaInfo)
 
-      if (mangaInfo.url !== 'https://kkjscans.co/comics/797735-saurus') reject(Error('URL did not match'))
+      if (mangaInfo.url !== 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.KKJScans) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Chapter 14') reject(Error('Chapter did not match'))
-      else if (mangaInfo.image !== 'https://kkjscans.co/storage/comics/B7AD2700758EE59D14ACDD75FDDE17D89207950A708C11A6/glM9WH3FZjnxtyx7BOBHOCDQckd6CI9MFz5PH1Jm.png') reject(Error('Image did not match'))
-      else if (mangaInfo.title !== 'Saurus') reject(Error('Title did not match'))
-      else if (mangaInfo.chapterUrl !== 'https://kkjscans.co/comics/797735-saurus/1/14') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapter !== 'Season 1 Finale') reject(Error('Chapter did not match'))
+      else if (mangaInfo.image !== 'https://kkjscans.co/storage/comics/AA1DB1EFF76AD034EED5034A101770A052FE4B16332B3A14/sG9SfErajIj3wg1Dhbu0f3rFcZYrXSVqBLjRgFAA.jpeg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'The Rebirth of an 8th Circled Wizard') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard/1/36') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-06-01').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -200,7 +203,7 @@ function testWebtoons (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/episode-16/viewer?title_no=2142&episode_no=16') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-07-24').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -219,7 +222,7 @@ function testWebtoonsMobile (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://m.webtoons.com/en/super-hero/xinker/epilogue/viewer?title_no=541&episode_no=223') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-07-01').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -238,7 +241,7 @@ function testHatigarmScans (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai/1/5') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-07-01').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -246,18 +249,18 @@ function testHatigarmScans (): Promise<void> {
 
 function testFirstkissmanga (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://1stkissmanga.com/manga/ripples-of-love/', SiteType.FirstKissManga).then(mangaInfo => {
+    getMangaInfo('https://1stkissmanga.com/manga/royal-shop-of-young-lady/', SiteType.FirstKissManga).then(mangaInfo => {
       if (mangaInfo instanceof Error) return reject(mangaInfo)
 
-      if (mangaInfo.url !== 'https://1stkissmanga.com/manga/ripples-of-love/') reject(Error('URL did not match'))
+      if (mangaInfo.url !== 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.FirstKissManga) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Chapter 99') reject(Error('Chapter did not match'))
-      else if (mangaInfo.image !== 'https://1stkissmanga.com/wp-content/uploads/2019/12/Hades-Delivery-Shop.jpg') reject(Error('Image did not match'))
-      else if (mangaInfo.title !== 'Ripples Of Love') reject(Error('Title did not match'))
-      else if (mangaInfo.chapterUrl !== 'https://1stkissmanga.com/manga/ripples-of-love/chapter-99/') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 16') reject(Error('Chapter did not match'))
+      else if (mangaInfo.image !== 'https://1stkissmanga.com/wp-content/uploads/2020/08/royal-shop-of-young-lady-193x278.jpg') reject(Error('Image did not match'))
+      else if (mangaInfo.title !== 'Royal Shop of Young Lady') reject(Error('Title did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-16/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-02-09').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -270,13 +273,13 @@ function testMangakakalot (): Promise<void> {
 
       if (mangaInfo.url !== 'https://mangakakalot.com/manga/ui921789') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.Mangakakalot) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Vol.3 Chapter 19: The Great Tehonbiki Gamble, Part 6') reject(Error('Chapter did not match'))
+      else if (mangaInfo.chapter !== 'Vol.3 Chapter 20: The Great Tehonbiki Gamble, Part 7') reject(Error('Chapter did not match'))
       else if (mangaInfo.image !== 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'Legend of the End-of-Century Gambling Wolf Saga') reject(Error('Title did not match'))
-      else if (mangaInfo.chapterUrl !== 'https://mangakakalot.com/chapter/ui921789/chapter_19') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapterUrl !== 'https://mangakakalot.com/chapter/ui921789/chapter_20') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-08-11').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -295,7 +298,7 @@ function testMangadex (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://mangadex.org/chapter/24552') reject(Error('Chapter URL did not match, was: ' + mangaInfo.chapterUrl))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2018-01-30').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -309,12 +312,12 @@ function testMangakomi (): Promise<void> {
       if (mangaInfo.url !== 'https://mangakomi.com/manga/good-night/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.MangaKomi) reject(Error('Site did not match'))
       else if (mangaInfo.chapter !== 'Chapter 34 - The End') reject(Error('Chapter did not match'))
-      else if (mangaInfo.image !== 'https://mangakomi.com/wp-content/uploads/2020/08/thumb_5f35bc951b432-193x278.png') reject(Error('Image did not match'))
+      else if (mangaInfo.image !== 'https://mangakomi.com/wp-content/uploads/2020/08/thumb_5f35bc951b432.png') reject(Error('Image did not match'))
       else if (mangaInfo.title !== 'Good Night') reject(Error(`Title ${mangaInfo.title} did not match`))
       else if (mangaInfo.chapterUrl !== 'https://mangakomi.com/manga/good-night/chapter-34/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-08-14').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -333,7 +336,7 @@ function testMethodScans (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://methodscans.com/comics/773532-meng-shi-zai-shang/1/172') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-08-06').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -352,7 +355,7 @@ function testLeviatanScans (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://leviatanscans.com/comics/909261-stresser/1/8') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2019-09-14').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -371,7 +374,7 @@ function testHiperDEX (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://hiperdex.com/manga/arata-primal-the-new-primitive/35-end/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-06-07').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -390,7 +393,7 @@ function testReaperScans (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://reaperscans.com/comics/621295-alpha/1/20') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-02-01').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -409,7 +412,7 @@ function testMangaDoDs (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://www.mangadods.com/manga/flower-war/22-end/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-04-16').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -417,18 +420,18 @@ function testMangaDoDs (): Promise<void> {
 
 function testAsuraScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    getMangaInfo('https://asurascans.com/manga/the-cycle-of-resentment/', SiteType.AsuraScans).then(mangaInfo => {
+    getMangaInfo('https://asurascans.com/manga/tougen-anki/', SiteType.AsuraScans).then(mangaInfo => {
       if (mangaInfo instanceof Error) return reject(mangaInfo)
 
-      if (mangaInfo.url !== 'https://asurascans.com/manga/the-cycle-of-resentment/') reject(Error('URL did not match'))
+      if (mangaInfo.url !== 'https://asurascans.com/manga/tougen-anki/') reject(Error('URL did not match'))
       else if (mangaInfo.site !== SiteType.AsuraScans) reject(Error('Site did not match'))
-      else if (mangaInfo.chapter !== 'Chapter 2') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
-      else if (mangaInfo.image !== 'https://asurascans.com/wp-content/uploads/2020/07/the-cycle-of-resentment-full-AACAQcW6DA0-193x278.jpg') reject(Error(`Image ${mangaInfo.image} did not match`))
-      else if (mangaInfo.title !== 'The Cycle of Resentment') reject(Error(`Title ${mangaInfo.title} did not match`))
-      else if (mangaInfo.chapterUrl !== 'https://asurascans.com/manga/the-cycle-of-resentment/chapter-2/') reject(Error('Chapter URL did not match'))
+      else if (mangaInfo.chapter !== 'Chapter 19') reject(Error(`Chapter ${mangaInfo.chapter} did not match`))
+      else if (mangaInfo.image !== 'https://asurascans.com/wp-content/uploads/2020/09/49754.jpg') reject(Error(`Image ${mangaInfo.image} did not match`))
+      else if (mangaInfo.title !== 'Tougen Anki') reject(Error(`Title ${mangaInfo.title} did not match`))
+      else if (mangaInfo.chapterUrl !== 'https://asurascans.com/tougen-anki-chapter-19/') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-07-03').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -447,7 +450,7 @@ function testManhwaClub (): Promise<void> {
       else if (mangaInfo.chapterUrl !== 'https://manhwa.club/manhwa/settia/chapter-25') reject(Error('Chapter URL did not match'))
       else if (mangaInfo.read !== undefined) reject(Error('Read did not match'))
       else if (mangaInfo.readUrl !== undefined) reject(Error('Read URL did not match'))
-      else if (mangaInfo.chapterDate !== moment('2020-04-28').fromNow()) reject(Error(`Chapter date ${mangaInfo.chapterDate} did not match`))
+      else if (!mangaInfo.chapterDate.includes('ago')) reject(Error('Chapter date not valid'))
       else resolve()
     }).catch((error) => reject(error))
   })
@@ -473,13 +476,13 @@ function testSearchManganelo (): Promise<void> {
 
 function testSearchKKJScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    searchManga('saurus', SiteType.KKJScans).then(result => {
+    searchManga('the rebirth of an 8th circled wizard', SiteType.KKJScans).then(result => {
       const matchingManga = result.filter(manga => {
         return manga.site === SiteType.KKJScans &&
-              manga.title === 'Saurus' &&
-              manga.image === 'https://kkjscans.co/storage/comics/B7AD2700758EE59D14ACDD75FDDE17D89207950A708C11A6/glM9WH3FZjnxtyx7BOBHOCDQckd6CI9MFz5PH1Jm.png' &&
-              manga.chapter === 'Chapter 14' &&
-              manga.url === 'https://kkjscans.co/comics/797735-saurus'
+              manga.title === 'The Rebirth of an 8th Circled Wizard' &&
+              manga.image === 'https://kkjscans.co/storage/comics/AA1DB1EFF76AD034EED5034A101770A052FE4B16332B3A14/sG9SfErajIj3wg1Dhbu0f3rFcZYrXSVqBLjRgFAA.jpeg' &&
+              manga.chapter === 'Season 1 Finale' &&
+              manga.url === 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard'
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))
@@ -525,6 +528,24 @@ function testSearchHatigarmScans (): Promise<void> {
   })
 }
 
+function testSearchFirstKissManga (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('cajole a childe into being my boyfriend', SiteType.FirstKissManga).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.FirstKissManga &&
+              manga.title === 'Cajole a Childe Into Being My Boyfriend' &&
+              manga.image === 'https://1stkissmanga.com/wp-content/uploads/2019/12/Cajole-a-Childe-Into-Being-My-Boyfriend-193x278.jpg' &&
+              manga.chapter === 'Chapter 155' &&
+              manga.url === 'https://1stkissmanga.com/manga/cajole-a-childe-into-being-my-boyfriend/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
 function testSearchMangakakalot (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('together with the rain', SiteType.Mangakakalot).then(result => {
@@ -561,31 +582,13 @@ function testSearchMangakakalot (): Promise<void> {
   })
 } */
 
-function testSearchFirstKissManga (): Promise<void> {
-  return new Promise((resolve, reject) => {
-    searchManga('cajole a childe into being my boyfriend', SiteType.FirstKissManga).then(result => {
-      const matchingManga = result.filter(manga => {
-        return manga.site === SiteType.FirstKissManga &&
-              manga.title === 'Cajole a Childe Into Being My Boyfriend' &&
-              manga.image === 'https://1stkissmanga.com/wp-content/uploads/2019/12/Cajole-a-Childe-Into-Being-My-Boyfriend-193x278.jpg' &&
-              manga.chapter === 'Chapter 155' &&
-              manga.url === 'https://1stkissmanga.com/manga/cajole-a-childe-into-being-my-boyfriend/'
-      })
-
-      if (matchingManga.length === 0) reject(Error('No matching result'))
-      else if (matchingManga.length > 1) reject(Error('Too many results'))
-      else resolve()
-    }).catch(error => reject(error))
-  })
-}
-
 function testSearchMangaKomi (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('nanatsu no taizai', SiteType.MangaKomi).then(result => {
       const matchingManga = result.filter(manga => {
         return manga.site === SiteType.MangaKomi &&
               manga.title === 'Nanatsu no Taizai' &&
-              manga.image === 'https://mangakomi.com/wp-content/uploads/2020/03/thumb_5e5c4904a9158-193x278.jpg' &&
+              manga.image === 'https://mangakomi.com/wp-content/uploads/2020/03/thumb_5e5c4904a9158.jpg' &&
               manga.chapter === 'Chapter 346.6' &&
               manga.url === 'https://mangakomi.com/manga/nanatsu-no-taizai/'
       })
@@ -689,13 +692,13 @@ function testSearchMangaDoDs (): Promise<void> {
 
 function testSearchAsuraScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    searchManga('the cycle of resentment', SiteType.AsuraScans).then(result => {
+    searchManga('tougen anki', SiteType.AsuraScans).then(result => {
       const matchingManga = result.filter(manga => {
         return manga.site === SiteType.AsuraScans &&
-              manga.title === 'The Cycle of Resentment' &&
-              manga.image === 'https://asurascans.com/wp-content/uploads/2020/07/the-cycle-of-resentment-full-AACAQcW6DA0-193x278.jpg' &&
-              manga.chapter === 'Chapter 2' &&
-              manga.url === 'https://asurascans.com/manga/the-cycle-of-resentment/'
+              manga.title === 'Tougen Anki' &&
+              manga.image === 'https://asurascans.com/wp-content/uploads/2020/09/49754.jpg' &&
+              manga.chapter === '19' &&
+              manga.url === 'https://asurascans.com/manga/tougen-anki/'
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))

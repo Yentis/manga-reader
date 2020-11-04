@@ -25,6 +25,9 @@ import {
 import {
   BaseSite
 } from '../classes/sites/baseSite'
+import {
+  AsuraScans
+} from '../classes/sites/asurascans'
 
 const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
@@ -40,8 +43,9 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
   [SiteType.MangaDoDs, new WordPress(SiteType.MangaDoDs)],
-  [SiteType.AsuraScans, new WordPress(SiteType.AsuraScans)],
-  [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)]
+  [SiteType.AsuraScans, new AsuraScans()],
+  [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
+  [SiteType.MangaTx, new WordPress(SiteType.MangaTx)]
 ])
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
