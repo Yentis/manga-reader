@@ -28,6 +28,8 @@ import {
 import {
   AsuraScans
 } from '../classes/sites/asurascans'
+import axios from 'axios'
+import FormData from 'form-data'
 
 const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
@@ -101,4 +103,34 @@ export function searchManga (query: string, siteType: SiteType | undefined = und
 
 export function getSiteMap () {
   return siteMap
+}
+
+export function syncReadChapter (id: number, chapterNum: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (chapterNum === 0) {
+      resolve()
+      return
+    }
+
+    const data = new FormData()
+    data.append('volume', '0')
+    data.append('chapter', chapterNum)
+
+    axios({
+      method: 'post',
+      url: `https://mangadex.org/ajax/actions.ajax.php?function=edit_progress&id=${id}`,
+      headers: {
+        'x-requested-with': 'XMLHttpRequest'
+      },
+      data
+    }).then(response => {
+      if (response.data === '') {
+        resolve()
+      } else {
+        reject(Error(response.data))
+      }
+    }).catch(error => {
+      reject(error)
+    })
+  })
 }

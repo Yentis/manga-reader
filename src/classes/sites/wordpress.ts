@@ -18,6 +18,24 @@ export class WordPress extends BaseSite {
     return this.getUrl()
   }
 
+  getChapterNum (): number {
+    const chapter = this.getChapter()
+    const matches = /Chapter (\d*)/gm.exec(chapter) || []
+    let num = 0
+
+    for (const match of matches) {
+      const parsedMatch = parseInt(match)
+      if (!isNaN(parsedMatch)) num = parsedMatch
+    }
+
+    if (num === 0) {
+      const candidateNum = parseInt(chapter.split(' ')[0])
+      if (!isNaN(candidateNum)) num = candidateNum
+    }
+
+    return num
+  }
+
   getChapterDate (): string {
     let format
 
@@ -94,7 +112,9 @@ export class WordPress extends BaseSite {
           manga.title = cheerioElem.find('.post-title').first().text().trim()
           manga.chapter = cheerioElem.find('.font-meta.chapter').first().text()
 
-          mangaList.push(manga)
+          if (manga.title.toLowerCase().includes(query.toLowerCase())) {
+            mangaList.push(manga)
+          }
         })
 
         resolve(mangaList)

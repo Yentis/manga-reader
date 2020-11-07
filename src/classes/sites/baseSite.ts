@@ -9,6 +9,7 @@ export abstract class BaseSite {
     image: Cheerio | undefined
     title: Cheerio | undefined
     chapterDate: Cheerio | undefined
+    chapterNum: Cheerio | undefined
     loggedIn = true
 
     canSearch (): boolean {
@@ -29,6 +30,10 @@ export abstract class BaseSite {
 
     getChapter (): string {
       return this.chapter?.text().trim() || 'Unknown'
+    }
+
+    getChapterNum (): number {
+      return this.parseNum(this.chapterNum?.text().trim())
     }
 
     getChapterUrl (): string {
@@ -87,8 +92,18 @@ export abstract class BaseSite {
       manga.image = this.getImage()
       manga.title = this.getTitle()
       manga.chapterDate = this.getChapterDate()
+      manga.chapterNum = this.getChapterNum()
 
       return manga
+    }
+
+    parseNum (elem: string | undefined): number {
+      const parsedInt = parseInt(elem || '0')
+      if (isNaN(parsedInt)) {
+        return 0
+      } else {
+        return parsedInt
+      }
     }
 
     abstract readUrl(url: string): Promise<Error | Manga>

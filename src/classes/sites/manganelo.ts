@@ -17,6 +17,19 @@ export class Manganelo extends BaseSite {
     return LOGIN_URL
   }
 
+  getChapterNum (): number {
+    const chapter = this.getChapter()
+    const matches = /Chapter (\d*)/gm.exec(chapter) || []
+    let num = 0
+
+    for (const match of matches) {
+      const parsedMatch = parseInt(match)
+      if (!isNaN(parsedMatch)) num = parsedMatch
+    }
+
+    return num
+  }
+
   getChapterDate (): string {
     const curTime = moment(this.currentTime?.text(), '[Current Time is] MMM DD,YYYY - hh:mm:ss A')
     const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM DD,YYYY hh:mm')
@@ -58,8 +71,9 @@ export class Manganelo extends BaseSite {
 
         for (const entry of searchData) {
           const manga = new Manga('', this.siteType)
-          manga.image = entry.image
           manga.title = cheerio.load(entry.name).root().text()
+          if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
+          manga.image = entry.image
           manga.chapter = entry.lastchapter
           manga.url = `${this.getUrl()}/manga/${entry.id_encode}`
 

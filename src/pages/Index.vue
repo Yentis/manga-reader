@@ -58,6 +58,13 @@
             <q-space />
 
             <q-card-actions vertical>
+              <q-space />
+
+              <q-btn v-if="$q.platform.is.mobile && !manga.mangaDexId" color="info" icon="link" @click="onLinkClicked(index)" />
+              <q-btn v-else-if="!manga.mangaDexId" color="info" label="Link with MangaDex" @click="onLinkClicked(index)" />
+            </q-card-actions>
+
+            <q-card-actions vertical>
               <q-btn
                 flat
                 icon="close"
@@ -84,13 +91,13 @@
         </q-toolbar>
 
         <q-card-section>
-          <q-input v-model="search" placeholder="Search for a manga" @keydown.enter="searchManga">
+          <q-input v-model="search" placeholder="Search for a manga" @keydown.enter="searchManga()">
             <template v-if="search" v-slot:append>
               <q-icon name="cancel" @click.stop="search = ''; searchResults = []" class="cursor-pointer"></q-icon>
             </template>
 
             <template v-slot:after>
-              <q-btn round dense flat icon="send" @click="searchManga"></q-btn>
+              <q-btn round dense flat icon="send" @click="searchManga()"></q-btn>
             </template>
           </q-input>
 
@@ -117,6 +124,52 @@
 
         <q-card-actions>
           <q-btn color="secondary" label="Add" @click="addManga"></q-btn>
+          <q-btn label="Cancel" v-close-popup></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="mangaDexModalShown">
+      <q-card>
+        <q-toolbar class="bg-primary text-white">
+          <q-toolbar-title>Select manga</q-toolbar-title>
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-toolbar>
+
+        <q-card-section>
+          <q-input v-model="search" placeholder="Search for the manga" @keydown.enter="searchManga(siteTypes.MangaDex)">
+            <template v-if="search" v-slot:append>
+              <q-icon name="cancel" @click.stop="search = ''; searchResults = []" class="cursor-pointer"></q-icon>
+            </template>
+
+            <template v-slot:after>
+              <q-btn round dense flat icon="send" @click="searchManga(siteTypes.MangaDex)"></q-btn>
+            </template>
+          </q-input>
+
+          <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="title || 'Selected manga'">
+            <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
+              <q-list separator>
+                <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
+                  <q-item-section avatar>
+                    <q-img contain class="manga-image-search" :src="manga.image"></q-img>
+                  </q-item-section>
+
+                  <q-item-section>
+                    <div class="text-subtitle2">{{ manga.title }}</div>
+                    <div class="text-body2">{{ manga.chapter }}</div>
+                    <div>{{ siteNames[manga.site] }}</div>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
+
+          <q-input v-if="searchResults.length === 0" v-model="url" placeholder="Or enter the url manually"></q-input>
+        </q-card-section>
+
+        <q-card-actions>
+          <q-btn color="secondary" label="Select" @click="linkMangaDex"></q-btn>
           <q-btn label="Cancel" v-close-popup></q-btn>
         </q-card-actions>
       </q-card>
@@ -157,7 +210,7 @@ import { defineComponent } from '@vue/composition-api'
 import { LocalStorage, openURL } from 'quasar'
 import { Manga } from 'src/classes/manga'
 import { SiteType, SiteName } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga, getSiteMap, checkLogins } from 'src/services/siteService'
+import { getMangaInfo, searchManga, getSiteMap, checkLogins, syncReadChapter } from 'src/services/siteService'
 import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
 import relevancy from 'relevancy'
 import { NotifyOptions } from 'src/classes/notifyOptions'
@@ -199,6 +252,7 @@ export default defineComponent({
   data () {
     return {
       addModalShown: false,
+      mangaDexModalShown: false,
       notificationShown: true,
       windowSize: [] as Array<number>,
       siteModalShown: true,
@@ -215,7 +269,9 @@ export default defineComponent({
       openBrowser: false,
       darkMode: false,
       siteMap: [] as BaseSite[],
-      siteNames: SiteName
+      siteNames: SiteName,
+      siteTypes: SiteType,
+      pendingMangaDexIndex: -1
     }
   },
   watch: {
@@ -243,13 +299,13 @@ export default defineComponent({
       this.search = ''
       this.searchResults = []
     },
-    searchManga () {
+    searchManga (siteType: SiteType | undefined = undefined) {
       if (!this.search) return
       this.$q.loading.show({
         delay: 100
       })
 
-      searchManga(this.search).then(result => {
+      searchManga(this.search, siteType).then(result => {
         this.searchDropdownShown = true
 
         // Some websites return results from other websites...
@@ -378,6 +434,13 @@ export default defineComponent({
       manga.read = manga.chapter
       manga.readUrl = manga.chapterUrl
 
+      if (manga.mangaDexId) {
+        syncReadChapter(manga.mangaDexId, manga.chapterNum).catch(error => {
+          console.error(error)
+          this.showNotification(new NotifyOptions(Error('Failed to sync with MangaDex')))
+        })
+      }
+
       this.$set(this.mangaList, index, manga)
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
     },
@@ -484,6 +547,45 @@ export default defineComponent({
       } else {
         this.openLogin(getAuthUrl())
       }
+    },
+    onLinkClicked (index: number) {
+      this.pendingMangaDexIndex = index
+
+      const manga = this.mangaList[index]
+      this.search = manga.title
+
+      if (manga.site === SiteType.MangaDex) {
+        this.url = manga.url
+        this.linkMangaDex()
+        return
+      }
+
+      this.mangaDexModalShown = true
+    },
+    linkMangaDex () {
+      if (this.pendingMangaDexIndex === -1) return
+      if (this.url === '') return
+
+      const manga = this.mangaList[this.pendingMangaDexIndex]
+      const matches = /\/title\/(\d*)\//gm.exec(this.url) || []
+      let mangaId = -1
+
+      for (const match of matches) {
+        const parsedMatch = parseInt(match)
+        if (!isNaN(parsedMatch)) mangaId = parsedMatch
+      }
+
+      if (mangaId !== -1) {
+        manga.mangaDexId = mangaId
+
+        this.$set(this.mangaList, this.pendingMangaDexIndex, manga)
+        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+      }
+
+      this.pendingMangaDexIndex = -1
+      this.url = ''
+      this.mangaDexModalShown = false
+      this.search = ''
     }
   },
   mounted () {

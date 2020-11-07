@@ -5,6 +5,7 @@ declare module 'relevancy' {
 
   interface Relevancy {
     Sorter: new <T> (options: { comparator: (a: T, b: T) => number }) => Sorter<T>
+    sort: (array: string[], query: string) => string[]
   }
 
   const relevancy: Relevancy

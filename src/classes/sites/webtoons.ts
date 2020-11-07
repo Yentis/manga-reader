@@ -20,6 +20,10 @@ export class Webtoons extends BaseSite {
     return this.getUrl()
   }
 
+  getChapterNum (): number {
+    return this.parseNum(this.chapterNum?.attr('data-episode-no'))
+  }
+
   getChapterUrl (): string {
     return this.chapterUrl?.attr('href') || ''
   }
@@ -55,10 +59,12 @@ export class Webtoons extends BaseSite {
         if (mobile || Platform.is?.mobile === true) {
           this.chapter = $('.sub_title span').first()
           this.chapterUrl = $('li[data-episode-no] a').first()
+          this.chapterNum = $('#_episodeList li').first()
           this.title = $('._btnInfo .subj').first()
         } else {
           this.chapter = $('#_listUl .subj span').first()
           this.chapterUrl = $('#_listUl a').first()
+          this.chapterNum = $('#_listUl li').first()
           this.title = $('.info .subj').first()
         }
 
@@ -80,6 +86,8 @@ export class Webtoons extends BaseSite {
 
         for (const firstIndent of searchData.items) {
           for (const item of firstIndent) {
+            const title = item[0][0]
+            if (!title.toLowerCase().includes(query.toLowerCase())) continue
             const url = `${this.getUrl()}/episodeList?titleNo=${item[3][0]}`
             promises.push(this.readUrl(url))
           }

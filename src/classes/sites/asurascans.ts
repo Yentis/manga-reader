@@ -8,6 +8,10 @@ import moment from 'moment'
 export class AsuraScans extends BaseSite {
     siteType = SiteType.AsuraScans
 
+    getChapterNum (): number {
+      return this.parseNum(this.chapterNum?.attr('data-num'))
+    }
+
     getChapterUrl (): string {
       return this.chapter?.parent()?.attr('href') || ''
     }
@@ -27,6 +31,7 @@ export class AsuraScans extends BaseSite {
           const $ = cheerio.load(response.data)
           this.chapter = $('.chapternum').first()
           this.chapterDate = $('.chapterdate').first()
+          this.chapterNum = $('#chapterlist li').first()
           this.image = $('.wp-post-image').first()
           this.title = $('.entry-title').first()
 
@@ -55,6 +60,8 @@ export class AsuraScans extends BaseSite {
 
           for (const entry of searchData.series) {
             for (const entryItem of entry.all) {
+              if (!entryItem.post_title.toLowerCase().includes(query.toLowerCase())) continue
+
               const manga = new Manga('', this.siteType)
               manga.title = entryItem.post_title
               manga.image = entryItem.post_image
