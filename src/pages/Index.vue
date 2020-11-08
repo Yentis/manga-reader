@@ -471,9 +471,11 @@ export default defineComponent({
 
             const read = this.mangaList[index].read
             const readUrl = this.mangaList[index].readUrl
+            const mangaDexId = this.mangaList[index].mangaDexId
 
             result.read = read
             result.readUrl = readUrl
+            result.mangaDexId = mangaDexId
             this.$set(this.mangaList, index, result)
           }
 

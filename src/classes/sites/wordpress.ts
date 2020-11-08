@@ -20,16 +20,16 @@ export class WordPress extends BaseSite {
 
   getChapterNum (): number {
     const chapter = this.getChapter()
-    const matches = /Chapter (\d*)/gm.exec(chapter) || []
+    const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
     let num = 0
 
     for (const match of matches) {
-      const parsedMatch = parseInt(match)
+      const parsedMatch = parseFloat(match)
       if (!isNaN(parsedMatch)) num = parsedMatch
     }
 
     if (num === 0) {
-      const candidateNum = parseInt(chapter.split(' ')[0])
+      const candidateNum = parseFloat(chapter.split(' ')[0])
       if (!isNaN(candidateNum)) num = candidateNum
     }
 

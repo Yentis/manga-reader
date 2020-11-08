@@ -19,11 +19,11 @@ export class Manganelo extends BaseSite {
 
   getChapterNum (): number {
     const chapter = this.getChapter()
-    const matches = /Chapter (\d*)/gm.exec(chapter) || []
+    const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
     let num = 0
 
     for (const match of matches) {
-      const parsedMatch = parseInt(match)
+      const parsedMatch = parseFloat(match)
       if (!isNaN(parsedMatch)) num = parsedMatch
     }
 
