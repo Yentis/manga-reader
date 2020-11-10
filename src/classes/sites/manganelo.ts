@@ -41,47 +41,46 @@ export class Manganelo extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
-      axios.get(url).then(response => {
-        const $ = cheerio.load(response.data)
-        this.chapter = $('.chapter-name').first()
-        this.image = $('.info-image img').first()
-        this.title = $('.story-info-right h1').first()
-        this.chapterDate = $('.chapter-time').first()
-        this.currentTime = $('.pn-contacts p').first()
+    return this.addToQueue(async () => {
+      const response = await axios.get(url)
+      const $ = cheerio.load(response.data)
 
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+      this.chapter = $('.chapter-name').first()
+      this.image = $('.info-image img').first()
+      this.title = $('.story-info-right h1').first()
+      this.chapterDate = $('.chapter-time').first()
+      this.currentTime = $('.pn-contacts p').first()
+
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
+    return this.addToQueue(async () => {
       const data = qs.stringify({
         searchword: query
       })
-
-      axios.post(`${this.getUrl()}/getstorysearchjson`, data, {
+      const response = await axios.post(`${this.getUrl()}/getstorysearchjson`, data, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
-      }).then(response => {
-        const searchData = response.data as ManganeloSearch[]
-        const mangaList = []
+      })
 
-        for (const entry of searchData) {
-          const manga = new Manga('', this.siteType)
-          manga.title = cheerio.load(entry.name).root().text()
-          if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
-          manga.image = entry.image
-          manga.chapter = entry.lastchapter
-          manga.url = `${this.getUrl()}/manga/${entry.id_encode}`
+      const searchData = response.data as ManganeloSearch[]
+      const mangaList = []
 
-          mangaList.push(manga)
-        }
+      for (const entry of searchData) {
+        const manga = new Manga('', this.siteType)
+        manga.title = cheerio.load(entry.name).root().text()
+        if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
+        manga.image = entry.image
+        manga.chapter = entry.lastchapter
+        manga.url = `${this.getUrl()}/manga/${entry.id_encode}`
 
-        resolve(mangaList)
-      }).catch(error => resolve(error))
+        mangaList.push(manga)
+      }
+
+      return mangaList
     })
   }
 }

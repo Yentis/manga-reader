@@ -26,54 +26,53 @@ export class AsuraScans extends BaseSite {
     }
 
     readUrl (url: string): Promise<Error | Manga> {
-      return new Promise(resolve => {
-        axios.get(url).then(response => {
-          const $ = cheerio.load(response.data)
-          this.chapter = $('.chapternum').first()
-          this.chapterDate = $('.chapterdate').first()
-          this.chapterNum = $('#chapterlist li').first()
-          this.image = $('.wp-post-image').first()
-          this.title = $('.entry-title').first()
+      return this.addToQueue(async () => {
+        const response = await axios.get(url)
+        const $ = cheerio.load(response.data)
 
-          resolve(this.buildManga(url))
-        }).catch(error => resolve(error))
+        this.chapter = $('.chapternum').first()
+        this.chapterDate = $('.chapterdate').first()
+        this.chapterNum = $('#chapterlist li').first()
+        this.image = $('.wp-post-image').first()
+        this.title = $('.entry-title').first()
+
+        return this.buildManga(url)
       })
     }
 
     search (query: string): Promise<Error | Manga[]> {
-      return new Promise(resolve => {
+      return this.addToQueue(async () => {
         const data = `action=ts_ac_do_search&ts_ac_query=${encodeURIComponent(query)}`
-
-        axios({
+        const response = await axios({
           method: 'post',
           url: `${this.getUrl()}/wp-admin/admin-ajax.php`,
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
           },
           data
-        }).then(response => {
-          const searchData = response.data as AsuraScansSearch
-          if (!searchData.series) {
-            return resolve([])
+        })
+
+        const searchData = response.data as AsuraScansSearch
+        if (!searchData.series) {
+          return []
+        }
+        const mangaList = []
+
+        for (const entry of searchData.series) {
+          for (const entryItem of entry.all) {
+            if (!entryItem.post_title.toLowerCase().includes(query.toLowerCase())) continue
+
+            const manga = new Manga('', this.siteType)
+            manga.title = entryItem.post_title
+            manga.image = entryItem.post_image
+            manga.chapter = entryItem.post_latest
+            manga.url = entryItem.post_link
+
+            mangaList.push(manga)
           }
-          const mangaList = []
+        }
 
-          for (const entry of searchData.series) {
-            for (const entryItem of entry.all) {
-              if (!entryItem.post_title.toLowerCase().includes(query.toLowerCase())) continue
-
-              const manga = new Manga('', this.siteType)
-              manga.title = entryItem.post_title
-              manga.image = entryItem.post_image
-              manga.chapter = entryItem.post_latest
-              manga.url = entryItem.post_link
-
-              mangaList.push(manga)
-            }
-          }
-
-          resolve(mangaList)
-        }).catch(error => resolve(error))
+        return mangaList
       })
     }
 }

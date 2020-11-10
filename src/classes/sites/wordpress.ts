@@ -68,26 +68,27 @@ export class WordPress extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
-      axios.get(url).then(async response => {
-        const $ = cheerio.load(response.data)
+    return this.addToQueue(async () => {
+      const response = await axios.get(url)
+      const $ = cheerio.load(response.data)
 
-        this.chapter = $('.wp-manga-chapter a').first()
-        this.chapterDate = $('.chapter-release-date').first()
-        if (!this.chapter.html() || !this.chapterDate.html()) {
-          const mangaId = $('.rating-post-id').first().attr('value') || ''
-          await this.readChapters(mangaId)
-        }
-        this.image = $('.summary_image img').first()
-        this.title = $('.post-title').first()
+      this.chapter = $('.wp-manga-chapter a').first()
+      this.chapterDate = $('.chapter-release-date').first()
+      if (!this.chapter.html() || !this.chapterDate.html()) {
+        const mangaId = $('.rating-post-id').first().attr('value') || ''
+        const error = await this.readChapters(mangaId)
 
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+        if (error) return error
+      }
+      this.image = $('.summary_image img').first()
+      this.title = $('.post-title').first()
+
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
+    return this.addToQueue(async () => {
       let queryString = ''
       query.split(' ').forEach((word, index) => {
         if (index > 0) {
@@ -95,35 +96,34 @@ export class WordPress extends BaseSite {
         }
         queryString = queryString + word
       })
-
-      axios({
+      const response = await axios({
         method: 'get',
         url: `${this.getUrl()}?s=${queryString}&post_type=wp-manga`
-      }).then(response => {
-        const $ = cheerio.load(response.data)
-        const mangaList: Manga[] = []
+      })
+      const $ = cheerio.load(response.data)
 
-        $('.c-tabs-item__content').each((_index, elem) => {
-          const cheerioElem = $(elem)
-          const imageElem = cheerioElem.find('a').first()
-          const manga = new Manga(imageElem.attr('href') || '', this.siteType)
+      const mangaList: Manga[] = []
 
-          manga.image = this.getImageSrc(imageElem.find('img').first())
-          manga.title = cheerioElem.find('.post-title').first().text().trim()
-          manga.chapter = cheerioElem.find('.font-meta.chapter').first().text()
+      $('.c-tabs-item__content').each((_index, elem) => {
+        const cheerioElem = $(elem)
+        const imageElem = cheerioElem.find('a').first()
+        const manga = new Manga(imageElem.attr('href') || '', this.siteType)
 
-          if (manga.title.toLowerCase().includes(query.toLowerCase())) {
-            mangaList.push(manga)
-          }
-        })
+        manga.image = this.getImageSrc(imageElem.find('img').first())
+        manga.title = cheerioElem.find('.post-title').first().text().trim()
+        manga.chapter = cheerioElem.find('.font-meta.chapter').first().text()
 
-        resolve(mangaList)
-      }).catch(error => resolve(error))
+        if (manga.title.toLowerCase().includes(query.toLowerCase())) {
+          mangaList.push(manga)
+        }
+      })
+
+      return mangaList
     })
   }
 
-  private readChapters (mangaId: string): Promise<void> {
-    return new Promise(resolve => {
+  private readChapters (mangaId: string): Promise<void | Error> {
+    return this.addToQueue(async () => {
       const data = qs.stringify({
         action: 'manga_get_chapters',
         manga: mangaId
@@ -138,16 +138,10 @@ export class WordPress extends BaseSite {
         data
       }
 
-      axios(config).then((response) => {
-        const $ = cheerio.load(response.data)
-        this.chapter = $('.wp-manga-chapter a').first()
-        this.chapterDate = $('.chapter-release-date').first()
-
-        resolve()
-      }).catch(error => {
-        console.error(error)
-        resolve()
-      })
+      const response = await axios(config)
+      const $ = cheerio.load(response.data)
+      this.chapter = $('.wp-manga-chapter a').first()
+      this.chapterDate = $('.chapter-release-date').first()
     })
   }
 

@@ -17,56 +17,54 @@ export class Genkan extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
-      axios.get(url).then(response => {
-        const $ = cheerio.load(response.data)
-        const chapterElem = $('.list-item.col-sm-3 a')
-        this.chapter = chapterElem.first()
-        this.chapterDate = chapterElem.eq(1)
-        this.chapterNum = $('.list-item.col-sm-3 span').first()
-        this.image = $('.media-content').first()
-        this.title = $('.text-highlight').first()
+    return this.addToQueue(async () => {
+      const response = await axios.get(url)
+      const $ = cheerio.load(response.data)
 
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+      const chapterElem = $('.list-item.col-sm-3 a')
+      this.chapter = chapterElem.first()
+      this.chapterDate = chapterElem.eq(1)
+      this.chapterNum = $('.list-item.col-sm-3 span').first()
+      this.image = $('.media-content').first()
+      this.title = $('.text-highlight').first()
+
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
-      axios.get(`${this.getUrl()}/comics`, {
+    return this.addToQueue(async () => {
+      const response = await axios.get(`${this.getUrl()}/comics`, {
         params: {
           query
         }
-      }).then(response => {
-        const $ = cheerio.load(response.data)
-        const promises: Promise<Error | Manga>[] = []
+      })
+      const $ = cheerio.load(response.data)
+      const promises: Promise<Error | Manga>[] = []
 
-        if (this.siteType === SiteType.MethodScans) {
-          $('.list-item.rounded').each((_index, elem) => {
-            const titleElem = $(elem).find('.list-body a').first()
-            const title = titleElem.html() || ''
-            const url = titleElem.attr('href') || ''
+      if (this.siteType === SiteType.MethodScans) {
+        $('.list-item.rounded').each((_index, elem) => {
+          const titleElem = $(elem).find('.list-body a').first()
+          const title = titleElem.html() || ''
+          const url = titleElem.attr('href') || ''
 
-            if (title.toLowerCase().includes(query.toLowerCase()) && url) {
-              promises.push(this.readUrl(url))
-            }
-          })
-        } else {
-          $('.list-item.rounded').each((_index, elem) => {
-            const url = $(elem).find('.media-content').first().attr('href') || ''
-            const title = $(elem).find('.list-body a').first().html() || ''
+          if (title.toLowerCase().includes(query.toLowerCase()) && url) {
+            promises.push(this.readUrl(url))
+          }
+        })
+      } else {
+        $('.list-item.rounded').each((_index, elem) => {
+          const url = $(elem).find('.media-content').first().attr('href') || ''
+          const title = $(elem).find('.list-body a').first().html() || ''
 
-            if (title.toLowerCase().includes(query.toLowerCase()) && url) {
-              promises.push(this.readUrl(url))
-            }
-          })
-        }
+          if (title.toLowerCase().includes(query.toLowerCase()) && url) {
+            promises.push(this.readUrl(url))
+          }
+        })
+      }
 
-        Promise.all(promises)
-          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
-          .catch(error => resolve(error))
-      }).catch(error => resolve(error))
+      const mangaList = await Promise.all(promises)
+      return mangaList.filter(manga => manga instanceof Manga) as Manga[]
     })
   }
 }

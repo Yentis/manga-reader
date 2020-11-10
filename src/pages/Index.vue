@@ -19,7 +19,14 @@
       </div>
     </div>
 
-    <q-linear-progress v-if="loading" indeterminate size="xl" class="q-mt-sm"></q-linear-progress>
+    <q-linear-progress
+      v-if="loading"
+      :indeterminate="refreshProgress === 0"
+      :value="refreshProgress"
+      instant-feedback
+      size="xl"
+      class="q-mt-sm"
+    ></q-linear-progress>
 
     <div class="manga-container q-mt-sm full-width">
       <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in sortedMangaList" :key="manga.url">
@@ -217,6 +224,7 @@ import { NotifyOptions } from 'src/classes/notifyOptions'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import moment from 'moment'
+import pEachSeries from 'p-each-series'
 
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
@@ -271,7 +279,8 @@ export default defineComponent({
       siteMap: [] as BaseSite[],
       siteNames: SiteName,
       siteTypes: SiteType,
-      pendingMangaDexIndex: -1
+      pendingMangaDexIndex: -1,
+      refreshProgress: 0
     }
   },
   watch: {
@@ -450,41 +459,32 @@ export default defineComponent({
     },
     onRefreshAllManga () {
       if (this.loading) return
-
+      this.refreshProgress = 0.01
       this.loading = true
-      let finishedCount = 0
 
-      const mangaUrlList = this.mangaList.map(manga => {
-        return {
-          url: manga.url,
-          site: manga.site
+      const promises = this.mangaList.map(manga => getMangaInfo(manga.url, manga.site))
+      const step = promises.length > 0 ? (1 / promises.length) : 0
+      pEachSeries(promises, (result, index) => {
+        if (result instanceof Error) {
+          this.showNotification(new NotifyOptions(result))
+        } else {
+          const read = this.mangaList[index].read
+          const readUrl = this.mangaList[index].readUrl
+          const mangaDexId = this.mangaList[index].mangaDexId
+
+          result.read = read
+          result.readUrl = readUrl
+          result.mangaDexId = mangaDexId
+          this.$set(this.mangaList, index, result)
         }
-      })
 
-      mangaUrlList.forEach(manga => {
-        getMangaInfo(manga.url, manga.site).then(result => {
-          if (result instanceof Error) {
-            this.showNotification(new NotifyOptions(result))
-          } else {
-            const index = this.mangaList.findIndex(item => item.url === manga.url)
-            if (index === -1) return
-
-            const read = this.mangaList[index].read
-            const readUrl = this.mangaList[index].readUrl
-            const mangaDexId = this.mangaList[index].mangaDexId
-
-            result.read = read
-            result.readUrl = readUrl
-            result.mangaDexId = mangaDexId
-            this.$set(this.mangaList, index, result)
-          }
-
-          finishedCount++
-          if (finishedCount >= mangaUrlList.length) {
-            LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
-            this.loading = false
-          }
-        }).catch(error => this.showNotification(new NotifyOptions(error)))
+        this.refreshProgress += step
+      }).catch((error: Error) => {
+        this.showNotification(new NotifyOptions(error))
+      }).finally(() => {
+        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+        this.loading = false
+        this.refreshProgress = 0
       })
     },
     openLogin (url: string) {

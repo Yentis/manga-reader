@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -27,6 +27,8 @@
     "isomorphic-fetch": "^2.2.1",
     "mocha": "^8.1.1",
     "moment": "^2.27.0",
+    "p-each-series": "^2.1.0",
+    "p-queue": "^6.6.2",
     "quasar": "^1.0.0",
     "relevancy": "^0.2.0"
   },

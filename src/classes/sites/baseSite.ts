@@ -1,10 +1,12 @@
 import { Manga } from '../manga'
 import { SiteType } from '../../enums/siteEnum'
 import moment from 'moment'
+import PQueue from 'p-queue'
 
 export abstract class BaseSite {
     abstract siteType: SiteType
 
+    requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
     chapter: Cheerio | undefined
     image: Cheerio | undefined
     title: Cheerio | undefined
@@ -104,6 +106,20 @@ export abstract class BaseSite {
       } else {
         return parsedInt
       }
+    }
+
+    protected addToQueue<T> (task: (() => PromiseLike<T | Error>)): Promise<T | Error> {
+      return this.requestQueue.add(async () => {
+        try {
+          return await task()
+        } catch (error) {
+          if (!(error instanceof Error)) {
+            return Error(error)
+          } else {
+            return error
+          }
+        }
+      })
     }
 
     abstract readUrl(url: string): Promise<Error | Manga>

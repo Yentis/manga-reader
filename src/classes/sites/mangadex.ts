@@ -5,9 +5,11 @@ import axios from 'axios'
 import cheerio from 'cheerio'
 import moment from 'moment'
 import relevancy from 'relevancy'
+import PQueue from 'p-queue'
 
 export class MangaDex extends BaseSite {
   siteType = SiteType.MangaDex
+  requestQueue = new PQueue({ interval: 1000, intervalCap: 1 })
 
   constructor () {
     super()
@@ -47,53 +49,50 @@ export class MangaDex extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
-      axios.get(url).then(response => {
-        const $ = cheerio.load(response.data)
-        this.chapter = $('.chapter-row a').first()
-        this.chapterNum = $('.chapter-row').eq(1)
-        this.chapterDate = $('.chapter-row div[title]').first()
-        this.image = $('.row img').first()
-        this.title = $('.card-header .mx-1').first()
+    return this.addToQueue(async () => {
+      const response = await axios.get(url)
+      const $ = cheerio.load(response.data)
 
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+      this.chapter = $('.chapter-row a').first()
+      this.chapterNum = $('.chapter-row').eq(1)
+      this.chapterDate = $('.chapter-row div[title]').first()
+      this.image = $('.row img').first()
+      this.title = $('.card-header .mx-1').first()
+
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
-      axios.get(`${this.getUrl()}/search`, {
+    return this.addToQueue(async () => {
+      const response = await axios.get(`${this.getUrl()}/search`, {
         params: {
           title: query
         }
-      }).then(response => {
-        const $ = cheerio.load(response.data)
+      })
+      const $ = cheerio.load(response.data)
 
-        if ($('#login_button').length === 1) {
-          resolve(Error('Login required'))
-          return
+      if ($('#login_button').length === 1) {
+        return Error('Login required')
+      }
+
+      let candidateUrls: string[] = []
+      const promises: Promise<Error | Manga>[] = []
+
+      $('.ml-1.manga_title').each((_index, elem) => {
+        if ($(elem).text().toLowerCase().includes(query.toLowerCase())) {
+          const url = $(elem).attr('href') || ''
+          candidateUrls.push(this.processUrl(url))
         }
+      })
+      candidateUrls = relevancy.sort(candidateUrls, query)
 
-        let candidateUrls: string[] = []
-        const promises: Promise<Error | Manga>[] = []
+      for (let i = 0; i < Math.min(5, candidateUrls.length); i++) {
+        promises.push(this.readUrl(candidateUrls[i]))
+      }
 
-        $('.ml-1.manga_title').each((_index, elem) => {
-          if ($(elem).text().toLowerCase().includes(query.toLowerCase())) {
-            const url = $(elem).attr('href') || ''
-            candidateUrls.push(this.processUrl(url))
-          }
-        })
-        candidateUrls = relevancy.sort(candidateUrls, query)
-
-        for (let i = 0; i < Math.min(5, candidateUrls.length); i++) {
-          promises.push(this.readUrl(candidateUrls[i]))
-        }
-
-        Promise.all(promises)
-          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
-          .catch(error => resolve(error))
-      }).catch(error => resolve(error))
+      const mangaList = await Promise.all(promises)
+      return mangaList.filter(manga => manga instanceof Manga) as Manga[]
     })
   }
 

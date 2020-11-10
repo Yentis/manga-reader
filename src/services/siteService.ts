@@ -30,7 +30,9 @@ import {
 } from '../classes/sites/asurascans'
 import axios from 'axios'
 import FormData from 'form-data'
+import PQueue from 'p-queue'
 
+const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
   [SiteType.KKJScans, new Genkan(SiteType.KKJScans)],
@@ -65,40 +67,39 @@ export function checkLogins (): void {
 }
 
 export function getMangaInfo (url: string, siteType: SiteType): Promise <Error | Manga> {
-  return siteMap.get(siteType)?.readUrl(url) || Promise.reject(Error('Invalid site type'))
+  const site = siteMap.get(siteType)
+  if (!site) return Promise.reject(Error('Invalid site type'))
+
+  return requestQueue.add(() => site.readUrl(url))
 }
 
 export function searchManga (query: string, siteType: SiteType | undefined = undefined): Promise <Manga[]> {
-  if (siteType) {
-    return new Promise((resolve, reject) => {
-      createRace(siteMap.get(siteType)?.search(query) || Promise.reject(Error('Invalid site type'))).then(result => {
-        if (result instanceof Error) {
-          reject(result)
-        } else {
-          resolve(result)
-        }
-      }).catch(error => reject(error))
-    })
-  } else {
-    return new Promise((resolve, reject) => {
+  return requestQueue.add(async () => {
+    if (siteType) {
+      const result = await createRace(siteMap.get(siteType)?.search(query) || Promise.reject(Error('Invalid site type')))
+      if (result instanceof Error) {
+        throw result
+      } else {
+        return result
+      }
+    } else {
       const promises: Promise<Error | Manga[]>[] = []
 
       siteMap.forEach(site => {
         promises.push(createRace(site.search(query)))
       })
 
-      Promise.all(promises).then(results => {
-        let mangaResults: Manga[] = []
+      const results = await Promise.all(promises)
+      let mangaResults: Manga[] = []
 
-        for (const mangaList of results) {
-          if (mangaList instanceof Error) continue
-          mangaResults = mangaResults.concat(mangaList)
-        }
+      for (const mangaList of results) {
+        if (mangaList instanceof Error) continue
+        mangaResults = mangaResults.concat(mangaList)
+      }
 
-        resolve(mangaResults)
-      }).catch(error => reject(error))
-    })
-  }
+      return mangaResults
+    }
+  })
 }
 
 export function getSiteMap () {

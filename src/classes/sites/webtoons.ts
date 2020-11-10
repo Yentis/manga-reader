@@ -42,61 +42,58 @@ export class Webtoons extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
+    return this.addToQueue(async () => {
       const mobile = url.includes('//m.' + this.siteType)
       const headers = mobile && Platform.is?.mobile !== true ? {
         common: {
           'User-Agent': MOBILE_USER_AGENT
         }
       } : null
+      const response = await axios.get(url, { headers })
+      const $ = cheerio.load(response.data)
 
-      axios.get(url, { headers }).then(response => {
-        const $ = cheerio.load(response.data)
+      this.image = $('meta[property="og:image"]').first()
+      this.chapterDate = $('.date').first()
 
-        this.image = $('meta[property="og:image"]').first()
-        this.chapterDate = $('.date').first()
+      if (mobile || Platform.is?.mobile === true) {
+        this.chapter = $('.sub_title span').first()
+        this.chapterUrl = $('li[data-episode-no] a').first()
+        this.chapterNum = $('#_episodeList li').first()
+        this.title = $('._btnInfo .subj').first()
+      } else {
+        this.chapter = $('#_listUl .subj span').first()
+        this.chapterUrl = $('#_listUl a').first()
+        this.chapterNum = $('#_listUl li').first()
+        this.title = $('.info .subj').first()
+      }
 
-        if (mobile || Platform.is?.mobile === true) {
-          this.chapter = $('.sub_title span').first()
-          this.chapterUrl = $('li[data-episode-no] a').first()
-          this.chapterNum = $('#_episodeList li').first()
-          this.title = $('._btnInfo .subj').first()
-        } else {
-          this.chapter = $('#_listUl .subj span').first()
-          this.chapterUrl = $('#_listUl a').first()
-          this.chapterNum = $('#_listUl li').first()
-          this.title = $('.info .subj').first()
-        }
-
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
-      axios.get(`https://ac.${this.siteType}/ac`, {
+    return this.addToQueue(async () => {
+      const response = await axios.get(`https://ac.${this.siteType}/ac`, {
         params: {
           q: `en^${query}`,
           st: 1
         }
-      }).then(response => {
-        const searchData = response.data as WebtoonsSearch
-        const promises: Promise<Error | Manga>[] = []
+      })
 
-        for (const firstIndent of searchData.items) {
-          for (const item of firstIndent) {
-            const title = item[0][0]
-            if (!title.toLowerCase().includes(query.toLowerCase())) continue
-            const url = `${this.getUrl()}/episodeList?titleNo=${item[3][0]}`
-            promises.push(this.readUrl(url))
-          }
+      const searchData = response.data as WebtoonsSearch
+      const promises: Promise<Error | Manga>[] = []
+
+      for (const firstIndent of searchData.items) {
+        for (const item of firstIndent) {
+          const title = item[0][0]
+          if (!title.toLowerCase().includes(query.toLowerCase())) continue
+          const url = `${this.getUrl()}/episodeList?titleNo=${item[3][0]}`
+          promises.push(this.readUrl(url))
         }
+      }
 
-        Promise.all(promises)
-          .then(mangaList => resolve(mangaList.filter(manga => manga instanceof Manga) as Manga[]))
-          .catch(error => resolve(error))
-      }).catch(error => resolve(error))
+      const mangaList = await Promise.all(promises)
+      return mangaList.filter(manga => manga instanceof Manga) as Manga[]
     })
   }
 }

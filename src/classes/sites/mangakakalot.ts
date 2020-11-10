@@ -38,46 +38,45 @@ export class Mangakakalot extends BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return new Promise(resolve => {
-      axios.get(url).then(response => {
-        const $ = cheerio.load(response.data)
-        this.chapter = $('.chapter-list a').first()
-        this.image = $('.manga-info-pic img').first()
-        this.title = $('.manga-info-text h1').first()
-        this.chapterDate = $('.chapter-list .row').first().find('span').last()
+    return this.addToQueue(async () => {
+      const response = await axios.get(url)
+      const $ = cheerio.load(response.data)
 
-        resolve(this.buildManga(url))
-      }).catch(error => resolve(error))
+      this.chapter = $('.chapter-list a').first()
+      this.image = $('.manga-info-pic img').first()
+      this.title = $('.manga-info-text h1').first()
+      this.chapterDate = $('.chapter-list .row').first().find('span').last()
+
+      return this.buildManga(url)
     })
   }
 
   search (query: string): Promise<Error | Manga[]> {
-    return new Promise(resolve => {
+    return this.addToQueue(async () => {
       const data = qs.stringify({
         searchword: query
       })
-
-      axios.post(`${this.getUrl()}/home_json_search`, data, {
+      const response = await axios.post(`${this.getUrl()}/home_json_search`, data, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
-      }).then(response => {
-        const searchData = response.data as MangakakalotSearch[]
-        const mangaList = []
+      })
 
-        for (const entry of searchData) {
-          const manga = new Manga('', this.siteType)
-          manga.title = cheerio.load(entry.name).root().text()
-          if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
-          manga.image = entry.image
-          manga.chapter = entry.lastchapter
-          manga.url = entry.story_link
+      const searchData = response.data as MangakakalotSearch[]
+      const mangaList = []
 
-          mangaList.push(manga)
-        }
+      for (const entry of searchData) {
+        const manga = new Manga('', this.siteType)
+        manga.title = cheerio.load(entry.name).root().text()
+        if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
+        manga.image = entry.image
+        manga.chapter = entry.lastchapter
+        manga.url = entry.story_link
 
-        resolve(mangaList)
-      }).catch(error => resolve(error))
+        mangaList.push(manga)
+      }
+
+      return mangaList
     })
   }
 }
