@@ -10,6 +10,7 @@ export class Genkan extends BaseSite {
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
+    this.checkReachable()
   }
 
   getImage (): string {

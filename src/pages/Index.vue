@@ -32,7 +32,7 @@
       <q-intersection once class="q-mb-sm full-width" v-for="(manga, index) in sortedMangaList" :key="manga.url">
         <q-card :class="{ 'card-container': manga.chapter !== manga.read }">
           <q-card-section horizontal>
-            <q-img contain class="manga-image q-ma-sm" :src="manga.image" @error="showLoadImageFailed">
+            <q-img contain class="manga-image q-ma-sm" :src="manga.image">
               <template v-slot:error>
                 <div class="error-image bg-negative">
                   <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
@@ -198,11 +198,12 @@
               clickable
               v-for="site in siteMap"
               :key="site.siteType"
-              :class="{ 'bg-warning': !site.canSearch(), 'text-black': !site.canSearch() && $q.dark.isActive }"
-              @click="site.loggedIn ? onLinkClick(site.getUrl()) : openLogin(site.getLoginUrl())">
+              :class="{ 'bg-warning': !site.statusOK(), 'text-black': !site.statusOK() && $q.dark.isActive }"
+              @click="site.loggedIn ? site.reachable ? onLinkClick(site.getUrl()) : openInApp(site.getUrl()) : openInApp(site.getLoginUrl())">
               <q-item-section>
                 <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
-                <q-item-label v-if="!site.canSearch()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Search disabled{{ !site.loggedIn ? ' | Click to login' : '' }}</q-item-label>
+                <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
+                <q-item-label v-else-if="!site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Visit to set cookies</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -229,8 +230,6 @@ import pEachSeries from 'p-each-series'
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
 const DARK_MODE_KEY = 'dark_mode'
-// eslint-disable-next-line @typescript-eslint/ban-types
-let hidePersistentError: Function | undefined
 
 const mangaSearchSorter = new relevancy.Sorter({
   comparator: (a: Manga, b: Manga) => {
@@ -247,9 +246,9 @@ function mangaSort (a: Manga, b: Manga): number {
 }
 
 function siteSort (a: BaseSite, b: BaseSite): number {
-  if (!a.canSearch() && b.canSearch()) {
+  if (!a.statusOK() && b.statusOK()) {
     return -1
-  } else if (!b.loggedIn && a.loggedIn) {
+  } else if (!b.statusOK() && a.statusOK()) {
     return 1
   } else {
     return SiteName[a.siteType] > SiteName[b.siteType] ? 1 : -1
@@ -368,25 +367,6 @@ export default defineComponent({
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
       this.loading = false
     },
-    showLoadImageFailed () {
-      if (hidePersistentError) hidePersistentError()
-
-      const notifyOptions = new NotifyOptions('One or more images could not be loaded')
-      notifyOptions.timeout = 0
-      notifyOptions.position = 'top'
-      notifyOptions.actions = [{
-        label: 'Refresh manga',
-        handler: () => {
-          this.onRefreshAllManga()
-        },
-        color: 'white'
-      }, {
-        label: 'Dismiss',
-        color: 'white'
-      }]
-
-      hidePersistentError = this.showNotification(notifyOptions)
-    },
     showUpdateAvailable (githubRelease: GithubRelease) {
       const notifyOptions = new NotifyOptions(`Update available: ${githubRelease.tag_name}`)
       notifyOptions.type = 'positive'
@@ -407,7 +387,7 @@ export default defineComponent({
         color: 'white'
       }]
 
-      hidePersistentError = this.showNotification(notifyOptions)
+      this.showNotification(notifyOptions)
     },
     saveOpenBrowser () {
       LocalStorage.set(OPEN_BROWSER_KEY, this.openBrowser)
@@ -444,7 +424,11 @@ export default defineComponent({
       manga.readUrl = manga.chapterUrl
 
       if (manga.mangaDexId) {
-        syncReadChapter(manga.mangaDexId, manga.chapterNum).catch(error => {
+        syncReadChapter(manga.mangaDexId, manga.chapterNum).then(() => {
+          const notifyOptions = new NotifyOptions('Synced with MangaDex')
+          notifyOptions.type = 'positive'
+          this.showNotification(notifyOptions)
+        }).catch(error => {
           console.error(error)
           this.showNotification(new NotifyOptions(Error('Failed to sync with MangaDex')))
         })
@@ -487,7 +471,7 @@ export default defineComponent({
         this.refreshProgress = 0
       })
     },
-    openLogin (url: string) {
+    openInApp (url: string) {
       if (this.$q.platform.is.mobile) {
         const browser = this.$q.cordova.InAppBrowser.open(url)
 
@@ -547,7 +531,7 @@ export default defineComponent({
           setAccessToken(token)
         }).catch(error => this.showNotification(new NotifyOptions(error)))
       } else {
-        this.openLogin(getAuthUrl())
+        this.openInApp(getAuthUrl())
       }
     },
     onLinkClicked (index: number) {

@@ -11,6 +11,11 @@ const LOGIN_URL = 'https://user.manganelo.com/login?l=mangakakalot'
 export class Mangakakalot extends BaseSite {
   siteType = SiteType.Mangakakalot
 
+  constructor () {
+    super()
+    this.checkReachable()
+  }
+
   getLoginUrl (): string {
     return LOGIN_URL
   }

@@ -288,11 +288,11 @@ function testFirstkissmanga (): Promise<void> {
 
     getMangaInfo(url, site).then(mangaInfo => {
       const desired = new Manga(url, site)
-      desired.chapter = 'Chapter 16'
+      desired.chapter = 'Chapter 24'
       desired.image = 'https://1stkissmanga.com/wp-content/uploads/2020/08/royal-shop-of-young-lady-193x278.jpg'
       desired.title = 'Royal Shop of Young Lady'
-      desired.chapterUrl = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-16/'
-      desired.chapterNum = 16
+      desired.chapterUrl = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-24/'
+      desired.chapterNum = 24
 
       const result = equals(mangaInfo, desired)
 
@@ -309,11 +309,11 @@ function testMangakakalot (): Promise<void> {
 
     getMangaInfo(url, site).then(mangaInfo => {
       const desired = new Manga(url, site)
-      desired.chapter = 'Vol.3 Chapter 20: The Great Tehonbiki Gamble, Part 7'
+      desired.chapter = 'Vol.3 Chapter 22: The Great Tehonbiki Gamble, Part 9'
       desired.image = 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg'
       desired.title = 'Legend of the End-of-Century Gambling Wolf Saga'
-      desired.chapterUrl = 'https://mangakakalot.com/chapter/ui921789/chapter_20'
-      desired.chapterNum = 20
+      desired.chapterUrl = 'https://mangakakalot.com/chapter/ui921789/chapter_22'
+      desired.chapterNum = 22
 
       const result = equals(mangaInfo, desired)
 
@@ -451,7 +451,7 @@ function testReaperScans (): Promise<void> {
 
 function testMangaDoDs (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://www.mangadods.com/manga/akagi-2/'
+    const url = 'https://www.mangadods.com/manga/flower-war/'
     const site = SiteType.MangaDoDs
 
     getMangaInfo(url, site).then(mangaInfo => {
@@ -478,7 +478,7 @@ function testAsuraScans (): Promise<void> {
     getMangaInfo(url, site).then(mangaInfo => {
       const desired = new Manga(url, site)
       desired.chapter = 'Chapter 19'
-      desired.image = 'https://asurascans.com/wp-content/uploads/2020/09/49754.jpg'
+      desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg'
       desired.title = 'Tougen Anki'
       desired.chapterUrl = 'https://asurascans.com/tougen-anki-chapter-19/'
       desired.chapterNum = 19

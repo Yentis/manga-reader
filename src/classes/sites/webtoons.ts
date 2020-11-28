@@ -12,6 +12,11 @@ export class Webtoons extends BaseSite {
   chapterUrl: Cheerio | undefined
   siteType = SiteType.Webtoons
 
+  constructor () {
+    super()
+    this.checkReachable()
+  }
+
   getUrl (): string {
     return `https://www.${this.siteType}`
   }

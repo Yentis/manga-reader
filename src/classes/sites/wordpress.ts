@@ -12,6 +12,7 @@ export class WordPress extends BaseSite {
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
+    this.checkReachable()
   }
 
   getLoginUrl (): string {

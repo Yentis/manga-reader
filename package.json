@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.18.2",
+    "@quasar/cli": "^1.1.2",
     "@quasar/extras": "^1.0.0",
     "@vue/composition-api": "^0.6.4",
     "axios": "^0.19.2",

@@ -14,16 +14,16 @@ export class MangaDex extends BaseSite {
   constructor () {
     super()
     this.checkLogin()
-  }
-
-  canSearch (): boolean {
-    return this.loggedIn
+    this.checkReachable()
   }
 
   checkLogin (): void {
     this.search('together with the rain').then(results => {
       this.loggedIn = !(results instanceof Error)
-    }).catch(error => console.error(error))
+    }).catch(error => {
+      console.error(error)
+      this.loggedIn = false
+    })
   }
 
   getChapter (): string {

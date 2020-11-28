@@ -13,6 +13,11 @@ export class Manganelo extends BaseSite {
   siteType = SITE_TYPE
   currentTime: Cheerio | undefined
 
+  constructor () {
+    super()
+    this.checkReachable()
+  }
+
   getLoginUrl (): string {
     return LOGIN_URL
   }

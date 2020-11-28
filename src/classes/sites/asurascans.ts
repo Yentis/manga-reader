@@ -8,6 +8,11 @@ import moment from 'moment'
 export class AsuraScans extends BaseSite {
     siteType = SiteType.AsuraScans
 
+    constructor () {
+      super()
+      this.checkReachable()
+    }
+
     getChapterNum (): number {
       return this.parseNum(this.chapterNum?.attr('data-num'))
     }

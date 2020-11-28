@@ -2,6 +2,7 @@ import { Manga } from '../manga'
 import { SiteType } from '../../enums/siteEnum'
 import moment from 'moment'
 import PQueue from 'p-queue'
+import axios from 'axios'
 
 export abstract class BaseSite {
     abstract siteType: SiteType
@@ -13,9 +14,26 @@ export abstract class BaseSite {
     chapterDate: Cheerio | undefined
     chapterNum: Cheerio | undefined
     loggedIn = true
+    reachable = true
 
-    canSearch (): boolean {
-      return true
+    isReachable (): boolean {
+      return this.reachable
+    }
+
+    statusOK (): boolean {
+      return this.loggedIn && this.reachable
+    }
+
+    checkReachable (): void {
+      this.addToQueue(async () => {
+        const response = await axios.get(this.getUrl())
+        return response.status < 400
+      }).then((results) => {
+        this.reachable = results === true
+      }).catch((error) => {
+        console.error(error)
+        this.reachable = false
+      })
     }
 
     checkLogin (): void {
@@ -100,7 +118,7 @@ export abstract class BaseSite {
     }
 
     parseNum (elem: string | undefined): number {
-      const parsedInt = parseInt(elem || '0')
+      const parsedInt = parseFloat(elem || '0')
       if (isNaN(parsedInt)) {
         return 0
       } else {
