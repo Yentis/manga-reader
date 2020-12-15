@@ -109,7 +109,8 @@ module.exports = configure(function (ctx) {
         'LocalStorage',
         'Cookies',
         'Notify',
-        'Loading'
+        'Loading',
+        'Dialog'
       ]
     },
 

@@ -5,6 +5,7 @@ export class NotifyOptions {
     position: 'bottom' | 'top' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'left' | 'right' | 'center' | undefined = undefined
     closeBtn: boolean | string = false
     actions: Array<{ label: string, handler?: () => void, color?: string }> | undefined
+    caption: string | undefined = undefined
 
     constructor (message: Error | string) {
       this.message = message
@@ -17,7 +18,8 @@ export class NotifyOptions {
         timeout: this.timeout,
         position: this.position,
         closeBtn: this.closeBtn,
-        actions: this.actions
+        actions: this.actions,
+        caption: this.caption
       }
     }
 }

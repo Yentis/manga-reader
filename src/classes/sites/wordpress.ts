@@ -12,7 +12,7 @@ export class WordPress extends BaseSite {
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
-    this.checkReachable()
+    this.checkState()
   }
 
   getLoginUrl (): string {
@@ -66,6 +66,25 @@ export class WordPress extends BaseSite {
 
   getTitle (): string {
     return this.title?.text().replace(this.title.find('span').text(), '').trim() || 'Unknown'
+  }
+
+  getTestUrl (): string {
+    switch (this.siteType) {
+      case SiteType.FirstKissManga:
+        return 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/'
+      case SiteType.MangaKomi:
+        return 'https://mangakomi.com/manga/good-night/'
+      case SiteType.HiperDEX:
+        return 'https://hiperdex.com/manga/arata-primal-the-new-primitive/'
+      case SiteType.MangaDoDs:
+        return 'https://www.mangadods.com/manga/flower-war/'
+      case SiteType.ManhwaClub:
+        return 'https://manhwa.club/manhwa/settia/'
+      case SiteType.MangaTx:
+        return 'https://mangatx.com/manga/grandest-wedding/'
+    }
+
+    return this.getUrl()
   }
 
   readUrl (url: string): Promise<Error | Manga> {

@@ -10,7 +10,7 @@ export class AsuraScans extends BaseSite {
 
     constructor () {
       super()
-      this.checkReachable()
+      this.checkState()
     }
 
     getChapterNum (): number {
@@ -28,6 +28,10 @@ export class AsuraScans extends BaseSite {
       } else {
         return ''
       }
+    }
+
+    getTestUrl (): string {
+      return 'https://asurascans.com/manga/tougen-anki/'
     }
 
     readUrl (url: string): Promise<Error | Manga> {

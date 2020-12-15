@@ -14,7 +14,7 @@ export class Webtoons extends BaseSite {
 
   constructor () {
     super()
-    this.checkReachable()
+    this.checkState()
   }
 
   getUrl (): string {
@@ -44,6 +44,10 @@ export class Webtoons extends BaseSite {
 
   getImage (): string {
     return this.image?.attr('content') || ''
+  }
+
+  getTestUrl (): string {
+    return 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142'
   }
 
   readUrl (url: string): Promise<Error | Manga> {

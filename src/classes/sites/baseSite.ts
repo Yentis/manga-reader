@@ -1,8 +1,7 @@
 import { Manga } from '../manga'
-import { SiteType } from '../../enums/siteEnum'
+import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
 import moment from 'moment'
 import PQueue from 'p-queue'
-import axios from 'axios'
 
 export abstract class BaseSite {
     abstract siteType: SiteType
@@ -14,25 +13,25 @@ export abstract class BaseSite {
     chapterDate: Cheerio | undefined
     chapterNum: Cheerio | undefined
     loggedIn = true
-    reachable = true
-
-    isReachable (): boolean {
-      return this.reachable
-    }
+    state = SiteState.REACHABLE
 
     statusOK (): boolean {
-      return this.loggedIn && this.reachable
+      return this.loggedIn && this.state === SiteState.REACHABLE
     }
 
-    checkReachable (): void {
+    checkState (): void {
       this.addToQueue(async () => {
-        const response = await axios.get(this.getUrl())
-        return response.status < 400
+        const response = await this.readUrl(this.getTestUrl())
+        return response instanceof Error ? SiteState.OFFLINE : response.title === 'Unknown' ? SiteState.INVALID : SiteState.REACHABLE
       }).then((results) => {
-        this.reachable = results === true
+        if (results instanceof Error) {
+          this.state = SiteState.OFFLINE
+        } else {
+          this.state = results
+        }
       }).catch((error) => {
         console.error(error)
-        this.reachable = false
+        this.state = SiteState.OFFLINE
       })
     }
 
@@ -126,6 +125,24 @@ export abstract class BaseSite {
       }
     }
 
+    compare (b: BaseSite): number {
+      if (this.state === SiteState.INVALID && b.state !== SiteState.INVALID) {
+        return -1
+      } else if (b.state === SiteState.INVALID && this.state !== SiteState.INVALID) {
+        return 1
+      } else if (!this.loggedIn && b.loggedIn) {
+        return -1
+      } else if (!b.loggedIn && this.loggedIn) {
+        return 1
+      } else if (this.state === SiteState.OFFLINE && b.state !== SiteState.OFFLINE) {
+        return -1
+      } else if (b.state === SiteState.OFFLINE && this.state !== SiteState.OFFLINE) {
+        return 1
+      } else {
+        return SiteName[this.siteType] > SiteName[b.siteType] ? 1 : -1
+      }
+    }
+
     protected addToQueue<T> (task: (() => PromiseLike<T | Error>)): Promise<T | Error> {
       return this.requestQueue.add(async () => {
         try {
@@ -140,6 +157,7 @@ export abstract class BaseSite {
       })
     }
 
+    abstract getTestUrl(): string
     abstract readUrl(url: string): Promise<Error | Manga>
     abstract search(query: string): Promise<Error | Manga[]>
 }

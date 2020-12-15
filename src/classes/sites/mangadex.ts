@@ -14,7 +14,7 @@ export class MangaDex extends BaseSite {
   constructor () {
     super()
     this.checkLogin()
-    this.checkReachable()
+    this.checkState()
   }
 
   checkLogin (): void {
@@ -46,6 +46,10 @@ export class MangaDex extends BaseSite {
     } else {
       return ''
     }
+  }
+
+  getTestUrl (): string {
+    return 'https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored'
   }
 
   readUrl (url: string): Promise<Error | Manga> {

@@ -1,6 +1,6 @@
 import 'mocha'
 import 'jsdom-global'
-import { getMangaInfo, searchManga } from '../src/services/siteService'
+import { getMangaInfo, searchManga, testSite } from '../src/services/siteService'
 import { SiteType } from '../src/enums/siteEnum'
 import { Manga } from '../src/classes/manga'
 
@@ -178,11 +178,10 @@ function equals (
 
 function testManganelo (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://manganelo.com/manga/pu918807'
     const site = SiteType.Manganelo
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://manganelo.com/manga/pu918807', site)
       desired.chapter = 'Vol.6 Chapter 57: The Final Chapter'
       desired.image = 'https://avt.mkklcdnv6.com/8/x/18-1583497426.jpg'
       desired.title = 'Kudan No Gotoshi'
@@ -199,11 +198,10 @@ function testManganelo (): Promise<void> {
 
 function testKKJScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard'
     const site = SiteType.KKJScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard', site)
       desired.chapter = 'Season 1 Finale'
       desired.image = 'https://kkjscans.co/storage/comics/AA1DB1EFF76AD034EED5034A101770A052FE4B16332B3A14/sG9SfErajIj3wg1Dhbu0f3rFcZYrXSVqBLjRgFAA.jpeg'
       desired.title = 'The Rebirth of an 8th Circled Wizard'
@@ -220,11 +218,10 @@ function testKKJScans (): Promise<void> {
 
 function testWebtoons (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142'
     const site = SiteType.Webtoons
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/list?title_no=2142', site)
       desired.chapter = 'Episode 16'
       desired.image = 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540'
       desired.title = 'The Wolf & Red Riding Hood'
@@ -262,11 +259,10 @@ function testWebtoonsMobile (): Promise<void> {
 
 function testHatigarmScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai'
     const site = SiteType.HatigarmScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai', site)
       desired.chapter = 'Chapter 5'
       desired.image = 'https://hatigarmscanz.net/storage/comics/0136EED9F0042F701F86C0B47B925F5255FC39FB87F336DB/bhK9esSCI5sZgJOO9dw5gcLNfwne47H69XOxQHs1.jpeg'
       desired.title = 'Ichizu de Bitch na Kouhai'
@@ -283,11 +279,10 @@ function testHatigarmScans (): Promise<void> {
 
 function testFirstkissmanga (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/'
     const site = SiteType.FirstKissManga
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://1stkissmanga.com/manga/royal-shop-of-young-lady/', site)
       desired.chapter = 'Chapter 24'
       desired.image = 'https://1stkissmanga.com/wp-content/uploads/2020/08/royal-shop-of-young-lady-193x278.jpg'
       desired.title = 'Royal Shop of Young Lady'
@@ -304,11 +299,10 @@ function testFirstkissmanga (): Promise<void> {
 
 function testMangakakalot (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://mangakakalot.com/manga/ui921789'
     const site = SiteType.Mangakakalot
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://mangakakalot.com/manga/ui921789', site)
       desired.chapter = 'Vol.3 Chapter 22: The Great Tehonbiki Gamble, Part 9'
       desired.image = 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg'
       desired.title = 'Legend of the End-of-Century Gambling Wolf Saga'
@@ -325,11 +319,10 @@ function testMangakakalot (): Promise<void> {
 
 function testMangadex (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored'
     const site = SiteType.MangaDex
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored', site)
       desired.chapter = 'Vol. 24 Ch. 95 - World of Stars and Stripes - Outro'
       desired.image = 'https://mangadex.org/images/manga/6272.jpg?1531150797'
       desired.title = 'JoJo\'s Bizarre Adventure Part 7 - Steel Ball Run (Official Colored)'
@@ -346,11 +339,10 @@ function testMangadex (): Promise<void> {
 
 function testMangakomi (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://mangakomi.com/manga/good-night/'
     const site = SiteType.MangaKomi
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://mangakomi.com/manga/good-night/', site)
       desired.chapter = 'Chapter 34 - The End'
       desired.image = 'https://mangakomi.com/wp-content/uploads/2020/08/thumb_5f35bc951b432.png'
       desired.title = 'Good Night'
@@ -367,11 +359,10 @@ function testMangakomi (): Promise<void> {
 
 function testMethodScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://methodscans.com/comics/773532-meng-shi-zai-shang'
     const site = SiteType.MethodScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://methodscans.com/comics/773532-meng-shi-zai-shang', site)
       desired.chapter = 'Yuan Yuan is as sharp as ever'
       desired.image = 'https://methodscans.com/storage/comics/32C023D5E17475B0A11F44D374454D1731B83F43D8576CF3/O7ExypuTakfFfImsojgiZqwd1dFTGevwYCKY2707.png'
       desired.title = 'Meng Shi Zai Shang'
@@ -388,11 +379,10 @@ function testMethodScans (): Promise<void> {
 
 function testLeviatanScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://leviatanscans.com/comics/909261-stresser'
     const site = SiteType.LeviatanScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://leviatanscans.com/comics/909261-stresser', site)
       desired.chapter = 'Chapter 8'
       desired.image = 'https://leviatanscans.com/storage/comics/BCB5DC2B80EFE1F1AA0CD616E62D075313A91F7CD6FFDFFC/BFzN2G6vA89PxW15VHliJxTLNXUO185Srlyt0GAH.jpeg'
       desired.title = 'Stresser'
@@ -409,11 +399,10 @@ function testLeviatanScans (): Promise<void> {
 
 function testHiperDEX (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://hiperdex.com/manga/arata-primal-the-new-primitive/'
     const site = SiteType.HiperDEX
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://hiperdex.com/manga/arata-primal-the-new-primitive/', site)
       desired.chapter = '35 [END]'
       desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Arata-Primal-193x278.jpg'
       desired.title = 'Arata Primal'
@@ -430,11 +419,10 @@ function testHiperDEX (): Promise<void> {
 
 function testReaperScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://reaperscans.com/comics/621295-alpha'
     const site = SiteType.ReaperScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://reaperscans.com/comics/621295-alpha', site)
       desired.chapter = 'End'
       desired.image = 'https://reaperscans.com/storage/comics/EB4E79D4AF295DAFD75B2CE8C91E9B8CF209090AB259BE2A/rYXSCHcBgkjup3vxpqhg4RH7Q1LwhqLXS6hPGZIK.jpeg'
       desired.title = 'ALPHA'
@@ -451,11 +439,10 @@ function testReaperScans (): Promise<void> {
 
 function testMangaDoDs (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://www.mangadods.com/manga/flower-war/'
     const site = SiteType.MangaDoDs
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://www.mangadods.com/manga/flower-war/', site)
       desired.chapter = '22 END'
       desired.image = 'https://www.mangadods.com/wp-content/uploads/2020/02/12-193x278.jpg'
       desired.title = 'Flower War'
@@ -472,11 +459,10 @@ function testMangaDoDs (): Promise<void> {
 
 function testAsuraScans (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://asurascans.com/manga/tougen-anki/'
     const site = SiteType.AsuraScans
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://asurascans.com/manga/tougen-anki/', site)
       desired.chapter = 'Chapter 19'
       desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg'
       desired.title = 'Tougen Anki'
@@ -493,11 +479,10 @@ function testAsuraScans (): Promise<void> {
 
 function testManhwaClub (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://manhwa.club/manhwa/settia/'
     const site = SiteType.ManhwaClub
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://manhwa.club/manhwa/settia/', site)
       desired.chapter = 'Chapter 25'
       desired.image = 'https://manhwa.club/wp-content/uploads/2020/04/Settia-193x278.jpg'
       desired.title = 'Settia'
@@ -514,11 +499,10 @@ function testManhwaClub (): Promise<void> {
 
 function testMangaTx (): Promise<void> {
   return new Promise((resolve, reject) => {
-    const url = 'https://mangatx.com/manga/grandest-wedding/'
     const site = SiteType.MangaTx
 
-    getMangaInfo(url, site).then(mangaInfo => {
-      const desired = new Manga(url, site)
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('https://mangatx.com/manga/grandest-wedding/', site)
       desired.chapter = 'Chapter 169 [End]'
       desired.image = 'https://mangatx.com/wp-content/uploads/2019/10/85012-193x278.png'
       desired.title = 'Grandest Wedding'

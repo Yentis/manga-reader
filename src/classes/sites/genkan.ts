@@ -10,11 +10,28 @@ export class Genkan extends BaseSite {
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
-    this.checkReachable()
+    this.checkState()
   }
 
   getImage (): string {
     return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), this.getUrl()).replace(new RegExp('"?\\)', 'g'), '') || ''
+  }
+
+  getTestUrl (): string {
+    switch (this.siteType) {
+      case SiteType.KKJScans:
+        return 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard'
+      case SiteType.HatigarmScans:
+        return 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai'
+      case SiteType.MethodScans:
+        return 'https://methodscans.com/comics/773532-meng-shi-zai-shang'
+      case SiteType.LeviatanScans:
+        return 'https://leviatanscans.com/comics/909261-stresser'
+      case SiteType.ReaperScans:
+        return 'https://reaperscans.com/comics/621295-alpha'
+    }
+
+    return this.getUrl()
   }
 
   readUrl (url: string): Promise<Error | Manga> {

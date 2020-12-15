@@ -199,11 +199,11 @@
               v-for="site in siteMap"
               :key="site.siteType"
               :class="{ 'bg-warning': !site.statusOK(), 'text-black': !site.statusOK() && $q.dark.isActive }"
-              @click="site.loggedIn ? site.reachable ? onLinkClick(site.getUrl()) : openInApp(site.getUrl()) : openInApp(site.getLoginUrl())">
+              @click="site.loggedIn ? site.statusOK() ? onLinkClick(site.getUrl()) : openInApp(site.getUrl()) : openInApp(site.getLoginUrl())">
               <q-item-section>
                 <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
                 <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
-                <q-item-label v-else-if="!site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Visit to set cookies</q-item-label>
+                <q-item-label v-else-if="!site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>{{ site.state }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -226,6 +226,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import moment from 'moment'
 import pEachSeries from 'p-each-series'
+import CustomDialog from 'src/components/CustomDialog.vue'
 
 const MANGA_LIST_KEY = 'manga'
 const OPEN_BROWSER_KEY = 'open_browser'
@@ -246,13 +247,7 @@ function mangaSort (a: Manga, b: Manga): number {
 }
 
 function siteSort (a: BaseSite, b: BaseSite): number {
-  if (!a.statusOK() && b.statusOK()) {
-    return -1
-  } else if (!b.statusOK() && a.statusOK()) {
-    return 1
-  } else {
-    return SiteName[a.siteType] > SiteName[b.siteType] ? 1 : -1
-  }
+  return a.compare(b)
 }
 
 export default defineComponent({
@@ -437,10 +432,19 @@ export default defineComponent({
       this.$set(this.mangaList, index, manga)
       LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
     },
+
     onDeleteClick (index: number) {
-      this.mangaList.splice(index, 1)
-      LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+      this.$q.dialog({
+        component: CustomDialog,
+        title: 'Delete manga',
+        content: `Are you sure you want to delete ${this.mangaList[index].title}?`,
+        imageUrl: this.mangaList[index].image
+      }).onOk(() => {
+        this.mangaList.splice(index, 1)
+        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+      })
     },
+
     onRefreshAllManga () {
       if (this.loading) return
       this.refreshProgress = 0.01
@@ -450,7 +454,17 @@ export default defineComponent({
       const step = promises.length > 0 ? (1 / promises.length) : 0
       pEachSeries(promises, (result, index) => {
         if (result instanceof Error) {
-          this.showNotification(new NotifyOptions(result))
+          const notifyOptions = new NotifyOptions(`Failed to refresh ${this.mangaList[index].title}`)
+          notifyOptions.caption = result.message
+          notifyOptions.actions = [{
+            label: 'Visit',
+            handler: () => {
+              this.onLinkClick(this.mangaList[index].url)
+            },
+            color: 'white'
+          }]
+
+          this.showNotification(notifyOptions)
         } else {
           const read = this.mangaList[index].read
           const readUrl = this.mangaList[index].readUrl

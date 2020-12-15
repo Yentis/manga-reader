@@ -35,3 +35,9 @@ export enum SiteName {
     'manhwa.club' = 'Manhwa Club',
     'mangatx.com' = 'MangaTx'
 }
+
+export enum SiteState {
+    OFFLINE = 'Site not reachable',
+    INVALID = 'Visit to set cookies',
+    REACHABLE = 'Reachable'
+}

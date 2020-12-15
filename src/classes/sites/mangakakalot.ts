@@ -13,7 +13,7 @@ export class Mangakakalot extends BaseSite {
 
   constructor () {
     super()
-    this.checkReachable()
+    this.checkState()
   }
 
   getLoginUrl (): string {
@@ -40,6 +40,10 @@ export class Mangakakalot extends BaseSite {
     } else {
       return this.getDateFromNow(this.chapterDate?.attr('title'))
     }
+  }
+
+  getTestUrl (): string {
+    return 'https://mangakakalot.com/manga/ui921789'
   }
 
   readUrl (url: string): Promise<Error | Manga> {

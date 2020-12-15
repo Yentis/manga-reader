@@ -15,7 +15,7 @@ export class Manganelo extends BaseSite {
 
   constructor () {
     super()
-    this.checkReachable()
+    this.checkState()
   }
 
   getLoginUrl (): string {
@@ -43,6 +43,10 @@ export class Manganelo extends BaseSite {
     } else {
       return ''
     }
+  }
+
+  getTestUrl (): string {
+    return 'https://manganelo.com/manga/pu918807'
   }
 
   readUrl (url: string): Promise<Error | Manga> {
