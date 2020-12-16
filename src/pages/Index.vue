@@ -4,17 +4,13 @@
 
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="secondary" label="Refresh" @click="onRefreshAllManga" />
-        <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
-      </div>
-      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
         <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
         <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="exportList" />
         <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
       </div>
       <div class="flex-column-between">
-        <q-checkbox v-model="openBrowser" label="Open in browser" @input="saveOpenBrowser" />
+        <q-checkbox :value="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
         <q-checkbox v-model="darkMode" label="Dark mode" @input="saveDarkMode" />
       </div>
     </div>
@@ -141,19 +137,19 @@
 <script lang="ts">
 import { mapGetters, mapMutations } from 'vuex'
 import { defineComponent } from '@vue/composition-api'
-import { LocalStorage, openURL } from 'quasar'
+import { LocalStorage } from 'quasar'
 import relevancy from 'relevancy'
 import moment from 'moment'
-import pEachSeries from 'p-each-series'
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UpdateManga } from 'src/classes/updateManga'
 import { SiteType, SiteName } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga, checkLogins, syncReadChapter } from 'src/services/siteService'
+import { searchManga, syncReadChapter } from 'src/services/siteService'
 import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import MangaHeader from 'src/components/Header.vue'
 import CustomDialog from 'src/components/CustomDialog.vue'
+import { UrlNavigation } from 'src/classes/urlNavigation'
 
 const mangaSearchSorter = new relevancy.Sorter({
   comparator: (a: Manga, b: Manga) => {
@@ -182,12 +178,10 @@ export default defineComponent({
       search: '',
       searchResults: [] as Manga[],
       notificationText: '',
-      openBrowser: false,
       darkMode: false,
       siteNames: SiteName,
       siteTypes: SiteType,
-      pendingMangaDexIndex: -1,
-      refreshProgress: 0
+      pendingMangaDexIndex: -1
     }
   },
 
@@ -198,7 +192,9 @@ export default defineComponent({
   computed: {
     ...mapGetters('reader', {
       mangaList: 'mangaList',
-      refreshing: 'refreshing'
+      refreshing: 'refreshing',
+      refreshProgress: 'refreshProgress',
+      openInBrowser: 'openInBrowser'
     }),
     sortedMangaList: function (): Manga[] {
       return (this.mangaList as Manga[]).sort(mangaSort)
@@ -211,7 +207,9 @@ export default defineComponent({
       pushNotification: 'pushNotification',
       updateMangaList: 'updateMangaList',
       removeManga: 'removeManga',
-      updateManga: 'updateManga'
+      updateManga: 'updateManga',
+      pushUrlNavigation: 'pushUrlNavigation',
+      updateOpenInBrowser: 'updateOpenInBrowser'
     }),
 
     resetState () {
@@ -267,8 +265,9 @@ export default defineComponent({
 
       this.showNotification(notifyOptions)
     },
-    saveOpenBrowser () {
-      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, this.openBrowser)
+    saveOpenInBrowser (checked: boolean) {
+      this.updateOpenInBrowser(checked)
+      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, checked)
     },
     saveDarkMode () {
       this.$q.dark.set(this.darkMode)
@@ -278,14 +277,8 @@ export default defineComponent({
       this.resetState()
       this.pushNotification(notifyOptions)
     },
-    onLinkClick (url: string) {
-      // Mobile will open the InAppBrowser when openURL is called
-      const openBrowser = this.$q.platform.is.mobile ? !this.openBrowser : this.openBrowser
-      if (openBrowser) {
-        openURL(url)
-      } else {
-        window.location.href = url
-      }
+    onLinkClick (url: string, openInApp = false) {
+      this.pushUrlNavigation(new UrlNavigation(url, openInApp))
     },
     onReadClick (index: number) {
       const manga = (this.mangaList as Manga[])[index]
@@ -321,60 +314,6 @@ export default defineComponent({
       })
     },
 
-    onRefreshAllManga () {
-      if (this.refreshing) return
-      this.refreshProgress = 0.01
-      this.updateRefreshing(true)
-
-      const promises = (this.mangaList as Manga[]).map(manga => getMangaInfo(manga.url, manga.site))
-      const step = promises.length > 0 ? (1 / promises.length) : 0
-      pEachSeries(promises, (result, index) => {
-        const manga = (this.mangaList as Manga[])[index]
-
-        if (result instanceof Error) {
-          const notifyOptions = new NotifyOptions(`Failed to refresh ${manga.title}`)
-          notifyOptions.caption = result.message
-          notifyOptions.actions = [{
-            label: 'Visit',
-            handler: () => {
-              this.onLinkClick(manga.url)
-            },
-            color: 'white'
-          }]
-
-          this.showNotification(notifyOptions)
-        } else {
-          const read = manga.read
-          const readUrl = manga.readUrl
-          const mangaDexId = manga.mangaDexId
-
-          result.read = read
-          result.readUrl = readUrl
-          result.mangaDexId = mangaDexId
-
-          this.updateManga(new UpdateManga(result, index))
-        }
-
-        this.refreshProgress += step
-      }).catch((error: Error) => {
-        this.showNotification(new NotifyOptions(error))
-      }).finally(() => {
-        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
-        this.updateRefreshing(false)
-        this.refreshProgress = 0
-      })
-    },
-    openInApp (url: string) {
-      if (this.$q.platform.is.mobile) {
-        const browser = this.$q.cordova.InAppBrowser.open(url)
-
-        browser.addEventListener('exit', () => {
-          checkLogins()
-        })
-      } else {
-        window.location.href = url
-      }
-    },
     exportList () {
       this.exporting = true
 
@@ -424,7 +363,7 @@ export default defineComponent({
           setAccessToken(token)
         }).catch(error => this.showNotification(new NotifyOptions(error)))
       } else {
-        this.openInApp(getAuthUrl())
+        this.onLinkClick(getAuthUrl(), true)
       }
     },
     onLinkClicked (index: number) {
@@ -468,9 +407,6 @@ export default defineComponent({
     }
   },
   mounted () {
-    const openBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
-    this.openBrowser = openBrowser
-
     const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
     this.$q.dark.set(darkMode)
     this.darkMode = darkMode

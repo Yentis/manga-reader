@@ -6,9 +6,11 @@ import { UrlNavigation } from 'src/classes/urlNavigation'
 class ReaderState {
     mangaList: Manga[] = []
     refreshing = false
+    refreshProgress = 0
     notification: NotifyOptions | undefined = undefined
     searchResults: Manga[] = []
     urlNavigation: UrlNavigation | undefined = undefined
+    openInBrowser = false
 }
 
 const state = new ReaderState()
@@ -29,6 +31,12 @@ const mutations = {
   updateRefreshing (state: ReaderState, refreshing: boolean) {
     state.refreshing = refreshing
   },
+  updateRefreshProgress (state: ReaderState, refreshProgress: number) {
+    state.refreshProgress = refreshProgress
+  },
+  incrementRefreshProgress (state: ReaderState, increment: number) {
+    state.refreshProgress += increment
+  },
   pushNotification (state: ReaderState, notification: NotifyOptions) {
     state.notification = notification
   },
@@ -37,6 +45,9 @@ const mutations = {
   },
   pushUrlNavigation (state: ReaderState, urlNavigation: UrlNavigation) {
     state.urlNavigation = urlNavigation
+  },
+  updateOpenInBrowser (state: ReaderState, openInBrowser: boolean) {
+    state.openInBrowser = openInBrowser
   }
 }
 
@@ -47,6 +58,9 @@ const getters = {
   refreshing: (state: ReaderState) => {
     return state.refreshing
   },
+  refreshProgress: (state: ReaderState) => {
+    return state.refreshProgress
+  },
   notification: (state: ReaderState) => {
     return state.notification
   },
@@ -55,6 +69,9 @@ const getters = {
   },
   urlNavigation: (state: ReaderState) => {
     return state.urlNavigation
+  },
+  openInBrowser: (state: ReaderState) => {
+    return state.openInBrowser
   }
 }
 

@@ -24,16 +24,11 @@ function mangaSort (a: Manga, b: Manga): number {
 export default defineComponent({
   name: 'App',
 
-  data () {
-    return {
-      openBrowser: false
-    }
-  },
-
   computed: {
     ...mapGetters('reader', {
       notification: 'notification',
-      urlNavigation: 'urlNavigation'
+      urlNavigation: 'urlNavigation',
+      openInBrowser: 'openInBrowser'
     })
   },
 
@@ -56,8 +51,9 @@ export default defineComponent({
       }
 
       // Mobile will open the InAppBrowser when openURL is called
-      const openBrowser = this.$q.platform.is.mobile ? !this.openBrowser : this.openBrowser
-      if (openBrowser) {
+      const openInBrowserValue = this.openInBrowser as boolean
+      const openInBrowser = this.$q.platform.is.mobile ? !openInBrowserValue : openInBrowserValue
+      if (openInBrowser) {
         openURL(urlNavigation.url)
       } else {
         window.location.href = urlNavigation.url
@@ -67,7 +63,8 @@ export default defineComponent({
 
   methods: {
     ...mapMutations('reader', {
-      updateMangaList: 'updateMangaList'
+      updateMangaList: 'updateMangaList',
+      updateOpenInBrowser: 'updateOpenInBrowser'
     }),
 
     openInApp (url: string) {
@@ -84,12 +81,11 @@ export default defineComponent({
   },
 
   mounted () {
-    const openBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
-    this.openBrowser = openBrowser
+    const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
+    this.updateOpenInBrowser(openInBrowser)
 
     const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
     mangaList.sort(mangaSort)
-
     this.updateMangaList(mangaList)
   }
 })
