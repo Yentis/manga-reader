@@ -193,7 +193,7 @@ export default defineComponent({
 
     onSaveEdit () {
       if (typeof this.newReadNum === 'number' || this.newReadNum === undefined || this.newReadNum === -1) return
-      const parsedReadNum = parseInt(this.newReadNum)
+      const parsedReadNum = parseFloat(this.newReadNum)
       if (isNaN(parsedReadNum) || parsedReadNum === this.manga.readNum) return
 
       const isEqualToCurrent = parsedReadNum === this.manga.chapterNum
