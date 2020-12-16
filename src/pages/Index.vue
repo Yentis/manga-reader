@@ -2,15 +2,6 @@
   <q-page class="q-ma-sm">
     <manga-header />
 
-    <div class="header">
-      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
-        <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="exportList" />
-        <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
-        <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
-      </div>
-    </div>
-
     <q-linear-progress
       v-if="refreshing"
       :indeterminate="refreshProgress === 0"
@@ -81,52 +72,6 @@
         </q-card>
       </q-intersection>
     </div>
-
-    <q-dialog v-model="mangaDexModalShown">
-      <q-card>
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title>Select manga</q-toolbar-title>
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-toolbar>
-
-        <q-card-section>
-          <q-input v-model="search" placeholder="Search for the manga" @keydown.enter="searchManga(siteTypes.MangaDex)">
-            <template v-if="search" v-slot:append>
-              <q-icon name="cancel" @click.stop="search = ''; searchResults = []" class="cursor-pointer"></q-icon>
-            </template>
-
-            <template v-slot:after>
-              <q-btn round dense flat icon="send" @click="searchManga(siteTypes.MangaDex)"></q-btn>
-            </template>
-          </q-input>
-
-          <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="title || 'Selected manga'">
-            <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
-              <q-list separator>
-                <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
-                  <q-item-section avatar>
-                    <q-img contain class="manga-image-search" :src="manga.image"></q-img>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <div class="text-subtitle2">{{ manga.title }}</div>
-                    <div class="text-body2">{{ manga.chapter }}</div>
-                    <div>{{ siteNames[manga.site] }}</div>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-
-          <q-input v-if="searchResults.length === 0" v-model="url" placeholder="Or enter the url manually"></q-input>
-        </q-card-section>
-
-        <q-card-actions>
-          <q-btn color="secondary" label="Select" @click="linkMangaDex"></q-btn>
-          <q-btn label="Cancel" v-close-popup></q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
@@ -134,24 +79,18 @@
 import { mapGetters, mapMutations } from 'vuex'
 import { defineComponent } from '@vue/composition-api'
 import { LocalStorage } from 'quasar'
-import relevancy from 'relevancy'
 import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UpdateManga } from 'src/classes/updateManga'
+import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType, SiteName } from 'src/enums/siteEnum'
-import { searchManga, syncReadChapter } from 'src/services/siteService'
+import { syncReadChapter } from 'src/services/siteService'
 import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
-import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
+import { setAccessToken } from 'src/services/dropboxService'
 import MangaHeader from 'src/components/Header.vue'
 import CustomDialog from 'src/components/CustomDialog.vue'
-import { UrlNavigation } from 'src/classes/urlNavigation'
-
-const mangaSearchSorter = new relevancy.Sorter({
-  comparator: (a: Manga, b: Manga) => {
-    return mangaSort(a, b)
-  }
-})
+import SearchDialog from 'src/components/SearchDialog.vue'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -164,15 +103,7 @@ function mangaSort (a: Manga, b: Manga): number {
 export default defineComponent({
   data () {
     return {
-      mangaDexModalShown: false,
       notificationShown: true,
-      searchDropdownShown: true,
-      importing: false,
-      exporting: false,
-      url: '',
-      title: '',
-      search: '',
-      searchResults: [] as Manga[],
       notificationText: '',
       siteNames: SiteName,
       siteTypes: SiteType,
@@ -199,7 +130,6 @@ export default defineComponent({
     ...mapMutations('reader', {
       updateRefreshing: 'updateRefreshing',
       pushNotification: 'pushNotification',
-      updateMangaList: 'updateMangaList',
       removeManga: 'removeManga',
       updateManga: 'updateManga',
       pushUrlNavigation: 'pushUrlNavigation'
@@ -207,35 +137,9 @@ export default defineComponent({
 
     resetState () {
       this.updateRefreshing(false)
-      this.importing = false
-      this.exporting = false
       this.$q.loading.hide()
     },
-    searchManga (siteType: SiteType | undefined = undefined) {
-      if (!this.search) return
-      this.$q.loading.show({
-        delay: 100
-      })
 
-      searchManga(this.search, siteType).then(result => {
-        this.searchDropdownShown = true
-
-        // Some websites return results from other websites...
-        const processedResults: string[] = []
-
-        const searchResults = result.filter(resultManga => {
-          const alreadyAdded = !(this.mangaList as Manga[]).find(manga => resultManga.url === manga.url) && !processedResults.includes(resultManga.url)
-          processedResults.push(resultManga.url)
-
-          return alreadyAdded
-        })
-
-        this.searchResults = mangaSearchSorter.sort(searchResults, this.search, (obj, calc) => {
-          return calc(obj.title)
-        })
-        this.$q.loading.hide()
-      }).catch(error => this.showNotification(new NotifyOptions(error)))
-    },
     showUpdateAvailable (githubRelease: GithubRelease) {
       const notifyOptions = new NotifyOptions(`Update available: ${githubRelease.tag_name}`)
       notifyOptions.type = 'positive'
@@ -299,78 +203,35 @@ export default defineComponent({
       })
     },
 
-    exportList () {
-      this.exporting = true
-
-      if (!getAccessToken()) {
-        this.dropboxLogin()
-      } else {
-        saveList(this.mangaList).then(() => {
-          const notifyOptions = new NotifyOptions('Exported!')
-          notifyOptions.type = 'positive'
-          this.showNotification(notifyOptions)
-        }).catch((error: Error) => {
-          if (error.message === 'Unauthorized') {
-            this.dropboxLogin()
-          } else {
-            this.showNotification(new NotifyOptions(error))
-          }
-        })
-      }
-    },
-    importList () {
-      this.importing = true
-
-      if (!getAccessToken()) {
-        this.dropboxLogin()
-      } else {
-        readList().then(mangaList => {
-          const notifyOptions = new NotifyOptions('Imported!')
-          notifyOptions.type = 'positive'
-          this.showNotification(notifyOptions)
-          this.updateMangaList(mangaList)
-          LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
-        }).catch((error: Error) => {
-          if (error.message === 'Unauthorized') {
-            this.dropboxLogin()
-          } else {
-            this.showNotification(new NotifyOptions(error))
-          }
-        })
-      }
-    },
-    dropboxLogin () {
-      if (this.$q.platform.is.mobile) {
-        cordovaLogin().then(token => {
-          const notifyOptions = new NotifyOptions('Logged in successfully!')
-          notifyOptions.type = 'positive'
-          this.showNotification(notifyOptions)
-          setAccessToken(token)
-        }).catch(error => this.showNotification(new NotifyOptions(error)))
-      } else {
-        this.onLinkClick(getAuthUrl(), true)
-      }
-    },
     onLinkClicked (index: number) {
       this.pendingMangaDexIndex = index
 
       const manga = (this.mangaList as Manga[])[index]
-      this.search = manga.title
 
       if (manga.site === SiteType.MangaDex) {
-        this.url = manga.url
-        this.linkMangaDex()
+        this.linkMangaDex(manga.url)
         return
       }
 
-      this.mangaDexModalShown = true
+      this.$q.dialog({
+        component: SearchDialog,
+        parent: this,
+        title: 'Select manga',
+        initialSearch: manga.title,
+        searchPlaceholder: 'Search for the manga',
+        manualPlaceholder: 'Or enter the url manually',
+        siteType: SiteType.MangaDex,
+        confirmButton: 'Select'
+      }).onOk((data: { url: string }) => {
+        this.linkMangaDex(data.url)
+      })
     },
-    linkMangaDex () {
+    linkMangaDex (url: string) {
       if (this.pendingMangaDexIndex === -1) return
-      if (this.url === '') return
+      if (url === '') return
 
       const manga = (this.mangaList as Manga[])[this.pendingMangaDexIndex]
-      const matches = /\/title\/(\d*)\//gm.exec(this.url) || []
+      const matches = /\/title\/(\d*)\//gm.exec(url) || []
       let mangaId = -1
 
       for (const match of matches) {
@@ -386,9 +247,6 @@ export default defineComponent({
       }
 
       this.pendingMangaDexIndex = -1
-      this.url = ''
-      this.mangaDexModalShown = false
-      this.search = ''
     }
   },
   mounted () {
@@ -444,11 +302,6 @@ a {
   color: $primary;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-}
-
 .manga-container {
   display: inline-block;
 }
@@ -467,16 +320,6 @@ a {
   min-height: 96px;
   width: 96px;
   height: 96px;
-}
-
-.manga-image-search {
-  min-width: 48px;
-  width: 48px;
-}
-
-.manga-dropdown a {
-  color: black;
-  pointer-events: none;
 }
 
 </style>

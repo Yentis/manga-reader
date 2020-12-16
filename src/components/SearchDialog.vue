@@ -7,13 +7,13 @@
     </q-toolbar>
 
     <q-card-section>
-      <q-input v-model="search" placeholder="Search for a manga" @keydown.enter="onSearch()">
+      <q-input v-model="search" :placeholder="searchPlaceholder" @keydown.enter="onSearch(siteType)">
         <template v-if="search" v-slot:append>
           <q-icon name="cancel" @click.stop="search = ''; updateSearchResults([])" class="cursor-pointer"></q-icon>
         </template>
 
         <template v-slot:after>
-          <q-btn round dense flat icon="send" @click="onSearch()"></q-btn>
+          <q-btn round dense flat icon="send" @click="onSearch(siteType)"></q-btn>
         </template>
         </q-input>
 
@@ -35,11 +35,11 @@
         </q-menu>
         </q-btn>
 
-        <q-input v-if="searchResults.length === 0" v-model="url" placeholder="Or enter a manga url manually"></q-input>
+        <q-input v-if="searchResults.length === 0" v-model="url" :placeholder="manualPlaceholder"></q-input>
     </q-card-section>
 
       <q-card-actions>
-        <q-btn color="secondary" label="Add" @click="onOKClick"></q-btn>
+        <q-btn color="secondary" :label="confirmButton" @click="onOKClick"></q-btn>
         <q-btn label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
       </q-card>
@@ -76,7 +76,12 @@ export default (Vue as VueConstructor<Vue &
   }
 >).extend({
   props: {
-    title: String
+    title: String,
+    initialSearch: String,
+    searchPlaceholder: String,
+    manualPlaceholder: String,
+    siteType: String,
+    confirmButton: String
   },
 
   data () {
@@ -97,6 +102,7 @@ export default (Vue as VueConstructor<Vue &
   },
 
   mounted () {
+    this.search = this.initialSearch
     this.updateSearchResults([])
   },
 
@@ -115,12 +121,13 @@ export default (Vue as VueConstructor<Vue &
       this.$refs.dialog.hide()
     },
 
-    onSearch (siteType: SiteType | undefined = undefined) {
+    onSearch (siteTypeName: string | undefined = undefined) {
       if (!this.search) return
       this.$q.loading.show({
         delay: 100
       })
 
+      const siteType = Object.values(SiteType).find(siteType => siteTypeName === siteType)
       searchManga(this.search, siteType)
         .then(result => {
           this.searchDropdownShown = true

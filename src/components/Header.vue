@@ -6,12 +6,12 @@
         <q-btn v-if="$q.platform.is.mobile" color="secondary" label="Refresh" @click="onRefreshAllManga" />
         <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
       </div>
-      <!--<div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="exportList" />
-        <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="exportList" />
-        <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
-        <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
-      </div>!-->
+      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
+        <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
+        <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="onExportList" />
+        <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
+        <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
+      </div>
       <div class="flex-column-between">
         <q-checkbox :value="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
         <q-checkbox :value="darkMode" label="Dark mode" @input="saveDarkMode" />
@@ -28,6 +28,7 @@ import { NotifyOptions } from 'src/classes/notifyOptions'
 import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo } from 'src/services/siteService'
+import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import SearchDialog from './SearchDialog.vue'
 import SiteDialog from './SiteDialog.vue'
 import { UrlNavigation } from 'src/classes/urlNavigation'
@@ -35,6 +36,13 @@ import { UpdateManga } from 'src/classes/updateManga'
 
 export default defineComponent({
   name: 'manga-header',
+
+  data () {
+    return {
+      exporting: false,
+      importing: false
+    }
+  },
 
   computed: {
     ...mapGetters('reader', {
@@ -52,6 +60,7 @@ export default defineComponent({
       updateRefreshProgress: 'updateRefreshProgress',
       incrementRefreshProgress: 'incrementRefreshProgress',
       pushNotification: 'pushNotification',
+      updateMangaList: 'updateMangaList',
       addManga: 'addManga',
       updateManga: 'updateManga',
       pushUrlNavigation: 'pushUrlNavigation',
@@ -63,7 +72,10 @@ export default defineComponent({
       this.$q.dialog({
         component: SearchDialog,
         parent: this,
-        title: 'Add manga'
+        title: 'Add manga',
+        searchPlaceholder: 'Search for a manga',
+        manualPlaceholder: 'Or enter a manga url manually',
+        confirmButton: 'Add'
       }).onOk((data: { url: string }) => {
         this.onMangaSelected(data.url)
       }).onDismiss(() => {
@@ -155,6 +167,65 @@ export default defineComponent({
         this.updateRefreshing(false)
         this.updateRefreshProgress(0)
       })
+    },
+
+    onImportList () {
+      this.importing = true
+
+      if (!getAccessToken()) {
+        this.startDropboxLogin()
+      } else {
+        readList().then(mangaList => {
+          const notifyOptions = new NotifyOptions('Imported!')
+          notifyOptions.type = 'positive'
+          this.pushNotification(notifyOptions)
+          this.updateMangaList(mangaList)
+          LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+        }).catch((error: Error) => {
+          if (error.message === 'Unauthorized') {
+            this.startDropboxLogin()
+          } else {
+            this.pushNotification(new NotifyOptions(error))
+          }
+        }).finally(() => {
+          this.importing = false
+        })
+      }
+    },
+
+    onExportList () {
+      this.exporting = true
+
+      if (!getAccessToken()) {
+        this.startDropboxLogin()
+      } else {
+        saveList(this.mangaList).then(() => {
+          const notifyOptions = new NotifyOptions('Exported!')
+          notifyOptions.type = 'positive'
+          this.pushNotification(notifyOptions)
+        }).catch((error: Error) => {
+          if (error.message === 'Unauthorized') {
+            this.startDropboxLogin()
+          } else {
+            this.pushNotification(new NotifyOptions(error))
+          }
+        }).finally(() => {
+          this.exporting = false
+        })
+      }
+    },
+
+    startDropboxLogin () {
+      if (this.$q.platform.is.mobile) {
+        cordovaLogin().then(token => {
+          const notifyOptions = new NotifyOptions('Logged in successfully!')
+          notifyOptions.type = 'positive'
+          this.pushNotification(notifyOptions)
+          setAccessToken(token)
+        }).catch(error => this.pushNotification(new NotifyOptions(error)))
+      } else {
+        this.pushUrlNavigation(getAuthUrl(), true)
+      }
     },
 
     saveOpenInBrowser (checked: boolean) {
