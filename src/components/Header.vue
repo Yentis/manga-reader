@@ -32,7 +32,6 @@ import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordova
 import SearchDialog from './SearchDialog.vue'
 import SiteDialog from './SiteDialog.vue'
 import { UrlNavigation } from 'src/classes/urlNavigation'
-import { UpdateManga } from 'src/classes/updateManga'
 
 export default defineComponent({
   name: 'manga-header',
@@ -156,7 +155,7 @@ export default defineComponent({
           result.readUrl = readUrl
           result.mangaDexId = mangaDexId
 
-          this.updateManga(new UpdateManga(result, index))
+          this.updateManga(result)
         }
 
         this.incrementRefreshProgress(step)

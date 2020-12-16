@@ -1,6 +1,5 @@
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import { UpdateManga } from 'src/classes/updateManga'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 
 class ReaderState {
@@ -14,20 +13,35 @@ class ReaderState {
     darkMode = false
 }
 
+function mangaSort (a: Manga, b: Manga): number {
+  if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
+    return a.title > b.title ? 1 : -1
+  } else {
+    return b.chapter !== b.read ? 1 : -1
+  }
+}
+
 const state = new ReaderState()
 
 const mutations = {
   updateMangaList (state: ReaderState, mangaList: Manga[]) {
-    state.mangaList = mangaList
+    state.mangaList = mangaList.sort(mangaSort)
   },
   addManga (state: ReaderState, manga: Manga) {
     state.mangaList.unshift(manga)
+    state.mangaList = state.mangaList.sort(mangaSort)
   },
-  removeManga (state: ReaderState, index: number) {
+  removeManga (state: ReaderState, url: string) {
+    const index = state.mangaList.findIndex(manga => manga.url === url)
+    if (index === -1) return
     state.mangaList.splice(index, 1)
+    state.mangaList = state.mangaList.sort(mangaSort)
   },
-  updateManga (state: ReaderState, updateManga: UpdateManga) {
-    state.mangaList[updateManga.index] = updateManga.manga
+  updateManga (state: ReaderState, manga: Manga) {
+    const index = state.mangaList.findIndex(curManga => manga.url === curManga.url)
+    if (index === -1) return
+    state.mangaList[index] = manga
+    state.mangaList = state.mangaList.sort(mangaSort)
   },
   updateRefreshing (state: ReaderState, refreshing: boolean) {
     state.refreshing = refreshing
@@ -58,6 +72,9 @@ const mutations = {
 const getters = {
   mangaList: (state: ReaderState) => {
     return state.mangaList
+  },
+  manga: (state: ReaderState) => (url: string) => {
+    return state.mangaList.find(manga => manga.url === url)
   },
   refreshing: (state: ReaderState) => {
     return state.refreshing
