@@ -9,10 +9,6 @@
         <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
       </div>
-      <div class="flex-column-between">
-        <q-checkbox :value="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
-        <q-checkbox v-model="darkMode" label="Dark mode" @input="saveDarkMode" />
-      </div>
     </div>
 
     <q-linear-progress
@@ -178,7 +174,6 @@ export default defineComponent({
       search: '',
       searchResults: [] as Manga[],
       notificationText: '',
-      darkMode: false,
       siteNames: SiteName,
       siteTypes: SiteType,
       pendingMangaDexIndex: -1
@@ -193,8 +188,7 @@ export default defineComponent({
     ...mapGetters('reader', {
       mangaList: 'mangaList',
       refreshing: 'refreshing',
-      refreshProgress: 'refreshProgress',
-      openInBrowser: 'openInBrowser'
+      refreshProgress: 'refreshProgress'
     }),
     sortedMangaList: function (): Manga[] {
       return (this.mangaList as Manga[]).sort(mangaSort)
@@ -208,8 +202,7 @@ export default defineComponent({
       updateMangaList: 'updateMangaList',
       removeManga: 'removeManga',
       updateManga: 'updateManga',
-      pushUrlNavigation: 'pushUrlNavigation',
-      updateOpenInBrowser: 'updateOpenInBrowser'
+      pushUrlNavigation: 'pushUrlNavigation'
     }),
 
     resetState () {
@@ -264,14 +257,6 @@ export default defineComponent({
       }]
 
       this.showNotification(notifyOptions)
-    },
-    saveOpenInBrowser (checked: boolean) {
-      this.updateOpenInBrowser(checked)
-      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, checked)
-    },
-    saveDarkMode () {
-      this.$q.dark.set(this.darkMode)
-      LocalStorage.set(this.$constants.DARK_MODE_KEY, this.darkMode)
     },
     showNotification (notifyOptions: NotifyOptions) {
       this.resetState()
@@ -407,10 +392,6 @@ export default defineComponent({
     }
   },
   mounted () {
-    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
-    this.$q.dark.set(darkMode)
-    this.darkMode = darkMode
-
     if (this.$q.platform.is.mobile) {
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'timezoneOffset', (moment().utcOffset() / 60).toString(), () => undefined, (error) => console.error(error))

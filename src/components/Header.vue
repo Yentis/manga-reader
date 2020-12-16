@@ -11,11 +11,11 @@
         <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="exportList" />
         <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="importList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="importList" />
-      </div>
-      <div class="flex-column-between">
-        <q-checkbox v-model="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
-        <q-checkbox v-model="darkMode" label="Dark mode" @input="saveDarkMode" />
       </div>!-->
+      <div class="flex-column-between">
+        <q-checkbox :value="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
+        <q-checkbox :value="darkMode" label="Dark mode" @input="saveDarkMode" />
+      </div>
     </div>
 </template>
 
@@ -40,7 +40,9 @@ export default defineComponent({
     ...mapGetters('reader', {
       mangaList: 'mangaList',
       refreshing: 'refreshing',
-      refreshProgress: 'refreshProgress'
+      refreshProgress: 'refreshProgress',
+      openInBrowser: 'openInBrowser',
+      darkMode: 'darkMode'
     })
   },
 
@@ -52,7 +54,9 @@ export default defineComponent({
       pushNotification: 'pushNotification',
       addManga: 'addManga',
       updateManga: 'updateManga',
-      pushUrlNavigation: 'pushUrlNavigation'
+      pushUrlNavigation: 'pushUrlNavigation',
+      updateOpenInBrowser: 'updateOpenInBrowser',
+      updateDarkMode: 'updateDarkMode'
     }),
 
     onAddManga () {
@@ -151,6 +155,17 @@ export default defineComponent({
         this.updateRefreshing(false)
         this.updateRefreshProgress(0)
       })
+    },
+
+    saveOpenInBrowser (checked: boolean) {
+      this.updateOpenInBrowser(checked)
+      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, checked)
+    },
+
+    saveDarkMode (checked: boolean) {
+      this.$q.dark.set(checked)
+      this.updateDarkMode(checked)
+      LocalStorage.set(this.$constants.DARK_MODE_KEY, checked)
     }
   }
 })

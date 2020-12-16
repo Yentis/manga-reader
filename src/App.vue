@@ -64,7 +64,8 @@ export default defineComponent({
   methods: {
     ...mapMutations('reader', {
       updateMangaList: 'updateMangaList',
-      updateOpenInBrowser: 'updateOpenInBrowser'
+      updateOpenInBrowser: 'updateOpenInBrowser',
+      updateDarkMode: 'updateDarkMode'
     }),
 
     openInApp (url: string) {
@@ -83,6 +84,10 @@ export default defineComponent({
   mounted () {
     const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
     this.updateOpenInBrowser(openInBrowser)
+
+    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
+    this.$q.dark.set(darkMode)
+    this.updateDarkMode(darkMode)
 
     const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
     mangaList.sort(mangaSort)

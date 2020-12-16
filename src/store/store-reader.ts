@@ -11,6 +11,7 @@ class ReaderState {
     searchResults: Manga[] = []
     urlNavigation: UrlNavigation | undefined = undefined
     openInBrowser = false
+    darkMode = false
 }
 
 const state = new ReaderState()
@@ -48,6 +49,9 @@ const mutations = {
   },
   updateOpenInBrowser (state: ReaderState, openInBrowser: boolean) {
     state.openInBrowser = openInBrowser
+  },
+  updateDarkMode (state: ReaderState, darkMode: boolean) {
+    state.darkMode = darkMode
   }
 }
 
@@ -72,6 +76,9 @@ const getters = {
   },
   openInBrowser: (state: ReaderState) => {
     return state.openInBrowser
+  },
+  darkMode: (state: ReaderState) => {
+    return state.darkMode
   }
 }
 
