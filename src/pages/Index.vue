@@ -1,9 +1,9 @@
 <template>
   <q-page class="q-ma-sm">
+    <manga-header />
+
     <div class="header">
       <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="primary" label="Add" @click="onAddManga" />
-        <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
         <q-btn v-if="$q.platform.is.mobile" color="secondary" label="Refresh" @click="onRefreshAllManga" />
         <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
       </div>
@@ -20,7 +20,7 @@
     </div>
 
     <q-linear-progress
-      v-if="loading"
+      v-if="refreshing"
       :indeterminate="refreshProgress === 0"
       :value="refreshProgress"
       instant-feedback
@@ -90,52 +90,6 @@
       </q-intersection>
     </div>
 
-    <q-dialog v-model="addModalShown">
-      <q-card>
-        <q-toolbar class="bg-primary text-white">
-          <q-toolbar-title>Add manga</q-toolbar-title>
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-toolbar>
-
-        <q-card-section>
-          <q-input v-model="search" placeholder="Search for a manga" @keydown.enter="searchManga()">
-            <template v-if="search" v-slot:append>
-              <q-icon name="cancel" @click.stop="search = ''; searchResults = []" class="cursor-pointer"></q-icon>
-            </template>
-
-            <template v-slot:after>
-              <q-btn round dense flat icon="send" @click="searchManga()"></q-btn>
-            </template>
-          </q-input>
-
-          <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="title || 'Selected manga'">
-            <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
-              <q-list separator>
-                <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; title = manga.title">
-                  <q-item-section avatar>
-                    <q-img contain class="manga-image-search" :src="manga.image"></q-img>
-                  </q-item-section>
-
-                  <q-item-section>
-                    <div class="text-subtitle2">{{ manga.title }}</div>
-                    <div class="text-body2">{{ manga.chapter }}</div>
-                    <div>{{ siteNames[manga.site] }}</div>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-
-          <q-input v-if="searchResults.length === 0" v-model="url" placeholder="Or enter a manga url manually"></q-input>
-        </q-card-section>
-
-        <q-card-actions>
-          <q-btn color="secondary" label="Add" @click="addManga"></q-btn>
-          <q-btn label="Cancel" v-close-popup></q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
     <q-dialog v-model="mangaDexModalShown">
       <q-card>
         <q-toolbar class="bg-primary text-white">
@@ -181,56 +135,25 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-
-    <q-dialog
-      no-focus
-      no-refocus
-      seamless
-      :value="addModalShown && siteModalShown && (!$q.platform.is.mobile || searchResults.length === 0)"
-      :position="$q.platform.is.mobile ? 'bottom' : 'right'">
-      <q-card :class="{ 'mobile-site-dialog': $q.platform.is.mobile }">
-        <q-toolbar class="bg-primary text-white text-center">
-          <q-toolbar-title>Supported sites</q-toolbar-title>
-        </q-toolbar>
-        <q-card-section class="q-pa-none">
-          <q-list separator :class="{ 'text-center': $q.platform.is.mobile }">
-            <q-item
-              clickable
-              v-for="site in siteMap"
-              :key="site.siteType"
-              :class="{ 'bg-warning': !site.statusOK(), 'text-black': !site.statusOK() && $q.dark.isActive }"
-              @click="site.loggedIn ? site.statusOK() ? onLinkClick(site.getUrl()) : openInApp(site.getUrl()) : openInApp(site.getLoginUrl())">
-              <q-item-section>
-                <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
-                <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
-                <q-item-label v-else-if="!site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>{{ site.state }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </q-page>
 </template>
 
 <script lang="ts">
+import { mapGetters, mapMutations } from 'vuex'
 import { defineComponent } from '@vue/composition-api'
 import { LocalStorage, openURL } from 'quasar'
-import { Manga } from 'src/classes/manga'
-import { SiteType, SiteName } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga, getSiteMap, checkLogins, syncReadChapter } from 'src/services/siteService'
-import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
 import relevancy from 'relevancy'
-import { NotifyOptions } from 'src/classes/notifyOptions'
-import { BaseSite } from 'src/classes/sites/baseSite'
-import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import moment from 'moment'
 import pEachSeries from 'p-each-series'
+import { Manga } from 'src/classes/manga'
+import { NotifyOptions } from 'src/classes/notifyOptions'
+import { UpdateManga } from 'src/classes/updateManga'
+import { SiteType, SiteName } from 'src/enums/siteEnum'
+import { getMangaInfo, searchManga, checkLogins, syncReadChapter } from 'src/services/siteService'
+import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
+import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
+import MangaHeader from 'src/components/Header.vue'
 import CustomDialog from 'src/components/CustomDialog.vue'
-
-const MANGA_LIST_KEY = 'manga'
-const OPEN_BROWSER_KEY = 'open_browser'
-const DARK_MODE_KEY = 'dark_mode'
 
 const mangaSearchSorter = new relevancy.Sorter({
   comparator: (a: Manga, b: Manga) => {
@@ -246,20 +169,12 @@ function mangaSort (a: Manga, b: Manga): number {
   }
 }
 
-function siteSort (a: BaseSite, b: BaseSite): number {
-  return a.compare(b)
-}
-
 export default defineComponent({
   data () {
     return {
-      addModalShown: false,
       mangaDexModalShown: false,
       notificationShown: true,
-      windowSize: [] as Array<number>,
-      siteModalShown: true,
       searchDropdownShown: true,
-      loading: false,
       importing: false,
       exporting: false,
       url: '',
@@ -267,40 +182,43 @@ export default defineComponent({
       search: '',
       searchResults: [] as Manga[],
       notificationText: '',
-      mangaList: [] as Manga[],
       openBrowser: false,
       darkMode: false,
-      siteMap: [] as BaseSite[],
       siteNames: SiteName,
       siteTypes: SiteType,
       pendingMangaDexIndex: -1,
       refreshProgress: 0
     }
   },
-  watch: {
-    windowSize (value: Array<number>) {
-      if (value[0] <= 700 && !this.$q.platform.is.mobile) this.siteModalShown = false
-      else if (value[1] <= 500 && this.$q.platform.is.mobile) this.siteModalShown = false
-      else this.siteModalShown = true
-    }
+
+  components: {
+    MangaHeader
   },
+
   computed: {
+    ...mapGetters('reader', {
+      mangaList: 'mangaList',
+      refreshing: 'refreshing'
+    }),
     sortedMangaList: function (): Manga[] {
-      return this.mangaList.sort(mangaSort)
+      return (this.mangaList as Manga[]).sort(mangaSort)
     }
   },
+
   methods: {
+    ...mapMutations('reader', {
+      updateRefreshing: 'updateRefreshing',
+      pushNotification: 'pushNotification',
+      updateMangaList: 'updateMangaList',
+      removeManga: 'removeManga',
+      updateManga: 'updateManga'
+    }),
+
     resetState () {
-      this.loading = false
+      this.updateRefreshing(false)
       this.importing = false
       this.exporting = false
       this.$q.loading.hide()
-    },
-    resetInput () {
-      this.url = ''
-      this.title = ''
-      this.search = ''
-      this.searchResults = []
     },
     searchManga (siteType: SiteType | undefined = undefined) {
       if (!this.search) return
@@ -315,7 +233,7 @@ export default defineComponent({
         const processedResults: string[] = []
 
         const searchResults = result.filter(resultManga => {
-          const alreadyAdded = !this.mangaList.find(manga => resultManga.url === manga.url) && !processedResults.includes(resultManga.url)
+          const alreadyAdded = !(this.mangaList as Manga[]).find(manga => resultManga.url === manga.url) && !processedResults.includes(resultManga.url)
           processedResults.push(resultManga.url)
 
           return alreadyAdded
@@ -326,41 +244,6 @@ export default defineComponent({
         })
         this.$q.loading.hide()
       }).catch(error => this.showNotification(new NotifyOptions(error)))
-    },
-    addManga () {
-      this.loading = true
-      this.addModalShown = false
-
-      for (const site of Object.values(SiteType)) {
-        if (this.url.includes(site)) {
-          getMangaInfo(this.url, site).then(manga => {
-            if (manga instanceof Error) {
-              this.showNotification(new NotifyOptions(manga))
-            } else {
-              manga.read = manga.chapter
-              manga.readUrl = manga.chapterUrl
-              this.saveManga(manga)
-            }
-          }).catch(error => this.showNotification(new NotifyOptions(error)))
-
-          this.resetInput()
-          return
-        }
-      }
-
-      this.showNotification(new NotifyOptions(Error('Valid site not found')))
-    },
-    saveManga (manga: Manga) {
-      for (const entry of this.mangaList) {
-        if (entry.url === manga.url) {
-          this.showNotification(new NotifyOptions(Error('Manga already exists')))
-          return
-        }
-      }
-
-      this.mangaList.unshift(manga)
-      LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
-      this.loading = false
     },
     showUpdateAvailable (githubRelease: GithubRelease) {
       const notifyOptions = new NotifyOptions(`Update available: ${githubRelease.tag_name}`)
@@ -385,24 +268,15 @@ export default defineComponent({
       this.showNotification(notifyOptions)
     },
     saveOpenBrowser () {
-      LocalStorage.set(OPEN_BROWSER_KEY, this.openBrowser)
+      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, this.openBrowser)
     },
     saveDarkMode () {
       this.$q.dark.set(this.darkMode)
-      LocalStorage.set(DARK_MODE_KEY, this.darkMode)
+      LocalStorage.set(this.$constants.DARK_MODE_KEY, this.darkMode)
     },
     showNotification (notifyOptions: NotifyOptions) {
-      if (notifyOptions.message instanceof Error) {
-        console.error(notifyOptions.message)
-      }
-
       this.resetState()
-
-      return this.$q.notify(notifyOptions.getOptions())
-    },
-    onAddManga () {
-      this.addModalShown = true
-      this.siteMap = Array.from(getSiteMap().values()).sort(siteSort)
+      this.pushNotification(notifyOptions)
     },
     onLinkClick (url: string) {
       // Mobile will open the InAppBrowser when openURL is called
@@ -414,7 +288,7 @@ export default defineComponent({
       }
     },
     onReadClick (index: number) {
-      const manga = this.mangaList[index]
+      const manga = (this.mangaList as Manga[])[index]
       manga.read = manga.chapter
       manga.readUrl = manga.chapterUrl
 
@@ -429,59 +303,64 @@ export default defineComponent({
         })
       }
 
-      this.$set(this.mangaList, index, manga)
-      LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+      this.updateManga(new UpdateManga(manga, index))
+      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
     },
 
     onDeleteClick (index: number) {
+      const manga = (this.mangaList as Manga[])[index]
+
       this.$q.dialog({
         component: CustomDialog,
         title: 'Delete manga',
-        content: `Are you sure you want to delete ${this.mangaList[index].title}?`,
-        imageUrl: this.mangaList[index].image
+        content: `Are you sure you want to delete ${manga.title}?`,
+        imageUrl: manga.image
       }).onOk(() => {
-        this.mangaList.splice(index, 1)
-        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+        this.removeManga(index)
+        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
       })
     },
 
     onRefreshAllManga () {
-      if (this.loading) return
+      if (this.refreshing) return
       this.refreshProgress = 0.01
-      this.loading = true
+      this.updateRefreshing(true)
 
-      const promises = this.mangaList.map(manga => getMangaInfo(manga.url, manga.site))
+      const promises = (this.mangaList as Manga[]).map(manga => getMangaInfo(manga.url, manga.site))
       const step = promises.length > 0 ? (1 / promises.length) : 0
       pEachSeries(promises, (result, index) => {
+        const manga = (this.mangaList as Manga[])[index]
+
         if (result instanceof Error) {
-          const notifyOptions = new NotifyOptions(`Failed to refresh ${this.mangaList[index].title}`)
+          const notifyOptions = new NotifyOptions(`Failed to refresh ${manga.title}`)
           notifyOptions.caption = result.message
           notifyOptions.actions = [{
             label: 'Visit',
             handler: () => {
-              this.onLinkClick(this.mangaList[index].url)
+              this.onLinkClick(manga.url)
             },
             color: 'white'
           }]
 
           this.showNotification(notifyOptions)
         } else {
-          const read = this.mangaList[index].read
-          const readUrl = this.mangaList[index].readUrl
-          const mangaDexId = this.mangaList[index].mangaDexId
+          const read = manga.read
+          const readUrl = manga.readUrl
+          const mangaDexId = manga.mangaDexId
 
           result.read = read
           result.readUrl = readUrl
           result.mangaDexId = mangaDexId
-          this.$set(this.mangaList, index, result)
+
+          this.updateManga(new UpdateManga(result, index))
         }
 
         this.refreshProgress += step
       }).catch((error: Error) => {
         this.showNotification(new NotifyOptions(error))
       }).finally(() => {
-        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
-        this.loading = false
+        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+        this.updateRefreshing(false)
         this.refreshProgress = 0
       })
     },
@@ -525,8 +404,8 @@ export default defineComponent({
           const notifyOptions = new NotifyOptions('Imported!')
           notifyOptions.type = 'positive'
           this.showNotification(notifyOptions)
-          this.mangaList = mangaList
-          LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+          this.updateMangaList(mangaList)
+          LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
         }).catch((error: Error) => {
           if (error.message === 'Unauthorized') {
             this.dropboxLogin()
@@ -551,7 +430,7 @@ export default defineComponent({
     onLinkClicked (index: number) {
       this.pendingMangaDexIndex = index
 
-      const manga = this.mangaList[index]
+      const manga = (this.mangaList as Manga[])[index]
       this.search = manga.title
 
       if (manga.site === SiteType.MangaDex) {
@@ -566,7 +445,7 @@ export default defineComponent({
       if (this.pendingMangaDexIndex === -1) return
       if (this.url === '') return
 
-      const manga = this.mangaList[this.pendingMangaDexIndex]
+      const manga = (this.mangaList as Manga[])[this.pendingMangaDexIndex]
       const matches = /\/title\/(\d*)\//gm.exec(this.url) || []
       let mangaId = -1
 
@@ -578,8 +457,8 @@ export default defineComponent({
       if (mangaId !== -1) {
         manga.mangaDexId = mangaId
 
-        this.$set(this.mangaList, this.pendingMangaDexIndex, manga)
-        LocalStorage.set(MANGA_LIST_KEY, this.mangaList)
+        this.updateManga(new UpdateManga(manga, this.pendingMangaDexIndex))
+        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
       }
 
       this.pendingMangaDexIndex = -1
@@ -589,22 +468,10 @@ export default defineComponent({
     }
   },
   mounted () {
-    this.windowSize = [window.innerWidth, window.innerHeight]
-
-    this.$nextTick(() => {
-      window.addEventListener('resize', () => {
-        this.windowSize = [window.innerWidth, window.innerHeight]
-      })
-    })
-
-    const mangaList: Manga[] = LocalStorage.getItem(MANGA_LIST_KEY) || []
-    mangaList.sort(mangaSort)
-    this.mangaList = mangaList
-
-    const openBrowser: boolean = LocalStorage.getItem(OPEN_BROWSER_KEY) || false
+    const openBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
     this.openBrowser = openBrowser
 
-    const darkMode: boolean = LocalStorage.getItem(DARK_MODE_KEY) || false
+    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
     this.$q.dark.set(darkMode)
     this.darkMode = darkMode
 
@@ -653,11 +520,6 @@ export default defineComponent({
 
 .flex-column-between button {
   width: 100%;
-}
-
-.mobile-site-dialog {
-  height: 25vh;
-  min-height: 25vh;
 }
 
 a {
