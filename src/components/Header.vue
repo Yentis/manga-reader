@@ -130,7 +130,7 @@ export default defineComponent({
       this.updateRefreshProgress(0.01)
       this.updateRefreshing(true)
 
-      const promises = (this.mangaList as Manga[]).map(manga => getMangaInfo(manga.url, manga.site))
+      const promises = (this.mangaList as Manga[]).filter(manga => !manga.completed).map(manga => getMangaInfo(manga.url, manga.site))
       const step = promises.length > 0 ? (1 / promises.length) : 0
       pEachSeries(promises, (result, index) => {
         const manga = (this.mangaList as Manga[])[index]

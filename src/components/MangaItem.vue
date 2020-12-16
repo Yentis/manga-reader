@@ -1,5 +1,8 @@
 <template>
-  <q-card :class="{ 'card-container': (manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum)) }">
+  <q-card :class="{
+    'completed-container': manga.completed,
+    'unread-container': (!manga.completed && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
+  }">
     <q-card-section horizontal>
       <q-img contain class="manga-image q-ma-sm" :src="manga.image">
         <template v-slot:error>
@@ -37,6 +40,8 @@
       <q-space />
 
       <q-card-actions vertical>
+        <q-checkbox v-if="editing" v-model="newCompleted" left-label color="secondary" label="Completed" />
+
         <q-space />
 
         <q-btn v-if="$q.platform.is.mobile && !manga.mangaDexId" color="info" icon="link" @click="onLinkingClicked()" />
@@ -53,12 +58,12 @@
           flat
           icon="edit"
           v-if="!editing"
-          @click="editing = !editing; newReadNum = manga.readNum" />
+          @click="onStartEditing()" />
         <q-btn
           flat
           icon="save"
           v-else
-          @click="editing = !editing; onSaveEdit()" />
+          @click="onSaveEdit()" />
 
         <q-space />
 
@@ -109,7 +114,8 @@ export default defineComponent({
     return {
       siteNames: SiteName,
       editing: false,
-      newReadNum: -1
+      newReadNum: -1 as number | undefined,
+      newCompleted: false as boolean
     }
   },
 
@@ -191,10 +197,27 @@ export default defineComponent({
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
     },
 
+    onStartEditing () {
+      this.editing = !this.editing
+      this.newReadNum = this.manga.readNum
+      this.newCompleted = this.manga.completed || false
+    },
+
     onSaveEdit () {
-      if (typeof this.newReadNum === 'number' || this.newReadNum === undefined || this.newReadNum === -1) return
+      this.editing = !this.editing
+      const readNumChanged = this.trySaveNewReadNum()
+      const completedChanged = this.trySaveNewCompleted()
+
+      if (!readNumChanged && !completedChanged) return
+
+      this.updateManga(this.manga)
+      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+    },
+
+    trySaveNewReadNum (): boolean {
+      if (typeof this.newReadNum === 'number' || this.newReadNum === undefined || this.newReadNum === -1) return false
       const parsedReadNum = parseFloat(this.newReadNum)
-      if (isNaN(parsedReadNum) || parsedReadNum === this.manga.readNum) return
+      if (isNaN(parsedReadNum) || parsedReadNum === this.manga.readNum) return false
 
       const isEqualToCurrent = parsedReadNum === this.manga.chapterNum
       this.manga.read = isEqualToCurrent ? this.manga.chapter : this.newReadNum
@@ -202,8 +225,15 @@ export default defineComponent({
       this.manga.readNum = parsedReadNum
 
       this.trySyncMangaDex(this.manga.readNum)
-      this.updateManga(this.manga)
-      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+      return true
+    },
+
+    trySaveNewCompleted (): boolean {
+      const currentCompleted = this.manga.completed || false
+      if (this.newCompleted === currentCompleted) return false
+
+      this.manga.completed = this.newCompleted
+      return true
     },
 
     trySyncMangaDex (chapterNum: number) {
@@ -225,18 +255,26 @@ export default defineComponent({
 <style lang="scss">
 
 .body--light {
-  .card-container {
+  .unread-container {
     background-color: $grey-4;
+  }
+
+  .completed-container {
+    background-color: $green-3;
   }
 }
 
 .body--dark {
-  .card-container {
+  .unread-container {
     background-color: $grey-9;
+  }
+
+  .completed-container {
+    background-color: $teal-10;
   }
 }
 
-.card-container a {
+.unread-container a {
   color: $secondary;
 }
 

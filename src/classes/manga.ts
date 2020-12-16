@@ -13,6 +13,7 @@ export class Manga {
     readNum: number | undefined
     readUrl: string | undefined
     mangaDexId: number | undefined
+    completed: boolean | undefined
 
     constructor (url: string, site: SiteType) {
       this.url = url
