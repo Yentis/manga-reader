@@ -1,5 +1,5 @@
 <template>
-  <q-card :class="{ 'card-container': manga.chapter !== manga.read }">
+  <q-card :class="{ 'card-container': (manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum)) }">
     <q-card-section horizontal>
       <q-img contain class="manga-image q-ma-sm" :src="manga.image">
         <template v-slot:error>
@@ -14,10 +14,13 @@
           <div class="text-h6">
             <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
           </div>
-          <div class="text-body2">
+
+          <div v-if="!editing" class="text-body2">
             Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
             <span v-else>{{ manga.read }}</span>
           </div>
+          <q-input v-else v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
+
           <div class="text-body2">
             Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
             <span v-else>{{ manga.chapter }}</span>
@@ -46,6 +49,17 @@
           icon="close"
           @click="onDeleteClick()" />
 
+        <q-btn
+          flat
+          icon="edit"
+          v-if="!editing"
+          @click="editing = !editing; newReadNum = manga.readNum" />
+        <q-btn
+          flat
+          icon="save"
+          v-else
+          @click="editing = !editing; onSaveEdit()" />
+
         <q-space />
 
         <q-btn
@@ -68,7 +82,7 @@ import { NotifyOptions } from 'src/classes/notifyOptions'
 import { SiteName, SiteType } from 'src/enums/siteEnum'
 import { syncReadChapter } from 'src/services/siteService'
 import SearchDialog from './SearchDialog.vue'
-import CustomDialog from './CustomDialog.vue'
+import ConfirmationDialog from './ConfirmationDialog.vue'
 
 export default defineComponent({
   name: 'manga-item',
@@ -93,7 +107,9 @@ export default defineComponent({
 
   data () {
     return {
-      siteNames: SiteName
+      siteNames: SiteName,
+      editing: false,
+      newReadNum: -1
     }
   },
 
@@ -102,7 +118,7 @@ export default defineComponent({
       pushUrlNavigation: 'pushUrlNavigation',
       updateManga: 'updateManga',
       removeManga: 'removeManga',
-      pushNotification: 'pushNotificaion'
+      pushNotification: 'pushNotification'
     }),
 
     onLinkClick (url: string) {
@@ -155,7 +171,7 @@ export default defineComponent({
 
     onDeleteClick () {
       this.$q.dialog({
-        component: CustomDialog,
+        component: ConfirmationDialog,
         title: 'Delete manga',
         content: `Are you sure you want to delete ${this.manga.title}?`,
         imageUrl: this.manga.image
@@ -168,9 +184,31 @@ export default defineComponent({
     onReadClick () {
       this.manga.read = this.manga.chapter
       this.manga.readUrl = this.manga.chapterUrl
+      this.manga.readNum = this.manga.chapterNum
 
+      this.trySyncMangaDex(this.manga.chapterNum)
+      this.updateManga(this.manga)
+      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+    },
+
+    onSaveEdit () {
+      if (typeof this.newReadNum === 'number' || this.newReadNum === undefined || this.newReadNum === -1) return
+      const parsedReadNum = parseInt(this.newReadNum)
+      if (isNaN(parsedReadNum) || parsedReadNum === this.manga.readNum) return
+
+      const isEqualToCurrent = parsedReadNum === this.manga.chapterNum
+      this.manga.read = isEqualToCurrent ? this.manga.chapter : this.newReadNum
+      this.manga.readUrl = isEqualToCurrent ? this.manga.chapterUrl : undefined
+      this.manga.readNum = parsedReadNum
+
+      this.trySyncMangaDex(this.manga.readNum)
+      this.updateManga(this.manga)
+      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+    },
+
+    trySyncMangaDex (chapterNum: number) {
       if (this.manga.mangaDexId) {
-        syncReadChapter(this.manga.mangaDexId, this.manga.chapterNum).then(() => {
+        syncReadChapter(this.manga.mangaDexId, chapterNum).then(() => {
           const notifyOptions = new NotifyOptions('Synced with MangaDex')
           notifyOptions.type = 'positive'
           this.pushNotification(notifyOptions)
@@ -179,9 +217,6 @@ export default defineComponent({
           this.pushNotification(new NotifyOptions(Error('Failed to sync with MangaDex')))
         })
       }
-
-      this.updateManga(this.manga)
-      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
     }
   }
 })

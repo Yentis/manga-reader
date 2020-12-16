@@ -14,11 +14,16 @@ class ReaderState {
 }
 
 function mangaSort (a: Manga, b: Manga): number {
-  if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
-    return a.title > b.title ? 1 : -1
-  } else {
-    return b.chapter !== b.read ? 1 : -1
+  const isARead = a.chapter === a.read || (a.chapterNum === a.readNum && a.readNum !== undefined)
+  const isBRead = b.chapter === b.read || (b.chapterNum === b.readNum && b.readNum !== undefined)
+
+  if (!isARead && isBRead) {
+    return -1
+  } else if (!isBRead && isARead) {
+    return 1
   }
+
+  return a.title > b.title ? 1 : -1
 }
 
 const state = new ReaderState()

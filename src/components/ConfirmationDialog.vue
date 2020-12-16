@@ -8,10 +8,12 @@
 
       <q-card-section>
         <div class="text-body2">{{ content }}</div>
-        <q-img v-if="imageUrl" class="q-mt-sm" contain :src="imageUrl"></q-img>
+        <q-img v-if="imageUrl" class="q-mt-sm confirmation-image-size" contain :src="imageUrl"></q-img>
       </q-card-section>
 
       <q-card-actions>
+        <q-space />
+
         <q-btn color="secondary" label="Confirm" @click="onOKClick"></q-btn>
         <q-btn label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
@@ -58,3 +60,11 @@ export default (Vue as VueConstructor<Vue &
   }
 })
 </script>
+
+<style lang="scss">
+
+.confirmation-image-size {
+  max-height: 256px
+}
+
+</style>

@@ -10,6 +10,7 @@ export class Manga {
     chapterUrl = ''
     chapterDate = ''
     read: string | undefined
+    readNum: number | undefined
     readUrl: string | undefined
     mangaDexId: number | undefined
 

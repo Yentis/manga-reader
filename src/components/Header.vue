@@ -104,6 +104,7 @@ export default defineComponent({
           } else {
             manga.read = manga.chapter
             manga.readUrl = manga.chapterUrl
+            manga.readNum = manga.chapterNum
             this.onMangaRetrieved(manga)
           }
         })
@@ -149,10 +150,12 @@ export default defineComponent({
         } else {
           const read = manga.read
           const readUrl = manga.readUrl
+          const readNum = manga.readNum
           const mangaDexId = manga.mangaDexId
 
           result.read = read
           result.readUrl = readUrl
+          result.readNum = readNum
           result.mangaDexId = mangaDexId
 
           this.updateManga(result)

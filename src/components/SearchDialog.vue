@@ -15,9 +15,9 @@
         <template v-slot:after>
           <q-btn round dense flat icon="send" @click="onSearch(siteType)"></q-btn>
         </template>
-        </q-input>
+      </q-input>
 
-        <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
+      <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
         <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
           <q-list separator>
           <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; mangaTitle = manga.title">
@@ -33,12 +33,14 @@
           </q-item>
           </q-list>
         </q-menu>
-        </q-btn>
+      </q-btn>
 
-        <q-input v-if="searchResults.length === 0" v-model="url" :placeholder="manualPlaceholder"></q-input>
+      <q-input v-if="searchResults.length === 0" v-model="url" :placeholder="manualPlaceholder"></q-input>
     </q-card-section>
 
       <q-card-actions>
+        <q-space />
+
         <q-btn color="secondary" :label="confirmButton" @click="onOKClick"></q-btn>
         <q-btn label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
