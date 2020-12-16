@@ -18,21 +18,29 @@
             <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
           </div>
 
-          <div v-if="!editing" class="text-body2">
-            Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
-            <span v-else>{{ manga.read }}</span>
-          </div>
-          <q-input v-else v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
+          <div v-if="!editing">
+            <div class="text-body2">
+              Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
+              <span v-else>{{ manga.read }}</span>
+            </div>
 
-          <div class="text-body2">
-            Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
-            <span v-else>{{ manga.chapter }}</span>
+            <div class="text-body2">
+              Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
+              <span v-else>{{ manga.chapter }}</span>
+            </div>
+
+            <div class="text-body2" v-if="manga.chapterDate">
+              {{ manga.chapterDate }}
+            </div>
           </div>
-          <div class="text-body2" v-if="manga.chapterDate">
-            {{ manga.chapterDate }}
+
+          <div v-else>
+            <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
+            <q-checkbox v-if="editing" v-model="newCompleted" class="q-mb-sm" dense color="secondary" label="Completed" />
           </div>
         </div>
-        <div class="text-subtitle1">
+
+        <div v-if="!editing" class="text-subtitle1">
           {{ siteNames[manga.site] }}
         </div>
       </q-card-section>
@@ -40,8 +48,6 @@
       <q-space />
 
       <q-card-actions vertical>
-        <q-checkbox v-if="editing" v-model="newCompleted" left-label color="secondary" label="Completed" />
-
         <q-space />
 
         <q-btn v-if="$q.platform.is.mobile && !manga.mangaDexId" color="info" icon="link" @click="onLinkingClicked()" />
