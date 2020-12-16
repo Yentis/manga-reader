@@ -141,7 +141,7 @@ export default defineComponent({
           notifyOptions.actions = [{
             label: 'Visit',
             handler: () => {
-              this.pushUrlNavigation(new UrlNavigation(manga.url, false))
+              this.pushUrlNavigation(new UrlNavigation(manga.url, true))
             },
             color: 'white'
           }]
@@ -172,11 +172,11 @@ export default defineComponent({
     },
 
     onImportList () {
-      this.importing = true
-
       if (!getAccessToken()) {
         this.startDropboxLogin()
       } else {
+        this.importing = true
+
         readList().then(mangaList => {
           const notifyOptions = new NotifyOptions('Imported!')
           notifyOptions.type = 'positive'
@@ -196,11 +196,11 @@ export default defineComponent({
     },
 
     onExportList () {
-      this.exporting = true
-
       if (!getAccessToken()) {
         this.startDropboxLogin()
       } else {
+        this.exporting = true
+
         saveList(this.mangaList).then(() => {
           const notifyOptions = new NotifyOptions('Exported!')
           notifyOptions.type = 'positive'
@@ -219,12 +219,14 @@ export default defineComponent({
 
     startDropboxLogin () {
       if (this.$q.platform.is.mobile) {
-        cordovaLogin().then(token => {
-          const notifyOptions = new NotifyOptions('Logged in successfully!')
-          notifyOptions.type = 'positive'
-          this.pushNotification(notifyOptions)
-          setAccessToken(token)
-        }).catch(error => this.pushNotification(new NotifyOptions(error)))
+        cordovaLogin()
+          .then(token => {
+            const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
+            notifyOptions.type = 'positive'
+            this.pushNotification(notifyOptions)
+            setAccessToken(token)
+          })
+          .catch(error => this.pushNotification(new NotifyOptions(error)))
       } else {
         this.pushUrlNavigation(getAuthUrl(), true)
       }

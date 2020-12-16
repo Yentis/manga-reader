@@ -1,6 +1,5 @@
 export enum SiteType {
     Manganelo = 'manganelo.com',
-    KKJScans = 'kkjscans.co',
     Webtoons = 'webtoons.com',
     HatigarmScans = 'hatigarmscanz.net',
     FirstKissManga = '1stkissmanga.com',
@@ -19,7 +18,6 @@ export enum SiteType {
 
 export enum SiteName {
     'manganelo.com' = 'Manganelo',
-    'kkjscans.co' = 'KKJ Scans',
     'webtoons.com' = 'Webtoons',
     'hatigarmscanz.net' = 'Hatigarm Scans',
     '1stkissmanga.com' = '1st Kiss Manga',

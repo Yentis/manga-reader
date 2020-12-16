@@ -10,8 +10,8 @@ if (DEV) {
   describe('Dev', function () {
     this.timeout(10000)
 
-    it(SiteType.MangaDoDs, () => {
-      return testMangaDoDs()
+    it(SiteType.AsuraScans, () => {
+      return testSearchAsuraScans()
     })
   })
 } else {
@@ -20,10 +20,6 @@ if (DEV) {
 
     it(SiteType.Manganelo, () => {
       return testManganelo()
-    })
-
-    it(SiteType.KKJScans, () => {
-      return testKKJScans()
     })
 
     it(SiteType.Webtoons, () => {
@@ -92,10 +88,6 @@ if (DEV) {
 
     it(SiteType.Manganelo, () => {
       return testSearchManganelo()
-    })
-
-    it(SiteType.KKJScans, () => {
-      return testSearchKKJScans()
     })
 
     it(SiteType.Webtoons, () => {
@@ -196,26 +188,6 @@ function testManganelo (): Promise<void> {
   })
 }
 
-function testKKJScans (): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const site = SiteType.KKJScans
-
-    testSite(site).then(mangaInfo => {
-      const desired = new Manga('https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard', site)
-      desired.chapter = 'Season 1 Finale'
-      desired.image = 'https://kkjscans.co/storage/comics/AA1DB1EFF76AD034EED5034A101770A052FE4B16332B3A14/sG9SfErajIj3wg1Dhbu0f3rFcZYrXSVqBLjRgFAA.jpeg'
-      desired.title = 'The Rebirth of an 8th Circled Wizard'
-      desired.chapterUrl = 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard/1/36'
-      desired.chapterNum = 36
-
-      const result = equals(mangaInfo, desired)
-
-      if (result === true) resolve()
-      else reject(result)
-    }).catch((error) => reject(error))
-  })
-}
-
 function testWebtoons (): Promise<void> {
   return new Promise((resolve, reject) => {
     const site = SiteType.Webtoons
@@ -244,7 +216,7 @@ function testWebtoonsMobile (): Promise<void> {
     getMangaInfo(url, site).then(mangaInfo => {
       const desired = new Manga(url, site)
       desired.chapter = 'Epilogue'
-      desired.image = 'https://swebtoon-phinf.pstatic.net/20150914_105/1442197929184ASdSX_JPEG/_EB9AA1EB80AB_E293A4EABCB9__EB84BD_EB90A3EB80AB_EC86BDE.jpg?type=crop540_540'
+      desired.image = 'https://swebtoon-phinf.pstatic.net/20201208_32/1607362598371MvQ4S_JPEG/8_EB9AA1EB80AB_E293A4EABCB9__EB84BD_EB90A3EB80AB_EC86BDE-1.jpg?type=crop540_540'
       desired.title = 'XINK3R'
       desired.chapterUrl = 'https://m.webtoons.com/en/super-hero/xinker/epilogue/viewer?title_no=541&episode_no=223'
       desired.chapterNum = 223
@@ -283,11 +255,11 @@ function testFirstkissmanga (): Promise<void> {
 
     testSite(site).then(mangaInfo => {
       const desired = new Manga('https://1stkissmanga.com/manga/royal-shop-of-young-lady/', site)
-      desired.chapter = 'Chapter 24'
+      desired.chapter = 'Chapter 36'
       desired.image = 'https://1stkissmanga.com/wp-content/uploads/2020/08/royal-shop-of-young-lady-193x278.jpg'
       desired.title = 'Royal Shop of Young Lady'
-      desired.chapterUrl = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-24/'
-      desired.chapterNum = 24
+      desired.chapterUrl = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-36/'
+      desired.chapterNum = 36
 
       const result = equals(mangaInfo, desired)
 
@@ -535,24 +507,6 @@ function testSearchManganelo (): Promise<void> {
   })
 }
 
-function testSearchKKJScans (): Promise<void> {
-  return new Promise((resolve, reject) => {
-    searchManga('the rebirth of an 8th circled wizard', SiteType.KKJScans).then(result => {
-      const matchingManga = result.filter(manga => {
-        return manga.site === SiteType.KKJScans &&
-              manga.title === 'The Rebirth of an 8th Circled Wizard' &&
-              manga.image === 'https://kkjscans.co/storage/comics/AA1DB1EFF76AD034EED5034A101770A052FE4B16332B3A14/sG9SfErajIj3wg1Dhbu0f3rFcZYrXSVqBLjRgFAA.jpeg' &&
-              manga.chapter === 'Season 1 Finale' &&
-              manga.url === 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard'
-      })
-
-      if (matchingManga.length === 0) reject(Error('No matching result'))
-      else if (matchingManga.length > 1) reject(Error('Too many results'))
-      else resolve()
-    }).catch(error => reject(error))
-  })
-}
-
 function testSearchWebtoons (): Promise<void> {
   return new Promise((resolve, reject) => {
     searchManga('the wolf & red riding hood', SiteType.Webtoons).then(result => {
@@ -757,7 +711,7 @@ function testSearchAsuraScans (): Promise<void> {
       const matchingManga = result.filter(manga => {
         return manga.site === SiteType.AsuraScans &&
               manga.title === 'Tougen Anki' &&
-              manga.image === 'https://asurascans.com/wp-content/uploads/2020/09/49754.jpg' &&
+              manga.image === 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg?h=80' &&
               manga.chapter === '19' &&
               manga.url === 'https://asurascans.com/manga/tougen-anki/'
       })

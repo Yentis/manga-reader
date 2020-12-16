@@ -19,8 +19,6 @@ export class Genkan extends BaseSite {
 
   getTestUrl (): string {
     switch (this.siteType) {
-      case SiteType.KKJScans:
-        return 'https://kkjscans.co/comics/688015-the-rebirth-of-an-8th-circled-wizard'
       case SiteType.HatigarmScans:
         return 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai'
       case SiteType.MethodScans:

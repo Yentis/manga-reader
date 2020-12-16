@@ -35,7 +35,6 @@ import PQueue from 'p-queue'
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
-  [SiteType.KKJScans, new Genkan(SiteType.KKJScans)],
   [SiteType.HatigarmScans, new Genkan(SiteType.HatigarmScans)],
   [SiteType.Webtoons, new Webtoons()],
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
@@ -75,7 +74,7 @@ export function testSite (siteType: SiteType): Promise <Error | Manga> {
 
 export function getMangaInfo (url: string, siteType: SiteType): Promise <Error | Manga> {
   const site = siteMap.get(siteType)
-  if (!site) return Promise.reject(Error('Invalid site type'))
+  if (!site) return Promise.resolve(Error('Invalid site type'))
 
   return requestQueue.add(() => site.readUrl(url))
 }
