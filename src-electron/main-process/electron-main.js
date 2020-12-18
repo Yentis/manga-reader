@@ -3,6 +3,7 @@ import { ElectronBlocker } from '@cliqz/adblocker-electron'
 import qs from 'qs'
 import fetch from 'isomorphic-fetch'
 import moment from 'moment'
+import path from 'path'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -56,10 +57,10 @@ function createWindow () {
       // Change from /quasar.conf.js > electron > nodeIntegration;
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: process.env.QUASAR_NODE_INTEGRATION,
-      nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION
+      nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION,
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-      // preload: path.resolve(__dirname, 'electron-preload.js')
+      preload: path.resolve(__dirname, 'electron-preload.js')
     }
   })
 
@@ -80,15 +81,11 @@ function createWindow () {
     name: 'timezoneOffset',
     value: (moment().utcOffset() / 60).toString()
   })
-
-  session.defaultSession.webRequest.onBeforeRequest({
-    urls: ['http://localhost/redirect*']
-  }, (details, callback) => {
-    queryString = qs.parse(details.url.replace('http://localhost/redirect#', ''))
-
-    callback({
-      cancel: true
-    })
+  
+  mainWindow.webContents.on('will-redirect', (event, url) => {
+    if (!url.startsWith('http://localhost/redirect')) return
+    event.preventDefault()
+    queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
 
     mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
     mainWindow.webContents.on('did-finish-load', onFinishLoad)

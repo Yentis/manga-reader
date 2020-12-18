@@ -228,7 +228,7 @@ export default defineComponent({
           })
           .catch(error => this.pushNotification(new NotifyOptions(error)))
       } else {
-        this.pushUrlNavigation(getAuthUrl(), true)
+        this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
       }
     },
 
