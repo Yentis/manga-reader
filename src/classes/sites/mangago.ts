@@ -11,6 +11,11 @@ const SITE_TYPE = SiteType.Mangago
 export class Mangago extends BaseSite {
   siteType = SITE_TYPE
 
+  constructor () {
+    super()
+    this.checkState()
+  }
+
   getUrl (): string {
     return `http://www.${this.siteType}`
   }
