@@ -30,6 +30,10 @@ export class AsuraScans extends BaseSite {
       }
     }
 
+    getImage (): string {
+      return this.image?.attr('data-src') || ''
+    }
+
     getTestUrl (): string {
       return 'https://asurascans.com/manga/tougen-anki/'
     }
@@ -69,7 +73,7 @@ export class AsuraScans extends BaseSite {
 
         for (const entry of searchData.series) {
           for (const entryItem of entry.all) {
-            if (!entryItem.post_title.toLowerCase().includes(query.toLowerCase())) continue
+            if (!this.titleContainsQuery(query, entryItem.post_title)) continue
 
             const manga = new Manga('', this.siteType)
             manga.title = entryItem.post_title

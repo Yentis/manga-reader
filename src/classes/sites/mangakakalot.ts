@@ -77,7 +77,7 @@ export class Mangakakalot extends BaseSite {
       for (const entry of searchData) {
         const manga = new Manga('', this.siteType)
         manga.title = cheerio.load(entry.name).root().text()
-        if (!manga.title.toLowerCase().includes(query.toLowerCase())) continue
+        if (!this.titleContainsQuery(query, manga.title)) continue
         manga.image = entry.image
         manga.chapter = entry.lastchapter
         manga.url = entry.story_link

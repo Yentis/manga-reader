@@ -64,7 +64,7 @@ export class Genkan extends BaseSite {
           const title = titleElem.html() || ''
           const url = titleElem.attr('href') || ''
 
-          if (title.toLowerCase().includes(query.toLowerCase()) && url) {
+          if (this.titleContainsQuery(query, title) && url) {
             promises.push(this.readUrl(url))
           }
         })
@@ -73,7 +73,7 @@ export class Genkan extends BaseSite {
           const url = $(elem).find('.media-content').first().attr('href') || ''
           const title = $(elem).find('.list-body a').first().html() || ''
 
-          if (title.toLowerCase().includes(query.toLowerCase()) && url) {
+          if (this.titleContainsQuery(query, title) && url) {
             promises.push(this.readUrl(url))
           }
         })

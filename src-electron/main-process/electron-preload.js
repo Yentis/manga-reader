@@ -10,5 +10,3 @@ if (!matchingItem) {
   delete window.exports;
   delete window.module;
 }
-
-console.log(window.location.href)

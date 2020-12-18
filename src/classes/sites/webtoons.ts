@@ -95,7 +95,7 @@ export class Webtoons extends BaseSite {
       for (const firstIndent of searchData.items) {
         for (const item of firstIndent) {
           const title = item[0][0]
-          if (!title.toLowerCase().includes(query.toLowerCase())) continue
+          if (!this.titleContainsQuery(query, title)) continue
           const url = `${this.getUrl()}/episodeList?titleNo=${item[3][0]}`
           promises.push(this.readUrl(url))
         }

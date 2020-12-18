@@ -19,8 +19,10 @@
     "@cliqz/adblocker-electron": "^1.18.2",
     "@quasar/cli": "^1.1.2",
     "@quasar/extras": "^1.0.0",
+    "@types/tough-cookie": "^4.0.0",
     "@vue/composition-api": "^0.6.4",
     "axios": "^0.19.2",
+    "axios-cookiejar-support": "^1.0.1",
     "cheerio": "^1.0.0-rc.3",
     "core-js": "^3.6.5",
     "dropbox": "^5.2.1",
@@ -31,7 +33,8 @@
     "p-each-series": "^2.1.0",
     "p-queue": "^6.6.2",
     "quasar": "^1.0.0",
-    "relevancy": "^0.2.0"
+    "relevancy": "^0.2.0",
+    "tough-cookie": "^4.0.0"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

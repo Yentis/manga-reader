@@ -1,17 +1,27 @@
 import 'mocha'
 import 'jsdom-global'
-import { getMangaInfo, searchManga, testSite } from '../src/services/siteService'
+import { setRequestConfig, getMangaInfo, searchManga, testSite } from '../src/services/siteService'
 import { SiteType } from '../src/enums/siteEnum'
 import { Manga } from '../src/classes/manga'
+import axios from 'axios'
+import axiosCookieJarSupport from 'axios-cookiejar-support'
+import tough from 'tough-cookie'
 
+axiosCookieJarSupport(axios)
+const cookieJar = new tough.CookieJar()
 const DEV = false
+
+setRequestConfig({
+  jar: cookieJar,
+  withCredentials: true
+})
 
 if (DEV) {
   describe('Dev', function () {
     this.timeout(10000)
 
-    it(SiteType.AsuraScans, () => {
-      return testSearchAsuraScans()
+    it(SiteType.Mangago, () => {
+      return testSearchMangago()
     })
   })
 } else {
@@ -81,6 +91,10 @@ if (DEV) {
     it(SiteType.MangaTx, () => {
       return testMangaTx()
     })
+
+    it(SiteType.Mangago, () => {
+      return testMangago()
+    })
   })
 
   describe('Search query', function () {
@@ -145,6 +159,10 @@ if (DEV) {
 
     it(SiteType.MangaTx, () => {
       return testSearchMangaTx()
+    })
+
+    it(SiteType.Mangago, () => {
+      return testSearchMangago()
     })
   })
 }
@@ -254,12 +272,12 @@ function testFirstkissmanga (): Promise<void> {
     const site = SiteType.FirstKissManga
 
     testSite(site).then(mangaInfo => {
-      const desired = new Manga('https://1stkissmanga.com/manga/royal-shop-of-young-lady/', site)
-      desired.chapter = 'Chapter 36'
-      desired.image = 'https://1stkissmanga.com/wp-content/uploads/2020/08/royal-shop-of-young-lady-193x278.jpg'
-      desired.title = 'Royal Shop of Young Lady'
-      desired.chapterUrl = 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/chapter-36/'
-      desired.chapterNum = 36
+      const desired = new Manga('https://1stkissmanga.com/manga/ripples-of-love/', site)
+      desired.chapter = 'Chapter 99'
+      desired.image = 'https://1stkissmanga.com/wp-content/uploads/2019/12/Hades-Delivery-Shop-193x278.jpg'
+      desired.title = 'Ripples Of Love'
+      desired.chapterUrl = 'https://1stkissmanga.com/manga/ripples-of-love/chapter-99/'
+      desired.chapterNum = 99
 
       const result = equals(mangaInfo, desired)
 
@@ -480,6 +498,26 @@ function testMangaTx (): Promise<void> {
       desired.title = 'Grandest Wedding'
       desired.chapterUrl = 'https://mangatx.com/manga/grandest-wedding/chapter-169-end/'
       desired.chapterNum = 169
+
+      const result = equals(mangaInfo, desired)
+
+      if (result === true) resolve()
+      else reject(result)
+    }).catch((error) => reject(error))
+  })
+}
+
+function testMangago (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const site = SiteType.Mangago
+
+    testSite(site).then(mangaInfo => {
+      const desired = new Manga('http://www.mangago.me/read-manga/curtain/', site)
+      desired.chapter = 'Vol.1 Ch.5'
+      desired.image = 'http://i6.mangapicgallery.com/r/coverlink/rROHYUm8aBnzo-L7jmKxeVpVAcPItlyo_7uFcU_twRCXnD7oAOrY_iGWGe5a5RDJz46jsLM.jpg?4'
+      desired.title = '...curtain'
+      desired.chapterUrl = 'http://www.mangago.me/read-manga/curtain/mf/v01/c005/'
+      desired.chapterNum = 5
 
       const result = equals(mangaInfo, desired)
 
@@ -750,6 +788,24 @@ function testSearchMangaTx (): Promise<void> {
               manga.image === 'https://mangatx.com/wp-content/uploads/2019/10/85012-193x278.png' &&
               manga.chapter === 'Chapter 169 [End]' &&
               manga.url === 'https://mangatx.com/manga/grandest-wedding/'
+      })
+
+      if (matchingManga.length === 0) reject(Error('No matching result'))
+      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      else resolve()
+    }).catch(error => reject(error))
+  })
+}
+
+function testSearchMangago (): Promise<void> {
+  return new Promise((resolve, reject) => {
+    searchManga('kimetsu no yaiba tomioka giyuu gaiden', SiteType.Mangago).then(result => {
+      const matchingManga = result.filter(manga => {
+        return manga.site === SiteType.Mangago &&
+              manga.title === 'Kimetsu no Yaiba: Tomioka Giyuu Gaiden' &&
+              manga.image === 'http://i4.mangapicgallery.com/r/coverlink/rROHYYKHa8HiliDzWniyeapxzJzU4oSoQvrAEzs86qJ0-9a9KsW_WCWDR6JmMILwX7iiPFrhc1qQVGKUHxoNO0X_TxZml7V2h2XjXDYSPEeBcveUNZKJki_m9uxZhO_YTR6I5lBX9PK.jpg?4' &&
+              manga.chapter === 'Ch.2' &&
+              manga.url === 'http://www.mangago.me/read-manga/kimetsu_no_yaiba_tomioka_giyuu_gaiden/'
       })
 
       if (matchingManga.length === 0) reject(Error('No matching result'))

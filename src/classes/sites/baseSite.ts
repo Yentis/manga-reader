@@ -2,6 +2,7 @@ import { Manga } from '../manga'
 import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
 import moment from 'moment'
 import PQueue from 'p-queue'
+import { AxiosRequestConfig } from 'axios'
 
 export abstract class BaseSite {
     abstract siteType: SiteType
@@ -14,6 +15,7 @@ export abstract class BaseSite {
     chapterNum: Cheerio | undefined
     loggedIn = true
     state = SiteState.REACHABLE
+    requestConfig: AxiosRequestConfig | undefined
 
     statusOK (): boolean {
       return this.loggedIn && this.state === SiteState.REACHABLE
@@ -155,6 +157,11 @@ export abstract class BaseSite {
           }
         }
       })
+    }
+
+    protected titleContainsQuery (query: string, title: string): boolean {
+      const querySplit = query.toLowerCase().split(' ')
+      return querySplit.every(word => title.toLowerCase().includes(word))
     }
 
     abstract getTestUrl(): string

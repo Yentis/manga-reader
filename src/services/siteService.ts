@@ -28,7 +28,10 @@ import {
 import {
   AsuraScans
 } from '../classes/sites/asurascans'
-import axios from 'axios'
+import {
+  Mangago
+} from '../classes/sites/mangago'
+import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import PQueue from 'p-queue'
 
@@ -48,7 +51,8 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.MangaDoDs, new WordPress(SiteType.MangaDoDs)],
   [SiteType.AsuraScans, new AsuraScans()],
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
-  [SiteType.MangaTx, new WordPress(SiteType.MangaTx)]
+  [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
+  [SiteType.Mangago, new Mangago()]
 ])
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
@@ -57,6 +61,12 @@ function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]
     promise,
     timeoutPromise
   ])
+}
+
+export function setRequestConfig (requestConfig: AxiosRequestConfig) {
+  siteMap.forEach(site => {
+    site.requestConfig = requestConfig
+  })
 }
 
 export function checkLogins (): void {

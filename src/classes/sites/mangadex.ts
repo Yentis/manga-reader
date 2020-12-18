@@ -84,7 +84,7 @@ export class MangaDex extends BaseSite {
       const promises: Promise<Error | Manga>[] = []
 
       $('.ml-1.manga_title').each((_index, elem) => {
-        if ($(elem).text().toLowerCase().includes(query.toLowerCase())) {
+        if (this.titleContainsQuery(query, $(elem).text())) {
           const url = $(elem).attr('href') || ''
           candidateUrls.push(this.processUrl(url))
         }

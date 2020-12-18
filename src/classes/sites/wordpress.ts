@@ -15,6 +15,14 @@ export class WordPress extends BaseSite {
     this.checkState()
   }
 
+  getUrl (): string {
+    if (this.siteType === SiteType.MangaDoDs) {
+      return `https://www.${this.siteType}`
+    } else {
+      return `https://${this.siteType}`
+    }
+  }
+
   getLoginUrl (): string {
     return this.getUrl()
   }
@@ -71,7 +79,7 @@ export class WordPress extends BaseSite {
   getTestUrl (): string {
     switch (this.siteType) {
       case SiteType.FirstKissManga:
-        return 'https://1stkissmanga.com/manga/royal-shop-of-young-lady/'
+        return 'https://1stkissmanga.com/manga/ripples-of-love/'
       case SiteType.MangaKomi:
         return 'https://mangakomi.com/manga/good-night/'
       case SiteType.HiperDEX:
@@ -133,7 +141,7 @@ export class WordPress extends BaseSite {
         manga.title = cheerioElem.find('.post-title').first().text().trim()
         manga.chapter = cheerioElem.find('.font-meta.chapter').first().text()
 
-        if (manga.title.toLowerCase().includes(query.toLowerCase())) {
+        if (this.titleContainsQuery(query, manga.title)) {
           mangaList.push(manga)
         }
       })
