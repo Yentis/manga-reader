@@ -130,10 +130,11 @@ export default defineComponent({
       this.updateRefreshProgress(0.01)
       this.updateRefreshing(true)
 
-      const promises = (this.mangaList as Manga[]).filter(manga => !manga.completed).map(manga => getMangaInfo(manga.url, manga.site))
+      const filteredMangaList = (this.mangaList as Manga[]).filter(manga => !manga.completed)
+      const promises = filteredMangaList.map(manga => getMangaInfo(manga.url, manga.site))
       const step = promises.length > 0 ? (1 / promises.length) : 0
       pEachSeries(promises, (result, index) => {
-        const manga = (this.mangaList as Manga[])[index]
+        const manga = filteredMangaList[index]
 
         if (result instanceof Error) {
           const notifyOptions = new NotifyOptions(`Failed to refresh ${manga.title}`)

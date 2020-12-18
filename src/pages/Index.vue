@@ -12,7 +12,12 @@
     ></q-linear-progress>
 
     <div class="manga-container q-mt-sm full-width">
-      <q-intersection once class="q-mb-sm full-width" v-for="manga in mangaList" :key="manga.url">
+      <q-intersection
+        v-for="manga in mangaList"
+        :key="manga.url"
+        transition="scale"
+        class="q-mb-sm full-width manga-item"
+      >
         <manga-item :url="manga.url" />
       </q-intersection>
     </div>
@@ -83,7 +88,7 @@ export default defineComponent({
 
     if (this.$q.platform.is.electron) {
       this.$q.electron.ipcRenderer.on('dropbox-token', (event, token) => {
-        const notifyOptions = new NotifyOptions('Logged in successfully!')
+        const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
         notifyOptions.type = 'positive'
         this.pushNotification(notifyOptions)
         setAccessToken(token)
@@ -118,6 +123,10 @@ a {
 
 .manga-container {
   display: inline-block;
+}
+
+.manga-item {
+  height: 11rem;
 }
 
 </style>

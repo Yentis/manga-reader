@@ -1,42 +1,44 @@
 <template>
   <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card>
-    <q-toolbar class="bg-primary text-white">
-      <q-toolbar-title>{{ title }}</q-toolbar-title>
-      <q-btn icon="close" flat round dense v-close-popup />
-    </q-toolbar>
+      <q-toolbar class="bg-primary text-white">
+        <q-toolbar-title>{{ title }}</q-toolbar-title>
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-toolbar>
 
-    <q-card-section>
-      <q-input v-model="search" :placeholder="searchPlaceholder" @keydown.enter="onSearch(siteType)">
-        <template v-if="search" v-slot:append>
-          <q-icon name="cancel" @click.stop="search = ''; updateSearchResults([])" class="cursor-pointer"></q-icon>
-        </template>
+      <q-card-section>
+        <div class="text-body2 content">{{ content }}</div>
 
-        <template v-slot:after>
-          <q-btn round dense flat icon="send" @click="onSearch(siteType)"></q-btn>
-        </template>
-      </q-input>
+        <q-input v-model="search" :placeholder="searchPlaceholder" @keydown.enter="onSearch(siteType)">
+          <template v-if="search" v-slot:append>
+            <q-icon name="cancel" @click.stop="search = ''; updateSearchResults([])" class="cursor-pointer"></q-icon>
+          </template>
 
-      <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
-        <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
-          <q-list separator>
-          <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; mangaTitle = manga.title">
-            <q-item-section avatar>
-              <q-img contain class="manga-image-search" :src="manga.image"></q-img>
-            </q-item-section>
+          <template v-slot:after>
+            <q-btn round dense flat icon="send" @click="onSearch(siteType)"></q-btn>
+          </template>
+        </q-input>
 
-            <q-item-section>
-              <div class="text-subtitle2">{{ manga.title }}</div>
-              <div class="text-body2">{{ manga.chapter }}</div>
-              <div>{{ siteNames[manga.site] }}</div>
-            </q-item-section>
-          </q-item>
-          </q-list>
-        </q-menu>
-      </q-btn>
+        <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
+          <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
+            <q-list separator>
+            <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="url = manga.url; mangaTitle = manga.title">
+              <q-item-section avatar>
+                <q-img contain class="manga-image-search" :src="manga.image"></q-img>
+              </q-item-section>
 
-      <q-input v-if="searchResults.length === 0" v-model="url" :placeholder="manualPlaceholder"></q-input>
-    </q-card-section>
+              <q-item-section>
+                <div class="text-subtitle2">{{ manga.title }}</div>
+                <div class="text-body2">{{ manga.chapter }}</div>
+                <div>{{ siteNames[manga.site] }}</div>
+              </q-item-section>
+            </q-item>
+            </q-list>
+          </q-menu>
+        </q-btn>
+
+        <q-input v-if="searchResults.length === 0" v-model="url" :placeholder="manualPlaceholder"></q-input>
+      </q-card-section>
 
       <q-card-actions>
         <q-space />
@@ -44,7 +46,7 @@
         <q-btn color="secondary" :label="confirmButton" @click="onOKClick"></q-btn>
         <q-btn label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
-      </q-card>
+    </q-card>
   </q-dialog>
 </template>
 
@@ -79,6 +81,7 @@ export default (Vue as VueConstructor<Vue &
 >).extend({
   props: {
     title: String,
+    content: String,
     initialSearch: String,
     searchPlaceholder: String,
     manualPlaceholder: String,
@@ -180,6 +183,10 @@ export default (Vue as VueConstructor<Vue &
 .manga-dropdown a {
   color: black;
   pointer-events: none;
+}
+
+.content {
+  white-space: pre-wrap;
 }
 
 </style>

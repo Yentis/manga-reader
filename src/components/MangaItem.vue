@@ -3,7 +3,7 @@
     'completed-container': manga.completed,
     'unread-container': (!manga.completed && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
   }">
-    <q-card-section horizontal>
+    <q-card-section class="manga-item" horizontal>
       <q-img contain class="manga-image q-ma-sm" :src="manga.image">
         <template v-slot:error>
           <div class="error-image bg-negative">
@@ -12,19 +12,19 @@
         </template>
       </q-img>
 
-      <q-card-section class="q-pb-none flex-column-between">
+      <q-card-section class="q-pb-none q-pl-sm q-pr-none flex-column-between">
         <div class="q-mb-sm">
           <div class="text-h6">
-            <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
+            <a class="manga-title" :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
           </div>
 
           <div v-if="!editing">
-            <div class="text-body2">
+            <div class="text-body2 manga-subtitle">
               Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
               <span v-else>{{ manga.read }}</span>
             </div>
 
-            <div class="text-body2">
+            <div class="text-body2 manga-subtitle">
               Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
               <span v-else>{{ manga.chapter }}</span>
             </div>
@@ -47,14 +47,7 @@
 
       <q-space />
 
-      <q-card-actions vertical>
-        <q-space />
-
-        <q-btn v-if="$q.platform.is.mobile && !manga.mangaDexId" color="info" icon="link" @click="onLinkingClicked()" />
-        <q-btn v-else-if="!manga.mangaDexId" color="info" label="Link with MangaDex" @click="onLinkingClicked()" />
-      </q-card-actions>
-
-      <q-card-actions vertical>
+      <q-card-actions class="q-pl-none" vertical>
         <q-btn
           flat
           icon="close"
@@ -70,6 +63,12 @@
           icon="save"
           v-else
           @click="onSaveEdit()" />
+
+        <q-btn
+          v-if="!manga.mangaDexId"
+          color="info"
+          icon="link"
+          @click="onLinkingClicked()" />
 
         <q-space />
 
@@ -146,7 +145,8 @@ export default defineComponent({
       this.$q.dialog({
         component: SearchDialog,
         parent: this,
-        title: 'Select manga',
+        title: 'Link with MangaDex',
+        content: 'This will sync your read chapter with the reading progress on MangaDex.\nNote: the manga MUST be bookmarked on MangaDex.',
         initialSearch: this.manga.title,
         searchPlaceholder: 'Search for the manga',
         manualPlaceholder: 'Or enter the url manually',
@@ -287,6 +287,22 @@ export default defineComponent({
 .manga-image {
   min-width: 96px;
   width: 96px;
+}
+
+.manga-title {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.manga-subtitle {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
 }
 
 .error-image {
