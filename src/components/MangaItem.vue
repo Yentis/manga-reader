@@ -14,33 +14,33 @@
 
       <q-card-section class="q-pb-none q-pl-sm q-pr-none flex-column-between">
         <div class="q-mb-sm">
-          <div class="text-h6">
-            <a class="manga-title" :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
+          <div :class="{ 'text-subtitle2': $q.platform.is.mobile, 'text-h6': !$q.platform.is.mobile }">
+            <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
           </div>
 
           <div v-if="!editing">
-            <div class="text-body2 manga-subtitle">
+            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile, 'manga-subtitle': true }">
               Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
               <span v-else>{{ manga.read }}</span>
             </div>
 
-            <div class="text-body2 manga-subtitle">
+            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile, 'manga-subtitle': true }">
               Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
               <span v-else>{{ manga.chapter }}</span>
             </div>
 
-            <div class="text-body2" v-if="manga.chapterDate">
+            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile }" v-if="manga.chapterDate">
               {{ manga.chapterDate }}
             </div>
           </div>
 
           <div v-else>
             <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
-            <q-checkbox v-if="editing" v-model="newCompleted" class="q-mb-sm" dense color="secondary" label="Completed" />
+            <q-checkbox v-if="editing" v-model="newCompleted" :size="itemSize" class="q-mb-sm" dense color="secondary" label="Completed" />
           </div>
         </div>
 
-        <div v-if="!editing" class="text-subtitle1">
+        <div v-if="!editing" :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile }">
           {{ siteNames[manga.site] }}
         </div>
       </q-card-section>
@@ -51,23 +51,27 @@
         <q-btn
           flat
           icon="close"
+          :size="itemSize"
           @click="onDeleteClick()" />
 
         <q-btn
           flat
           icon="edit"
           v-if="!editing"
+          :size="itemSize"
           @click="onStartEditing()" />
         <q-btn
           flat
           icon="save"
           v-else
+          :size="itemSize"
           @click="onSaveEdit()" />
 
         <q-btn
           v-if="!manga.mangaDexId"
           color="info"
           icon="link"
+          :size="itemSize"
           @click="onLinkingClicked()" />
 
         <q-space />
@@ -76,6 +80,7 @@
           v-if="manga.chapter !== manga.read"
           color="secondary"
           icon="done"
+          :size="itemSize"
           @click="onReadClick()" />
       </q-card-actions>
     </q-card-section>
@@ -112,6 +117,10 @@ export default defineComponent({
 
     manga (): Manga {
       return (this.mangaByUrl as (url: string) => Manga)(this.url)
+    },
+
+    itemSize (): string {
+      return this.$q.platform.is.mobile ? 'sm' : 'md'
     }
   },
 
@@ -258,7 +267,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .body--light {
   .unread-container {
@@ -289,12 +298,11 @@ export default defineComponent({
   width: 96px;
 }
 
-.manga-title {
-  display: -webkit-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.error-image {
+  min-width: 96px;
+  min-height: 96px;
+  width: 96px;
+  height: 96px;
 }
 
 .manga-subtitle {
@@ -303,13 +311,6 @@ export default defineComponent({
   text-overflow: ellipsis;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
-}
-
-.error-image {
-  min-width: 96px;
-  min-height: 96px;
-  width: 96px;
-  height: 96px;
 }
 
 </style>

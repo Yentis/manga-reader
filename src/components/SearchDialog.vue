@@ -173,7 +173,7 @@ export default (Vue as VueConstructor<Vue &
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .manga-image-search {
   min-width: 48px;

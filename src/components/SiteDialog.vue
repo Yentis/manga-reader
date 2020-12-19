@@ -122,7 +122,7 @@ export default (Vue as VueConstructor<Vue &
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .mobile-site-dialog {
   height: 25vh;
