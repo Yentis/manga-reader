@@ -15,6 +15,7 @@ import { checkLogins } from './services/siteService'
 import { tryMigrateMangaList } from './services/migrationService'
 import { getChangelog } from './services/updateService'
 import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
+import { version } from '../package.json'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -74,6 +75,38 @@ export default defineComponent({
     }
   },
 
+  async mounted () {
+    this.windowSize = [window.innerWidth, window.innerHeight]
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowSize = [window.innerWidth, window.innerHeight]
+      })
+    })
+
+    const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
+    this.updateOpenInBrowser(openInBrowser)
+
+    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
+    this.$q.dark.set(darkMode)
+    this.updateDarkMode(darkMode)
+
+    tryMigrateMangaList()
+    this.initMangaList()
+
+    const changelog = await getChangelog()
+    if (changelog) {
+      this.$q.dialog({
+        component: ConfirmationDialog,
+        title: 'Changelog',
+        content: changelog,
+        hideCancel: true
+      }).onDismiss(() => {
+        LocalStorage.set(this.$constants.MIGRATION_VERSION, version)
+      })
+    }
+  },
+
   methods: {
     ...mapMutations('reader', {
       updateMangaList: 'updateMangaList',
@@ -92,43 +125,13 @@ export default defineComponent({
       } else {
         window.location.href = url
       }
+    },
+
+    initMangaList () {
+      const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
+      mangaList.sort(mangaSort)
+      this.updateMangaList(mangaList)
     }
-  },
-
-  mounted () {
-    this.windowSize = [window.innerWidth, window.innerHeight]
-
-    this.$nextTick(() => {
-      window.addEventListener('resize', () => {
-        this.windowSize = [window.innerWidth, window.innerHeight]
-      })
-    })
-
-    const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
-    this.updateOpenInBrowser(openInBrowser)
-
-    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
-    this.$q.dark.set(darkMode)
-    this.updateDarkMode(darkMode)
-
-    getChangelog().then(changelog => {
-      if (!changelog) return
-
-      this.$q.dialog({
-        component: ConfirmationDialog,
-        title: 'Changelog',
-        content: changelog,
-        hideCancel: true
-      }).onDismiss(() => {
-        tryMigrateMangaList()
-      })
-    }).catch(error => {
-      console.error(error)
-    })
-
-    const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
-    mangaList.sort(mangaSort)
-    this.updateMangaList(mangaList)
   }
 })
 </script>

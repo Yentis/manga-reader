@@ -28,6 +28,7 @@ import { NotifyOptions } from 'src/classes/notifyOptions'
 import { Manga } from 'src/classes/manga'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType } from 'src/enums/siteEnum'
+import { Status } from 'src/enums/statusEnum'
 import { getMangaInfo } from 'src/services/siteService'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import SearchDialog from './SearchDialog.vue'
@@ -132,7 +133,7 @@ export default defineComponent({
       this.updateRefreshProgress(0.01)
       this.updateRefreshing(true)
 
-      const filteredMangaList = (this.mangaList as Manga[]).filter(manga => !manga.completed)
+      const filteredMangaList = (this.mangaList as Manga[]).filter(manga => manga.status === (undefined || Status.READING))
       const promises = filteredMangaList.map(manga => getMangaInfo(manga.url, manga.site))
       const step = promises.length > 0 ? (1 / promises.length) : 0
       pEachSeries(promises, (result, index) => {

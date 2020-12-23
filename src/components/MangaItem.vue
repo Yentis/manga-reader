@@ -1,7 +1,10 @@
 <template>
   <q-card :class="{
-    'completed-container': manga.completed,
-    'unread-container': (!manga.completed && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
+    'completed-container': manga.status === status.COMPLETED,
+    'on-hold-container': manga.status === status.ON_HOLD,
+    'plan-to-read-container': manga.status === status.PLAN_TO_READ,
+    'dropped-container': manga.status === status.DROPPED,
+    'unread-container': ((manga.status === undefined || status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
   }">
     <q-card-section class="manga-item" horizontal>
       <q-img contain class="manga-image q-ma-sm" :src="manga.image">
@@ -36,7 +39,25 @@
 
           <q-card-actions class="q-pa-none" align="left" vertical v-else>
             <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
-            <q-checkbox v-if="editing" v-model="newCompleted" :size="itemSize" class="q-mb-sm" dense color="secondary" label="Completed" />
+            <q-btn-dropdown no-caps :label="newStatus">
+              <q-list
+                v-for="status in Object.values(status)"
+                :key="status"
+              >
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="newStatus = status"
+                >
+                  <q-icon
+                    size="sm"
+                    class="q-mr-sm vertical-center"
+                    :name="statusIcon[status]"
+                  />
+                  <span class="full-width vertical-center text-center">{{ status }}</span>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
             <q-btn
               v-if="editing"
               color="info"
@@ -47,6 +68,11 @@
         </div>
 
         <div v-if="!editing" :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }">
+          <q-icon
+            class="q-mr-xs q-mb-xs"
+            :name="statusIcon[manga.status]"
+            size="xs"
+          />
           <span>{{ siteNames[manga.site] }}</span>
           <q-icon
             class="q-ml-xs"
@@ -59,6 +85,7 @@
             :key="site"
           >
           <q-img
+            class="q-mb-xs"
             width="1rem"
             :src="'https://' + site + '/favicon.ico'"
           />
@@ -113,6 +140,7 @@ import { getSite } from 'src/services/siteService'
 import LinkingDialog from './LinkingDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { Status, StatusIcon } from 'src/enums/statusEnum'
 
 export default defineComponent({
   name: 'manga-item',
@@ -140,7 +168,7 @@ export default defineComponent({
     },
 
     linkedSites (): Record<string, number> {
-      return this.manga.linkedSites || {}
+      return this.manga.linkedSites
     },
 
     hasLinkedSites (): boolean {
@@ -151,9 +179,11 @@ export default defineComponent({
   data () {
     return {
       siteNames: SiteName,
+      status: Status,
+      statusIcon: StatusIcon,
       editing: false,
       newReadNum: -1 as number | undefined,
-      newCompleted: false as boolean,
+      newStatus: Status.READING as Status,
       newLinkedSites: undefined as Record<string, number> | undefined
     }
   },
@@ -179,7 +209,7 @@ export default defineComponent({
       this.$q.dialog({
         component: LinkingDialog,
         parent: this,
-        linkedSites: this.newLinkedSites || this.manga.linkedSites || {},
+        linkedSites: this.newLinkedSites || this.manga.linkedSites,
         initialSearch: this.manga.title,
         searchPlaceholder: 'Search for the manga',
         manualPlaceholder: 'Or enter the url manually',
@@ -240,17 +270,17 @@ export default defineComponent({
     onToggleEditing () {
       this.editing = !this.editing
       this.newReadNum = this.manga.readNum
-      this.newCompleted = this.manga.completed || false
+      this.newStatus = this.manga.status
       this.newLinkedSites = undefined
     },
 
     onSaveEdit () {
       this.editing = !this.editing
       const readNumChanged = this.trySaveNewReadNum()
-      const completedChanged = this.trySaveNewCompleted()
+      const statusChanged = this.trySaveNewStatus()
       const linkedSitesChanged = this.trySaveNewLinkedSites()
 
-      if (!readNumChanged && !completedChanged && !linkedSitesChanged) return
+      if (!readNumChanged && !statusChanged && !linkedSitesChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -270,11 +300,11 @@ export default defineComponent({
       return true
     },
 
-    trySaveNewCompleted (): boolean {
-      const currentCompleted = this.manga.completed || false
-      if (this.newCompleted === currentCompleted) return false
+    trySaveNewStatus (): boolean {
+      const currentStatus = this.manga.status
+      if (this.newStatus === currentStatus) return false
 
-      this.manga.completed = this.newCompleted
+      this.manga.status = this.newStatus
       return true
     },
 
@@ -286,7 +316,7 @@ export default defineComponent({
     },
 
     trySyncSites (chapterNum: number) {
-      const linkedSites = this.manga.linkedSites || {}
+      const linkedSites = this.manga.linkedSites
       Object.keys(linkedSites).forEach(key => {
         const siteType = key as SiteType | LinkingSiteType
         const site = getSite(siteType)
@@ -330,6 +360,18 @@ export default defineComponent({
   .completed-container {
     background-color: $green-3;
   }
+
+  .on-hold-container {
+    background-color: $lime-4;
+  }
+
+  .plan-to-read-container {
+    background-color: $blue-11;
+  }
+
+  .dropped-container {
+    background-color: $red-4;
+  }
 }
 
 .body--dark {
@@ -339,6 +381,18 @@ export default defineComponent({
 
   .completed-container {
     background-color: $teal-10;
+  }
+
+  .on-hold-container {
+    background-color: $lime-10;
+  }
+
+  .plan-to-read-container {
+    background-color: $blue-10;
+  }
+
+  .dropped-container {
+    background-color: $brown-10;
   }
 }
 
@@ -364,6 +418,12 @@ export default defineComponent({
   text-overflow: ellipsis;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+}
+
+.vertical-center {
+  margin-top: auto;
+  margin-bottom: auto;
+  height: 100%;
 }
 
 </style>

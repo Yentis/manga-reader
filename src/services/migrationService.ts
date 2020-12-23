@@ -1,6 +1,7 @@
 import { LocalStorage } from 'quasar'
 import constants from 'src/boot/constants'
 import { SiteType } from 'src/enums/siteEnum'
+import { Status } from 'src/enums/statusEnum'
 import { version } from '../../package.json'
 
 const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERSION) || ''
@@ -8,6 +9,8 @@ const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERS
 interface MigrationManga {
   mangaDexId: number | undefined
   linkedSites: Record<string, number> | undefined
+  completed: boolean | undefined
+  status: Status | undefined
 }
 
 export function tryMigrateMangaList () {
@@ -17,8 +20,6 @@ export function tryMigrateMangaList () {
   if (mangaList) {
     LocalStorage.set(constants().MANGA_LIST_KEY, doMigration(mangaList))
   }
-
-  LocalStorage.set(constants().MIGRATION_VERSION, version)
 }
 
 export function migrateInput (input: string): string {
@@ -28,12 +29,19 @@ export function migrateInput (input: string): string {
 
 function doMigration (mangaList: MigrationManga[]) {
   mangaList.forEach(item => {
-    if (item.mangaDexId) {
-      const linkedSites = item.linkedSites || {}
-      linkedSites[SiteType.MangaDex] = item.mangaDexId
+    if (item.linkedSites === undefined) {
+      const linkedSites = {} as Record<string, number>
+      if (item.mangaDexId !== undefined) {
+        linkedSites[SiteType.MangaDex] = item.mangaDexId
+      }
 
       item.linkedSites = linkedSites
       delete item.mangaDexId
+    }
+
+    if (item.status === undefined) {
+      item.status = item.completed === true ? Status.COMPLETED : Status.READING
+      delete item.completed
     }
   })
 
