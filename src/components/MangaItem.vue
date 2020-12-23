@@ -14,22 +14,22 @@
 
       <q-card-section class="q-pb-none q-pl-sm q-pr-none flex-column-between">
         <div class="q-mb-sm">
-          <div :class="{ 'text-subtitle2': $q.platform.is.mobile, 'text-h6': !$q.platform.is.mobile }">
+          <div :class="{ 'text-subtitle2': mobileView, 'text-h6': !mobileView }">
             <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
           </div>
 
           <div v-if="!editing">
-            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile, 'manga-subtitle': true }">
+            <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
               Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
               <span v-else>{{ manga.read }}</span>
             </div>
 
-            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile, 'manga-subtitle': true }">
+            <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
               Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
               <span v-else>{{ manga.chapter }}</span>
             </div>
 
-            <div :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile }" v-if="manga.chapterDate">
+            <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }" v-if="manga.chapterDate">
               {{ manga.chapterDate }}
             </div>
           </div>
@@ -46,7 +46,7 @@
           </q-card-actions>
         </div>
 
-        <div v-if="!editing" :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile }">
+        <div v-if="!editing" :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }">
           <span>{{ siteNames[manga.site] }}</span>
           <q-icon
             class="q-ml-xs"
@@ -127,7 +127,8 @@ export default defineComponent({
   computed: {
     ...mapGetters('reader', {
       mangaList: 'mangaList',
-      mangaByUrl: 'manga'
+      mangaByUrl: 'manga',
+      mobileView: 'mobileView'
     }),
 
     manga (): Manga {
@@ -135,7 +136,7 @@ export default defineComponent({
     },
 
     itemSize (): string {
-      return this.$q.platform.is.mobile ? 'sm' : 'md'
+      return this.mobileView ? 'sm' : 'md'
     },
 
     linkedSites (): Record<string, number> {

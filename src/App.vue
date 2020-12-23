@@ -35,6 +35,12 @@ export default defineComponent({
     })
   },
 
+  data () {
+    return {
+      windowSize: [] as Array<number>
+    }
+  },
+
   watch: {
     notification (notifyOptions: NotifyOptions | undefined) {
       if (!(notifyOptions instanceof NotifyOptions)) return
@@ -61,6 +67,10 @@ export default defineComponent({
       } else {
         window.location.href = urlNavigation.url
       }
+    },
+
+    windowSize (value: Array<number>) {
+      this.updateMobileView(value[0] <= 850)
     }
   },
 
@@ -68,7 +78,8 @@ export default defineComponent({
     ...mapMutations('reader', {
       updateMangaList: 'updateMangaList',
       updateOpenInBrowser: 'updateOpenInBrowser',
-      updateDarkMode: 'updateDarkMode'
+      updateDarkMode: 'updateDarkMode',
+      updateMobileView: 'updateMobileView'
     }),
 
     openInApp (url: string) {
@@ -85,6 +96,14 @@ export default defineComponent({
   },
 
   mounted () {
+    this.windowSize = [window.innerWidth, window.innerHeight]
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowSize = [window.innerWidth, window.innerHeight]
+      })
+    })
+
     const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
     this.updateOpenInBrowser(openInBrowser)
 

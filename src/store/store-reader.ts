@@ -11,6 +11,7 @@ class ReaderState {
     urlNavigation: UrlNavigation | undefined = undefined
     openInBrowser = false
     darkMode = false
+    mobileView = false
 }
 
 function mangaSort (a: Manga, b: Manga): number {
@@ -75,6 +76,9 @@ const mutations = {
   },
   updateDarkMode (state: ReaderState, darkMode: boolean) {
     state.darkMode = darkMode
+  },
+  updateMobileView (state: ReaderState, mobileView: boolean) {
+    state.mobileView = mobileView
   }
 }
 
@@ -105,6 +109,9 @@ const getters = {
   },
   darkMode: (state: ReaderState) => {
     return state.darkMode
+  },
+  mobileView: (state: ReaderState) => {
+    return state.mobileView
   }
 }
 

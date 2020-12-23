@@ -1,15 +1,15 @@
 <template>
     <div class="header">
-      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="primary" label="Add" @click="onAddManga" />
+      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+        <q-btn v-if="mobileView" color="primary" label="Add" @click="onAddManga" />
         <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
-        <q-btn v-if="$q.platform.is.mobile" color="secondary" label="Refresh" @click="onRefreshAllManga" />
+        <q-btn v-if="mobileView" color="secondary" label="Refresh" @click="onRefreshAllManga" />
         <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
       </div>
-      <div :class="{ 'flex-column-between': $q.platform.is.mobile, 'q-gutter-sm': $q.platform.is.mobile }">
-        <q-btn v-if="$q.platform.is.mobile" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
+      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+        <q-btn v-if="mobileView" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
         <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="onExportList" />
-        <q-btn v-if="$q.platform.is.mobile" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
+        <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
       </div>
       <div class="flex-column-between">
@@ -50,7 +50,8 @@ export default defineComponent({
       refreshing: 'refreshing',
       refreshProgress: 'refreshProgress',
       openInBrowser: 'openInBrowser',
-      darkMode: 'darkMode'
+      darkMode: 'darkMode',
+      mobileView: 'mobileView'
     })
   },
 

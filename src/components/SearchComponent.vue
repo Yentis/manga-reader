@@ -11,7 +11,7 @@
     </q-input>
 
     <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
-      <q-menu auto-close :max-width="$q.platform.is.mobile ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
+      <q-menu auto-close :max-width="mobileView ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
         <q-list separator>
         <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="$emit('change', manga.url); mangaTitle = manga.title">
           <q-item-section avatar>
@@ -88,7 +88,8 @@ export default defineComponent({
   computed: {
     ...mapGetters('reader', {
       mangaList: 'mangaList',
-      searchResults: 'searchResults'
+      searchResults: 'searchResults',
+      mobileView: 'mobileView'
     })
   },
 
