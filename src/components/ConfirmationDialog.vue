@@ -15,7 +15,7 @@
         <q-space />
 
         <q-btn color="secondary" label="Confirm" @click="onOKClick"></q-btn>
-        <q-btn label="Cancel" v-close-popup></q-btn>
+        <q-btn v-if="!hideCancel" label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -33,7 +33,8 @@ export default (Vue as VueConstructor<Vue &
   props: {
     title: String,
     content: String,
-    imageUrl: String
+    imageUrl: String,
+    hideCancel: Boolean
   },
 
   methods: {

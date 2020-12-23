@@ -13,6 +13,8 @@ import { NotifyOptions } from './classes/notifyOptions'
 import { UrlNavigation } from './classes/urlNavigation'
 import { checkLogins } from './services/siteService'
 import { tryMigrateMangaList } from './services/migrationService'
+import { getChangelog } from './services/updateService'
+import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -90,7 +92,20 @@ export default defineComponent({
     this.$q.dark.set(darkMode)
     this.updateDarkMode(darkMode)
 
-    tryMigrateMangaList()
+    getChangelog().then(changelog => {
+      if (!changelog) return
+
+      this.$q.dialog({
+        component: ConfirmationDialog,
+        title: 'Changelog',
+        content: changelog,
+        hideCancel: true
+      }).onDismiss(() => {
+        tryMigrateMangaList()
+      })
+    }).catch(error => {
+      console.error(error)
+    })
 
     const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
     mangaList.sort(mangaSort)
