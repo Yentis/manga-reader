@@ -31,19 +31,25 @@ import {
 import {
   Mangago
 } from '../classes/sites/mangago'
-import axios, { AxiosRequestConfig } from 'axios'
-import FormData from 'form-data'
+import {
+  Kitsu
+} from 'src/classes/sites/kitsu'
+import {
+  LinkingSiteType
+} from '../enums/linkingSiteEnum'
+import { AxiosRequestConfig } from 'axios'
 import PQueue from 'p-queue'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
-const siteMap = new Map<SiteType, BaseSite>([
+const mangaDex = new MangaDex()
+const siteMap = new Map<string, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
   [SiteType.HatigarmScans, new Genkan(SiteType.HatigarmScans)],
   [SiteType.Webtoons, new Webtoons()],
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
   [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.Mangakakalot, new Mangakakalot()],
-  [SiteType.MangaDex, new MangaDex()],
+  [SiteType.MangaDex, mangaDex],
   [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
   [SiteType.LeviatanScans, new Genkan(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
@@ -53,6 +59,10 @@ const siteMap = new Map<SiteType, BaseSite>([
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()]
+])
+const linkingSiteMap = new Map<string, BaseSite>([
+  [LinkingSiteType.MangaDex, mangaDex],
+  [LinkingSiteType.Kitsu, new Kitsu()]
 ])
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
@@ -71,7 +81,11 @@ export function setRequestConfig (requestConfig: AxiosRequestConfig) {
 
 export function checkLogins (): void {
   siteMap.forEach(site => {
-    site.checkLogin()
+    site.checkLogin().then(() => {
+      // Do nothing
+    }).catch(() => {
+      // Do nothing
+    })
   })
 }
 
@@ -82,17 +96,18 @@ export function testSite (siteType: SiteType): Promise <Error | Manga> {
   return requestQueue.add(() => site.readUrl(site.getTestUrl()))
 }
 
-export function getMangaInfo (url: string, siteType: SiteType): Promise <Error | Manga> {
+export function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType): Promise <Error | Manga> {
   const site = siteMap.get(siteType)
   if (!site) return Promise.resolve(Error('Invalid site type'))
 
   return requestQueue.add(() => site.readUrl(url))
 }
 
-export function searchManga (query: string, siteType: SiteType | undefined = undefined): Promise <Manga[]> {
+export function searchManga (query: string, siteType: SiteType | LinkingSiteType | undefined = undefined): Promise <Manga[]> {
   return requestQueue.add(async () => {
     if (siteType) {
-      const result = await createRace(siteMap.get(siteType)?.search(query) || Promise.reject(Error('Invalid site type')))
+      const site = siteMap.get(siteType) || linkingSiteMap.get(siteType)
+      const result = await createRace(site?.search(query) || Promise.reject(Error('Invalid site type')))
       if (result instanceof Error) {
         throw result
       } else {
@@ -122,32 +137,6 @@ export function getSiteMap () {
   return siteMap
 }
 
-export function syncReadChapter (id: number, chapterNum: number): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (chapterNum === 0) {
-      resolve()
-      return
-    }
-
-    const data = new FormData()
-    data.append('volume', '0')
-    data.append('chapter', chapterNum)
-
-    axios({
-      method: 'post',
-      url: `https://mangadex.org/ajax/actions.ajax.php?function=edit_progress&id=${id}`,
-      headers: {
-        'x-requested-with': 'XMLHttpRequest'
-      },
-      data
-    }).then(response => {
-      if (response.data === '') {
-        resolve()
-      } else {
-        reject(Error(response.data))
-      }
-    }).catch(error => {
-      reject(error)
-    })
-  })
+export function getSite (siteType: SiteType | LinkingSiteType): BaseSite | undefined {
+  return siteMap.get(siteType) || linkingSiteMap.get(siteType)
 }

@@ -34,14 +34,35 @@
             </div>
           </div>
 
-          <div v-else>
+          <q-card-actions class="q-pa-none" align="left" vertical v-else>
             <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
             <q-checkbox v-if="editing" v-model="newCompleted" :size="itemSize" class="q-mb-sm" dense color="secondary" label="Completed" />
-          </div>
+            <q-btn
+              v-if="editing"
+              color="info"
+              label="Progress linking"
+              :size="itemSize"
+              @click="onLinkingClicked()" />
+          </q-card-actions>
         </div>
 
         <div v-if="!editing" :class="{ 'text-caption': $q.platform.is.mobile, 'text-body2': !$q.platform.is.mobile }">
-          {{ siteNames[manga.site] }}
+          <span>{{ siteNames[manga.site] }}</span>
+          <q-icon
+            class="q-ml-xs"
+            :name="hasLinkedSites ? 'link' : 'link_off'"
+            :color="hasLinkedSites ? 'positive' : 'negative'"
+          />
+          <span
+            class="q-ml-xs"
+            v-for="(id, site) in linkedSites"
+            :key="site"
+          >
+          <q-img
+            width="1rem"
+            :src="'https://' + site + '/favicon.ico'"
+          />
+          </span>
         </div>
       </q-card-section>
 
@@ -52,27 +73,20 @@
           flat
           icon="close"
           :size="itemSize"
-          @click="onDeleteClick()" />
+          @click="editing ? onToggleEditing() : onDeleteClick()" />
 
         <q-btn
           flat
           icon="edit"
           v-if="!editing"
           :size="itemSize"
-          @click="onStartEditing()" />
+          @click="onToggleEditing()" />
         <q-btn
           flat
           icon="save"
           v-else
           :size="itemSize"
           @click="onSaveEdit()" />
-
-        <q-btn
-          v-if="!manga.mangaDexId"
-          color="info"
-          icon="link"
-          :size="itemSize"
-          @click="onLinkingClicked()" />
 
         <q-space />
 
@@ -95,9 +109,10 @@ import { Manga } from 'src/classes/manga'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { SiteName, SiteType } from 'src/enums/siteEnum'
-import { syncReadChapter } from 'src/services/siteService'
-import SearchDialog from './SearchDialog.vue'
+import { getSite } from 'src/services/siteService'
+import LinkingDialog from './LinkingDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
+import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 
 export default defineComponent({
   name: 'manga-item',
@@ -121,6 +136,14 @@ export default defineComponent({
 
     itemSize (): string {
       return this.$q.platform.is.mobile ? 'sm' : 'md'
+    },
+
+    linkedSites (): Record<string, number> {
+      return this.manga.linkedSites || {}
+    },
+
+    hasLinkedSites (): boolean {
+      return Object.keys(this.linkedSites).length > 0
     }
   },
 
@@ -129,7 +152,8 @@ export default defineComponent({
       siteNames: SiteName,
       editing: false,
       newReadNum: -1 as number | undefined,
-      newCompleted: false as boolean
+      newCompleted: false as boolean,
+      newLinkedSites: undefined as Record<string, number> | undefined
     }
   },
 
@@ -147,46 +171,46 @@ export default defineComponent({
 
     onLinkingClicked () {
       if (this.manga.site === SiteType.MangaDex) {
-        this.linkMangaDex(this.manga.url)
+        this.linkSite(this.manga.url, this.manga.site)
         return
       }
 
       this.$q.dialog({
-        component: SearchDialog,
+        component: LinkingDialog,
         parent: this,
-        title: 'Link with MangaDex',
-        content: 'This will sync your read chapter with the reading progress on MangaDex.\nNote: the manga MUST be bookmarked on MangaDex.',
+        mangaUrl: this.url,
         initialSearch: this.manga.title,
         searchPlaceholder: 'Search for the manga',
         manualPlaceholder: 'Or enter the url manually',
-        siteType: SiteType.MangaDex,
         confirmButton: 'Select'
-      }).onOk((data: { url: string }) => {
-        this.linkMangaDex(data.url)
+      }).onOk((data: {
+        url: string,
+        siteType: SiteType | LinkingSiteType,
+        linkedSites: Record<string, number>
+      }) => {
+        this.newLinkedSites = data.linkedSites
+        this.linkSite(data.url, data.siteType)
       })
     },
 
-    linkMangaDex (url: string) {
-      if (url === '') {
-        this.pushNotification(new NotifyOptions('Received empty URL'))
+    linkSite (url: string, siteType: SiteType | LinkingSiteType) {
+      if (url === '') return
+
+      const site = getSite(siteType)
+      if (!site) {
+        this.pushNotification(new NotifyOptions('Site not found'))
         return
       }
 
-      const matches = /\/title\/(\d*)/gm.exec(url) || []
-      let mangaId = -1
-
-      for (const match of matches) {
-        const parsedMatch = parseInt(match)
-        if (!isNaN(parsedMatch)) mangaId = parsedMatch
-      }
+      const mangaId = site.getMangaId(url)
 
       if (mangaId !== -1) {
-        this.manga.mangaDexId = mangaId
+        const newLinkedSites = this.newLinkedSites || {}
+        newLinkedSites[siteType] = mangaId
 
-        this.updateManga(this.manga)
-        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+        this.newLinkedSites = newLinkedSites
       } else {
-        this.pushNotification(new NotifyOptions('Could not find MangaDex ID in selected URL'))
+        this.pushNotification(new NotifyOptions('Could not find ID in selected URL'))
       }
     },
 
@@ -207,23 +231,25 @@ export default defineComponent({
       this.manga.readUrl = this.manga.chapterUrl
       this.manga.readNum = this.manga.chapterNum
 
-      this.trySyncMangaDex(this.manga.chapterNum)
+      this.trySyncSites(this.manga.chapterNum)
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
     },
 
-    onStartEditing () {
+    onToggleEditing () {
       this.editing = !this.editing
       this.newReadNum = this.manga.readNum
       this.newCompleted = this.manga.completed || false
+      this.newLinkedSites = undefined
     },
 
     onSaveEdit () {
       this.editing = !this.editing
       const readNumChanged = this.trySaveNewReadNum()
       const completedChanged = this.trySaveNewCompleted()
+      const linkedSitesChanged = this.trySaveNewLinkedSites()
 
-      if (!readNumChanged && !completedChanged) return
+      if (!readNumChanged && !completedChanged && !linkedSitesChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -239,7 +265,7 @@ export default defineComponent({
       this.manga.readUrl = isEqualToCurrent ? this.manga.chapterUrl : undefined
       this.manga.readNum = parsedReadNum
 
-      this.trySyncMangaDex(this.manga.readNum)
+      this.trySyncSites(this.manga.readNum)
       return true
     },
 
@@ -251,17 +277,43 @@ export default defineComponent({
       return true
     },
 
-    trySyncMangaDex (chapterNum: number) {
-      if (this.manga.mangaDexId) {
-        syncReadChapter(this.manga.mangaDexId, chapterNum).then(() => {
-          const notifyOptions = new NotifyOptions('Synced with MangaDex')
-          notifyOptions.type = 'positive'
-          this.pushNotification(notifyOptions)
-        }).catch(error => {
-          console.error(error)
-          this.pushNotification(new NotifyOptions(Error('Failed to sync with MangaDex')))
-        })
-      }
+    trySaveNewLinkedSites (): boolean {
+      if (this.newLinkedSites === undefined) return false
+
+      this.manga.linkedSites = this.newLinkedSites
+      return true
+    },
+
+    trySyncSites (chapterNum: number) {
+      const linkedSites = this.manga.linkedSites || {}
+      Object.keys(linkedSites).forEach(key => {
+        const siteType = key as SiteType | LinkingSiteType
+        const site = getSite(siteType)
+
+        if (site) {
+          site.syncReadChapter(linkedSites[siteType], chapterNum).then((result) => {
+            if (result instanceof Error) {
+              const notifyOptions = new NotifyOptions(`Failed to sync with ${SiteName[siteType]}`)
+              notifyOptions.caption = result.message
+              this.pushNotification(notifyOptions)
+              return
+            }
+
+            const notifyOptions = new NotifyOptions(`Synced with ${SiteName[siteType]}`)
+            notifyOptions.type = 'positive'
+            this.pushNotification(notifyOptions)
+          }).catch(error => {
+            console.error(error)
+            const notifyOptions = new NotifyOptions(`Failed to sync with ${SiteName[siteType]}`)
+            if (error instanceof Error) {
+              notifyOptions.caption = error.message
+            } else {
+              notifyOptions.caption = error as string
+            }
+            this.pushNotification(notifyOptions)
+          })
+        }
+      })
     }
   }
 })

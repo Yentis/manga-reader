@@ -149,17 +149,14 @@ export default defineComponent({
 
           this.pushNotification(notifyOptions)
         } else {
-          const read = manga.read
-          const readUrl = manga.readUrl
-          const readNum = manga.readNum
-          const mangaDexId = manga.mangaDexId
+          manga.title = result.title
+          manga.chapter = result.chapter
+          manga.chapterUrl = result.chapterUrl
+          manga.chapterNum = result.chapterNum
+          manga.chapterDate = result.chapterDate
+          manga.image = result.image
 
-          result.read = read
-          result.readUrl = readUrl
-          result.readNum = readNum
-          result.mangaDexId = mangaDexId
-
-          this.updateManga(result)
+          this.updateManga(manga)
         }
 
         this.incrementRefreshProgress(step)
@@ -252,6 +249,10 @@ export default defineComponent({
 .header {
   display: flex;
   justify-content: space-between;
+}
+
+.flex-column-between button {
+  width: 100%;
 }
 
 </style>

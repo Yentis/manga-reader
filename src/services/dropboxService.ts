@@ -1,5 +1,6 @@
 import dropbox from 'dropbox'
 import { Manga } from 'src/classes/manga'
+import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
 import { LocalStorage } from 'quasar'
 
@@ -78,7 +79,7 @@ export function readList (): Promise<Manga[]> {
 
       reader.onload = function () {
         if (typeof this.result !== 'string') return reject(Error('Failed to read file'))
-        resolve(JSON.parse(this.result))
+        resolve(JSON.parse(migrateInput(this.result)))
       }
 
       reader.readAsText(response.fileBlob)

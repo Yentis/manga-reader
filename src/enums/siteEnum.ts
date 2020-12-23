@@ -33,7 +33,8 @@ export enum SiteName {
     'asurascans.com' = 'Asura Scans',
     'manhwa.club' = 'Manhwa Club',
     'mangatx.com' = 'MangaTx',
-    'mangago.me' = 'Mangago'
+    'mangago.me' = 'Mangago',
+    'kitsu.io' = 'Kitsu'
 }
 
 export enum SiteState {

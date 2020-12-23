@@ -112,10 +112,6 @@ export default defineComponent({
   justify-content: space-between;
 }
 
-.flex-column-between button {
-  width: 100%;
-}
-
 a {
   text-decoration: none;
   color: $primary;

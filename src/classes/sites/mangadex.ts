@@ -13,16 +13,59 @@ export class MangaDex extends BaseSite {
 
   constructor () {
     super()
-    this.checkLogin()
-    this.checkState()
-  }
-
-  checkLogin (): void {
-    this.search('together with the rain').then(results => {
-      this.loggedIn = !(results instanceof Error)
+    this.checkLogin().then(loggedIn => {
+      this.loggedIn = loggedIn
     }).catch(error => {
       console.error(error)
       this.loggedIn = false
+    })
+    this.checkState()
+  }
+
+  checkLogin (): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.search('together with the rain').then(results => {
+        resolve(!(results instanceof Error))
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  }
+
+  getMangaId (url: string): number {
+    const matches = /\/title\/(\d*)/gm.exec(url) || []
+    let mangaId = -1
+
+    for (const match of matches) {
+      const parsedMatch = parseInt(match)
+      if (!isNaN(parsedMatch)) mangaId = parsedMatch
+    }
+
+    return mangaId
+  }
+
+  syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
+    return this.addToQueue(async () => {
+      if (chapterNum === 0) {
+        return
+      }
+
+      const data = new FormData()
+      data.append('volume', '0')
+      data.append('chapter', chapterNum.toString())
+
+      const response = await axios({
+        method: 'post',
+        url: `${this.getUrl()}/ajax/actions.ajax.php?function=edit_progress&id=${mangaId}`,
+        headers: {
+          'x-requested-with': 'XMLHttpRequest'
+        },
+        data
+      })
+
+      if (response.data !== '') {
+        return Error(response.data)
+      }
     })
   }
 

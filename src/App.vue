@@ -12,6 +12,7 @@ import { Manga } from './classes/manga'
 import { NotifyOptions } from './classes/notifyOptions'
 import { UrlNavigation } from './classes/urlNavigation'
 import { checkLogins } from './services/siteService'
+import { tryMigrateMangaList } from './services/migrationService'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -88,6 +89,8 @@ export default defineComponent({
     const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
     this.$q.dark.set(darkMode)
     this.updateDarkMode(darkMode)
+
+    tryMigrateMangaList()
 
     const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
     mangaList.sort(mangaSort)

@@ -1,11 +1,14 @@
 import { Manga } from '../manga'
+import { UrlNavigation } from '../urlNavigation'
 import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
+import { LinkingSiteType } from '../../enums/linkingSiteEnum'
+import { ComponentRenderProxy } from '@vue/composition-api'
 import moment from 'moment'
 import PQueue from 'p-queue'
 import { AxiosRequestConfig } from 'axios'
 
 export abstract class BaseSite {
-    abstract siteType: SiteType
+    abstract siteType: SiteType | LinkingSiteType
 
     requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
     chapter: Cheerio | undefined
@@ -37,8 +40,25 @@ export abstract class BaseSite {
       })
     }
 
-    checkLogin (): void {
-      // Do nothing
+    checkLogin (): Promise<boolean> {
+      return Promise.resolve(true)
+    }
+
+    openLogin (componentRenderProxy: ComponentRenderProxy): Promise<boolean | Error> {
+      componentRenderProxy.$store.commit('reader/pushUrlNavigation', new UrlNavigation(this.getLoginUrl(), true))
+      return Promise.resolve(false)
+    }
+
+    getMangaId (url: string): number {
+      const parsedUrl = parseInt(url)
+      if (!isNaN(parsedUrl)) return parsedUrl
+
+      return -1
+    }
+
+    syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
+      console.log(`Sync not implemented, ${mangaId}: ${chapterNum}`)
+      return Promise.resolve()
     }
 
     getUrl (): string {
