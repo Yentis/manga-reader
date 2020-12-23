@@ -10,7 +10,7 @@ export class AsuraScans extends BaseSite {
 
     constructor () {
       super()
-      this.checkState()
+      void this.checkState()
     }
 
     getChapterNum (): number {

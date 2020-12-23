@@ -13,7 +13,7 @@ export class Mangago extends BaseSite {
 
   constructor () {
     super()
-    this.checkState()
+    void this.checkState()
   }
 
   getUrl (): string {

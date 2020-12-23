@@ -19,7 +19,7 @@ export class MangaDex extends BaseSite {
       console.error(error)
       this.loggedIn = false
     })
-    this.checkState()
+    void this.checkState()
   }
 
   checkLogin (): Promise<boolean> {

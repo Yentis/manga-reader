@@ -12,7 +12,7 @@ export class WordPress extends BaseSite {
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
-    this.checkState()
+    void this.checkState()
   }
 
   getUrl (): string {

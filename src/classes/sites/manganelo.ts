@@ -15,7 +15,7 @@ export class Manganelo extends BaseSite {
 
   constructor () {
     super()
-    this.checkState()
+    void this.checkState()
   }
 
   getLoginUrl (): string {

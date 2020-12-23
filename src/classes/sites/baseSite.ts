@@ -24,19 +24,23 @@ export abstract class BaseSite {
       return this.loggedIn && this.state === SiteState.REACHABLE
     }
 
-    checkState (): void {
-      this.addToQueue(async () => {
-        const response = await this.readUrl(this.getTestUrl())
-        return response instanceof Error ? SiteState.OFFLINE : response.title === 'Unknown' ? SiteState.INVALID : SiteState.REACHABLE
-      }).then((results) => {
-        if (results instanceof Error) {
+    checkState (): Promise<void> {
+      return new Promise(resolve => {
+        this.addToQueue(async () => {
+          const response = await this.readUrl(this.getTestUrl())
+          return response instanceof Error ? SiteState.OFFLINE : response.title === 'Unknown' ? SiteState.INVALID : SiteState.REACHABLE
+        }).then((results) => {
+          if (results instanceof Error) {
+            this.state = SiteState.OFFLINE
+          } else {
+            this.state = results
+          }
+        }).catch((error) => {
+          console.error(error)
           this.state = SiteState.OFFLINE
-        } else {
-          this.state = results
-        }
-      }).catch((error) => {
-        console.error(error)
-        this.state = SiteState.OFFLINE
+        }).finally(() => {
+          resolve()
+        })
       })
     }
 

@@ -8,30 +8,42 @@
       :position="$q.platform.is.mobile ? 'bottom' : 'right'"
       @hide="onDialogHide">
       <q-card :class="{ 'mobile-site-dialog': $q.platform.is.mobile }">
-      <q-toolbar class="bg-primary text-white text-center">
-          <q-toolbar-title>Supported sites</q-toolbar-title>
-      </q-toolbar>
-      <q-card-section class="q-pa-none">
-          <q-list separator :class="{ 'text-center': $q.platform.is.mobile }">
-          <q-item
-              clickable
-              v-for="site in siteMap"
-              :key="site.siteType"
-              :class="{ 'bg-warning': !site.statusOK(), 'text-black': !site.statusOK() && $q.dark.isActive }"
-              @click="site.loggedIn ? site.statusOK() ? onLinkClicked(site.getUrl()) : onLinkClicked(site.getUrl(), true) : onLinkClicked(site.getLoginUrl(), true)">
-              <q-item-section>
-              <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[site.siteType] }}</q-item-label>
-              <q-item-label v-if="!site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
-              <q-item-label v-else-if="!site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>{{ site.state }}</q-item-label>
-              </q-item-section>
-          </q-item>
-          </q-list>
-      </q-card-section>
+        <q-toolbar class="bg-primary text-white text-center q-pl-xs">
+            <q-btn
+              flat
+              round
+              icon="refresh"
+              :loading="refreshing"
+              @click="onRefreshSites"
+            />
+            <q-toolbar-title class="q-pl-xs">Supported sites</q-toolbar-title>
+        </q-toolbar>
+        <q-card-section class="q-pa-none">
+            <q-list separator :class="{ 'text-center': $q.platform.is.mobile }">
+              <q-item
+                  clickable
+                  v-for="item in siteList"
+                  :key="item.site.siteType"
+                  :class="{ 'bg-warning': !item.site.statusOK(), 'text-black': !item.site.statusOK() && $q.dark.isActive }"
+                  @click="item.site.loggedIn ? item.site.statusOK() ? onLinkClicked(item.site.getUrl()) : onLinkClicked(item.site.getUrl(), true) : onLinkClicked(item.site.getLoginUrl(), true)">
+                  <q-item-section v-if="!item.refreshing">
+                    <q-item-label :class="{ 'full-width': $q.platform.is.mobile }">{{ siteNames[item.site.siteType] }}</q-item-label>
+                    <q-item-label v-if="!item.site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
+                    <q-item-label v-else-if="!item.site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>{{ item.site.state }}</q-item-label>
+                  </q-item-section>
+
+                  <q-inner-loading :showing="item.refreshing">
+                    <q-spinner-dots size="md" color="primary" />
+                  </q-inner-loading>
+              </q-item>
+            </q-list>
+        </q-card-section>
       </q-card>
   </q-dialog>
 </template>
 
 <script lang="ts">
+import pEachSeries from 'p-each-series'
 import Vue, { VueConstructor } from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
 import { QDialog } from 'quasar'
@@ -40,8 +52,13 @@ import { UrlNavigation } from 'src/classes/urlNavigation'
 import { getSiteMap } from 'src/services/siteService'
 import { SiteName } from 'src/enums/siteEnum'
 
-function siteSort (a: BaseSite, b: BaseSite): number {
-  return a.compare(b)
+interface DisplayedSite {
+   site: BaseSite
+   refreshing: boolean
+}
+
+function siteSort (a: DisplayedSite, b: DisplayedSite): number {
+  return a.site.compare(b.site)
 }
 
 export default (Vue as VueConstructor<Vue &
@@ -58,7 +75,8 @@ export default (Vue as VueConstructor<Vue &
   data () {
     return {
       visible: true,
-      siteMap: [] as BaseSite[],
+      refreshing: false,
+      siteList: [] as DisplayedSite[],
       siteNames: SiteName,
       windowSize: [] as Array<number>
     }
@@ -79,7 +97,7 @@ export default (Vue as VueConstructor<Vue &
   },
 
   mounted () {
-    this.siteMap = Array.from(getSiteMap().values()).sort(siteSort)
+    this.updateSiteList()
     this.windowSize = [window.innerWidth, window.innerHeight]
 
     this.$nextTick(() => {
@@ -93,6 +111,15 @@ export default (Vue as VueConstructor<Vue &
     ...mapMutations('reader', {
       pushUrlNavigation: 'pushUrlNavigation'
     }),
+
+    updateSiteList () {
+      this.siteList = Array.from(getSiteMap().values()).map(site => {
+        return {
+          site,
+          refreshing: false
+        }
+      }).sort(siteSort)
+    },
 
     show () {
       this.$refs.dialog.show()
@@ -117,6 +144,35 @@ export default (Vue as VueConstructor<Vue &
 
     onCancelClick () {
       this.hide()
+    },
+
+    onRefreshSites () {
+      this.refreshing = true
+      this.siteList.forEach(item => {
+        item.refreshing = true
+      })
+
+      const promises = [] as Promise<void>[]
+      const siteMap = [] as BaseSite[]
+
+      getSiteMap().forEach(site => {
+        siteMap.push(site)
+        promises.push(site.checkState())
+      })
+      pEachSeries(promises, (result, index) => {
+        const site = siteMap[index]
+        const siteItem = this.siteList.find(item => item.site.siteType === site.siteType)
+
+        if (siteItem) {
+          siteItem.site = site
+          siteItem.refreshing = false
+        }
+      }).catch((error: Error) => {
+        console.error(error)
+      }).finally(() => {
+        this.refreshing = false
+        this.siteList.sort(siteSort)
+      })
     }
   }
 })
