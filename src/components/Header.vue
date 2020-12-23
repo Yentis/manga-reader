@@ -26,12 +26,13 @@ import { defineComponent } from '@vue/composition-api'
 import pEachSeries from 'p-each-series'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { Manga } from 'src/classes/manga'
+import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo } from 'src/services/siteService'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import SearchDialog from './SearchDialog.vue'
 import SiteDialog from './SiteDialog.vue'
-import { UrlNavigation } from 'src/classes/urlNavigation'
+import ConfirmationDialog from './ConfirmationDialog.vue'
 
 export default defineComponent({
   name: 'manga-header',
@@ -176,11 +177,17 @@ export default defineComponent({
         this.importing = true
 
         readList().then(mangaList => {
-          const notifyOptions = new NotifyOptions('Imported!')
-          notifyOptions.type = 'positive'
-          this.pushNotification(notifyOptions)
-          this.updateMangaList(mangaList)
-          LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+          this.$q.dialog({
+            component: ConfirmationDialog,
+            title: 'Import from Dropbox',
+            content: `Are you sure you want to import ${mangaList.length} titles from Dropbox?\nYou currently have ${(this.mangaList as Manga[]).length} titles.`
+          }).onOk(() => {
+            const notifyOptions = new NotifyOptions('Imported!')
+            notifyOptions.type = 'positive'
+            this.pushNotification(notifyOptions)
+            this.updateMangaList(mangaList)
+            LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+          })
         }).catch((error: Error) => {
           if (error.message === 'Unauthorized') {
             this.startDropboxLogin()
@@ -197,20 +204,26 @@ export default defineComponent({
       if (!getAccessToken()) {
         this.startDropboxLogin()
       } else {
-        this.exporting = true
+        this.$q.dialog({
+          component: ConfirmationDialog,
+          title: 'Export to Dropbox',
+          content: `Are you sure you want to export ${(this.mangaList as Manga[]).length} titles to Dropbox?`
+        }).onOk(() => {
+          this.exporting = true
 
-        saveList(this.mangaList).then(() => {
-          const notifyOptions = new NotifyOptions('Exported!')
-          notifyOptions.type = 'positive'
-          this.pushNotification(notifyOptions)
-        }).catch((error: Error) => {
-          if (error.message === 'Unauthorized') {
-            this.startDropboxLogin()
-          } else {
-            this.pushNotification(new NotifyOptions(error))
-          }
-        }).finally(() => {
-          this.exporting = false
+          saveList(this.mangaList).then(() => {
+            const notifyOptions = new NotifyOptions('Exported!')
+            notifyOptions.type = 'positive'
+            this.pushNotification(notifyOptions)
+          }).catch((error: Error) => {
+            if (error.message === 'Unauthorized') {
+              this.startDropboxLogin()
+            } else {
+              this.pushNotification(new NotifyOptions(error))
+            }
+          }).finally(() => {
+            this.exporting = false
+          })
         })
       }
     },

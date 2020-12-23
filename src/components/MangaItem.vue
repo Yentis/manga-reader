@@ -178,7 +178,7 @@ export default defineComponent({
       this.$q.dialog({
         component: LinkingDialog,
         parent: this,
-        mangaUrl: this.url,
+        linkedSites: this.newLinkedSites || this.manga.linkedSites || {},
         initialSearch: this.manga.title,
         searchPlaceholder: 'Search for the manga',
         manualPlaceholder: 'Or enter the url manually',

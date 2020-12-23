@@ -7,7 +7,7 @@
       </q-toolbar>
 
       <q-card-section>
-        <div class="text-body2">{{ content }}</div>
+        <div class="text-body2 content">{{ content }}</div>
         <q-img v-if="imageUrl" class="q-mt-sm confirmation-image-size" contain :src="imageUrl"></q-img>
       </q-card-section>
 
@@ -65,6 +65,10 @@ export default (Vue as VueConstructor<Vue &
 
 .confirmation-image-size {
   max-height: 256px
+}
+
+.content {
+  white-space: pre-wrap;
 }
 
 </style>

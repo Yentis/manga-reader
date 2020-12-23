@@ -67,12 +67,11 @@
 
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapMutations } from 'vuex'
 import { QDialog } from 'quasar'
 import { SiteName } from 'src/enums/siteEnum'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import MangaSearch from './SearchComponent.vue'
-import { Manga } from 'src/classes/manga'
 
 export default (Vue as VueConstructor<Vue &
   { $refs:
@@ -80,25 +79,14 @@ export default (Vue as VueConstructor<Vue &
   }
 >).extend({
   props: {
-    mangaUrl: {
-      type: String,
+    linkedSites: {
+      type: Object,
       required: true
     },
     initialSearch: String,
     searchPlaceholder: String,
     manualPlaceholder: String,
     confirmButton: String
-  },
-
-  computed: {
-    ...mapGetters('reader', {
-      mangaList: 'mangaList',
-      mangaByUrl: 'manga'
-    }),
-
-    manga (): Manga {
-      return (this.mangaByUrl as (url: string) => Manga)(this.mangaUrl)
-    }
   },
 
   data () {
@@ -122,7 +110,8 @@ export default (Vue as VueConstructor<Vue &
   mounted () {
     this.updateSearchResults([])
     this.data = Object.values(LinkingSiteType).map(site => {
-      const id = this.manga.linkedSites ? this.manga.linkedSites[site] : ''
+      const linkedSites = this.linkedSites as Record<string, number>
+      const id = linkedSites ? linkedSites[site] : ''
 
       return {
         name: SiteName[site],
