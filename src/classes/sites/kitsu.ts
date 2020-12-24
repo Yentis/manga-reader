@@ -297,7 +297,7 @@ interface LibraryEntriesResponse {
       self: string
     },
     attributes: {
-      titles: Record<string, string>,
+      titles: Record<string, string | undefined>,
       posterImage: {
         small: string
       }

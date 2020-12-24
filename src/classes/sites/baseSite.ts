@@ -183,7 +183,9 @@ export abstract class BaseSite {
       })
     }
 
-    protected titleContainsQuery (query: string, title: string): boolean {
+    protected titleContainsQuery (query: string, title: string | undefined): boolean {
+      if (!title) return false
+
       const querySplit = query.toLowerCase().split(' ')
       return querySplit.every(word => title.toLowerCase().includes(word))
     }
