@@ -7,24 +7,23 @@ const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERS
 
 export async function getChangelog (): Promise<string | undefined> {
   if (migrationVersion === version) return
+  const releases = await getReleases()
+  const latestFeatureRelease = releases.find(release => release.tag_name.endsWith('0'))
+  if (!latestFeatureRelease) return 'No release found, please notify Yentis#5218 on Discord.'
 
-  const latestRelease = await getLatestRelease()
-  return latestRelease.body
+  return latestFeatureRelease.body
 }
 
 export async function checkUpdates (): Promise<GithubRelease | undefined> {
-  const latestRelease = await getLatestRelease()
+  const latestRelease = (await getReleases())[0]
   if (latestRelease.tag_name !== version) {
     return latestRelease
   }
 }
 
-async function getLatestRelease (): Promise<GithubRelease> {
+async function getReleases (): Promise<GithubRelease[]> {
   const response = await axios.get('https://api.github.com/repos/Yentis/manga-reader/releases')
-  const releases = response.data as Array<GithubRelease>
-  const latestRelease = releases[0]
-
-  return latestRelease
+  return response.data as Array<GithubRelease>
 }
 
 export function getApkAsset (githubRelease: GithubRelease): Asset | undefined {

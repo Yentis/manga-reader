@@ -129,6 +129,10 @@ export default defineComponent({
             return alreadyAdded
           })
 
+          if (searchResults.length === 0) {
+            this.pushNotification(new NotifyOptions('No results found'))
+          }
+
           this.updateSearchResults(mangaSearchSorter.sort(searchResults, this.search, (obj, calc) => {
             return calc(obj.title)
           }))

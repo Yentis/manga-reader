@@ -6,6 +6,7 @@ import cheerio from 'cheerio'
 import moment from 'moment'
 import relevancy from 'relevancy'
 import PQueue from 'p-queue'
+import { ComponentRenderProxy } from '@vue/composition-api'
 
 export class MangaDex extends BaseSite {
   siteType = SiteType.MangaDex
@@ -32,7 +33,7 @@ export class MangaDex extends BaseSite {
     })
   }
 
-  getMangaId (url: string): number {
+  getMangaId (_componentRenderProxy: ComponentRenderProxy, url: string): Promise<number | Error> {
     const matches = /\/title\/(\d*)/gm.exec(url) || []
     let mangaId = -1
 
@@ -41,7 +42,7 @@ export class MangaDex extends BaseSite {
       if (!isNaN(parsedMatch)) mangaId = parsedMatch
     }
 
-    return mangaId
+    return Promise.resolve(mangaId)
   }
 
   syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {

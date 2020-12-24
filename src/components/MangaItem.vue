@@ -233,16 +233,31 @@ export default defineComponent({
         return
       }
 
-      const mangaId = site.getMangaId(url)
+      const failMessage = 'Failed to get manga from URL'
+      site.getMangaId(this, url).then(mangaId => {
+        if (mangaId instanceof Error) {
+          const notifyOptions = new NotifyOptions(failMessage)
+          notifyOptions.caption = mangaId.message
+          this.pushNotification(notifyOptions)
+          return
+        }
 
-      if (mangaId !== -1) {
-        const newLinkedSites = this.newLinkedSites || {}
-        newLinkedSites[siteType] = mangaId
+        if (mangaId !== -1) {
+          const newLinkedSites = this.newLinkedSites || {}
+          newLinkedSites[siteType] = mangaId
 
-        this.newLinkedSites = newLinkedSites
-      } else {
-        this.pushNotification(new NotifyOptions('Could not find ID in selected URL'))
-      }
+          this.newLinkedSites = newLinkedSites
+        } else {
+          const notifyOptions = new NotifyOptions(failMessage)
+          notifyOptions.caption = 'No ID found in URL'
+          this.pushNotification(notifyOptions)
+        }
+      }).catch(error => {
+        const notifyOptions = new NotifyOptions(failMessage)
+        if (error instanceof Error) notifyOptions.caption = error.message
+        else notifyOptions.caption = error as string
+        this.pushNotification(notifyOptions)
+      })
     },
 
     onDeleteClick () {

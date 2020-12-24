@@ -53,11 +53,11 @@ export abstract class BaseSite {
       return Promise.resolve(false)
     }
 
-    getMangaId (url: string): number {
+    getMangaId (_componentRenderProxy: ComponentRenderProxy, url: string): Promise<number | Error> {
       const parsedUrl = parseInt(url)
-      if (!isNaN(parsedUrl)) return parsedUrl
+      if (!isNaN(parsedUrl)) return Promise.resolve(parsedUrl)
 
-      return -1
+      return Promise.resolve(-1)
     }
 
     syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {

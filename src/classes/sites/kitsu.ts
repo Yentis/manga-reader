@@ -83,16 +83,60 @@ export class Kitsu extends BaseSite {
     })
   }
 
-  getMangaId (url: string): number {
-    const matches = /\/library-entries\/(\d*)/gm.exec(url) || []
-    let mangaId = -1
+  async getMangaId (componentRenderProxy: ComponentRenderProxy, url: string): Promise<number | Error> {
+    // First try a regular library entry URL
+    const libraryMatches = /\/library-entries\/(\d*)/gm.exec(url) || []
+    let result = -1
 
-    for (const match of matches) {
+    for (const match of libraryMatches) {
       const parsedMatch = parseInt(match)
-      if (!isNaN(parsedMatch)) mangaId = parsedMatch
+      if (!isNaN(parsedMatch)) result = parsedMatch
+    }
+    if (result !== -1) return result
+
+    // Next try a manga URL
+    const mangaMatches = /\/manga\/([\w-]*)/gm.exec(url) || []
+    if (mangaMatches.length !== 2) return result
+
+    componentRenderProxy.$q.loading.show({
+      delay: 100
+    })
+
+    // Try to get the manga ID
+    const match = mangaMatches[1]
+    const mangaId = await this.searchMangaSlug(match)
+    if (mangaId instanceof Error) {
+      componentRenderProxy.$q.loading.hide()
+      return mangaId
     }
 
-    return mangaId
+    // Try to get the user ID
+    let userId = await this.getUserId()
+    if (userId instanceof Error) {
+      componentRenderProxy.$q.loading.hide()
+
+      // Ask to log in if we're not already
+      const loggedIn = await this.openLogin(componentRenderProxy)
+      if (loggedIn instanceof Error) return loggedIn
+      if (loggedIn === false) return userId
+
+      componentRenderProxy.$q.loading.show({
+        delay: 100
+      })
+
+      userId = await this.getUserId()
+      if (userId instanceof Error) {
+        componentRenderProxy.$q.loading.hide()
+        return userId
+      }
+    }
+
+    // Finally get the library ID
+    const libraryId = await this.getLibraryId(mangaId, userId)
+    componentRenderProxy.$q.loading.hide()
+    if (libraryId instanceof Error) return libraryId
+
+    return parseInt(libraryId)
   }
 
   syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
@@ -148,6 +192,8 @@ export class Kitsu extends BaseSite {
       const libraryEntriesResponse = response.data as LibraryEntriesResponse
       const mangaList: Manga[] = []
 
+      if (!libraryEntriesResponse.included) return mangaList
+
       libraryEntriesResponse.included.forEach(entry => {
         const library = libraryEntriesResponse.data.find(library => {
           return library.relationships.manga.data.id === entry.id
@@ -182,10 +228,40 @@ export class Kitsu extends BaseSite {
         }
       })
 
-      const usersResponse = response.data as UsersResponse
+      const usersResponse = response.data as BasicResponse
       if (usersResponse.data.length === 0) return Error('Response did not contain ID')
 
       return usersResponse.data[0].id
+    })
+  }
+
+  private searchMangaSlug (url: string): Promise<Error | string> {
+    return this.addToQueue(async () => {
+      const queryString = qs.stringify({
+        'fields[manga]': 'id',
+        'filter[slug]': url
+      })
+
+      const response = await axios.get(`${this.getUrl()}/api/edge/manga?${queryString}`)
+      const mangaResponse = response.data as BasicResponse
+
+      if (mangaResponse.data.length === 0) return Error('Response did not contain ID')
+      return mangaResponse.data[0].id
+    })
+  }
+
+  private getLibraryId (mangaId: string, userId: string): Promise<Error | string> {
+    return this.addToQueue(async () => {
+      const queryString = qs.stringify({
+        'filter[manga_id]': mangaId,
+        'filter[user_id]': userId
+      })
+
+      const response = await axios.get(`${this.getUrl()}/api/edge/library-entries?${queryString}`)
+      const libraryResponse = response.data as BasicResponse
+
+      if (libraryResponse.data.length === 0) return Error('Response did not contain ID')
+      return libraryResponse.data[0].id
     })
   }
 }
@@ -194,7 +270,7 @@ interface LoginResponse {
   'access_token': string
 }
 
-interface UsersResponse {
+interface BasicResponse {
   data: { id: string }[]
 }
 
@@ -226,5 +302,5 @@ interface LibraryEntriesResponse {
         small: string
       }
     }
-  }[]
+  }[] | undefined
 }
