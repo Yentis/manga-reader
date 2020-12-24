@@ -23,6 +23,7 @@
         </q-card-actions>
         <q-input
           lazy-rules
+          type="number"
           class="q-mx-sm"
           suffix="minutes"
           label="Refresh interval"

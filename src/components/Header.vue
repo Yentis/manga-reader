@@ -12,7 +12,7 @@
         <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
       </div>
-      <q-btn round icon="settings" @click="onSettingsClick" />
+      <q-btn flat round icon="settings" @click="onSettingsClick" />
     </div>
 </template>
 

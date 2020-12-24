@@ -30,6 +30,8 @@
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-local-notification": {}
     },
-    "platforms": []
+    "platforms": [
+      "android"
+    ]
   }
 }
