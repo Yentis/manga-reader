@@ -13,8 +13,12 @@ Supported platforms:
 https://github.com/Yentis/manga-reader/releases
 
 # Preview
-![Preview](https://i.imgur.com/mQumFEa.png)
-![Preview](https://i.imgur.com/4U6QUyx.png)
+![Preview](https://i.imgur.com/I8maarB.png)
+![Preview](https://i.imgur.com/gbCwdKD.png)
+![Preview](https://i.imgur.com/qSDzBiz.png)
+![Preview](https://i.imgur.com/YNoNUc7.png)
+![Preview](https://i.imgur.com/iBKh8ad.png)
+![Preview](https://i.imgur.com/sqXJLYB.jpg)
 
 # Support
 For support contact Yentis#5218 on Discord.
