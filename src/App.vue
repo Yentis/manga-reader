@@ -16,6 +16,7 @@ import { tryMigrateMangaList } from './services/migrationService'
 import { getChangelog } from './services/updateService'
 import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
 import { version } from '../package.json'
+import { RefreshOptions } from './classes/refreshOptions'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -91,6 +92,9 @@ export default defineComponent({
     this.$q.dark.set(darkMode)
     this.updateDarkMode(darkMode)
 
+    const refreshOptions: RefreshOptions = LocalStorage.getItem(this.$constants.REFRESH_OPTIONS) || new RefreshOptions()
+    this.updateRefreshOptions(refreshOptions)
+
     tryMigrateMangaList()
     this.initMangaList()
 
@@ -112,7 +116,8 @@ export default defineComponent({
       updateMangaList: 'updateMangaList',
       updateOpenInBrowser: 'updateOpenInBrowser',
       updateDarkMode: 'updateDarkMode',
-      updateMobileView: 'updateMobileView'
+      updateMobileView: 'updateMobileView',
+      updateRefreshOptions: 'updateRefreshOptions'
     }),
 
     openInApp (url: string) {

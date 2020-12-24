@@ -15,7 +15,6 @@
       <q-intersection
         v-for="manga in mangaList"
         :key="manga.url"
-        transition="scale"
         class="q-mb-sm full-width manga-item"
       >
         <manga-item :url="manga.url" />

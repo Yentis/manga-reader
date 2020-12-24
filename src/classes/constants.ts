@@ -4,4 +4,5 @@ export class Constants {
   DARK_MODE_KEY = 'dark_mode'
   KITSU_TOKEN = 'kitsu_token'
   MIGRATION_VERSION = 'migration_version'
+  REFRESH_OPTIONS = 'refresh_options'
 }

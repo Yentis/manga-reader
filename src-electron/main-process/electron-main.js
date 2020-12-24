@@ -105,6 +105,8 @@ function onFinishLoad() {
   mainWindow.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 
+app.setAppUserModelId('Manga Reader')
+
 app.on('ready', createWindow)
 
 app.on('window-all-closed', () => {

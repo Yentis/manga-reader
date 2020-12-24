@@ -12,10 +12,7 @@
         <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
         <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
       </div>
-      <div class="flex-column-between">
-        <q-checkbox :value="openInBrowser" label="Open in browser" @input="saveOpenInBrowser" />
-        <q-checkbox :value="darkMode" label="Dark mode" @input="saveDarkMode" />
-      </div>
+      <q-btn round icon="settings" @click="onSettingsClick" />
     </div>
 </template>
 
@@ -34,6 +31,24 @@ import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordova
 import SearchDialog from './SearchDialog.vue'
 import SiteDialog from './SiteDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
+import SettingsDialog from './SettingsDialog.vue'
+import { RefreshOptions } from 'src/classes/refreshOptions'
+
+interface CordovaNotificationOptions {
+  title: string
+  text: string
+  icon: string
+  smallIcon: string
+  foreground: boolean
+}
+
+interface CordovaNotification {
+  notification: {
+    local: {
+      schedule: (options: CordovaNotificationOptions) => void
+    }
+  }
+}
 
 export default defineComponent({
   name: 'manga-header',
@@ -41,7 +56,9 @@ export default defineComponent({
   data () {
     return {
       exporting: false,
-      importing: false
+      importing: false,
+      autoRefreshing: false,
+      refreshInterval: undefined as NodeJS.Timeout | undefined
     }
   },
 
@@ -50,10 +67,24 @@ export default defineComponent({
       mangaList: 'mangaList',
       refreshing: 'refreshing',
       refreshProgress: 'refreshProgress',
-      openInBrowser: 'openInBrowser',
-      darkMode: 'darkMode',
-      mobileView: 'mobileView'
+      mobileView: 'mobileView',
+      refreshOptions: 'refreshOptions'
     })
+  },
+
+  watch: {
+    refreshOptions (refreshOptions: RefreshOptions) {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval)
+        this.refreshInterval = undefined
+      }
+
+      this.createRefreshInterval(refreshOptions)
+    }
+  },
+
+  mounted () {
+    this.createRefreshInterval(this.refreshOptions)
   },
 
   methods: {
@@ -65,10 +96,16 @@ export default defineComponent({
       updateMangaList: 'updateMangaList',
       addManga: 'addManga',
       updateManga: 'updateManga',
-      pushUrlNavigation: 'pushUrlNavigation',
-      updateOpenInBrowser: 'updateOpenInBrowser',
-      updateDarkMode: 'updateDarkMode'
+      pushUrlNavigation: 'pushUrlNavigation'
     }),
+
+    createRefreshInterval (refreshOptions: RefreshOptions) {
+      this.refreshInterval = setInterval(() => {
+        if (!refreshOptions.enabled || this.refreshing) return
+        this.autoRefreshing = true
+        this.onRefreshAllManga()
+      }, refreshOptions.period * 60 * 1000)
+    },
 
     onAddManga () {
       this.$q.dialog({
@@ -152,6 +189,10 @@ export default defineComponent({
 
           this.pushNotification(notifyOptions)
         } else {
+          if (this.autoRefreshing && manga.chapter !== result.chapter) {
+            this.sendPushNotification(manga)
+          }
+
           manga.title = result.title
           manga.chapter = result.chapter
           manga.chapterUrl = result.chapterUrl
@@ -167,6 +208,7 @@ export default defineComponent({
         this.pushNotification(new NotifyOptions(error))
       }).finally(() => {
         LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+        this.autoRefreshing = false
         this.updateRefreshing(false)
         this.updateRefreshProgress(0)
       })
@@ -230,6 +272,13 @@ export default defineComponent({
       }
     },
 
+    onSettingsClick () {
+      this.$q.dialog({
+        component: SettingsDialog,
+        parent: this
+      })
+    },
+
     startDropboxLogin () {
       if (this.$q.platform.is.mobile) {
         cordovaLogin()
@@ -245,15 +294,25 @@ export default defineComponent({
       }
     },
 
-    saveOpenInBrowser (checked: boolean) {
-      this.updateOpenInBrowser(checked)
-      LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, checked)
-    },
+    sendPushNotification (manga: Manga) {
+      if (this.$q.platform.is.electron) {
+        const notification = new Notification(manga.title, {
+          body: manga.chapter,
+          icon: manga.image
+        })
 
-    saveDarkMode (checked: boolean) {
-      this.$q.dark.set(checked)
-      this.updateDarkMode(checked)
-      LocalStorage.set(this.$constants.DARK_MODE_KEY, checked)
+        notification.onclick = () => {
+          this.pushUrlNavigation(new UrlNavigation(manga.url, false))
+        }
+      } else if (this.$q.platform.is.mobile) {
+        (this.$q.cordova.plugins as CordovaNotification).notification.local.schedule({
+          title: manga.title,
+          text: manga.chapter,
+          smallIcon: 'res://notification_icon',
+          icon: manga.image,
+          foreground: true
+        })
+      }
     }
   }
 })

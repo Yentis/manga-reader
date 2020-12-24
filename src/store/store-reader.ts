@@ -1,5 +1,6 @@
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
+import { RefreshOptions } from 'src/classes/refreshOptions'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { Status } from 'src/enums/statusEnum'
 
@@ -13,6 +14,7 @@ class ReaderState {
     openInBrowser = false
     darkMode = false
     mobileView = false
+    refreshOptions = new RefreshOptions()
 }
 
 function mangaSort (a: Manga, b: Manga): number {
@@ -105,6 +107,9 @@ const mutations = {
   },
   updateMobileView (state: ReaderState, mobileView: boolean) {
     state.mobileView = mobileView
+  },
+  updateRefreshOptions (state: ReaderState, refreshOptions: RefreshOptions) {
+    state.refreshOptions = refreshOptions
   }
 }
 
@@ -138,6 +143,9 @@ const getters = {
   },
   mobileView: (state: ReaderState) => {
     return state.mobileView
+  },
+  refreshOptions: (state: ReaderState) => {
+    return state.refreshOptions
   }
 }
 

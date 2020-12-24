@@ -33,6 +33,12 @@
         <splash density="port-xxhdpi" src="res/screen/android/splash-port-xxhdpi.png" />
         <splash density="land-xxxhdpi" src="res/screen/android/splash-land-xxxhdpi.png" />
         <splash density="port-xxxhdpi" src="res/screen/android/splash-port-xxxhdpi.png" />
+        <resource-file src="res/android/ldpi_notification.png" target="app/src/main/res/drawable-ldpi/notification_icon.png" />
+        <resource-file src="res/android/mdpi_notification.png" target="app/src/main/res/drawable-mdpi/notification_icon.png" />
+        <resource-file src="res/android/hdpi_notification.png" target="app/src/main/res/drawable-hdpi/notification_icon.png" />
+        <resource-file src="res/android/xhdpi_notification.png" target="app/src/main/res/drawable-xhdpi/notification_icon.png" />
+        <resource-file src="res/android/xxhdpi_notification.png" target="app/src/main/res/drawable-xxhdpi/notification_icon.png" />
+        <resource-file src="res/android/xxxhdpi_notification.png" target="app/src/main/res/drawable-xxxhdpi/notification_icon.png" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
