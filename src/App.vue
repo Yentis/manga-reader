@@ -20,7 +20,7 @@ import { RefreshOptions } from './classes/refreshOptions'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
-    return a.title > b.title ? 1 : -1
+    return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
   } else {
     return b.chapter !== b.read ? 1 : -1
   }

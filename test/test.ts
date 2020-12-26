@@ -293,11 +293,11 @@ function testMangakakalot (): Promise<void> {
 
     testSite(site).then(mangaInfo => {
       const desired = new Manga('https://mangakakalot.com/manga/ui921789', site)
-      desired.chapter = 'Vol.3 Chapter 22: The Great Tehonbiki Gamble, Part 9'
+      desired.chapter = 'Vol.4 Chapter 24: The Great Tehonbiki Gamble, Part 11'
       desired.image = 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg'
       desired.title = 'Legend of the End-of-Century Gambling Wolf Saga'
-      desired.chapterUrl = 'https://mangakakalot.com/chapter/ui921789/chapter_22'
-      desired.chapterNum = 22
+      desired.chapterUrl = 'https://mangakakalot.com/chapter/ui921789/chapter_24'
+      desired.chapterNum = 24
 
       const result = equals(mangaInfo, desired)
 
@@ -434,7 +434,7 @@ function testMangaDoDs (): Promise<void> {
     testSite(site).then(mangaInfo => {
       const desired = new Manga('https://www.mangadods.com/manga/flower-war/', site)
       desired.chapter = '22 END'
-      desired.image = 'https://www.mangadods.com/wp-content/uploads/2020/02/12-193x278.jpg'
+      desired.image = 'https://www.mangadods.com/wp-content/uploads/2020/02/cover-193x278.jpg'
       desired.title = 'Flower War'
       desired.chapterUrl = 'https://www.mangadods.com/manga/flower-war/22-end/'
       desired.chapterNum = 22
@@ -731,7 +731,7 @@ function testSearchMangaDoDs (): Promise<void> {
       const matchingManga = result.filter(manga => {
         return manga.site === SiteType.MangaDoDs &&
               manga.title === 'Flower War' &&
-              manga.image === 'https://www.mangadods.com/wp-content/uploads/2020/02/12-193x278.jpg' &&
+              manga.image === 'https://www.mangadods.com/wp-content/uploads/2020/02/cover-193x278.jpg' &&
               manga.chapter === '22 END' &&
               manga.url === 'https://www.mangadods.com/manga/flower-war/'
       })

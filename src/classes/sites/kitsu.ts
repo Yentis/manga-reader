@@ -5,10 +5,10 @@ import axios from 'axios'
 import { Manga } from '../manga'
 import { BaseSite } from './baseSite'
 import { NotifyOptions } from '../notifyOptions'
-import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-import LoginDialog from 'src/components/LoginDialog.vue'
-import constants from 'src/boot/constants'
-import { SiteName } from 'src/enums/siteEnum'
+import { LinkingSiteType } from '../../enums/linkingSiteEnum'
+import LoginDialog from '../../components/LoginDialog.vue'
+import constants from '../../boot/constants'
+import { SiteName } from '../../enums/siteEnum'
 
 const SITE_TYPE = LinkingSiteType.Kitsu
 

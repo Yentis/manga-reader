@@ -71,21 +71,35 @@ export class Mangago extends BaseSite {
       const $ = cheerio.load(response.data)
       const mangaList: Manga[] = []
 
+      const missingChapterUrls: string[] = []
+      const promises: Promise<Error | Manga>[] = []
+
       $('#search_list li').each((_index: number, element: cheerio.Element) => {
         const manga = new Manga('', this.siteType)
         const titleElem = $(element).find('.tit a')
         manga.title = titleElem.first().text().trim() || 'Unknown'
 
         if (this.titleContainsQuery(query, manga.title)) {
-          manga.image = $(element).find('.left img').first().attr('src') || ''
           manga.chapter = $(element).find('.chico').first().text().trim() || 'Unknown'
           manga.url = titleElem.first().attr('href') || ''
 
-          mangaList.push(manga)
+          // Some chapters aren't listed on the search results page
+          if (manga.chapter === 'Unknown') {
+            missingChapterUrls.push(manga.url)
+          } else {
+            manga.image = $(element).find('.left img').first().attr('src') || ''
+
+            mangaList.push(manga)
+          }
         }
       })
 
-      return mangaList
+      for (let i = 0; i < missingChapterUrls.length; i++) {
+        promises.push(this.readUrl(missingChapterUrls[i]))
+      }
+
+      const missingMangaList = await Promise.all(promises)
+      return mangaList.concat(missingMangaList.filter(manga => manga instanceof Manga) as Manga[])
     })
   }
 }

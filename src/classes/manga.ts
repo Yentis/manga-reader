@@ -1,5 +1,5 @@
-import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-import { Status } from 'src/enums/statusEnum'
+import { LinkingSiteType } from '../enums/linkingSiteEnum'
+import { Status } from '../enums/statusEnum'
 import { SiteType } from '../enums/siteEnum'
 
 export class Manga {
