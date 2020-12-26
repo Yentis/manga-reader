@@ -177,8 +177,7 @@ export default defineComponent({
         const manga = filteredMangaList[index]
 
         if (result instanceof Error) {
-          const notifyOptions = new NotifyOptions(`Failed to refresh ${manga.title}`)
-          notifyOptions.caption = result.message
+          const notifyOptions = new NotifyOptions(result, `Failed to refresh ${manga.title}`)
           notifyOptions.actions = [{
             label: 'Visit',
             handler: () => {
@@ -190,7 +189,7 @@ export default defineComponent({
           this.pushNotification(notifyOptions)
         } else {
           if (this.autoRefreshing && manga.chapter !== result.chapter) {
-            this.sendPushNotification(manga)
+            this.sendPushNotification(result)
           }
 
           manga.title = result.title

@@ -8,10 +8,21 @@ const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERS
 export async function getChangelog (): Promise<string | undefined> {
   if (migrationVersion === version) return
   const releases = await getReleases()
-  const latestFeatureRelease = releases.find(release => release.tag_name.endsWith('0'))
-  if (!latestFeatureRelease) return 'No release found, please notify Yentis#5218 on Discord.'
 
-  return latestFeatureRelease.body
+  let latestSeenReleaseIndex = releases.findIndex(release => release.tag_name === migrationVersion)
+  if (latestSeenReleaseIndex === -1) latestSeenReleaseIndex = releases.findIndex(release => release.tag_name.endsWith('0'))
+  else latestSeenReleaseIndex = Math.max(latestSeenReleaseIndex - 1, 0)
+  if (latestSeenReleaseIndex === -1) return 'No release found, please notify Yentis#5218 on Discord.'
+
+  let changelog = ''
+  for (let i = 0; i < latestSeenReleaseIndex + 1; i++) {
+    const release = releases[i]
+    if (i !== 0) changelog += '\n\n'
+    changelog += release.tag_name + '\n' + '-----------' + '\n'
+    changelog += release.body
+  }
+
+  return changelog
 }
 
 export async function checkUpdates (): Promise<GithubRelease | undefined> {

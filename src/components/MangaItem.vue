@@ -141,6 +141,7 @@ import LinkingDialog from './LinkingDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { Status, StatusIcon } from 'src/enums/statusEnum'
+import { BaseSite } from 'src/classes/sites/baseSite'
 
 export default defineComponent({
   name: 'manga-item',
@@ -201,11 +202,6 @@ export default defineComponent({
     },
 
     onLinkingClicked () {
-      if (this.manga.site === SiteType.MangaDex) {
-        this.linkSite(this.manga.url, this.manga.site)
-        return
-      }
-
       this.$q.dialog({
         component: LinkingDialog,
         parent: this,
@@ -236,9 +232,7 @@ export default defineComponent({
       const failMessage = 'Failed to get manga from URL'
       site.getMangaId(this, url).then(mangaId => {
         if (mangaId instanceof Error) {
-          const notifyOptions = new NotifyOptions(failMessage)
-          notifyOptions.caption = mangaId.message
-          this.pushNotification(notifyOptions)
+          this.pushNotification(new NotifyOptions(mangaId, failMessage))
           return
         }
 
@@ -248,15 +242,10 @@ export default defineComponent({
 
           this.newLinkedSites = newLinkedSites
         } else {
-          const notifyOptions = new NotifyOptions(failMessage)
-          notifyOptions.caption = 'No ID found in URL'
-          this.pushNotification(notifyOptions)
+          this.pushNotification(new NotifyOptions('No ID found in URL', failMessage))
         }
       }).catch(error => {
-        const notifyOptions = new NotifyOptions(failMessage)
-        if (error instanceof Error) notifyOptions.caption = error.message
-        else notifyOptions.caption = error as string
-        this.pushNotification(notifyOptions)
+        this.pushNotification(new NotifyOptions(error, failMessage))
       })
     },
 
@@ -337,29 +326,43 @@ export default defineComponent({
         const site = getSite(siteType)
 
         if (site) {
-          site.syncReadChapter(linkedSites[siteType], chapterNum).then((result) => {
-            if (result instanceof Error) {
-              const notifyOptions = new NotifyOptions(`Failed to sync with ${SiteName[siteType]}`)
-              notifyOptions.caption = result.message
-              this.pushNotification(notifyOptions)
-              return
-            }
-
-            const notifyOptions = new NotifyOptions(`Synced with ${SiteName[siteType]}`)
-            notifyOptions.type = 'positive'
-            this.pushNotification(notifyOptions)
-          }).catch(error => {
-            console.error(error)
-            const notifyOptions = new NotifyOptions(`Failed to sync with ${SiteName[siteType]}`)
-            if (error instanceof Error) {
-              notifyOptions.caption = error.message
-            } else {
-              notifyOptions.caption = error as string
-            }
-            this.pushNotification(notifyOptions)
-          })
+          this.syncSite(site, linkedSites[siteType], chapterNum)
         }
       })
+    },
+
+    syncSite (site: BaseSite, mangaId: number, chapterNum: number) {
+      site.syncReadChapter(mangaId, chapterNum).then((result) => {
+        if (result instanceof Error) {
+          this.onSyncError(result, site, mangaId, chapterNum)
+          return
+        }
+
+        const notifyOptions = new NotifyOptions(`Synced with ${SiteName[site.siteType]}`)
+        notifyOptions.type = 'positive'
+        this.pushNotification(notifyOptions)
+      }).catch(error => {
+        this.onSyncError(error, site, mangaId, chapterNum)
+      })
+    },
+
+    onSyncError (error: string | Error, site: BaseSite, mangaId: number, chapterNum: number) {
+      const notifyOptions = new NotifyOptions(error, `Failed to sync with ${SiteName[site.siteType]}`)
+
+      notifyOptions.actions = [{
+        label: 'Relog',
+        handler: async () => {
+          const loggedIn = await site.openLogin(this)
+          if (loggedIn instanceof Error) {
+            this.pushNotification(new NotifyOptions(loggedIn, 'Failed to log in'))
+          } else if (loggedIn === true) {
+            this.syncSite(site, mangaId, chapterNum)
+          }
+        },
+        color: 'white'
+      }]
+
+      this.pushNotification(notifyOptions)
     }
   }
 })

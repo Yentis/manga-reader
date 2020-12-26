@@ -8,6 +8,7 @@ import { NotifyOptions } from '../notifyOptions'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import LoginDialog from 'src/components/LoginDialog.vue'
 import constants from 'src/boot/constants'
+import { SiteName } from 'src/enums/siteEnum'
 
 const SITE_TYPE = LinkingSiteType.Kitsu
 
@@ -39,7 +40,8 @@ export class Kitsu extends BaseSite {
     return new Promise((resolve) => {
       componentRenderProxy.$q.dialog({
         component: LoginDialog,
-        parent: componentRenderProxy
+        parent: componentRenderProxy,
+        siteName: SiteName[this.siteType]
       }).onOk((data: { username: string, password: string }) => {
         componentRenderProxy.$q.loading.show({
           delay: 100
@@ -145,7 +147,7 @@ export class Kitsu extends BaseSite {
         return
       }
 
-      const response = await axios.patch(`${this.getUrl()}/api/edge/library-entries/${mangaId}`, {
+      await axios.patch(`${this.getUrl()}/api/edge/library-entries/${mangaId}`, {
         data: {
           attributes: {
             progress: chapterNum
@@ -159,8 +161,6 @@ export class Kitsu extends BaseSite {
           'Content-Type': 'application/vnd.api+json'
         }
       })
-
-      console.log(response.data)
     })
   }
 

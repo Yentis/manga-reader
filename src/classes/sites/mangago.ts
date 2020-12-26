@@ -71,7 +71,7 @@ export class Mangago extends BaseSite {
       const $ = cheerio.load(response.data)
       const mangaList: Manga[] = []
 
-      $('#search_list li').each((_index: number, element: CheerioElement) => {
+      $('#search_list li').each((_index: number, element: cheerio.Element) => {
         const manga = new Manga('', this.siteType)
         const titleElem = $(element).find('.tit a')
         manga.title = titleElem.first().text().trim() || 'Unknown'

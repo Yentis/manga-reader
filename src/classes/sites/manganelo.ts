@@ -11,7 +11,7 @@ const LOGIN_URL = `https://user.${SITE_TYPE}/login?l=manganelo`
 
 export class Manganelo extends BaseSite {
   siteType = SITE_TYPE
-  currentTime: Cheerio | undefined
+  currentTime: cheerio.Cheerio | undefined
 
   constructor () {
     super()

@@ -2,7 +2,7 @@
   <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card>
       <q-toolbar class="bg-primary text-white">
-        <q-toolbar-title>Login</q-toolbar-title>
+        <q-toolbar-title>{{ siteName }} Login</q-toolbar-title>
         <q-btn icon="close" flat round dense v-close-popup />
       </q-toolbar>
 
@@ -43,8 +43,10 @@ export default (Vue as VueConstructor<Vue &
   }
 >).extend({
   props: {
-    title: String,
-    content: String
+    siteName: {
+      required: true,
+      type: String
+    }
   },
 
   data () {

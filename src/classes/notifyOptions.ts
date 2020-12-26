@@ -7,8 +7,21 @@ export class NotifyOptions {
     actions: Array<{ label: string, handler?: () => void, color?: string }> | undefined
     caption: string | undefined = undefined
 
-    constructor (message: Error | string) {
-      this.message = message
+    constructor (message: Error | string, title: string | undefined = undefined) {
+      if (title) {
+        this.message = title
+        if (message instanceof Error) {
+          this.caption = message.message
+        } else {
+          this.caption = message
+        }
+      } else {
+        if (message instanceof Error) {
+          this.message = message.message
+        } else {
+          this.message = message
+        }
+      }
     }
 
     getOptions () {

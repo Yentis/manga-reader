@@ -11,11 +11,11 @@ export abstract class BaseSite {
     abstract siteType: SiteType | LinkingSiteType
 
     requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
-    chapter: Cheerio | undefined
-    image: Cheerio | undefined
-    title: Cheerio | undefined
-    chapterDate: Cheerio | undefined
-    chapterNum: Cheerio | undefined
+    chapter: cheerio.Cheerio | undefined
+    image: cheerio.Cheerio | undefined
+    title: cheerio.Cheerio | undefined
+    chapterDate: cheerio.Cheerio | undefined
+    chapterNum: cheerio.Cheerio | undefined
     loggedIn = true
     state = SiteState.REACHABLE
     requestConfig: AxiosRequestConfig | undefined

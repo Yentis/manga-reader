@@ -173,7 +173,7 @@ export class WordPress extends BaseSite {
     })
   }
 
-  private getImageSrc (elem: Cheerio | undefined) {
+  private getImageSrc (elem: cheerio.Cheerio | undefined) {
     return elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
   }
 }

@@ -9,7 +9,7 @@ import moment from 'moment'
 const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
 
 export class Webtoons extends BaseSite {
-  chapterUrl: Cheerio | undefined
+  chapterUrl: cheerio.Cheerio | undefined
   siteType = SiteType.Webtoons
 
   constructor () {
