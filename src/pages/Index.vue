@@ -76,6 +76,14 @@ export default defineComponent({
       }]
 
       this.pushNotification(notifyOptions)
+    },
+
+    doUpdateCheck () {
+      checkUpdates().then(result => {
+        if (result) {
+          this.showUpdateAvailable(result)
+        }
+      }).catch(error => this.pushNotification(new NotifyOptions(error, 'Failed to check for updates')))
     }
   },
 
@@ -83,6 +91,10 @@ export default defineComponent({
     if (this.$q.platform.is.mobile) {
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'timezoneOffset', (moment().utcOffset() / 60).toString(), () => undefined, (error) => console.error(error))
+
+      document.addEventListener('resume', () => {
+        this.doUpdateCheck()
+      })
     }
 
     if (this.$q.platform.is.electron) {
@@ -94,11 +106,7 @@ export default defineComponent({
       })
     }
 
-    checkUpdates().then(result => {
-      if (result) {
-        this.showUpdateAvailable(result)
-      }
-    }).catch(error => this.pushNotification(new NotifyOptions(error)))
+    this.doUpdateCheck()
   }
 })
 </script>

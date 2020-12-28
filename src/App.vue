@@ -11,12 +11,12 @@ import { defineComponent } from '@vue/composition-api'
 import { Manga } from './classes/manga'
 import { NotifyOptions } from './classes/notifyOptions'
 import { UrlNavigation } from './classes/urlNavigation'
-import { checkLogins } from './services/siteService'
 import { tryMigrateMangaList } from './services/migrationService'
 import { getChangelog } from './services/updateService'
 import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
 import { version } from '../package.json'
 import { RefreshOptions } from './classes/refreshOptions'
+import { checkSites } from './services/siteService'
 
 function mangaSort (a: Manga, b: Manga): number {
   if ((b.chapter !== b.read && a.chapter !== a.read) || (b.chapter === b.read && a.chapter === a.read)) {
@@ -56,18 +56,14 @@ export default defineComponent({
 
     urlNavigation (urlNavigation: UrlNavigation | undefined) {
       if (!(urlNavigation instanceof UrlNavigation)) return
-      if (urlNavigation.openInApp) {
-        this.openInApp(urlNavigation.url)
-        return
-      }
+      const openInBrowser = this.openInBrowser as boolean
 
-      // Mobile will open the InAppBrowser when openURL is called
-      const openInBrowserValue = this.openInBrowser as boolean
-      const openInBrowser = this.$q.platform.is.mobile ? !openInBrowserValue : openInBrowserValue
-      if (openInBrowser) {
-        openURL(urlNavigation.url)
-      } else {
+      if (urlNavigation.openInApp || !openInBrowser) {
+        this.openInApp(urlNavigation.url, urlNavigation.openInApp)
+      } else if (this.$q.platform.is.mobile) {
         window.location.href = urlNavigation.url
+      } else {
+        openURL(urlNavigation.url)
       }
     },
 
@@ -85,15 +81,7 @@ export default defineComponent({
       })
     })
 
-    const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
-    this.updateOpenInBrowser(openInBrowser)
-
-    const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
-    this.$q.dark.set(darkMode)
-    this.updateDarkMode(darkMode)
-
-    const refreshOptions: RefreshOptions = LocalStorage.getItem(this.$constants.REFRESH_OPTIONS) || new RefreshOptions()
-    this.updateRefreshOptions(refreshOptions)
+    this.loadSettings()
 
     tryMigrateMangaList()
     this.initMangaList()
@@ -120,12 +108,25 @@ export default defineComponent({
       updateRefreshOptions: 'updateRefreshOptions'
     }),
 
-    openInApp (url: string) {
+    loadSettings () {
+      const openInBrowser: boolean = LocalStorage.getItem(this.$constants.OPEN_BROWSER_KEY) || false
+      this.updateOpenInBrowser(openInBrowser)
+
+      const darkMode: boolean = LocalStorage.getItem(this.$constants.DARK_MODE_KEY) || false
+      this.$q.dark.set(darkMode)
+      this.updateDarkMode(darkMode)
+
+      const refreshOptions: RefreshOptions = LocalStorage.getItem(this.$constants.REFRESH_OPTIONS) || new RefreshOptions()
+      this.updateRefreshOptions(refreshOptions)
+    },
+
+    openInApp (url: string, forced: boolean) {
       if (this.$q.platform.is.mobile) {
         const browser = this.$q.cordova.InAppBrowser.open(url)
+        if (!forced) return
 
         browser.addEventListener('exit', () => {
-          checkLogins()
+          checkSites()
         })
       } else {
         window.location.href = url

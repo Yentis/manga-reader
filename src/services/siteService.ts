@@ -79,9 +79,10 @@ export function setRequestConfig (requestConfig: AxiosRequestConfig) {
   })
 }
 
-export function checkLogins (): void {
+export function checkSites (): void {
   siteMap.forEach(site => {
     void site.checkLogin()
+    void site.checkState()
   })
 }
 
