@@ -14,7 +14,8 @@ export enum SiteType {
     AsuraScans = 'asurascans.com',
     ManhwaClub = 'manhwa.club',
     MangaTx = 'mangatx.com',
-    Mangago = 'mangago.me'
+    Mangago = 'mangago.me',
+    SleepingKnightScans = 'skscans.com'
 }
 
 export enum SiteName {
@@ -34,7 +35,8 @@ export enum SiteName {
     'manhwa.club' = 'Manhwa Club',
     'mangatx.com' = 'MangaTx',
     'mangago.me' = 'Mangago',
-    'kitsu.io' = 'Kitsu'
+    'kitsu.io' = 'Kitsu',
+    'skscans.com' = 'Sleeping Knight Scans'
 }
 
 export enum SiteState {

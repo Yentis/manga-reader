@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "mocha -r ts-node/register test/test.ts",
+    "test": "mocha -r ts-node/register test/*.spec.ts",
     "test:unit": "jest --updateSnapshot",
     "test:unit:coverage": "jest --coverage",
     "test:unit:watch": "jest --watch",

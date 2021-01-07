@@ -113,11 +113,12 @@ export class MangaDex extends BaseSite {
 
   search (query: string): Promise<Error | Manga[]> {
     return this.addToQueue(async () => {
-      const response = await axios.get(`${this.getUrl()}/search`, {
-        params: {
-          title: query
-        }
-      })
+      const config = this.requestConfig || {}
+      config.params = {
+        title: query
+      }
+
+      const response = await axios.get(`${this.getUrl()}/search`, config)
       const $ = cheerio.load(response.data)
 
       if ($('#login_button').length === 1) {

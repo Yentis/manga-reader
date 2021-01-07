@@ -58,7 +58,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.AsuraScans, new AsuraScans()],
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
-  [SiteType.Mangago, new Mangago()]
+  [SiteType.Mangago, new Mangago()],
+  [SiteType.SleepingKnightScans, new Genkan(SiteType.SleepingKnightScans)]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
@@ -84,13 +85,6 @@ export function checkSites (): void {
     void site.checkLogin()
     void site.checkState()
   })
-}
-
-export function testSite (siteType: SiteType): Promise <Error | Manga> {
-  const site = siteMap.get(siteType)
-  if (!site) return Promise.reject(Error('Invalid site type'))
-
-  return requestQueue.add(() => site.readUrl(site.getTestUrl()))
 }
 
 export function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType): Promise <Error | Manga> {

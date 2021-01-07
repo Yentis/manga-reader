@@ -27,6 +27,8 @@ export class Genkan extends BaseSite {
         return 'https://leviatanscans.com/comics/909261-stresser'
       case SiteType.ReaperScans:
         return 'https://reaperscans.com/comics/621295-alpha'
+      case SiteType.SleepingKnightScans:
+        return 'https://skscans.com/comics/608374-the-second-coming-of-gluttony'
     }
 
     return this.getUrl()
