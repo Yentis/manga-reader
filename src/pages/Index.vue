@@ -13,7 +13,7 @@
 
     <div class="manga-container q-mt-sm full-width">
       <q-intersection
-        v-for="manga in mangaList"
+        v-for="manga in filteredMangaList"
         :key="manga.url"
         class="q-mb-sm full-width manga-item"
       >
@@ -34,6 +34,8 @@ import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/
 import { setAccessToken } from 'src/services/dropboxService'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/MangaItem.vue'
+import { Manga } from 'src/classes/manga'
+import { Settings } from 'src/classes/settings'
 
 export default defineComponent({
   components: {
@@ -45,8 +47,16 @@ export default defineComponent({
     ...mapGetters('reader', {
       mangaList: 'mangaList',
       refreshing: 'refreshing',
-      refreshProgress: 'refreshProgress'
-    })
+      refreshProgress: 'refreshProgress',
+      settings: 'settings'
+    }),
+
+    filteredMangaList () {
+      const settings = this.settings as Settings
+      return (this.mangaList as Manga[]).filter(manga => {
+        return settings.filters.includes(manga.status)
+      })
+    }
   },
 
   methods: {

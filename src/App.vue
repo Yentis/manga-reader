@@ -72,7 +72,7 @@ export default defineComponent({
         this.$q.dark.set(newSettings.darkMode)
       }
 
-      if (newSettings.sortedBy !== settings.sortedBy) {
+      if (newSettings.sortedBy !== settings.sortedBy || newSettings.filters !== settings.filters) {
         this.sortMangaList()
       }
 

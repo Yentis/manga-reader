@@ -1,4 +1,5 @@
 import { SortType } from 'src/enums/sortingEnum'
+import { Status } from 'src/enums/statusEnum'
 import { RefreshOptions } from './refreshOptions'
 
 export class Settings {
@@ -6,19 +7,28 @@ export class Settings {
   darkMode: boolean
   refreshOptions: RefreshOptions
   sortedBy: SortType
+  filters: Array<Status>
 
-  constructor (openInBrowser = false, darkMode = false, refreshOptions = new RefreshOptions(), sortedBy = SortType.TITLE) {
+  constructor (
+    openInBrowser = false,
+    darkMode = false,
+    refreshOptions = new RefreshOptions(),
+    sortedBy = SortType.TITLE,
+    filters = Object.values(Status)
+  ) {
     this.openInBrowser = openInBrowser
     this.darkMode = darkMode
     this.refreshOptions = new RefreshOptions(refreshOptions.enabled, refreshOptions.period)
     this.sortedBy = sortedBy
+    this.filters = filters
   }
 
   equals (settings: Settings) {
     return this.openInBrowser === settings.openInBrowser &&
            this.darkMode === settings.darkMode &&
            this.refreshOptions.equals(settings.refreshOptions) &&
-           this.sortedBy === settings.sortedBy
+           this.sortedBy === settings.sortedBy &&
+           this.filters === settings.filters
   }
 
   static clone (settings: Settings) {
@@ -29,7 +39,8 @@ export class Settings {
         settings.refreshOptions.enabled,
         settings.refreshOptions.period
       ),
-      settings.sortedBy
+      settings.sortedBy,
+      settings.filters
     )
   }
 }

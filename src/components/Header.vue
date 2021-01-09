@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div class="header">
+      <div :class="{ 'header': true, 'q-mb-sm': mobileView }">
         <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
           <q-btn v-if="mobileView" color="primary" label="Add" @click="onAddManga" />
           <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
@@ -32,6 +32,19 @@
               </q-item-section>
             </q-item>
           </q-list>
+        </q-btn-dropdown>
+
+        <q-btn-dropdown
+          no-caps
+          label="Filters"
+          @input="updateFilters"
+        >
+          <q-option-group
+            class="q-mr-sm"
+            type="checkbox"
+            v-model="newFilters"
+            :options="statusList"
+          />
         </q-btn-dropdown>
       </div>
     </div>
@@ -82,7 +95,9 @@ export default defineComponent({
       importing: false,
       autoRefreshing: false,
       refreshInterval: undefined as NodeJS.Timeout | undefined,
-      sortTypes: SortType
+      sortTypes: SortType,
+      status: Status,
+      newFilters: [] as Array<Status>
     }
   },
 
@@ -93,7 +108,16 @@ export default defineComponent({
       refreshProgress: 'refreshProgress',
       mobileView: 'mobileView',
       settings: 'settings'
-    })
+    }),
+
+    statusList () {
+      return Object.values(Status).map(value => {
+        return {
+          label: value,
+          value: value
+        }
+      })
+    }
   },
 
   watch: {
@@ -108,6 +132,7 @@ export default defineComponent({
   },
 
   mounted () {
+    this.newFilters = (this.settings as Settings).filters
     this.createRefreshInterval((this.settings as Settings).refreshOptions)
   },
 
@@ -342,6 +367,14 @@ export default defineComponent({
     updateSortedBy (sortType: SortType) {
       const newSettings = Settings.clone(this.settings as Settings)
       newSettings.sortedBy = sortType
+
+      this.updateSettings(newSettings)
+    },
+
+    updateFilters (showing: boolean) {
+      if (showing) return
+      const newSettings = Settings.clone(this.settings as Settings)
+      newSettings.filters = this.newFilters
 
       this.updateSettings(newSettings)
     }
