@@ -141,7 +141,7 @@ a {
 }
 
 .manga-item {
-  min-height: 10rem;
+  min-height: 11rem;
 }
 
 </style>

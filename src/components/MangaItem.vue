@@ -32,15 +32,35 @@
               <span v-else>{{ manga.chapter }}</span>
             </div>
 
+            <div v-if="manga.notes" :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
+              Notes:&nbsp;&nbsp; <span>{{ manga.notes }}</span>
+            </div>
+
             <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }" v-if="manga.chapterDate">
               {{ manga.chapterDate }}
             </div>
+
+            <q-rating
+              v-if="manga.rating"
+              v-model="manga.rating"
+              readonly
+              size="1em"
+              class="q-mt-sm"
+              :max="10"
+              :color="manga.rating > 6 ? 'positive' : manga.rating > 3 ? 'warning' : 'negative'"
+            />
           </div>
 
           <q-card-actions class="q-pa-none" align="left" vertical v-else>
             <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
-            <q-input stack-label autogrow v-model="newNotes" label="Notes:" class="q-mb-sm" />
-            <q-btn-dropdown no-caps :label="newStatus">
+
+            <q-input stack-label v-model="newNotes" label="Notes:" class="q-mb-sm" />
+
+            <q-btn-dropdown
+              no-caps
+              class="q-mb-xs"
+              :label="newStatus"
+            >
               <q-list
                 v-for="status in Object.values(status)"
                 :key="status"
@@ -59,12 +79,29 @@
                 </q-item>
               </q-list>
             </q-btn-dropdown>
+
+            <q-btn-dropdown no-caps :label="'Rating: ' + newRating">
+              <q-list v-for="index in 10" :key="index">
+                <q-item
+                  dense
+                  clickable
+                  v-close-popup
+                  @click="newRating = index"
+                >
+                  <q-item-section>
+                    <q-item-label>{{ index }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+
             <q-btn
+              no-caps
               v-if="editing"
-              color="info"
-              label="Progress linking"
+              label="Progress Linking"
               :size="itemSize"
-              @click="onLinkingClicked()" />
+              @click="onLinkingClicked()"
+            />
           </q-card-actions>
         </div>
 
@@ -187,7 +224,8 @@ export default defineComponent({
       newReadNum: -1 as number | undefined,
       newStatus: Status.READING as Status,
       newLinkedSites: undefined as Record<string, number> | undefined,
-      newNotes: '' as string | undefined
+      newNotes: '' as string,
+      newRating: 0 as number
     }
   },
 
@@ -278,7 +316,8 @@ export default defineComponent({
       this.newReadNum = this.manga.readNum
       this.newStatus = this.manga.status
       this.newLinkedSites = undefined
-      this.newNotes = this.manga.notes
+      this.newNotes = this.manga.notes || ''
+      this.newRating = this.manga.rating || 0
     },
 
     onSaveEdit () {
@@ -287,8 +326,9 @@ export default defineComponent({
       const statusChanged = this.trySaveNewStatus()
       const linkedSitesChanged = this.trySaveNewLinkedSites()
       const notesChanged = this.trySaveNewNotes()
+      const ratingChanged = this.trySaveNewRating()
 
-      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged) return
+      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged && !ratingChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -328,6 +368,14 @@ export default defineComponent({
       if (this.newNotes === currentNotes) return false
 
       this.manga.notes = this.newNotes
+      return true
+    },
+
+    trySaveNewRating (): boolean {
+      const currentRating = this.manga.rating || 0
+      if (this.newRating === currentRating) return false
+
+      this.manga.rating = this.newRating
       return true
     },
 

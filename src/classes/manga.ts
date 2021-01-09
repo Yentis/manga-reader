@@ -17,6 +17,7 @@ export class Manga {
     linkedSites: Record<string, number>
     status: Status
     notes: string | undefined
+    rating: number | undefined
 
     constructor (url: string, site: SiteType | LinkingSiteType) {
       this.url = url
