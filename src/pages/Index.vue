@@ -48,13 +48,14 @@ export default defineComponent({
       mangaList: 'mangaList',
       refreshing: 'refreshing',
       refreshProgress: 'refreshProgress',
-      settings: 'settings'
+      settings: 'settings',
+      searchValue: 'searchValue'
     }),
 
     filteredMangaList () {
       const settings = this.settings as Settings
       return (this.mangaList as Manga[]).filter(manga => {
-        return settings.filters.includes(manga.status)
+        return manga.title.includes(this.searchValue as string) && settings.filters.includes(manga.status)
       })
     }
   },

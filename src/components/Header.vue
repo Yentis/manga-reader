@@ -17,7 +17,24 @@
       </div>
 
       <div>
-        <q-btn-dropdown no-caps :label="'Sort by ' + settings.sortedBy">
+        <q-input
+          dense
+          outlined
+          v-model="newSearch"
+          class="q-mb-sm full-width"
+          @input="updateSearchValue(newSearch)"
+        >
+          <template v-slot:append>
+            <q-icon v-if="newSearch === ''" name="search" />
+            <q-icon v-else name="clear" class="cursor-pointer" @click="newSearch = ''; updateSearchValue(newSearch)" />
+          </template>
+        </q-input>
+
+        <q-btn-dropdown
+          no-caps
+          class="q-mr-sm"
+          :label="'Sort by: ' + settings.sortedBy"
+        >
           <q-list
               v-for="type in sortTypes"
               :key="type"
@@ -97,7 +114,8 @@ export default defineComponent({
       refreshInterval: undefined as NodeJS.Timeout | undefined,
       sortTypes: SortType,
       status: Status,
-      newFilters: [] as Array<Status>
+      newFilters: [] as Array<Status>,
+      newSearch: ''
     }
   },
 
@@ -146,7 +164,8 @@ export default defineComponent({
       addManga: 'addManga',
       updateManga: 'updateManga',
       pushUrlNavigation: 'pushUrlNavigation',
-      updateSettings: 'updateSettings'
+      updateSettings: 'updateSettings',
+      updateSearchValue: 'updateSearchValue'
     }),
 
     createRefreshInterval (refreshOptions: RefreshOptions) {

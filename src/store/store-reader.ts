@@ -13,6 +13,7 @@ class ReaderState {
     urlNavigation: UrlNavigation | undefined = undefined
     mobileView = false
     settings = new Settings()
+    searchValue = ''
 }
 
 function doSort (mangaList: Manga[]): Manga[] {
@@ -69,6 +70,9 @@ const mutations = {
   },
   updateSettings (state: ReaderState, settings: Settings) {
     state.settings = settings
+  },
+  updateSearchValue (state: ReaderState, searchValue: string) {
+    state.searchValue = searchValue
   }
 }
 
@@ -99,6 +103,9 @@ const getters = {
   },
   settings: (state: ReaderState) => {
     return state.settings
+  },
+  searchValue: (state: ReaderState) => {
+    return state.searchValue
   }
 }
 
