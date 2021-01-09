@@ -1,8 +1,8 @@
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import { RefreshOptions } from 'src/classes/refreshOptions'
+import { Settings } from 'src/classes/settings'
 import { UrlNavigation } from 'src/classes/urlNavigation'
-import { Status } from 'src/enums/statusEnum'
+import { mangaSort } from 'src/services/sortService'
 
 class ReaderState {
     mangaList: Manga[] = []
@@ -11,75 +11,40 @@ class ReaderState {
     notification: NotifyOptions | undefined = undefined
     searchResults: Manga[] = []
     urlNavigation: UrlNavigation | undefined = undefined
-    openInBrowser = false
-    darkMode = false
     mobileView = false
-    refreshOptions = new RefreshOptions()
+    settings = new Settings()
 }
 
-function mangaSort (a: Manga, b: Manga): number {
-  const isARead = a.chapter === a.read || (a.chapterNum === a.readNum && a.readNum !== undefined)
-  const isBRead = b.chapter === b.read || (b.chapterNum === b.readNum && b.readNum !== undefined)
-
-  if ((a.status !== Status.READING || undefined) && (b.status === Status.READING || undefined)) {
-    return 1
-  }
-  if ((b.status !== Status.READING || undefined) && (a.status === Status.READING || undefined)) {
-    return -1
-  }
-
-  if (a.status === Status.DROPPED && b.status !== Status.DROPPED) {
-    return 1
-  }
-  if (b.status === Status.DROPPED && a.status !== Status.DROPPED) {
-    return -1
-  }
-
-  if (a.status === Status.PLAN_TO_READ && b.status !== Status.PLAN_TO_READ) {
-    return 1
-  }
-  if (b.status === Status.PLAN_TO_READ && a.status !== Status.PLAN_TO_READ) {
-    return -1
-  }
-
-  if (a.status === Status.ON_HOLD && b.status !== Status.ON_HOLD) {
-    return 1
-  }
-  if (b.status === Status.ON_HOLD && a.status !== Status.ON_HOLD) {
-    return -1
-  }
-
-  if (!isARead && isBRead) {
-    return -1
-  }
-  if (!isBRead && isARead) {
-    return 1
-  }
-
-  return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
+function doSort (mangaList: Manga[]): Manga[] {
+  return mangaList.sort((a, b) => {
+    return mangaSort(a, b, state.settings.sortedBy)
+  })
 }
 
 const state = new ReaderState()
 
 const mutations = {
   updateMangaList (state: ReaderState, mangaList: Manga[]) {
-    state.mangaList = mangaList.sort(mangaSort)
+    state.mangaList = doSort(mangaList)
+  },
+  sortMangaList (state: ReaderState) {
+    state.mangaList = doSort(state.mangaList)
   },
   addManga (state: ReaderState, manga: Manga) {
     state.mangaList.unshift(manga)
-    state.mangaList = state.mangaList.sort(mangaSort)
+    state.mangaList = doSort(state.mangaList)
   },
   removeManga (state: ReaderState, url: string) {
     const index = state.mangaList.findIndex(manga => manga.url === url)
     if (index === -1) return
     state.mangaList.splice(index, 1)
-    state.mangaList = state.mangaList.sort(mangaSort)
+    state.mangaList = doSort(state.mangaList)
   },
   updateManga (state: ReaderState, manga: Manga) {
     const index = state.mangaList.findIndex(curManga => manga.url === curManga.url)
     if (index === -1) return
     state.mangaList[index] = manga
-    state.mangaList = state.mangaList.sort(mangaSort)
+    state.mangaList = doSort(state.mangaList)
   },
   updateRefreshing (state: ReaderState, refreshing: boolean) {
     state.refreshing = refreshing
@@ -99,17 +64,11 @@ const mutations = {
   pushUrlNavigation (state: ReaderState, urlNavigation: UrlNavigation) {
     state.urlNavigation = urlNavigation
   },
-  updateOpenInBrowser (state: ReaderState, openInBrowser: boolean) {
-    state.openInBrowser = openInBrowser
-  },
-  updateDarkMode (state: ReaderState, darkMode: boolean) {
-    state.darkMode = darkMode
-  },
   updateMobileView (state: ReaderState, mobileView: boolean) {
     state.mobileView = mobileView
   },
-  updateRefreshOptions (state: ReaderState, refreshOptions: RefreshOptions) {
-    state.refreshOptions = refreshOptions
+  updateSettings (state: ReaderState, settings: Settings) {
+    state.settings = settings
   }
 }
 
@@ -135,17 +94,11 @@ const getters = {
   urlNavigation: (state: ReaderState) => {
     return state.urlNavigation
   },
-  openInBrowser: (state: ReaderState) => {
-    return state.openInBrowser
-  },
-  darkMode: (state: ReaderState) => {
-    return state.darkMode
-  },
   mobileView: (state: ReaderState) => {
     return state.mobileView
   },
-  refreshOptions: (state: ReaderState) => {
-    return state.refreshOptions
+  settings: (state: ReaderState) => {
+    return state.settings
   }
 }
 

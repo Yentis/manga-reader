@@ -9,15 +9,15 @@
       <q-form @submit="onOKClick">
         <q-card-actions vertical>
           <q-toggle
-            v-model="newOpenInBrowser"
+            v-model="newSettings.openInBrowser"
             label="Open in browser"
           />
           <q-toggle
-            v-model="newDarkMode"
+            v-model="newSettings.darkMode"
             label="Dark mode"
           />
           <q-toggle
-            v-model="newRefreshOptions.enabled"
+            v-model="newSettings.refreshOptions.enabled"
             label="Auto refresh"
           />
         </q-card-actions>
@@ -27,7 +27,7 @@
           class="q-mx-sm"
           suffix="minutes"
           label="Refresh interval"
-          v-model="newRefreshOptions.period"
+          v-model="newSettings.refreshOptions.period"
           :rules="[
             val => val && val > 0 || 'Must be at least one minute',
             val => val && val <= 1440 || 'Must be at most one day'
@@ -48,8 +48,8 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { LocalStorage, QDialog } from 'quasar'
-import { RefreshOptions } from 'src/classes/refreshOptions'
+import { QDialog } from 'quasar'
+import { Settings } from 'src/classes/settings'
 
 export default (Vue as VueConstructor<Vue &
   { $refs:
@@ -58,33 +58,23 @@ export default (Vue as VueConstructor<Vue &
 >).extend({
   computed: {
     ...mapGetters('reader', {
-      openInBrowser: 'openInBrowser',
-      darkMode: 'darkMode',
-      refreshOptions: 'refreshOptions'
+      settings: 'settings'
     })
   },
 
   data () {
     return {
-      newOpenInBrowser: false,
-      newDarkMode: false,
-      newRefreshOptions: new RefreshOptions()
+      newSettings: new Settings()
     }
   },
 
   mounted () {
-    this.newOpenInBrowser = this.openInBrowser as boolean
-    this.newDarkMode = this.darkMode as boolean
-
-    const refreshOptions = this.refreshOptions as RefreshOptions
-    this.newRefreshOptions = new RefreshOptions(refreshOptions.enabled, refreshOptions.period)
+    this.newSettings = Settings.clone(this.settings as Settings)
   },
 
   methods: {
     ...mapMutations('reader', {
-      updateOpenInBrowser: 'updateOpenInBrowser',
-      updateDarkMode: 'updateDarkMode',
-      updateRefreshOptions: 'updateRefreshOptions'
+      updateSettings: 'updateSettings'
     }),
 
     show () {
@@ -100,20 +90,7 @@ export default (Vue as VueConstructor<Vue &
     },
 
     onOKClick () {
-      if (this.newOpenInBrowser !== this.openInBrowser) {
-        this.updateOpenInBrowser(this.newOpenInBrowser)
-        LocalStorage.set(this.$constants.OPEN_BROWSER_KEY, this.newOpenInBrowser)
-      }
-      if (this.newDarkMode !== this.darkMode) {
-        this.$q.dark.set(this.newDarkMode)
-        this.updateDarkMode(this.newDarkMode)
-        LocalStorage.set(this.$constants.DARK_MODE_KEY, this.newDarkMode)
-      }
-      if (!this.newRefreshOptions.equals(this.refreshOptions)) {
-        this.updateRefreshOptions(this.newRefreshOptions)
-        LocalStorage.set(this.$constants.REFRESH_OPTIONS, this.newRefreshOptions)
-      }
-
+      this.updateSettings(this.newSettings)
       this.$emit('ok')
       this.hide()
     },

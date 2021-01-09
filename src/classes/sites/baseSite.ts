@@ -186,8 +186,11 @@ export abstract class BaseSite {
     protected titleContainsQuery (query: string, title: string | undefined): boolean {
       if (!title) return false
 
+      query = query.replace('’', '\'')
+      title = title.replace('’', '\'')
       const querySplit = query.toLowerCase().split(' ')
-      return querySplit.every(word => title.toLowerCase().includes(word))
+
+      return querySplit.every(word => title?.toLowerCase().includes(word))
     }
 
     abstract getTestUrl(): string

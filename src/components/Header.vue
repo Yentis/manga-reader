@@ -1,18 +1,39 @@
 <template>
-    <div class="header">
-      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
-        <q-btn v-if="mobileView" color="primary" label="Add" @click="onAddManga" />
-        <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
-        <q-btn v-if="mobileView" color="secondary" label="Refresh" @click="onRefreshAllManga" />
-        <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
+    <div>
+      <div class="header">
+        <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+          <q-btn v-if="mobileView" color="primary" label="Add" @click="onAddManga" />
+          <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
+          <q-btn v-if="mobileView" color="secondary" label="Refresh" @click="onRefreshAllManga" />
+          <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
+        </div>
+        <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+          <q-btn v-if="mobileView" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
+          <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="onExportList" />
+          <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
+          <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
+        </div>
+        <q-btn flat round icon="settings" @click="onSettingsClick" />
       </div>
-      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
-        <q-btn v-if="mobileView" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
-        <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="onExportList" />
-        <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
-        <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
+
+      <div>
+        <q-btn-dropdown no-caps :label="'Sort by ' + settings.sortedBy">
+          <q-list
+              v-for="type in sortTypes"
+              :key="type"
+          >
+            <q-item
+              clickable
+              v-close-popup
+              @click="updateSortedBy(type)"
+            >
+              <q-item-section>
+                <q-item-label>{{ type }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </div>
-      <q-btn flat round icon="settings" @click="onSettingsClick" />
     </div>
 </template>
 
@@ -26,12 +47,14 @@ import { Manga } from 'src/classes/manga'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType } from 'src/enums/siteEnum'
 import { Status } from 'src/enums/statusEnum'
+import { SortType } from 'src/enums/sortingEnum'
 import { getMangaInfo } from 'src/services/siteService'
 import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
 import SearchDialog from './SearchDialog.vue'
 import SiteDialog from './SiteDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
 import SettingsDialog from './SettingsDialog.vue'
+import { Settings } from 'src/classes/settings'
 import { RefreshOptions } from 'src/classes/refreshOptions'
 
 interface CordovaNotificationOptions {
@@ -58,7 +81,8 @@ export default defineComponent({
       exporting: false,
       importing: false,
       autoRefreshing: false,
-      refreshInterval: undefined as NodeJS.Timeout | undefined
+      refreshInterval: undefined as NodeJS.Timeout | undefined,
+      sortTypes: SortType
     }
   },
 
@@ -68,23 +92,23 @@ export default defineComponent({
       refreshing: 'refreshing',
       refreshProgress: 'refreshProgress',
       mobileView: 'mobileView',
-      refreshOptions: 'refreshOptions'
+      settings: 'settings'
     })
   },
 
   watch: {
-    refreshOptions (refreshOptions: RefreshOptions) {
+    settings (settings: Settings) {
       if (this.refreshInterval) {
         clearInterval(this.refreshInterval)
         this.refreshInterval = undefined
       }
 
-      this.createRefreshInterval(refreshOptions)
+      this.createRefreshInterval(settings.refreshOptions)
     }
   },
 
   mounted () {
-    this.createRefreshInterval(this.refreshOptions)
+    this.createRefreshInterval((this.settings as Settings).refreshOptions)
   },
 
   methods: {
@@ -96,7 +120,8 @@ export default defineComponent({
       updateMangaList: 'updateMangaList',
       addManga: 'addManga',
       updateManga: 'updateManga',
-      pushUrlNavigation: 'pushUrlNavigation'
+      pushUrlNavigation: 'pushUrlNavigation',
+      updateSettings: 'updateSettings'
     }),
 
     createRefreshInterval (refreshOptions: RefreshOptions) {
@@ -312,6 +337,13 @@ export default defineComponent({
           foreground: true
         })
       }
+    },
+
+    updateSortedBy (sortType: SortType) {
+      const newSettings = Settings.clone(this.settings as Settings)
+      newSettings.sortedBy = sortType
+
+      this.updateSettings(newSettings)
     }
   }
 })

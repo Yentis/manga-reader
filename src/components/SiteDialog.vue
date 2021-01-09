@@ -106,6 +106,8 @@ export default (Vue as VueConstructor<Vue &
         this.windowSize = [window.innerWidth, window.innerHeight]
       })
     })
+
+    this.onRefreshSites()
   },
 
   methods: {
