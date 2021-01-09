@@ -39,6 +39,7 @@
 
           <q-card-actions class="q-pa-none" align="left" vertical v-else>
             <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
+            <q-input stack-label autogrow v-model="newNotes" label="Notes:" class="q-mb-sm" />
             <q-btn-dropdown no-caps :label="newStatus">
               <q-list
                 v-for="status in Object.values(status)"
@@ -185,7 +186,8 @@ export default defineComponent({
       editing: false,
       newReadNum: -1 as number | undefined,
       newStatus: Status.READING as Status,
-      newLinkedSites: undefined as Record<string, number> | undefined
+      newLinkedSites: undefined as Record<string, number> | undefined,
+      newNotes: '' as string | undefined
     }
   },
 
@@ -276,6 +278,7 @@ export default defineComponent({
       this.newReadNum = this.manga.readNum
       this.newStatus = this.manga.status
       this.newLinkedSites = undefined
+      this.newNotes = this.manga.notes
     },
 
     onSaveEdit () {
@@ -283,8 +286,9 @@ export default defineComponent({
       const readNumChanged = this.trySaveNewReadNum()
       const statusChanged = this.trySaveNewStatus()
       const linkedSitesChanged = this.trySaveNewLinkedSites()
+      const notesChanged = this.trySaveNewNotes()
 
-      if (!readNumChanged && !statusChanged && !linkedSitesChanged) return
+      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -316,6 +320,14 @@ export default defineComponent({
       if (this.newLinkedSites === undefined) return false
 
       this.manga.linkedSites = this.newLinkedSites
+      return true
+    },
+
+    trySaveNewNotes (): boolean {
+      const currentNotes = this.manga.notes || ''
+      if (this.newNotes === currentNotes) return false
+
+      this.manga.notes = this.newNotes
       return true
     },
 

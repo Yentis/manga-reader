@@ -55,7 +55,8 @@ export default defineComponent({
     filteredMangaList () {
       const settings = this.settings as Settings
       return (this.mangaList as Manga[]).filter(manga => {
-        return manga.title.includes(this.searchValue as string) && settings.filters.includes(manga.status)
+        return manga.title.toLowerCase().includes((this.searchValue as string).toLowerCase()) &&
+               settings.filters.includes(manga.status)
       })
     }
   },
