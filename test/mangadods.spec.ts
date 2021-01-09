@@ -10,7 +10,7 @@ describe(SiteName[siteType], function () {
   const site = new WordPress(siteType)
   const query = 'flower war'
 
-  this.timeout(10000)
+  this.timeout(20000)
 
   it('Read URL', () => {
     const desired = new Manga(site.getTestUrl(), siteType)

@@ -19,7 +19,7 @@ export function search (site: BaseSite, query: string, desired: Manga) {
 
       const matchingManga = result.filter(manga => {
         return manga.site === site.siteType &&
-              manga.title.toLowerCase() === query &&
+              manga.title.toLowerCase() === query.toLowerCase() &&
               manga.image === desired.image &&
               manga.chapter === desired.chapter &&
               manga.url === desired.url

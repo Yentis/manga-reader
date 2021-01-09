@@ -38,7 +38,7 @@ export class Mangakakalot extends BaseSite {
   }
 
   getTestUrl (): string {
-    return 'https://mangakakalot.com/manga/ui921789'
+    return 'https://mangakakalot.com/read-qu4wd158504821675'
   }
 
   readUrl (url: string): Promise<Error | Manga> {

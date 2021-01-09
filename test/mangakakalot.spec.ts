@@ -13,11 +13,11 @@ describe(SiteName[siteType], function () {
 
   it('Read URL', () => {
     const desired = new Manga(site.getTestUrl(), siteType)
-    desired.chapter = 'Vol.4 Chapter 24: The Great Tehonbiki Gamble, Part 11'
-    desired.image = 'https://avt.mkklcdnv6.com/19/k/20-1583501770.jpg'
-    desired.title = 'Legend of the End-of-Century Gambling Wolf Saga'
-    desired.chapterUrl = 'https://mangakakalot.com/chapter/ui921789/chapter_24'
-    desired.chapterNum = 24
+    desired.chapter = 'Vol.8 Chapter 953.6: Volume 8 Extras'
+    desired.image = 'https://avt.mkklcdnv6.com/19/e/1-1583464448.jpg'
+    desired.title = 'Tomo-chan wa Onnanoko!'
+    desired.chapterUrl = 'https://mangakakalot.com/chapter/tomochan_wa_onnanoko/chapter_953.6'
+    desired.chapterNum = 953.6
 
     return readUrl(site, desired)
   })
