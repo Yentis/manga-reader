@@ -59,6 +59,7 @@
             <q-btn-dropdown
               no-caps
               class="q-mb-xs"
+              :size="itemSize"
               :label="newStatus"
             >
               <q-list
@@ -80,7 +81,11 @@
               </q-list>
             </q-btn-dropdown>
 
-            <q-btn-dropdown no-caps :label="'Rating: ' + newRating">
+            <q-btn-dropdown
+              no-caps
+              :label="'Rating: ' + newRating"
+              :size="itemSize"
+            >
               <q-list v-for="index in 10" :key="index">
                 <q-item
                   dense

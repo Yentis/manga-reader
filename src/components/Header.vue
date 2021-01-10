@@ -211,9 +211,8 @@ export default defineComponent({
           if (manga instanceof Error) {
             this.pushNotification(new NotifyOptions(manga))
           } else {
-            manga.read = manga.chapter
-            manga.readUrl = manga.chapterUrl
-            manga.readNum = manga.chapterNum
+            manga.read = '0'
+            manga.readNum = 0
             this.onMangaRetrieved(manga)
           }
         })

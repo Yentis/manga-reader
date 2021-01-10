@@ -31,7 +31,8 @@ import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType } from 'src/enums/siteEnum'
 import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
-import { setAccessToken } from 'src/services/dropboxService'
+import * as DropboxService from 'src/services/dropboxService'
+import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/MangaItem.vue'
 import { Manga } from 'src/classes/manga'
@@ -114,7 +115,14 @@ export default defineComponent({
         const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
         notifyOptions.type = 'positive'
         this.pushNotification(notifyOptions)
-        setAccessToken(token)
+        DropboxService.setAccessToken(token)
+      })
+
+      this.$q.electron.ipcRenderer.on('gitlab-token', (event, token) => {
+        const notifyOptions = new NotifyOptions('Logged in successfully!')
+        notifyOptions.type = 'positive'
+        this.pushNotification(notifyOptions)
+        GitlabService.setAccessToken(token)
       })
     }
 

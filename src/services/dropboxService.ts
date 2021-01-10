@@ -3,13 +3,13 @@ import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
 import { LocalStorage } from 'quasar'
+import constants from 'src/boot/constants'
+import { getShareId, setShareId } from './gitlabService'
 
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024
-const MANGA_LIST_FILENAME = 'manga-reader.json'
 const CLIENT_ID = 'uoywjq0b8q2208f'
-const DROPBOX_TOKEN_KEY = 'dropbox_token'
 
-let accessToken: string = LocalStorage.getItem(DROPBOX_TOKEN_KEY) || ''
+let accessToken: string = LocalStorage.getItem(constants().DROPBOX_TOKEN) || ''
 
 export function getAccessToken (): string {
   return accessToken
@@ -19,7 +19,7 @@ export function setAccessToken (token: string | undefined) {
   if (!token) return
 
   accessToken = token
-  LocalStorage.set(DROPBOX_TOKEN_KEY, token)
+  LocalStorage.set(constants().DROPBOX_TOKEN, token)
 }
 
 export function getAuthUrl () {
@@ -52,16 +52,38 @@ export function saveList (mangaList: Manga[]): Promise<void> {
 
     if (contents.length >= UPLOAD_FILE_SIZE_LIMIT) return reject(Error('File too large'))
 
-    new dropbox.Dropbox({
-      accessToken,
-      fetch
-    }).filesUpload({
-      path: `/${MANGA_LIST_FILENAME}`,
-      contents,
-      mode: {
-        '.tag': 'overwrite'
-      }
-    }).then(() => resolve()).catch((error: dropbox.files.Error) => reject(Error(error.response.statusText)))
+    const promises = []
+
+    promises.push(
+      new dropbox.Dropbox({
+        accessToken,
+        fetch
+      }).filesUpload({
+        path: `/${constants().MANGA_LIST_FILENAME}`,
+        contents,
+        mode: {
+          '.tag': 'overwrite'
+        }
+      })
+    )
+
+    const shareId = getShareId()
+    if (shareId) {
+      promises.push(
+        new dropbox.Dropbox({
+          accessToken,
+          fetch
+        }).filesUpload({
+          path: `/${constants().SHARE_FILENAME}`,
+          contents: JSON.stringify({ id: shareId }),
+          mode: {
+            '.tag': 'overwrite'
+          }
+        })
+      )
+    }
+
+    Promise.all(promises).then(() => resolve()).catch((error: dropbox.files.Error) => reject(Error(error.response.statusText)))
   })
 }
 
@@ -69,20 +91,45 @@ export function readList (): Promise<Manga[]> {
   if (!accessToken) return Promise.reject(Error('No access token'))
 
   return new Promise((resolve, reject) => {
-    new dropbox.Dropbox({
-      accessToken,
-      fetch
-    }).filesDownload({
-      path: `/${MANGA_LIST_FILENAME}`
-    }).then(response => {
-      const reader = new FileReader()
+    const promises = []
 
-      reader.onload = function () {
+    promises.push(
+      new dropbox.Dropbox({
+        accessToken,
+        fetch
+      }).filesDownload({
+        path: `/${constants().SHARE_FILENAME}`
+      })
+    )
+
+    promises.push(
+      new dropbox.Dropbox({
+        accessToken,
+        fetch
+      }).filesDownload({
+        path: `/${constants().MANGA_LIST_FILENAME}`
+      })
+    )
+
+    Promise.all(promises).then(responses => {
+      const shareFile = responses[0]
+      const mangaListFile = responses[1]
+
+      const shareReader = new FileReader()
+      const mangaListReader = new FileReader()
+
+      shareReader.onload = function () {
+        if (typeof this.result !== 'string') return
+        setShareId((JSON.parse(this.result) as { id: string }).id)
+      }
+
+      mangaListReader.onload = function () {
         if (typeof this.result !== 'string') return reject(Error('Failed to read file'))
         resolve(JSON.parse(migrateInput(this.result)))
       }
 
-      reader.readAsText(response.fileBlob)
+      shareReader.readAsText(shareFile.fileBlob)
+      mangaListReader.readAsText(mangaListFile.fileBlob)
     }).catch((error: dropbox.files.Error) => reject(Error(error.response.statusText)))
   })
 }

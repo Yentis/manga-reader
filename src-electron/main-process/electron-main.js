@@ -21,6 +21,9 @@ if (process.env.PROD) {
 
 let mainWindow
 let queryString
+let oauthType
+
+app.userAgentFallback = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) old-airport-include/1.0.0 Chrome Electron/7.1.7 Safari/537.36'
 
 function createWindow () {
   const menu = Menu.buildFromTemplate([{
@@ -83,12 +86,13 @@ function createWindow () {
   })
   
   mainWindow.webContents.on('will-redirect', (event, url) => {
-    if (!url.startsWith('http://localhost/redirect')) return
-    event.preventDefault()
-    queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
+    if (url.startsWith('http://localhost/redirect_gitlab')) {
+      handleGitlabOAuth(event, url)
+      return
+    }
 
-    mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
-    mainWindow.webContents.on('did-finish-load', onFinishLoad)
+    if (!url.startsWith('http://localhost/redirect#')) return
+    handleDropboxOAuth(event, url)
   })
 
   mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
@@ -98,10 +102,28 @@ function createWindow () {
   })
 }
 
+function handleGitlabOAuth(event, url) {
+  event.preventDefault()
+  queryString = qs.parse(url.replace('http://localhost/redirect_gitlab#', ''))
+  oauthType = 'gitlab'
+
+  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
+  mainWindow.webContents.on('did-finish-load', onFinishLoad)
+}
+
+function handleDropboxOAuth(event, url) {
+  event.preventDefault()
+  queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
+  oauthType = 'dropbox'
+
+  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
+  mainWindow.webContents.on('did-finish-load', onFinishLoad)
+}
+
 function onFinishLoad() {
-  if (queryString) {
-    mainWindow.webContents.send('dropbox-token', queryString.access_token)
-  }
+  if (!queryString) return
+
+  mainWindow.webContents.send(`${oauthType}-token`, queryString.access_token)
   mainWindow.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 

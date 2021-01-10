@@ -17,6 +17,8 @@ import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
 import { version } from '../package.json'
 import { checkSites } from './services/siteService'
 import { Settings } from './classes/settings'
+import { getAuthUrl, setAccessToken, setShareId, updateList } from './services/gitlabService'
+import qs from 'qs'
 
 export default defineComponent({
   name: 'App',
@@ -25,13 +27,15 @@ export default defineComponent({
     ...mapGetters('reader', {
       notification: 'notification',
       urlNavigation: 'urlNavigation',
-      settings: 'settings'
+      settings: 'settings',
+      mangaList: 'mangaList'
     })
   },
 
   data () {
     return {
-      windowSize: [] as Array<number>
+      windowSize: [] as Array<number>,
+      shareSyncInterval: undefined as NodeJS.Timeout | undefined
     }
   },
 
@@ -106,6 +110,8 @@ export default defineComponent({
         LocalStorage.set(this.$constants.MIGRATION_VERSION, version)
       })
     }
+
+    this.startShareSyncInterval()
   },
 
   methods: {
@@ -113,7 +119,9 @@ export default defineComponent({
       updateMangaList: 'updateMangaList',
       updateMobileView: 'updateMobileView',
       updateSettings: 'updateSettings',
-      sortMangaList: 'sortMangaList'
+      sortMangaList: 'sortMangaList',
+      pushNotification: 'pushNotification',
+      pushUrlNavigation: 'pushUrlNavigation'
     }),
 
     loadSettings () {
@@ -129,6 +137,18 @@ export default defineComponent({
         browser.addEventListener('exit', () => {
           checkSites()
         })
+        browser.addEventListener('loadstart', (event) => {
+          if (event.url.startsWith('http://localhost/redirect_gitlab')) {
+            browser.close()
+
+            const queryString = qs.parse(event.url.replace('http://localhost/redirect_gitlab#', ''))
+            setAccessToken(queryString.access_token as string)
+
+            const notifyOptions = new NotifyOptions('Logged in successfully!')
+            notifyOptions.type = 'positive'
+            this.pushNotification(notifyOptions)
+          }
+        })
       } else {
         window.location.href = url
       }
@@ -137,6 +157,44 @@ export default defineComponent({
     initMangaList () {
       const mangaList: Manga[] = LocalStorage.getItem(this.$constants.MANGA_LIST_KEY) || []
       this.updateMangaList(mangaList)
+    },
+
+    startShareSyncInterval () {
+      if (this.shareSyncInterval) {
+        clearInterval(this.shareSyncInterval)
+        this.shareSyncInterval = undefined
+      }
+
+      this.onUpdateList()
+      this.shareSyncInterval = setInterval(() => {
+        this.onUpdateList()
+      }, 5 * 60 * 1000)
+    },
+
+    onUpdateList () {
+      updateList(JSON.stringify(this.mangaList))
+        .catch(error => {
+          if (error instanceof Error) {
+            if (error.message.includes('404')) {
+              setShareId('')
+              return
+            } else if (error.message.includes('400')) {
+              // Spam, ignore
+              return
+            }
+          }
+
+          const notifyOptions = new NotifyOptions(error, 'Failed to update share URL')
+          notifyOptions.actions = [{
+            label: 'Relog',
+            handler: () => {
+              this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
+            },
+            color: 'white'
+          }]
+          this.pushNotification(notifyOptions)
+          console.error(error)
+        })
     }
   }
 })
