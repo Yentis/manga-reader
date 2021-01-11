@@ -9,6 +9,17 @@ Supported platforms:
 - Windows
 - Android
 
+Features:
+- Check all added manga for new chapters
+- Read manga in the app
+- Mark status, add notes, add ratings
+- Sort, filter and search
+- Link reading progress with MangaDex or Kitsu
+- Share list using Gitlab
+- Export to / import from Dropbox
+- Dark mode, read in browser
+- Automatically check for new chapters every x minutes, this will send a notification to your device (off by default)
+
 # Download
 https://github.com/Yentis/manga-reader/releases
 
