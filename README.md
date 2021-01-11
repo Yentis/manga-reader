@@ -24,9 +24,9 @@ Features:
 https://github.com/Yentis/manga-reader/releases
 
 # Preview
-![Preview](https://i.imgur.com/I8maarB.png)
+![Preview](https://i.imgur.com/6V07rV3.png)
 ![Preview](https://i.imgur.com/gbCwdKD.png)
-![Preview](https://i.imgur.com/qSDzBiz.png)
+![Preview](https://i.imgur.com/cd7J6SX.png)
 ![Preview](https://i.imgur.com/YNoNUc7.png)
 ![Preview](https://i.imgur.com/iBKh8ad.png)
 ![Preview](https://i.imgur.com/sqXJLYB.jpg)
