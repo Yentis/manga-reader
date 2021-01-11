@@ -1,3 +1,4 @@
+import { InitializeComponents } from 'src/classes/initializeComponents'
 import { Manga } from 'src/classes/manga'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { Settings } from 'src/classes/settings'
@@ -14,6 +15,7 @@ class ReaderState {
     mobileView = false
     settings = new Settings()
     searchValue = ''
+    initialized = new InitializeComponents()
 }
 
 function doSort (mangaList: Manga[]): Manga[] {
@@ -73,6 +75,9 @@ const mutations = {
   },
   updateSearchValue (state: ReaderState, searchValue: string) {
     state.searchValue = searchValue
+  },
+  updateInitialized (state: ReaderState, initialized: InitializeComponents) {
+    state.initialized = initialized
   }
 }
 
@@ -106,6 +111,9 @@ const getters = {
   },
   searchValue: (state: ReaderState) => {
     return state.searchValue
+  },
+  initialized: (state: ReaderState) => {
+    return state.initialized
   }
 }
 

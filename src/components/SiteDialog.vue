@@ -51,6 +51,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { getSiteMap } from 'src/services/siteService'
 import { SiteName } from 'src/enums/siteEnum'
+import { InitializeComponents } from 'src/classes/initializeComponents'
 
 interface DisplayedSite {
    site: BaseSite
@@ -85,7 +86,8 @@ export default (Vue as VueConstructor<Vue &
   computed: {
     ...mapGetters('reader', {
       searchResults: 'searchResults',
-      mobileView: 'mobileView'
+      mobileView: 'mobileView',
+      initialized: 'initialized'
     })
   },
 
@@ -107,12 +109,19 @@ export default (Vue as VueConstructor<Vue &
       })
     })
 
-    this.onRefreshSites()
+    const initialized = this.initialized as InitializeComponents
+    if (!initialized.siteState) {
+      this.onRefreshSites()
+
+      initialized.siteState = true
+      this.updateInitialized(initialized)
+    }
   },
 
   methods: {
     ...mapMutations('reader', {
-      pushUrlNavigation: 'pushUrlNavigation'
+      pushUrlNavigation: 'pushUrlNavigation',
+      updateInitialized: 'updateInitialized'
     }),
 
     updateSiteList () {

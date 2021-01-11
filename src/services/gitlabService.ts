@@ -1,18 +1,18 @@
 import { LocalStorage } from 'quasar'
 import constants from 'src/boot/constants'
 import { Gitlab } from '@gitbeaker/browser'
+import { NotifyOptions } from 'src/classes/notifyOptions'
 
 const CLIENT_ID = '1ac7147c66b40b6aaae3f3fd0cac5169d26fd4b406e6198f4b3fd1fd29d9816a'
 
 let accessToken: string = LocalStorage.getItem(constants().GITLAB_TOKEN) || ''
-let shareId: string = LocalStorage.getItem(constants().SHARE_ID) || ''
 
 export function getAccessToken (): string {
   return accessToken
 }
 
 export function getShareId (): string {
-  return shareId
+  return LocalStorage.getItem(constants().SHARE_ID) || ''
 }
 
 export function setAccessToken (token: string | undefined) {
@@ -28,8 +28,6 @@ export function getAuthUrl () {
 
 export function setShareId (id: string | undefined) {
   if (id === undefined) return
-
-  shareId = id
   LocalStorage.set(constants().SHARE_ID, id)
 }
 
@@ -45,10 +43,12 @@ export async function createList (list: string): Promise<string> {
   const response = await gitlab.Snippets.create('My Manga List', 'manga_list.json', getModifiedList(list), 'public')
   const id = response.id as string
   setShareId(id)
+
   return id
 }
 
 export async function updateList (list: string): Promise<void> {
+  const shareId = getShareId()
   if (!shareId) return Promise.resolve()
   if (!accessToken) throw Error('No login data found')
 
@@ -63,6 +63,20 @@ export async function updateList (list: string): Promise<void> {
       content: getModifiedList(list)
     }]
   })
+}
+
+export function getNotifyOptions (error: unknown) {
+  let description = JSON.stringify(error)
+
+  if (error instanceof Error) {
+    description = error.message
+    if ('description' in error) {
+      description = `Status code ${description}: ${JSON.stringify((error as { description: unknown }).description)}`
+    }
+  }
+
+  const notifyOptions = new NotifyOptions(description, 'Failed to set share URL')
+  return notifyOptions
 }
 
 function getModifiedList (list: string) {

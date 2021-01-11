@@ -28,15 +28,14 @@ import { mapGetters, mapMutations } from 'vuex'
 import { defineComponent } from '@vue/composition-api'
 import moment from 'moment'
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import { UrlNavigation } from 'src/classes/urlNavigation'
 import { SiteType } from 'src/enums/siteEnum'
-import { checkUpdates, GithubRelease, getElectronAsset, getApkAsset } from 'src/services/updateService'
 import * as DropboxService from 'src/services/dropboxService'
 import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/MangaItem.vue'
 import { Manga } from 'src/classes/manga'
 import { Settings } from 'src/classes/settings'
+import { InitializeComponents } from 'src/classes/initializeComponents'
 
 export default defineComponent({
   components: {
@@ -50,13 +49,14 @@ export default defineComponent({
       refreshing: 'refreshing',
       refreshProgress: 'refreshProgress',
       settings: 'settings',
-      searchValue: 'searchValue'
+      searchValue: 'searchValue',
+      initialized: 'initialized'
     }),
 
     filteredMangaList () {
       const settings = this.settings as Settings
-      return (this.mangaList as Manga[]).filter(manga => {
-        return manga.title.toLowerCase().includes((this.searchValue as string).toLowerCase()) &&
+      return ((this.mangaList as unknown) as Manga[]).filter(manga => {
+        return manga.title.toLowerCase().includes(((this.searchValue as unknown) as string).toLowerCase()) &&
                settings.filters.includes(manga.status)
       })
     }
@@ -65,39 +65,9 @@ export default defineComponent({
   methods: {
     ...mapMutations('reader', {
       pushNotification: 'pushNotification',
-      pushUrlNavigation: 'pushUrlNavigation'
-    }),
-
-    showUpdateAvailable (githubRelease: GithubRelease) {
-      const notifyOptions = new NotifyOptions(`Update available: ${githubRelease.tag_name}`)
-      notifyOptions.type = 'positive'
-      notifyOptions.position = 'bottom'
-      notifyOptions.actions = [{
-        label: 'Download',
-        handler: () => {
-          if (this.$q.platform.is.mobile) {
-            const apkAsset = getApkAsset(githubRelease)
-            if (!apkAsset) return
-            window.location.href = apkAsset.browser_download_url
-          } else {
-            const electronAsset = getElectronAsset(githubRelease)
-            if (!electronAsset) return
-            this.pushUrlNavigation(new UrlNavigation(electronAsset.browser_download_url, false))
-          }
-        },
-        color: 'white'
-      }]
-
-      this.pushNotification(notifyOptions)
-    },
-
-    doUpdateCheck () {
-      checkUpdates().then(result => {
-        if (result) {
-          this.showUpdateAvailable(result)
-        }
-      }).catch(error => this.pushNotification(new NotifyOptions(error, 'Failed to check for updates')))
-    }
+      pushUrlNavigation: 'pushUrlNavigation',
+      updateInitialized: 'updateInitialized'
+    })
   },
 
   mounted () {
@@ -106,7 +76,9 @@ export default defineComponent({
       window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'timezoneOffset', (moment().utcOffset() / 60).toString(), () => undefined, (error) => console.error(error))
 
       document.addEventListener('resume', () => {
-        this.doUpdateCheck()
+        if ((this.initialized as InitializeComponents).main) {
+          this.updateInitialized(new InitializeComponents())
+        }
       })
     }
 
@@ -123,10 +95,17 @@ export default defineComponent({
         notifyOptions.type = 'positive'
         this.pushNotification(notifyOptions)
         GitlabService.setAccessToken(token)
+
+        this.$q.loading.show({
+          delay: 100
+        })
+        GitlabService.createList(JSON.stringify(this.mangaList)).catch(error => {
+          this.pushNotification(GitlabService.getNotifyOptions(error))
+        }).finally(() => {
+          this.$q.loading.hide()
+        })
       })
     }
-
-    this.doUpdateCheck()
   }
 })
 </script>

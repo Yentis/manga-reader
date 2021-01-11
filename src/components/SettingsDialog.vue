@@ -34,17 +34,19 @@
           ]"
         />
 
-        <q-card-actions class="q-mx-sm" align="center">
+        <q-card-actions v-if="shareId" class="q-mx-sm" align="center">
           <a
-            v-if="shareId"
             class="ellipsis"
-            :href="`https://yentis.github.io/manga-list.html?id=${shareId}`"
-            @click.prevent="onUrlClick(`https://yentis.github.io/manga-list.html?id=${shareId}`)"
+            :href="`${sitePrefix}${shareId}`"
+            @click.prevent="onUrlClick(`${sitePrefix}${shareId}`)"
           >
-            {{ `https://yentis.github.io/manga-list.html?id=${shareId}` }}
+            {{ `${sitePrefix}${shareId}` }}
           </a>
+          <q-btn flat dense icon="content_copy"  @click="onCopyToClipboard" />
+        </q-card-actions>
+
+        <q-card-actions v-else class="q-mx-sm" align="center">
           <q-btn
-            v-else
             no-caps
             label="Share List"
             :loading="loading"
@@ -66,11 +68,12 @@
 <script lang="ts">
 import Vue, { VueConstructor } from 'vue'
 import { mapGetters, mapMutations } from 'vuex'
-import { QDialog } from 'quasar'
+import { QDialog, copyToClipboard } from 'quasar'
 import { Settings } from 'src/classes/settings'
-import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from 'src/classes/urlNavigation'
-import { createList, getAuthUrl, getShareId } from 'src/services/gitlabService'
+import { createList, getAuthUrl, getNotifyOptions, getShareId } from 'src/services/gitlabService'
+import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
+import { NotifyOptions } from 'src/classes/notifyOptions'
 
 export default (Vue as VueConstructor<Vue &
   { $refs:
@@ -88,7 +91,8 @@ export default (Vue as VueConstructor<Vue &
     return {
       newSettings: new Settings(),
       shareId: '',
-      loading: false
+      loading: false,
+      sitePrefix: 'https://yentis.github.io/manga-list.html?id='
     }
   },
 
@@ -131,33 +135,41 @@ export default (Vue as VueConstructor<Vue &
     },
 
     onShareList () {
-      this.loading = true
+      this.$q.dialog({
+        component: ConfirmationDialog,
+        title: 'List sharing',
+        content: 'Your list will be uploaded to Gitlab as a Snippet and a shareable URL will be generated.\nThis shareable list will be updated periodically or whenever the app is opened.'
+      }).onOk(async () => {
+        this.loading = true
 
-      createList(JSON.stringify(this.mangaList))
-        .then(id => {
-          this.shareId = id
-        })
-        .catch(error => {
-          if (error instanceof Error) {
-            if (error.message === 'Not logged in') {
-              this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
-              return
-            }
+        try {
+          const shareId = await createList(JSON.stringify(this.mangaList))
+          this.shareId = shareId
+        } catch (error) {
+          const notifyOptions = getNotifyOptions(error)
+
+          if (notifyOptions.caption?.includes('Not logged in')) {
+            this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
+            return
           }
-          const message = error instanceof Error ? error.message : error as string
-          const notifyOptions = new NotifyOptions(message, 'Failed to create share URL')
-          notifyOptions.actions = [{
-            label: 'Relog',
-            handler: () => {
-              this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
-            },
-            color: 'white'
-          }]
+
           this.pushNotification(notifyOptions)
           console.error(error)
+        }
+
+        this.loading = false
+      })
+    },
+
+    onCopyToClipboard () {
+      copyToClipboard(`${this.sitePrefix}${this.shareId}`)
+        .then(() => {
+          const notifyOptions = new NotifyOptions('Copied to clipboard!')
+          notifyOptions.type = 'positive'
+          this.pushNotification(notifyOptions)
         })
-        .finally(() => {
-          this.loading = false
+        .catch(error => {
+          this.pushNotification(new NotifyOptions(error, 'Failed to copy to clipboard'))
         })
     }
   }
