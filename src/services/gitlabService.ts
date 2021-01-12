@@ -32,6 +32,10 @@ export function setShareId (id: string | undefined) {
 }
 
 export async function createList (list: string): Promise<string> {
+  const shareId = getShareId()
+  if (shareId) {
+    return Promise.resolve(shareId)
+  }
   if (!accessToken) {
     throw Error('Not logged in')
   }
@@ -50,7 +54,7 @@ export async function createList (list: string): Promise<string> {
 export async function updateList (list: string): Promise<void> {
   const shareId = getShareId()
   if (!shareId) return Promise.resolve()
-  if (!accessToken) throw Error('No login data found')
+  if (!accessToken) throw Error('Not logged in')
 
   const gitlab = new Gitlab({
     oauthToken: accessToken

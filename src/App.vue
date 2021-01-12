@@ -251,7 +251,7 @@ export default defineComponent({
               color: 'white'
             }
           )
-          if (notifyOptions.caption?.includes('401 Unauthorized') || notifyOptions.caption?.includes('No login data found')) {
+          if (notifyOptions.caption?.includes('401 Unauthorized') || notifyOptions.caption?.includes('Not logged in')) {
             actions.push(
               {
                 label: 'Relog',
