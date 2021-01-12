@@ -24,7 +24,11 @@
                   clickable
                   v-for="item in siteList"
                   :key="item.site.siteType"
-                  :class="{ 'bg-warning': !item.site.statusOK(), 'text-black': !item.site.statusOK() && $q.dark.isActive }"
+                  :class="{
+                    'bg-negative': !item.site.statusOK() && item.site.state === siteState.OFFLINE,
+                    'bg-warning': !item.site.statusOK() && item.site.state !== siteState.OFFLINE,
+                    'text-black': !item.site.statusOK() && $q.dark.isActive
+                  }"
                   @click="item.site.loggedIn ? item.site.statusOK() ? onLinkClicked(item.site.getUrl()) : onLinkClicked(item.site.getUrl(), true) : onLinkClicked(item.site.getLoginUrl(), true)">
                   <q-item-section v-if="!item.refreshing">
                     <q-item-label :class="{ 'full-width': mobileView }">{{ siteNames[item.site.siteType] }}</q-item-label>
@@ -50,7 +54,7 @@ import { QDialog } from 'quasar'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import { getSiteMap } from 'src/services/siteService'
-import { SiteName } from 'src/enums/siteEnum'
+import { SiteName, SiteState } from 'src/enums/siteEnum'
 import { InitializeComponents } from 'src/classes/initializeComponents'
 
 interface DisplayedSite {
@@ -79,7 +83,8 @@ export default (Vue as VueConstructor<Vue &
       refreshing: false,
       siteList: [] as DisplayedSite[],
       siteNames: SiteName,
-      windowSize: [] as Array<number>
+      windowSize: [] as Array<number>,
+      siteState: SiteState
     }
   },
 

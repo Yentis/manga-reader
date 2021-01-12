@@ -146,15 +146,14 @@ export default (Vue as VueConstructor<Vue &
           const shareId = await createList(JSON.stringify(this.mangaList))
           this.shareId = shareId
         } catch (error) {
-          const notifyOptions = getNotifyOptions(error)
+          const notifyOptions = getNotifyOptions(this, error)
 
           if (notifyOptions.caption?.includes('Not logged in')) {
             this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
-            return
+          } else {
+            this.pushNotification(notifyOptions)
+            console.error(error)
           }
-
-          this.pushNotification(notifyOptions)
-          console.error(error)
         }
 
         this.loading = false

@@ -6,7 +6,6 @@ import { SiteType } from 'src/enums/siteEnum'
 import { Status } from 'src/enums/statusEnum'
 import { version } from '../../package.json'
 
-const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERSION) || ''
 const OPEN_BROWSER_KEY = 'open_browser'
 const DARK_MODE_KEY = 'dark_mode'
 const REFRESH_OPTIONS_KEY = 'refresh_options'
@@ -18,8 +17,12 @@ interface MigrationManga {
   status: Status | undefined
 }
 
+export function getMigrationVersion () {
+  return LocalStorage.getItem(constants().MIGRATION_VERSION) || ''
+}
+
 export function tryMigrateMangaList () {
-  if (migrationVersion === version) return
+  if (getMigrationVersion() === version) return
   const mangaList: MigrationManga[] | null = LocalStorage.getItem(constants().MANGA_LIST_KEY)
 
   if (mangaList !== null) {
@@ -28,7 +31,7 @@ export function tryMigrateMangaList () {
 }
 
 export function tryMigrateSettings () {
-  if (migrationVersion === version) return
+  if (getMigrationVersion() === version) return
   const settings: Settings = LocalStorage.getItem(constants().SETTINGS) || new Settings()
   const openInBrowser: boolean | null = LocalStorage.getItem(OPEN_BROWSER_KEY)
   const darkMode: boolean | null = LocalStorage.getItem(DARK_MODE_KEY)

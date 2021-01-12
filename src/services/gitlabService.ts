@@ -2,6 +2,8 @@ import { LocalStorage } from 'quasar'
 import constants from 'src/boot/constants'
 import { Gitlab } from '@gitbeaker/browser'
 import { NotifyOptions } from 'src/classes/notifyOptions'
+import { ComponentRenderProxy } from '@vue/composition-api'
+import { UrlNavigation } from 'src/classes/urlNavigation'
 
 const CLIENT_ID = '1ac7147c66b40b6aaae3f3fd0cac5169d26fd4b406e6198f4b3fd1fd29d9816a'
 
@@ -69,7 +71,7 @@ export async function updateList (list: string): Promise<void> {
   })
 }
 
-export function getNotifyOptions (error: unknown) {
+export function getNotifyOptions (componentRenderProxy: ComponentRenderProxy, error: unknown) {
   let description = JSON.stringify(error)
 
   if (error instanceof Error) {
@@ -80,6 +82,15 @@ export function getNotifyOptions (error: unknown) {
   }
 
   const notifyOptions = new NotifyOptions(description, 'Failed to set share URL')
+  notifyOptions.actions = [(
+    {
+      label: 'Visit',
+      handler: () => {
+        componentRenderProxy.$store.commit('reader/pushUrlNavigation', new UrlNavigation('https://gitlab.com/dashboard', false))
+      },
+      color: 'white'
+    }
+  )]
   return notifyOptions
 }
 

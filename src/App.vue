@@ -170,7 +170,7 @@ export default defineComponent({
               delay: 100
             })
             createList(JSON.stringify(this.mangaList)).catch(error => {
-              this.pushNotification(getNotifyOptions(error))
+              this.pushNotification(getNotifyOptions(this, error))
             }).finally(() => {
               this.$q.loading.hide()
             })
@@ -232,7 +232,7 @@ export default defineComponent({
     updateShareList () {
       updateList(JSON.stringify(this.mangaList))
         .catch(error => {
-          const notifyOptions = getNotifyOptions(error)
+          const notifyOptions = getNotifyOptions(this, error)
 
           if (notifyOptions.caption?.includes('404') || notifyOptions.caption?.includes('id is invalid')) {
             setShareId('')
@@ -241,16 +241,7 @@ export default defineComponent({
             return
           }
 
-          const actions = []
-          actions.push(
-            {
-              label: 'Visit',
-              handler: () => {
-                this.pushUrlNavigation(new UrlNavigation('https://gitlab.com/dashboard', false))
-              },
-              color: 'white'
-            }
-          )
+          const actions = notifyOptions.actions || []
           if (notifyOptions.caption?.includes('401 Unauthorized') || notifyOptions.caption?.includes('Not logged in')) {
             actions.push(
               {

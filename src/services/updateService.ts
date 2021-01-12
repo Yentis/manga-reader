@@ -1,11 +1,9 @@
 import axios from 'axios'
-import { LocalStorage } from 'quasar'
-import constants from 'src/boot/constants'
 import { version } from '../../package.json'
-
-const migrationVersion: string = LocalStorage.getItem(constants().MIGRATION_VERSION) || ''
+import { getMigrationVersion } from './migrationService'
 
 export async function getChangelog (): Promise<string | undefined> {
+  const migrationVersion = getMigrationVersion()
   if (migrationVersion === version) return
   const releases = await getReleases()
 

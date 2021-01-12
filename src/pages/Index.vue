@@ -100,7 +100,7 @@ export default defineComponent({
           delay: 100
         })
         GitlabService.createList(JSON.stringify(this.mangaList)).catch(error => {
-          this.pushNotification(GitlabService.getNotifyOptions(error))
+          this.pushNotification(GitlabService.getNotifyOptions(this, error))
         }).finally(() => {
           this.$q.loading.hide()
         })
