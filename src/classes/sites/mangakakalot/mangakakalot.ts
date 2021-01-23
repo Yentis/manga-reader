@@ -1,8 +1,9 @@
 import { BaseSite } from '../baseSite'
 import Worker from 'worker-loader!src/workers/mangakakalot.worker'
 import { MangakakalotWorker } from './mangakakalotWorker'
+import { ManganeloWorker } from '../manganelo/manganeloWorker'
 
-const LOGIN_URL = 'https://user.manganelo.com/login?l=mangakakalot'
+const LOGIN_URL = `https://user.${ManganeloWorker.siteType}/login?l=mangakakalot`
 
 export class Mangakakalot extends BaseSite {
   siteType = MangakakalotWorker.siteType

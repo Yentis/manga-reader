@@ -10,7 +10,7 @@ const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKi
 
 export class WebtoonsWorker extends BaseWorker {
   static siteType = SiteType.Webtoons
-  static url = `https://www.${WebtoonsWorker.siteType}`
+  static url = `${BaseWorker.urlPrefix}https://www.${WebtoonsWorker.siteType}`
   static testUrl = `${WebtoonsWorker.url}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
 
   platform: LooseDictionary | undefined

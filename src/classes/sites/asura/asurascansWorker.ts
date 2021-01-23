@@ -9,7 +9,7 @@ export class AsuraScansWorker extends BaseWorker {
   static siteType = SiteType.AsuraScans
   static url = BaseWorker.getUrl(AsuraScansWorker.siteType)
 
-  static testUrl = 'https://asurascans.com/manga/tougen-anki/'
+  static testUrl = `${AsuraScansWorker.url}/manga/tougen-anki/`
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(AsuraScansWorker.siteType, requestConfig)

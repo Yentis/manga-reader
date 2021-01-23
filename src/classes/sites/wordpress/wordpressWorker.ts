@@ -10,26 +10,26 @@ import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 export class WordPressWorker extends BaseWorker {
   static getUrl (siteType: SiteType | LinkingSiteType): string {
     if (siteType === SiteType.MangaDoDs) {
-      return `https://www.${siteType}`
+      return `${BaseWorker.urlPrefix}https://www.${siteType}`
     } else {
-      return `https://${siteType}`
+      return `${BaseWorker.urlPrefix}https://${siteType}`
     }
   }
 
   static getTestUrl (siteType: SiteType): string {
     switch (siteType) {
       case SiteType.FirstKissManga:
-        return 'https://1stkissmanga.com/manga/ripples-of-love/'
+        return `${WordPressWorker.getUrl(siteType)}/manga/ripples-of-love/`
       case SiteType.MangaKomi:
-        return 'https://mangakomi.com/manga/good-night/'
+        return `${WordPressWorker.getUrl(siteType)}/manga/good-night/`
       case SiteType.HiperDEX:
-        return 'https://hiperdex.com/manga/arata-primal-the-new-primitive/'
+        return `${WordPressWorker.getUrl(siteType)}/manga/arata-primal-the-new-primitive/`
       case SiteType.MangaDoDs:
-        return 'https://www.mangadods.com/manga/a-fairytale-for-the-demon-lord/'
+        return `${WordPressWorker.getUrl(siteType)}/manga/a-fairytale-for-the-demon-lord/`
       case SiteType.ManhwaClub:
-        return 'https://manhwa.club/manhwa/settia/'
+        return `${WordPressWorker.getUrl(siteType)}/manhwa/settia/`
       case SiteType.MangaTx:
-        return 'https://mangatx.com/manga/grandest-wedding/'
+        return `${WordPressWorker.getUrl(siteType)}/manga/grandest-wedding/`
     }
 
     return WordPressWorker.getUrl(siteType)

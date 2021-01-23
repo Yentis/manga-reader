@@ -13,19 +13,19 @@ export class GenkanWorker extends BaseWorker {
   static getTestUrl (siteType: SiteType | LinkingSiteType) : string {
     switch (siteType) {
       case SiteType.HatigarmScans:
-        return 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai'
+        return `${GenkanWorker.getUrl(siteType)}/comics/848996-ichizu-de-bitch-na-kouhai`
       case SiteType.MethodScans:
-        return 'https://methodscans.com/comics/773532-meng-shi-zai-shang'
+        return `${GenkanWorker.getUrl(siteType)}/comics/773532-meng-shi-zai-shang`
       case SiteType.LeviatanScans:
-        return 'https://leviatanscans.com/comics/909261-stresser'
+        return `${GenkanWorker.getUrl(siteType)}/comics/909261-stresser`
       case SiteType.ReaperScans:
-        return 'https://reaperscans.com/comics/621295-alpha'
+        return `${GenkanWorker.getUrl(siteType)}/comics/621295-alpha`
       case SiteType.SleepingKnightScans:
-        return 'https://skscans.com/comics/608374-the-second-coming-of-gluttony'
+        return `${GenkanWorker.getUrl(siteType)}/comics/608374-the-second-coming-of-gluttony`
       case SiteType.ZeroScans:
-        return 'https://zeroscans.com/comics/136750-all-heavenly-days'
+        return `${GenkanWorker.getUrl(siteType)}/comics/136750-all-heavenly-days`
       case SiteType.SecretScans:
-        return 'https://secretscans.co/comics/698439-dawn-of-the-eastland'
+        return `${GenkanWorker.getUrl(siteType)}/comics/698439-dawn-of-the-eastland`
     }
 
     return GenkanWorker.getUrl(siteType)

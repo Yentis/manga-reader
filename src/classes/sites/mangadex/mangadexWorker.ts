@@ -9,7 +9,7 @@ import relevancy from 'relevancy'
 export class MangaDexWorker extends BaseWorker {
   static siteType = SiteType.MangaDex
   static url = BaseWorker.getUrl(MangaDexWorker.siteType)
-  static testUrl = 'https://mangadex.org/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored'
+  static testUrl = `${MangaDexWorker.url}/title/6272/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored`
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(MangaDexWorker.siteType, requestConfig)

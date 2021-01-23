@@ -5,8 +5,10 @@ import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { AxiosRequestConfig } from 'axios'
 
 export abstract class BaseWorker {
+  // Use for CORS proxy
+  static urlPrefix = ''
   static getUrl (siteType: SiteType | LinkingSiteType) {
-    return `https://${siteType}`
+    return `${BaseWorker.urlPrefix}https://${siteType}`
   }
 
   siteType: SiteType | LinkingSiteType

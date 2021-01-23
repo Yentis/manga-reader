@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -13,7 +13,9 @@
     "test:unit:watch": "jest --watch",
     "test:unit:watchAll": "jest --watchAll",
     "serve:test:coverage": "quasar serve test/jest/coverage/lcov-report/ --port 8788",
-    "concurrently:dev:jest": "concurrently \"quasar dev\" \"jest --watch\""
+    "concurrently:dev:jest": "concurrently \"quasar dev\" \"jest --watch\"",
+    "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m android",
+    "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron"
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.18.2",

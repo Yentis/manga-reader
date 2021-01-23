@@ -8,7 +8,7 @@ import { SiteType } from '../../../enums/siteEnum'
 
 export class MangagoWorker extends BaseWorker {
   static siteType = SiteType.Mangago
-  static url = `http://www.${MangagoWorker.siteType}`
+  static url = `${BaseWorker.urlPrefix}http://www.${MangagoWorker.siteType}`
   static testUrl = `${MangagoWorker.url}/read-manga/curtain/`
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
