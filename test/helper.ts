@@ -1,9 +1,9 @@
 import { Manga } from 'src/classes/manga'
-import { BaseSite } from 'src/classes/sites/baseSite'
+import { BaseWorker } from 'src/classes/sites/baseWorker'
 
-export function readUrl (site: BaseSite, desired: Manga, url: string | undefined = undefined) {
+export function readUrl (worker: BaseWorker, desired: Manga, url: string) {
   return new Promise<void>((resolve, reject) => {
-    site.readUrl(url || site.getTestUrl()).then(mangaInfo => {
+    worker.readUrl(url).then(mangaInfo => {
       const result = mangaEqual(mangaInfo, desired)
 
       if (result === true) resolve()
@@ -12,13 +12,13 @@ export function readUrl (site: BaseSite, desired: Manga, url: string | undefined
   })
 }
 
-export function search (site: BaseSite, query: string, desired: Manga) {
+export function search (worker: BaseWorker, query: string, desired: Manga) {
   return new Promise<void>((resolve, reject) => {
-    site.search(query).then(result => {
+    worker.search(query).then(result => {
       if (result instanceof Error) return reject(result)
 
       const matchingManga = result.filter(manga => {
-        return manga.site === site.siteType &&
+        return manga.site === worker.siteType &&
               manga.title.toLowerCase() === query.toLowerCase() &&
               manga.image === desired.image &&
               manga.chapter === desired.chapter &&

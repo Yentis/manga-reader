@@ -6,34 +6,34 @@ import {
 } from '../enums/siteEnum'
 import {
   Manganelo
-} from '../classes/sites/manganelo'
+} from '../classes/sites/manganelo/manganelo'
 import {
   Genkan
-} from '../classes/sites/genkan'
+} from '../classes/sites/genkan/genkan'
 import {
   Webtoons
-} from '../classes/sites/webtoons'
+} from '../classes/sites/webtoons/webtoons'
 import {
   Mangakakalot
-} from '../classes/sites/mangakakalot'
+} from '../classes/sites/mangakakalot/mangakakalot'
 import {
   MangaDex
-} from '../classes/sites/mangadex'
+} from '../classes/sites/mangadex/mangadex'
 import {
   WordPress
-} from '../classes/sites/wordpress'
+} from '../classes/sites/wordpress/wordpress'
 import {
   BaseSite
 } from '../classes/sites/baseSite'
 import {
   AsuraScans
-} from '../classes/sites/asurascans'
+} from '../classes/sites/asura/asurascans'
 import {
   Mangago
-} from '../classes/sites/mangago'
+} from '../classes/sites/mangago/mangago'
 import {
   Kitsu
-} from 'src/classes/sites/kitsu'
+} from 'src/classes/sites/kitsu/kitsu'
 import {
   LinkingSiteType
 } from '../enums/linkingSiteEnum'

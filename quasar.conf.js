@@ -14,7 +14,8 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: {
       tsCheckerConfig: {
-        eslint: true
+        eslint: true,
+        memoryLimit: 8192
       }
     },
 
@@ -202,9 +203,11 @@ module.exports = configure(function (ctx) {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true,
 
-      extendWebpack (/* cfg */) {
-        // do something with Electron main process Webpack cfg
-        // chainWebpack also available besides this extendWebpack
+      extendWebpack (cfg) {
+        cfg.module.rules.unshift({
+          test: /\.worker\.ts$/,
+          use: { loader: 'worker-loader' }
+        })
       }
     }
   }

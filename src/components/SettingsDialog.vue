@@ -92,7 +92,7 @@ export default (Vue as VueConstructor<Vue &
       newSettings: new Settings(),
       shareId: '',
       loading: false,
-      sitePrefix: 'https://yentis.github.io/manga-list.html?id='
+      sitePrefix: 'https://yentis.github.io/mangalist?id='
     }
   },
 

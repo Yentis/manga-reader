@@ -1,33 +1,33 @@
-import { AsuraScans } from '../src/classes/sites/asurascans'
+import 'ts-jest'
 import { Manga } from '../src/classes/manga'
-import { SiteName, SiteType } from '../src/enums/siteEnum'
+import { SiteName } from '../src/enums/siteEnum'
 import { readUrl, search } from './helper'
+import { AsuraScansWorker } from '../src/classes/sites/asura/asurascansWorker'
 
-const siteType = SiteType.AsuraScans
+const siteType = AsuraScansWorker.siteType
+const worker = new AsuraScansWorker()
 
 describe(SiteName[siteType], function () {
-  const site = new AsuraScans()
+  const testUrl = AsuraScansWorker.testUrl
   const query = 'tougen anki'
 
-  this.timeout(10000)
-
   it('Read URL', () => {
-    const desired = new Manga(site.getTestUrl(), siteType)
+    const desired = new Manga(testUrl, siteType)
     desired.chapter = 'Chapter 19'
     desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg'
     desired.title = 'Tougen Anki'
     desired.chapterUrl = 'https://asurascans.com/tougen-anki-chapter-19/'
     desired.chapterNum = 19
 
-    return readUrl(site, desired)
+    return readUrl(worker, desired, testUrl)
   })
 
   it('Search', () => {
-    const desired = new Manga(site.getTestUrl(), siteType)
+    const desired = new Manga(testUrl, siteType)
     desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg?h=80'
     desired.chapter = '19'
-    desired.url = 'https://asurascans.com/manga/tougen-anki/'
+    desired.url = 'https://asurascans.com/comics/tougen-anki/'
 
-    return search(site, query, desired)
+    return search(worker, query, desired)
   })
 })

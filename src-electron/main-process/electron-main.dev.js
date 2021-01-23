@@ -18,7 +18,7 @@ app.whenReady().then(() => {
     // Install vuejs devtools
     installExtension(VUEJS_DEVTOOLS)
       .then(name => {
-        console.log(`Added Extension: ${name}`)
+        console.info(`Added Extension: ${name}`)
         // get main window
         const win = BrowserWindow.getFocusedWindow()
         if (win) {
@@ -27,13 +27,13 @@ app.whenReady().then(() => {
               win.webContents.focus()
             })
             // open electron debug
-            console.log('Opening dev tools')
+            console.info('Opening dev tools')
             win.webContents.openDevTools()
           })
         }
       })
       .catch(err => {
-        console.log('An error occurred: ', err)
+        console.info('An error occurred: ', err)
       })
   }, 250)
 })

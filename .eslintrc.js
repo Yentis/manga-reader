@@ -92,6 +92,7 @@ module.exports = {
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
 
-    'no-void': 'off'
+    'no-void': 'off',
+    'import/no-webpack-loader-syntax': 'off'
   }
 }
