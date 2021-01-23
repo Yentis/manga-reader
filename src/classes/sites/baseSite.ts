@@ -96,7 +96,7 @@ export abstract class BaseSite {
         }
         const data = new Map()
         data.set('query', query)
-        worker.postMessage(new WorkerRequest(RequestType.SEARCH, data, this))
+        worker.postMessage(new WorkerRequest(RequestType.SEARCH, data, this, Platform.is))
       })
     })
   }

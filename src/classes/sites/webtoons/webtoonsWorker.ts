@@ -58,7 +58,7 @@ export class WebtoonsWorker extends BaseWorker {
     if (mobile || this.platform?.mobile === true) {
       this.chapter = $('.sub_title span').first()
       this.chapterUrl = $('li[data-episode-no] a').first()
-      this.chapterNum = $('#_episodeList li').first()
+      this.chapterNum = $('#_episodeList li[data-episode-no]').first()
       this.title = $('._btnInfo .subj').first()
     } else {
       this.chapter = $('#_listUl .subj span').first()
