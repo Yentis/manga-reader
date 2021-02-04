@@ -19,7 +19,7 @@ export class GenkanWorker extends BaseWorker {
       case SiteType.LeviatanScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/909261-stresser`
       case SiteType.ReaperScans:
-        return `${GenkanWorker.getUrl(siteType)}/comics/621295-alpha`
+        return `${GenkanWorker.getUrl(siteType)}/comics/353239-aire`
       case SiteType.SleepingKnightScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/608374-the-second-coming-of-gluttony`
       case SiteType.ZeroScans:
@@ -67,7 +67,14 @@ export class GenkanWorker extends BaseWorker {
   }
 
   getImage (): string {
-    return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), GenkanWorker.getUrl(this.siteType)).replace(new RegExp('"?\\)', 'g'), '') || ''
+    const backgroundImage = this.image?.css('background-image')
+    let replaceText = GenkanWorker.getUrl(this.siteType)
+
+    if (backgroundImage && backgroundImage.includes('https://')) {
+      replaceText = ''
+    }
+
+    return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), replaceText).replace(new RegExp('"?\\)', 'g'), '') || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {

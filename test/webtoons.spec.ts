@@ -26,7 +26,7 @@ describe(SiteName[siteType], function () {
     const url = 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541'
     const desired = new Manga(url, siteType)
     desired.chapter = 'Epilogue'
-    desired.image = 'https://swebtoon-phinf.pstatic.net/20201208_32/1607362598371MvQ4S_JPEG/8_EB9AA1EB80AB_E293A4EABCB9__EB84BD_EB90A3EB80AB_EC86BDE-1.jpg?type=crop540_540'
+    desired.image = 'https://swebtoon-phinf.pstatic.net/20210127_227/1611710217905Pat8k_JPEG/6Xinker-Mobile-Landing-Page.jpg?type=crop540_540'
     desired.title = 'XINK3R'
     desired.chapterUrl = 'https://m.webtoons.com/en/super-hero/xinker/epilogue/viewer?title_no=541&episode_no=223'
     desired.chapterNum = 223

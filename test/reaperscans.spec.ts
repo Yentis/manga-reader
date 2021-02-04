@@ -9,24 +9,24 @@ const worker = new GenkanWorker(siteType)
 
 describe(SiteName[siteType], function () {
   const testUrl = GenkanWorker.getTestUrl(siteType)
-  const query = 'alpha'
+  const query = 'aire'
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = 'End'
-    desired.image = 'https://reaperscans.com/storage/comics/EB4E79D4AF295DAFD75B2CE8C91E9B8CF209090AB259BE2A/rYXSCHcBgkjup3vxpqhg4RH7Q1LwhqLXS6hPGZIK.jpeg'
-    desired.title = 'ALPHA'
-    desired.chapterUrl = 'https://reaperscans.com/comics/621295-alpha/1/20'
-    desired.chapterNum = 20
+    desired.chapter = 'Chapter 12'
+    desired.image = 'https://media.reaperscans.com/file/reaperscans/comics/951B222AB3EADADCBB32E241E817845AB609514BC21D2BAD/LMlEbRetOe0yzQorJjR87sMB8021OfFznpjdkaAN.jpeg'
+    desired.title = 'Aire'
+    desired.chapterUrl = 'https://reaperscans.com/comics/353239-aire/1/12'
+    desired.chapterNum = 12
 
     return readUrl(worker, desired, testUrl)
   })
 
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.image = 'https://reaperscans.com/storage/comics/EB4E79D4AF295DAFD75B2CE8C91E9B8CF209090AB259BE2A/rYXSCHcBgkjup3vxpqhg4RH7Q1LwhqLXS6hPGZIK.jpeg'
-    desired.chapter = 'End'
-    desired.url = 'https://reaperscans.com/comics/621295-alpha'
+    desired.image = 'https://media.reaperscans.com/file/reaperscans/comics/951B222AB3EADADCBB32E241E817845AB609514BC21D2BAD/LMlEbRetOe0yzQorJjR87sMB8021OfFznpjdkaAN.jpeg'
+    desired.chapter = 'Chapter 12'
+    desired.url = 'https://reaperscans.com/comics/353239-aire'
 
     return search(worker, query, desired)
   })

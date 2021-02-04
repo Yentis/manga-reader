@@ -9,11 +9,7 @@ import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 
 export class WordPressWorker extends BaseWorker {
   static getUrl (siteType: SiteType | LinkingSiteType): string {
-    if (siteType === SiteType.MangaDoDs) {
-      return `${BaseWorker.urlPrefix}https://www.${siteType}`
-    } else {
-      return `${BaseWorker.urlPrefix}https://${siteType}`
-    }
+    return `${BaseWorker.urlPrefix}https://${siteType}`
   }
 
   static getTestUrl (siteType: SiteType): string {
@@ -24,8 +20,6 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${WordPressWorker.getUrl(siteType)}/manga/arata-primal-the-new-primitive/`
-      case SiteType.MangaDoDs:
-        return `${WordPressWorker.getUrl(siteType)}/manga/a-fairytale-for-the-demon-lord/`
       case SiteType.ManhwaClub:
         return `${WordPressWorker.getUrl(siteType)}/manhwa/settia/`
       case SiteType.MangaTx:
@@ -99,9 +93,6 @@ export class WordPressWorker extends BaseWorker {
     switch (this.siteType) {
       case SiteType.FirstKissManga:
         format = 'Do MMMM YYYY'
-        break
-      case SiteType.MangaDoDs:
-        format = 'YYYY-MM-DD'
         break
       default:
         format = 'MMMM DD, YYYY'
