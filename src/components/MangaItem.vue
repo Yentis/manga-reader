@@ -7,11 +7,9 @@
     'unread-container': ((manga.status === undefined || status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
   }">
     <q-card-section class="manga-item" horizontal>
-      <q-img contain class="manga-image q-ma-sm" :src="manga.image">
+      <q-img contain class="manga-image q-ma-sm" :src="image" @error="onImageError($event.target.src)">
         <template v-slot:error>
-          <div class="error-image bg-negative">
-            <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
-          </div>
+          <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
         </template>
       </q-img>
 
@@ -185,6 +183,7 @@ import ConfirmationDialog from './ConfirmationDialog.vue'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { Status, StatusIcon } from 'src/enums/statusEnum'
 import { BaseSite } from 'src/classes/sites/baseSite'
+import { MangaDexWorker } from 'src/classes/sites/mangadex/mangadexWorker'
 
 export default defineComponent({
   name: 'manga-item',
@@ -204,7 +203,9 @@ export default defineComponent({
     }),
 
     manga (): Manga {
-      return (this.mangaByUrl as (url: string) => Manga)(this.url)
+      const manga = (this.mangaByUrl as (url: string) => Manga)(this.url)
+      this.image = manga.image
+      return manga
     },
 
     itemSize (): string {
@@ -223,6 +224,7 @@ export default defineComponent({
   data () {
     return {
       siteNames: SiteName,
+      siteTypes: SiteType,
       status: Status,
       statusIcon: StatusIcon,
       editing: false,
@@ -230,7 +232,8 @@ export default defineComponent({
       newStatus: Status.READING as Status,
       newLinkedSites: undefined as Record<string, number> | undefined,
       newNotes: '' as string,
-      newRating: 0 as number
+      newRating: 0 as number,
+      image: ''
     }
   },
 
@@ -337,6 +340,21 @@ export default defineComponent({
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
+    },
+
+    onImageError (src: string) {
+      if (!this.linkedSites[SiteType.MangaDex]) return
+
+      const baseUrl = `${MangaDexWorker.url}/images/manga/${this.linkedSites[SiteType.MangaDex]}`
+      if (!src.includes(SiteType.MangaDex)) {
+        this.image = `${baseUrl}.jpg`
+      } else if (src.endsWith('jpg')) {
+        this.image = `${baseUrl}.jpeg`
+      } else if (src.endsWith('jpeg')) {
+        this.image = `${baseUrl}.png`
+      } else if (src.endsWith('png')) {
+        this.image = `${baseUrl}.gif`
+      }
     },
 
     trySaveNewReadNum (): boolean {
@@ -486,13 +504,6 @@ export default defineComponent({
 .manga-image {
   min-width: 96px;
   width: 96px;
-}
-
-.error-image {
-  min-width: 96px;
-  min-height: 96px;
-  width: 96px;
-  height: 96px;
 }
 
 .manga-subtitle {
