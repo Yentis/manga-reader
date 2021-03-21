@@ -26,6 +26,8 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manga/grandest-wedding/`
       case SiteType.LeviatanScans:
         return `${WordPressWorker.getUrl(siteType)}/manga/the-throne/`
+      case SiteType.SleepingKnightScans:
+        return `${WordPressWorker.getUrl(siteType)}/manga/chronicles-of-heavenly-demon/`
     }
 
     return WordPressWorker.getUrl(siteType)

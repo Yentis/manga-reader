@@ -58,7 +58,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
-  [SiteType.SleepingKnightScans, new Genkan(SiteType.SleepingKnightScans)],
+  [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],
   [SiteType.ZeroScans, new Genkan(SiteType.ZeroScans)],
   [SiteType.SecretScans, new Genkan(SiteType.SecretScans)]
 ])

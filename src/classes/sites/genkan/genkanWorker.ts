@@ -18,8 +18,6 @@ export class GenkanWorker extends BaseWorker {
         return `${GenkanWorker.getUrl(siteType)}/comics/773532-meng-shi-zai-shang`
       case SiteType.ReaperScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/353239-aire`
-      case SiteType.SleepingKnightScans:
-        return `${GenkanWorker.getUrl(siteType)}/comics/608374-the-second-coming-of-gluttony`
       case SiteType.ZeroScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/136750-all-heavenly-days`
       case SiteType.SecretScans:
