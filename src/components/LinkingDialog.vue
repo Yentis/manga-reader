@@ -53,12 +53,12 @@
         :searchPlaceholder="searchPlaceholder"
         :manualPlaceholder="manualPlaceholder"
         :initialSearch="initialSearch"
-        :siteType="selected[0].value" />
+        :siteType="selected.length > 0 ? selected[0].value : linkingSiteType.MangaDex" />
 
       <q-card-actions>
         <q-space />
 
-        <q-btn color="secondary" :label="confirmButton" @click="onOKClick"></q-btn>
+        <q-btn color="secondary" :disable="selected.length === 0" :label="confirmButton" @click="onOKClick"></q-btn>
         <q-btn label="Cancel" v-close-popup></q-btn>
       </q-card-actions>
     </q-card>
@@ -103,7 +103,8 @@ export default (Vue as VueConstructor<Vue &
         value: string,
         id: number | string,
         deleted: boolean
-      }[]
+      }[],
+      linkingSiteType: LinkingSiteType
     }
   },
 

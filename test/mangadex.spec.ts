@@ -14,7 +14,7 @@ describe(SiteName[siteType], function () {
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
     desired.chapter = 'Vol. 24 Ch. 95 - World of Stars and Stripes - Outro'
-    desired.image = 'https://mangadex.org/images/manga/6272.jpg?1612134047'
+    desired.image = 'https://mangadex.org/images/manga/6272.jpg?1612558729'
     desired.title = 'JoJo\'s Bizarre Adventure Part 7 - Steel Ball Run (Official Colored)'
     desired.chapterUrl = 'https://mangadex.org/chapter/24552'
     desired.chapterNum = 95

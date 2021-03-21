@@ -13,11 +13,11 @@ describe(SiteName[siteType], function () {
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = 'Chapter 12'
+    desired.chapter = 'Chapter 16'
     desired.image = 'https://media.reaperscans.com/file/reaperscans/comics/951B222AB3EADADCBB32E241E817845AB609514BC21D2BAD/LMlEbRetOe0yzQorJjR87sMB8021OfFznpjdkaAN.jpeg'
     desired.title = 'Aire'
-    desired.chapterUrl = 'https://reaperscans.com/comics/353239-aire/1/12'
-    desired.chapterNum = 12
+    desired.chapterUrl = 'https://reaperscans.com/comics/353239-aire/1/16'
+    desired.chapterNum = 16
 
     return readUrl(worker, desired, testUrl)
   })
@@ -25,7 +25,7 @@ describe(SiteName[siteType], function () {
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
     desired.image = 'https://media.reaperscans.com/file/reaperscans/comics/951B222AB3EADADCBB32E241E817845AB609514BC21D2BAD/LMlEbRetOe0yzQorJjR87sMB8021OfFznpjdkaAN.jpeg'
-    desired.chapter = 'Chapter 12'
+    desired.chapter = 'Chapter 16'
     desired.url = 'https://reaperscans.com/comics/353239-aire'
 
     return search(worker, query, desired)
