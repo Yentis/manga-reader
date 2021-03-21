@@ -32,8 +32,11 @@ import {
   Mangago
 } from '../classes/sites/mangago/mangago'
 import {
+  Batoto
+} from '../classes/sites/batoto/batoto'
+import {
   Kitsu
-} from 'src/classes/sites/kitsu/kitsu'
+} from '../classes/sites/kitsu/kitsu'
 import {
   LinkingSiteType
 } from '../enums/linkingSiteEnum'
@@ -60,7 +63,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],
   [SiteType.ZeroScans, new Genkan(SiteType.ZeroScans)],
-  [SiteType.SecretScans, new Genkan(SiteType.SecretScans)]
+  [SiteType.SecretScans, new Genkan(SiteType.SecretScans)],
+  [SiteType.Batoto, new Batoto()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
