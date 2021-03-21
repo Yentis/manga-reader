@@ -15,6 +15,7 @@ interface MigrationManga {
   linkedSites: Record<string, number> | undefined
   completed: boolean | undefined
   status: Status | undefined
+  site: string
 }
 
 export function getMigrationVersion () {
@@ -75,6 +76,10 @@ function doMigration (mangaList: MigrationManga[]) {
     if (item.status === undefined) {
       item.status = item.completed === true ? Status.COMPLETED : Status.READING
       delete item.completed
+    }
+
+    if (item.site === 'secretscans.co') {
+      item.site = SiteType.LynxScans
     }
   })
 

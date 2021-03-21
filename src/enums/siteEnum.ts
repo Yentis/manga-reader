@@ -16,7 +16,7 @@ export enum SiteType {
     Mangago = 'mangago.me',
     SleepingKnightScans = 'skscans.com',
     ZeroScans = 'zeroscans.com',
-    SecretScans = 'secretscans.co',
+    LynxScans = 'lynxscans.com',
     Batoto = 'bato.to'
 }
 
@@ -39,7 +39,7 @@ export enum SiteName {
     'kitsu.io' = 'Kitsu',
     'skscans.com' = 'Sleeping Knight Scans',
     'zeroscans.com' = 'Zero Scans',
-    'secretscans.co' = 'Secret Scans',
+    'lynxscans.com' = 'Lynx Scans',
     'bato.to' = 'Batoto'
 }
 

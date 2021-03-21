@@ -20,7 +20,7 @@ export class GenkanWorker extends BaseWorker {
         return `${GenkanWorker.getUrl(siteType)}/comics/353239-aire`
       case SiteType.ZeroScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/136750-all-heavenly-days`
-      case SiteType.SecretScans:
+      case SiteType.LynxScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/698439-dawn-of-the-eastland`
     }
 
@@ -70,7 +70,7 @@ export class GenkanWorker extends BaseWorker {
       replaceText = ''
     }
 
-    return this.image?.css('background-image').replace(new RegExp('url\\("?', 'g'), replaceText).replace(new RegExp('"?\\)', 'g'), '') || ''
+    return this.image?.css('background-image')?.replace(new RegExp('url\\("?', 'g'), replaceText)?.replace(new RegExp('"?\\)', 'g'), '') || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {

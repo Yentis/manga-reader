@@ -63,7 +63,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],
   [SiteType.ZeroScans, new Genkan(SiteType.ZeroScans)],
-  [SiteType.SecretScans, new Genkan(SiteType.SecretScans)],
+  [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
