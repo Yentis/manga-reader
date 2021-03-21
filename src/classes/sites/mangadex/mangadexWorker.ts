@@ -76,7 +76,9 @@ export class MangaDexWorker extends BaseWorker {
   async search (query: string): Promise<Error | Manga[]> {
     const config = this.requestConfig || {}
     config.params = {
-      title: query
+      // Remove all special characters because
+      // MangaDex search sucks and can't handle them
+      title: query.replace(/\W/g, '')
     }
 
     const response = await axios.get(`${MangaDexWorker.url}/search`, config)

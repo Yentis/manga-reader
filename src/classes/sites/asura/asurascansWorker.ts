@@ -32,10 +32,6 @@ export class AsuraScansWorker extends BaseWorker {
     }
   }
 
-  getImage (): string {
-    return this.image?.attr('data-src') || ''
-  }
-
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
