@@ -24,6 +24,8 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manhwa/settia/`
       case SiteType.MangaTx:
         return `${WordPressWorker.getUrl(siteType)}/manga/grandest-wedding/`
+      case SiteType.LeviatanScans:
+        return `${WordPressWorker.getUrl(siteType)}/manga/the-throne/`
     }
 
     return WordPressWorker.getUrl(siteType)
@@ -125,7 +127,7 @@ export class WordPressWorker extends BaseWorker {
     this.chapterDate = $('.chapter-release-date').first()
     this.chapterNum = $('.parent.has-child')
     if (!this.chapter.html() || !this.chapterDate.html()) {
-      const mangaId = $('.rating-post-id').first().attr('value') || ''
+      const mangaId = $('#manga-chapters-holder').first().attr('data-id') || ''
       const error = await this.readChapters(mangaId)
 
       if (error) return error

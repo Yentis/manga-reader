@@ -51,7 +51,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Mangakakalot, new Mangakakalot()],
   [SiteType.MangaDex, mangaDex],
   [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
-  [SiteType.LeviatanScans, new Genkan(SiteType.LeviatanScans)],
+  [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
   [SiteType.AsuraScans, new AsuraScans()],
