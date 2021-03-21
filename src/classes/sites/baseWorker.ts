@@ -46,7 +46,7 @@ export abstract class BaseWorker {
   }
 
   getTitle (): string {
-    return this.title?.text().trim() || 'Unknown'
+    return this.title?.text().trim() || ''
   }
 
   getChapterDate (): string {
@@ -95,6 +95,9 @@ export abstract class BaseWorker {
     manga.chapterDate = this.getChapterDate()
     manga.chapterNum = this.getChapterNum()
 
+    if (manga.title === '') {
+      throw Error('Could not parse site')
+    }
     return manga
   }
 

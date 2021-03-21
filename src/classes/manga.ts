@@ -8,7 +8,7 @@ export class Manga {
     chapter = 'Unknown'
     chapterNum = 0
     image = ''
-    title = 'Unknown'
+    title = ''
     chapterUrl = ''
     chapterDate = ''
     read: string | undefined

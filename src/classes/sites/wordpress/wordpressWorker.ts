@@ -117,7 +117,7 @@ export class WordPressWorker extends BaseWorker {
   }
 
   getTitle (): string {
-    return this.title?.text().replace(this.title.find('span').text(), '').trim() || 'Unknown'
+    return this.title?.text().replace(this.title.find('span').text(), '').trim() || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {

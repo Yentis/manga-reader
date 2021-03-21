@@ -61,7 +61,7 @@ export class MangagoWorker extends BaseWorker {
     $('#search_list li').each((_index: number, element: cheerio.Element) => {
       const manga = new Manga('', this.siteType)
       const titleElem = $(element).find('.tit a')
-      manga.title = titleElem.first().text().trim() || 'Unknown'
+      manga.title = titleElem.first().text().trim() || ''
 
       if (this.titleContainsQuery(query, manga.title)) {
         manga.chapter = $(element).find('.chico').first().text().trim() || 'Unknown'

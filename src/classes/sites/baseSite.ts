@@ -27,7 +27,7 @@ export abstract class BaseSite {
   async checkState (): Promise<void> {
     try {
       const response = await this.readUrl(this.getTestUrl())
-      const results = response instanceof Error ? SiteState.OFFLINE : response.title === 'Unknown' ? SiteState.INVALID : SiteState.REACHABLE
+      const results = response instanceof Error ? SiteState.OFFLINE : response.title === '' ? SiteState.INVALID : SiteState.REACHABLE
 
       this.state = results
     } catch (error) {
