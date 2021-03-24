@@ -125,11 +125,16 @@
             v-for="(id, site) in linkedSites"
             :key="site"
           >
-          <q-img
-            class="q-mb-xs"
-            width="1rem"
-            :src="'https://' + site + '/favicon.ico'"
-          />
+            <q-img
+              class="q-ma-none q-pa-none"
+              height="1rem"
+              width="1rem"
+              :src="'https://' + site + '/favicon.ico'"
+            >
+              <template v-slot:error>
+                <q-icon class="absolute-full full-height full-width" name="image_not_supported"></q-icon>
+              </template>
+            </q-img>
           </span>
         </div>
       </q-card-section>
