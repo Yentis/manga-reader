@@ -1,24 +1,41 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    @hide="onDialogHide"
+  >
     <q-card>
       <q-toolbar class="bg-primary text-white">
         <q-toolbar-title>{{ title }}</q-toolbar-title>
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+        />
       </q-toolbar>
 
       <manga-search
         v-model="url"
         :content="content"
-        :searchPlaceholder="searchPlaceholder"
-        :manualPlaceholder="manualPlaceholder"
-        :initialSearch="initialSearch"
-        :siteType="siteType" />
+        :search-placeholder="searchPlaceholder"
+        :manual-placeholder="manualPlaceholder"
+        :initial-search="initialSearch"
+        :site-type="siteType"
+      />
 
       <q-card-actions>
         <q-space />
 
-        <q-btn color="secondary" :label="confirmButton" @click="onOKClick"></q-btn>
-        <q-btn label="Cancel" v-close-popup></q-btn>
+        <q-btn
+          color="secondary"
+          :label="confirmButton"
+          @click="onOKClick"
+        />
+        <q-btn
+          v-close-popup
+          label="Cancel"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -35,14 +52,39 @@ export default (Vue as VueConstructor<Vue &
     { dialog: QDialog },
   }
 >).extend({
+  components: {
+    MangaSearch
+  },
+
   props: {
-    title: String,
-    content: String,
-    initialSearch: String,
-    searchPlaceholder: String,
-    manualPlaceholder: String,
-    siteType: String,
-    confirmButton: String
+    title: {
+      type: String,
+      default: ''
+    },
+    content: {
+      type: String,
+      default: ''
+    },
+    initialSearch: {
+      type: String,
+      default: ''
+    },
+    searchPlaceholder: {
+      type: String,
+      default: ''
+    },
+    manualPlaceholder: {
+      type: String,
+      default: ''
+    },
+    siteType: {
+      type: String,
+      default: ''
+    },
+    confirmButton: {
+      type: String,
+      default: ''
+    }
   },
 
   data () {
@@ -53,10 +95,6 @@ export default (Vue as VueConstructor<Vue &
 
   mounted () {
     this.updateSearchResults([])
-  },
-
-  components: {
-    MangaSearch
   },
 
   methods: {

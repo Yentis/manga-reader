@@ -1,70 +1,133 @@
 <template>
-    <div>
-      <div :class="{ 'header': true, 'q-mb-sm': mobileView }">
-        <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
-          <q-btn v-if="mobileView" color="primary" label="Add" @click="onAddManga" />
-          <q-btn v-else class="q-mr-sm" color="primary" label="Add Manga" @click="onAddManga" />
-          <q-btn v-if="mobileView" color="secondary" label="Refresh" @click="onRefreshAllManga" />
-          <q-btn v-else color="secondary" label="Refresh Manga" @click="onRefreshAllManga" />
-        </div>
-        <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
-          <q-btn v-if="mobileView" color="info" icon="backup" :loading="exporting" :disable="importing" @click="onExportList" />
-          <q-btn v-else class="q-mr-sm" color="info" label="Export to Dropbox" :loading="exporting" :disable="importing" @click="onExportList" />
-          <q-btn v-if="mobileView" color="accent" icon="cloud_download" :loading="importing" :disable="exporting" @click="onImportList" />
-          <q-btn v-else color="accent" label="Import from Dropbox" :loading="importing" :disable="exporting" @click="onImportList" />
-        </div>
-        <q-btn flat round icon="settings" @click="onSettingsClick" />
-      </div>
-
-      <div>
-        <q-input
-          dense
-          outlined
-          v-model="newSearch"
-          class="q-mb-sm full-width"
-          @input="updateSearchValue(newSearch)"
-        >
-          <template v-slot:append>
-            <q-icon v-if="newSearch === ''" name="search" />
-            <q-icon v-else name="clear" class="cursor-pointer" @click="newSearch = ''; updateSearchValue(newSearch)" />
-          </template>
-        </q-input>
-
-        <q-btn-dropdown
-          no-caps
+  <div>
+    <div :class="{ 'header': true, 'q-mb-sm': mobileView }">
+      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+        <q-btn
+          v-if="mobileView"
+          color="primary"
+          label="Add"
+          @click="onAddManga"
+        />
+        <q-btn
+          v-else
           class="q-mr-sm"
-          :label="'Sort by: ' + settings.sortedBy"
-        >
-          <q-list
-              v-for="type in sortTypes"
-              :key="type"
-          >
-            <q-item
-              clickable
-              v-close-popup
-              @click="updateSortedBy(type)"
-            >
-              <q-item-section>
-                <q-item-label>{{ type }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-
-        <q-btn-dropdown
-          no-caps
-          label="Filters"
-          @input="updateFilters"
-        >
-          <q-option-group
-            class="q-mr-sm"
-            type="checkbox"
-            v-model="newFilters"
-            :options="statusList"
-          />
-        </q-btn-dropdown>
+          color="primary"
+          label="Add Manga"
+          @click="onAddManga"
+        />
+        <q-btn
+          v-if="mobileView"
+          color="secondary"
+          label="Refresh"
+          @click="onRefreshAllManga"
+        />
+        <q-btn
+          v-else
+          color="secondary"
+          label="Refresh Manga"
+          @click="onRefreshAllManga"
+        />
       </div>
+      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+        <q-btn
+          v-if="mobileView"
+          color="info"
+          icon="backup"
+          :loading="exporting"
+          :disable="importing"
+          @click="onExportList"
+        />
+        <q-btn
+          v-else
+          class="q-mr-sm"
+          color="info"
+          label="Export to Dropbox"
+          :loading="exporting"
+          :disable="importing"
+          @click="onExportList"
+        />
+        <q-btn
+          v-if="mobileView"
+          color="accent"
+          icon="cloud_download"
+          :loading="importing"
+          :disable="exporting"
+          @click="onImportList"
+        />
+        <q-btn
+          v-else
+          color="accent"
+          label="Import from Dropbox"
+          :loading="importing"
+          :disable="exporting"
+          @click="onImportList"
+        />
+      </div>
+      <q-btn
+        flat
+        round
+        icon="settings"
+        @click="onSettingsClick"
+      />
     </div>
+
+    <div>
+      <q-input
+        v-model="newSearch"
+        dense
+        outlined
+        class="q-mb-sm full-width"
+        @input="updateSearchValue(newSearch)"
+      >
+        <template v-slot:append>
+          <q-icon
+            v-if="newSearch === ''"
+            name="search"
+          />
+          <q-icon
+            v-else
+            name="clear"
+            class="cursor-pointer"
+            @click="newSearch = ''; updateSearchValue(newSearch)"
+          />
+        </template>
+      </q-input>
+
+      <q-btn-dropdown
+        no-caps
+        class="q-mr-sm"
+        :label="'Sort by: ' + settings.sortedBy"
+      >
+        <q-list
+          v-for="type in sortTypes"
+          :key="type"
+        >
+          <q-item
+            v-close-popup
+            clickable
+            @click="updateSortedBy(type)"
+          >
+            <q-item-section>
+              <q-item-label>{{ type }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-btn-dropdown>
+
+      <q-btn-dropdown
+        no-caps
+        label="Filters"
+        @input="updateFilters"
+      >
+        <q-option-group
+          v-model="newFilters"
+          class="q-mr-sm"
+          type="checkbox"
+          :options="statusList"
+        />
+      </q-btn-dropdown>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">

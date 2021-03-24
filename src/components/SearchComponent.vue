@@ -1,34 +1,79 @@
 <template>
   <q-card-section>
-    <q-input v-model="search" :placeholder="searchPlaceholder" @keydown.enter="onSearch(siteType)">
-      <template v-if="search" v-slot:append>
-        <q-icon name="cancel" @click.stop="search = ''; updateSearchResults([])" class="cursor-pointer"></q-icon>
+    <q-input
+      v-model="search"
+      :placeholder="searchPlaceholder"
+      @keydown.enter="onSearch(siteType)"
+    >
+      <template
+        v-if="search"
+        v-slot:append
+      >
+        <q-icon
+          name="cancel"
+          class="cursor-pointer"
+          @click.stop="search = ''; updateSearchResults([])"
+        />
       </template>
 
       <template v-slot:after>
-        <q-btn round dense flat icon="send" @click="onSearch(siteType)"></q-btn>
+        <q-btn
+          round
+          dense
+          flat
+          icon="send"
+          @click="onSearch(siteType)"
+        />
       </template>
     </q-input>
 
-    <q-btn no-caps class="q-mt-lg full-width manga-dropdown" v-if="searchResults.length > 0" :label="mangaTitle || 'Selected manga'">
-      <q-menu auto-close :max-width="mobileView ? '60%' : '40%'" max-height="40%" v-model="searchDropdownShown">
+    <q-btn
+      v-if="searchResults.length > 0"
+      no-caps
+      class="q-mt-lg full-width manga-dropdown"
+      :label="mangaTitle || 'Selected manga'"
+    >
+      <q-menu
+        v-model="searchDropdownShown"
+        auto-close
+        :max-width="mobileView ? '60%' : '40%'"
+        max-height="40%"
+      >
         <q-list separator>
-        <q-item v-for="manga in searchResults" :key="manga.url" clickable @click="$emit('change', manga.url); mangaTitle = manga.title">
-          <q-item-section avatar>
-            <q-img contain class="manga-image-search" :src="manga.image"></q-img>
-          </q-item-section>
+          <q-item
+            v-for="manga in searchResults"
+            :key="manga.url"
+            clickable
+            @click="$emit('change', manga.url); mangaTitle = manga.title"
+          >
+            <q-item-section avatar>
+              <q-img
+                contain
+                class="manga-image-search"
+                :src="manga.image"
+              />
+            </q-item-section>
 
-          <q-item-section>
-            <div class="text-subtitle2">{{ manga.title }}</div>
-            <div class="text-body2">{{ manga.chapter }}</div>
-            <div>{{ siteNames[manga.site] }}</div>
-          </q-item-section>
-        </q-item>
+            <q-item-section>
+              <div class="text-subtitle2">
+                {{ manga.title }}
+              </div>
+              <div class="text-body2">
+                {{ manga.chapter }}
+              </div>
+              <div>{{ siteNames[manga.site] }}</div>
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-menu>
     </q-btn>
 
-    <q-input v-if="searchResults.length === 0" v-bind:value="url" v-on:change="$emit('change', $event.target.value)" :placeholder="manualPlaceholder"></q-input>
+    <q-input
+      v-if="searchResults.length === 0"
+      :value="url"
+      :placeholder="manualPlaceholder"
+      @change="$emit('change', $event.target.value)"
+    />
   </q-card-section>
 </template>
 

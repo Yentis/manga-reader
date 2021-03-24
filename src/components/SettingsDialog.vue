@@ -1,9 +1,18 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    @hide="onDialogHide"
+  >
     <q-card>
       <q-toolbar class="bg-primary text-white">
         <q-toolbar-title>Settings</q-toolbar-title>
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+        />
       </q-toolbar>
 
       <q-form @submit="onOKClick">
@@ -22,19 +31,23 @@
           />
         </q-card-actions>
         <q-input
+          v-model="newSettings.refreshOptions.period"
           lazy-rules
           type="number"
           class="q-mx-sm"
           suffix="minutes"
           label="Refresh interval"
-          v-model="newSettings.refreshOptions.period"
           :rules="[
             val => val && val > 0 || 'Must be at least one minute',
             val => val && val <= 1440 || 'Must be at most one day'
           ]"
         />
 
-        <q-card-actions v-if="shareId" class="q-mx-sm" align="center">
+        <q-card-actions
+          v-if="shareId"
+          class="q-mx-sm"
+          align="center"
+        >
           <a
             class="ellipsis"
             :href="`${sitePrefix}${shareId}`"
@@ -42,10 +55,19 @@
           >
             {{ `${sitePrefix}${shareId}` }}
           </a>
-          <q-btn flat dense icon="content_copy"  @click="onCopyToClipboard" />
+          <q-btn
+            flat
+            dense
+            icon="content_copy"
+            @click="onCopyToClipboard"
+          />
         </q-card-actions>
 
-        <q-card-actions v-else class="q-mx-sm" align="center">
+        <q-card-actions
+          v-else
+          class="q-mx-sm"
+          align="center"
+        >
           <q-btn
             no-caps
             label="Share List"
@@ -57,8 +79,15 @@
         <q-card-actions>
           <q-space />
 
-          <q-btn color="secondary" label="Confirm" type="submit"></q-btn>
-          <q-btn label="Cancel" v-close-popup></q-btn>
+          <q-btn
+            color="secondary"
+            label="Confirm"
+            type="submit"
+          />
+          <q-btn
+            v-close-popup
+            label="Cancel"
+          />
         </q-card-actions>
       </q-form>
     </q-card>
@@ -80,13 +109,6 @@ export default (Vue as VueConstructor<Vue &
     { dialog: QDialog },
   }
 >).extend({
-  computed: {
-    ...mapGetters('reader', {
-      settings: 'settings',
-      mangaList: 'mangaList'
-    })
-  },
-
   data () {
     return {
       newSettings: new Settings(),
@@ -94,6 +116,13 @@ export default (Vue as VueConstructor<Vue &
       loading: false,
       sitePrefix: 'https://yentis.github.io/mangalist?id='
     }
+  },
+
+  computed: {
+    ...mapGetters('reader', {
+      settings: 'settings',
+      mangaList: 'mangaList'
+    })
   },
 
   mounted () {

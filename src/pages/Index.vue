@@ -9,7 +9,7 @@
       instant-feedback
       size="xl"
       class="q-mt-sm"
-    ></q-linear-progress>
+    />
 
     <div class="manga-container q-mt-sm full-width">
       <q-intersection

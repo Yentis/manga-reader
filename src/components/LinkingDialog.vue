@@ -1,9 +1,18 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    @hide="onDialogHide"
+  >
     <q-card>
       <q-toolbar class="bg-primary text-white">
         <q-toolbar-title>Link with external sites</q-toolbar-title>
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+        />
       </q-toolbar>
 
       <div class="q-mx-md q-mt-md text-body2">
@@ -48,18 +57,27 @@
       </q-table>
 
       <manga-search
-        class="q-pt-none"
         v-model="url"
-        :searchPlaceholder="searchPlaceholder"
-        :manualPlaceholder="manualPlaceholder"
-        :initialSearch="initialSearch"
-        :siteType="selected.length > 0 ? selected[0].value : linkingSiteType.MangaDex" />
+        class="q-pt-none"
+        :search-placeholder="searchPlaceholder"
+        :manual-placeholder="manualPlaceholder"
+        :initial-search="initialSearch"
+        :site-type="selected.length > 0 ? selected[0].value : linkingSiteType.MangaDex"
+      />
 
       <q-card-actions>
         <q-space />
 
-        <q-btn color="secondary" :disable="selected.length === 0" :label="confirmButton" @click="onOKClick"></q-btn>
-        <q-btn label="Cancel" v-close-popup></q-btn>
+        <q-btn
+          color="secondary"
+          :disable="selected.length === 0"
+          :label="confirmButton"
+          @click="onOKClick"
+        />
+        <q-btn
+          v-close-popup
+          label="Cancel"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -78,15 +96,31 @@ export default (Vue as VueConstructor<Vue &
     { dialog: QDialog },
   }
 >).extend({
+
+  components: {
+    MangaSearch
+  },
   props: {
     linkedSites: {
       type: Object,
       required: true
     },
-    initialSearch: String,
-    searchPlaceholder: String,
-    manualPlaceholder: String,
-    confirmButton: String
+    initialSearch: {
+      type: String,
+      default: ''
+    },
+    searchPlaceholder: {
+      type: String,
+      default: ''
+    },
+    manualPlaceholder: {
+      type: String,
+      default: ''
+    },
+    confirmButton: {
+      type: String,
+      default: ''
+    }
   },
 
   data () {
@@ -121,10 +155,6 @@ export default (Vue as VueConstructor<Vue &
         deleted: false
       }
     })
-  },
-
-  components: {
-    MangaSearch
   },
 
   methods: {

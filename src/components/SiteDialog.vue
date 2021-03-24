@@ -1,48 +1,72 @@
 <template>
   <q-dialog
-      ref="dialog"
-      no-focus
-      no-refocus
-      seamless
-      :hidden="!visible || (mobileView && searchResults.length !== 0)"
-      :position="mobileView ? 'bottom' : 'right'"
-      @hide="onDialogHide">
-      <q-card :class="{ 'mobile-site-dialog': mobileView }">
-        <q-toolbar class="bg-primary text-white text-center q-pl-xs">
-            <q-btn
-              flat
-              round
-              icon="refresh"
-              :loading="refreshing"
-              @click="onRefreshSites"
-            />
-            <q-toolbar-title class="q-pl-xs">Supported sites</q-toolbar-title>
-        </q-toolbar>
-        <q-card-section class="q-pa-none">
-            <q-list separator :class="{ 'text-center': mobileView }">
-              <q-item
-                  clickable
-                  v-for="item in siteList"
-                  :key="item.site.siteType"
-                  :class="{
-                    'bg-negative': !item.site.statusOK() && item.site.state === siteState.OFFLINE,
-                    'bg-warning': !item.site.statusOK() && item.site.state !== siteState.OFFLINE,
-                    'text-black': !item.site.statusOK() && $q.dark.isActive
-                  }"
-                  @click="item.site.loggedIn ? item.site.statusOK() ? onLinkClicked(item.site.getUrl()) : onLinkClicked(item.site.getUrl(), true) : onLinkClicked(item.site.getLoginUrl(), true)">
-                  <q-item-section v-if="!item.refreshing">
-                    <q-item-label :class="{ 'full-width': mobileView }">{{ siteNames[item.site.siteType] }}</q-item-label>
-                    <q-item-label v-if="!item.site.loggedIn" :class="{ 'text-grey-8': $q.dark.isActive }" caption>Click to login</q-item-label>
-                    <q-item-label v-else-if="!item.site.statusOK()" :class="{ 'text-grey-8': $q.dark.isActive }" caption>{{ item.site.state }}</q-item-label>
-                  </q-item-section>
+    ref="dialog"
+    no-focus
+    no-refocus
+    seamless
+    :hidden="!visible || (mobileView && searchResults.length !== 0)"
+    :position="mobileView ? 'bottom' : 'right'"
+    @hide="onDialogHide"
+  >
+    <q-card :class="{ 'mobile-site-dialog': mobileView }">
+      <q-toolbar class="bg-primary text-white text-center q-pl-xs">
+        <q-btn
+          flat
+          round
+          icon="refresh"
+          :loading="refreshing"
+          @click="onRefreshSites"
+        />
+        <q-toolbar-title class="q-pl-xs">
+          Supported sites
+        </q-toolbar-title>
+      </q-toolbar>
+      <q-card-section class="q-pa-none">
+        <q-list
+          separator
+          :class="{ 'text-center': mobileView }"
+        >
+          <q-item
+            v-for="item in siteList"
+            :key="item.site.siteType"
+            clickable
+            :class="{
+              'bg-negative': !item.site.statusOK() && item.site.state === siteState.OFFLINE,
+              'bg-warning': !item.site.statusOK() && item.site.state !== siteState.OFFLINE,
+              'text-black': !item.site.statusOK() && $q.dark.isActive
+            }"
+            @click="item.site.loggedIn ? item.site.statusOK() ? onLinkClicked(item.site.getUrl()) : onLinkClicked(item.site.getUrl(), true) : onLinkClicked(item.site.getLoginUrl(), true)"
+          >
+            <q-item-section v-if="!item.refreshing">
+              <q-item-label :class="{ 'full-width': mobileView }">
+                {{ siteNames[item.site.siteType] }}
+              </q-item-label>
+              <q-item-label
+                v-if="!item.site.loggedIn"
+                :class="{ 'text-grey-8': $q.dark.isActive }"
+                caption
+              >
+                Click to login
+              </q-item-label>
+              <q-item-label
+                v-else-if="!item.site.statusOK()"
+                :class="{ 'text-grey-8': $q.dark.isActive }"
+                caption
+              >
+                {{ item.site.state }}
+              </q-item-label>
+            </q-item-section>
 
-                  <q-inner-loading :showing="item.refreshing">
-                    <q-spinner-dots size="md" color="primary" />
-                  </q-inner-loading>
-              </q-item>
-            </q-list>
-        </q-card-section>
-      </q-card>
+            <q-inner-loading :showing="item.refreshing">
+              <q-spinner-dots
+                size="md"
+                color="primary"
+              />
+            </q-inner-loading>
+          </q-item>
+        </q-list>
+      </q-card-section>
+    </q-card>
   </q-dialog>
 </template>
 
@@ -72,9 +96,18 @@ export default (Vue as VueConstructor<Vue &
   }
 >).extend({
   props: {
-    title: String,
-    content: String,
-    imageUrl: String
+    title: {
+      type: String,
+      default: ''
+    },
+    content: {
+      type: String,
+      default: ''
+    },
+    imageUrl: {
+      type: String,
+      default: ''
+    }
   },
 
   data () {

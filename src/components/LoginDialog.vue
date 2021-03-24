@@ -1,32 +1,48 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    @hide="onDialogHide"
+  >
     <q-card>
       <q-toolbar class="bg-primary text-white">
         <q-toolbar-title>{{ siteName }} Login</q-toolbar-title>
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+        />
       </q-toolbar>
 
       <q-form
         @submit="onOKClick"
       >
         <q-input
-          filled
           v-model="username"
+          filled
           label="Username"
         />
 
         <q-input
+          v-model="password"
           filled
           type="password"
-          v-model="password"
           label="Password"
         />
 
         <q-card-actions>
           <q-space />
 
-          <q-btn label="Submit" type="submit" color="primary"/>
-          <q-btn label="Cancel" v-close-popup></q-btn>
+          <q-btn
+            label="Submit"
+            type="submit"
+            color="primary"
+          />
+          <q-btn
+            v-close-popup
+            label="Cancel"
+          />
         </q-card-actions>
       </q-form>
     </q-card>

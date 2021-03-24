@@ -1,21 +1,45 @@
 <template>
-  <q-dialog ref="dialog" @hide="onDialogHide">
+  <q-dialog
+    ref="dialog"
+    @hide="onDialogHide"
+  >
     <q-card>
       <q-toolbar class="bg-primary text-white">
         <q-toolbar-title>{{ title }}</q-toolbar-title>
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn
+          v-close-popup
+          icon="close"
+          flat
+          round
+          dense
+        />
       </q-toolbar>
 
       <q-card-section>
-        <div class="text-body2 content">{{ content }}</div>
-        <q-img v-if="imageUrl" class="q-mt-sm confirmation-image-size" contain :src="imageUrl"></q-img>
+        <div class="text-body2 content">
+          {{ content }}
+        </div>
+        <q-img
+          v-if="imageUrl"
+          class="q-mt-sm confirmation-image-size"
+          contain
+          :src="imageUrl"
+        />
       </q-card-section>
 
       <q-card-actions>
         <q-space />
 
-        <q-btn color="secondary" label="Confirm" @click="onOKClick"></q-btn>
-        <q-btn v-if="!hideCancel" label="Cancel" v-close-popup></q-btn>
+        <q-btn
+          color="secondary"
+          label="Confirm"
+          @click="onOKClick"
+        />
+        <q-btn
+          v-if="!hideCancel"
+          v-close-popup
+          label="Cancel"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -31,9 +55,18 @@ export default (Vue as VueConstructor<Vue &
   }
 >).extend({
   props: {
-    title: String,
-    content: String,
-    imageUrl: String,
+    title: {
+      type: String,
+      default: ''
+    },
+    content: {
+      type: String,
+      default: ''
+    },
+    imageUrl: {
+      type: String,
+      default: ''
+    },
     hideCancel: Boolean
   },
 

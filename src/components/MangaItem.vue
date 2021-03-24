@@ -1,40 +1,71 @@
 <template>
-  <q-card :class="{
-    'completed-container': manga.status === status.COMPLETED,
-    'on-hold-container': manga.status === status.ON_HOLD,
-    'plan-to-read-container': manga.status === status.PLAN_TO_READ,
-    'dropped-container': manga.status === status.DROPPED,
-    'unread-container': ((manga.status === undefined || status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
-  }">
-    <q-card-section class="manga-item" horizontal>
-      <q-img contain class="manga-image q-ma-sm" :src="image" @error="onImageError($event.target.src)">
+  <q-card
+    :class="{
+      'completed-container': manga.status === status.COMPLETED,
+      'on-hold-container': manga.status === status.ON_HOLD,
+      'plan-to-read-container': manga.status === status.PLAN_TO_READ,
+      'dropped-container': manga.status === status.DROPPED,
+      'unread-container': ((manga.status === undefined || status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
+    }"
+  >
+    <q-card-section
+      class="manga-item"
+      horizontal
+    >
+      <q-img
+        contain
+        class="manga-image q-ma-sm"
+        :src="image"
+        @error="onImageError($event.target.src)"
+      >
         <template v-slot:error>
-          <q-icon class="full-width full-height" size="xl" name="image_not_supported"></q-icon>
+          <q-icon
+            class="full-width full-height"
+            size="xl"
+            name="image_not_supported"
+          />
         </template>
       </q-img>
 
       <q-card-section class="q-pb-none q-pl-sm q-pr-none flex-column-between">
         <div class="q-mb-sm">
           <div :class="{ 'text-subtitle2': mobileView, 'text-h6': !mobileView }">
-            <a :href="manga.url" @click.prevent="onLinkClick(manga.url)">{{ manga.title }}</a>
+            <a
+              :href="manga.url"
+              @click.prevent="onLinkClick(manga.url)"
+            >{{ manga.title }}</a>
           </div>
 
           <div v-if="!editing">
             <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
-              Read:&nbsp;&nbsp;&nbsp;&nbsp; <a v-if="manga.readUrl" :href="manga.readUrl" @click.prevent="onLinkClick(manga.readUrl || '#')">{{ manga.read }}</a>
+              Read:&nbsp;&nbsp;&nbsp;&nbsp; <a
+                v-if="manga.readUrl"
+                :href="manga.readUrl"
+                @click.prevent="onLinkClick(manga.readUrl || '#')"
+              >{{ manga.read }}</a>
               <span v-else>{{ manga.read }}</span>
             </div>
 
             <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
-              Current: <a v-if="manga.chapterUrl" :href="manga.chapterUrl" @click.prevent="onLinkClick(manga.chapterUrl)">{{ manga.chapter }}</a>
+              Current: <a
+                v-if="manga.chapterUrl"
+                :href="manga.chapterUrl"
+                @click.prevent="onLinkClick(manga.chapterUrl)"
+              >{{ manga.chapter }}</a>
               <span v-else>{{ manga.chapter }}</span>
             </div>
 
-            <div v-if="manga.notes" :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
+            <div
+              v-if="manga.notes"
+              :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }"
+            >
               Notes:&nbsp;&nbsp; <span>{{ manga.notes }}</span>
             </div>
 
-            <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }" v-if="manga.chapterDate">
+            <div
+              v-if="manga.chapterDate"
+              :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }"
+            >
               {{ manga.chapterDate }}
             </div>
 
@@ -49,10 +80,26 @@
             />
           </div>
 
-          <q-card-actions class="q-pa-none" align="left" vertical v-else>
-            <q-input v-model="newReadNum" label="Read:" stack-label dense class="q-mb-sm" />
+          <q-card-actions
+            v-else
+            class="q-pa-none"
+            align="left"
+            vertical
+          >
+            <q-input
+              v-model="newReadNum"
+              label="Read:"
+              stack-label
+              dense
+              class="q-mb-sm"
+            />
 
-            <q-input stack-label v-model="newNotes" label="Notes:" class="q-mb-sm" />
+            <q-input
+              v-model="newNotes"
+              stack-label
+              label="Notes:"
+              class="q-mb-sm"
+            />
 
             <q-btn-dropdown
               no-caps
@@ -65,8 +112,8 @@
                 :key="status"
               >
                 <q-item
-                  clickable
                   v-close-popup
+                  clickable
                   @click="newStatus = status"
                 >
                   <q-icon
@@ -84,11 +131,14 @@
               :label="'Rating: ' + newRating"
               :size="itemSize"
             >
-              <q-list v-for="index in 10" :key="index">
+              <q-list
+                v-for="index in 10"
+                :key="index"
+              >
                 <q-item
+                  v-close-popup
                   dense
                   clickable
-                  v-close-popup
                   @click="newRating = index"
                 >
                   <q-item-section>
@@ -99,8 +149,8 @@
             </q-btn-dropdown>
 
             <q-btn
-              no-caps
               v-if="editing"
+              no-caps
               label="Progress Linking"
               :size="itemSize"
               @click="onLinkingClicked()"
@@ -108,7 +158,10 @@
           </q-card-actions>
         </div>
 
-        <div v-if="!editing" :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }">
+        <div
+          v-if="!editing"
+          :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }"
+        >
           <q-icon
             class="q-mr-xs q-mb-xs"
             :name="statusIcon[manga.status]"
@@ -121,9 +174,9 @@
             :color="hasLinkedSites ? 'positive' : 'negative'"
           />
           <span
-            class="q-ml-xs"
             v-for="(id, site) in linkedSites"
             :key="site"
+            class="q-ml-xs"
           >
             <q-img
               class="q-ma-none q-pa-none"
@@ -132,7 +185,10 @@
               :src="'https://' + site + '/favicon.ico'"
             >
               <template v-slot:error>
-                <q-icon class="absolute-full full-height full-width" name="image_not_supported"></q-icon>
+                <q-icon
+                  class="absolute-full full-height full-width"
+                  name="image_not_supported"
+                />
               </template>
             </q-img>
           </span>
@@ -141,25 +197,31 @@
 
       <q-space />
 
-      <q-card-actions class="q-pl-none" vertical>
+      <q-card-actions
+        class="q-pl-none"
+        vertical
+      >
         <q-btn
           flat
           icon="close"
           :size="itemSize"
-          @click="editing ? onToggleEditing() : onDeleteClick()" />
+          @click="editing ? onToggleEditing() : onDeleteClick()"
+        />
 
         <q-btn
+          v-if="!editing"
           flat
           icon="edit"
-          v-if="!editing"
           :size="itemSize"
-          @click="onToggleEditing()" />
+          @click="onToggleEditing()"
+        />
         <q-btn
+          v-else
           flat
           icon="save"
-          v-else
           :size="itemSize"
-          @click="onSaveEdit()" />
+          @click="onSaveEdit()"
+        />
 
         <q-space />
 
@@ -168,7 +230,8 @@
           color="secondary"
           icon="done"
           :size="itemSize"
-          @click="onReadClick()" />
+          @click="onReadClick()"
+        />
       </q-card-actions>
     </q-card-section>
   </q-card>
