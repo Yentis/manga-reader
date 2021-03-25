@@ -19,6 +19,7 @@ export class Manga {
     status: Status
     notes: string | undefined
     rating: number | undefined
+    shouldUpdate: boolean | undefined
 
     constructor (url: string, site: SiteType | LinkingSiteType) {
       this.url = url

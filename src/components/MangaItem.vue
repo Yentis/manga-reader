@@ -5,7 +5,7 @@
       'on-hold-container': manga.status === status.ON_HOLD,
       'plan-to-read-container': manga.status === status.PLAN_TO_READ,
       'dropped-container': manga.status === status.DROPPED,
-      'unread-container': ((manga.status === undefined || status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
+      'unread-container': ((manga.status === status.READING) && manga.chapter !== manga.read && (manga.readNum === undefined || manga.chapterNum !== manga.readNum))
     }"
   >
     <q-card-section
@@ -99,6 +99,12 @@
               stack-label
               label="Notes:"
               class="q-mb-sm"
+            />
+
+            <q-checkbox
+              v-if="manga.status !== status.READING"
+              v-model="newShouldUpdate"
+              label="Check on refresh"
             />
 
             <q-btn-dropdown
@@ -308,6 +314,7 @@ export default defineComponent({
       newReadNum: -1 as number | undefined,
       newStatus: Status.READING as Status,
       newNotes: '' as string,
+      newShouldUpdate: false,
       newRating: 0 as number,
       newLinkedSites: undefined as Record<string, number> | undefined,
       newSources: undefined as Record<string, string> | undefined,
@@ -428,11 +435,18 @@ export default defineComponent({
       const readNumChanged = this.trySaveNewReadNum()
       const statusChanged = this.trySaveNewStatus()
       const notesChanged = this.trySaveNewNotes()
+      const shouldUpdateChanged = this.trySaveNewShouldUpdate()
       const ratingChanged = this.trySaveNewRating()
       const linkedSitesChanged = this.trySaveNewLinkedSites()
       const sourcesChanged = this.trySaveNewSources()
 
-      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged && !ratingChanged && !sourcesChanged) return
+      if (!readNumChanged &&
+          !statusChanged &&
+          !linkedSitesChanged &&
+          !notesChanged &&
+          !ratingChanged &&
+          !sourcesChanged &&
+          !shouldUpdateChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -480,6 +494,14 @@ export default defineComponent({
       if (this.newNotes === currentNotes) return false
 
       this.manga.notes = this.newNotes
+      return true
+    },
+
+    trySaveNewShouldUpdate (): boolean {
+      const currentShouldUpdate = this.manga.shouldUpdate || false
+      if (this.newShouldUpdate === currentShouldUpdate) return false
+
+      this.manga.shouldUpdate = this.newShouldUpdate
       return true
     },
 
