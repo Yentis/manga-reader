@@ -19,6 +19,7 @@ Features:
 - Export to / import from Dropbox
 - Dark mode, read in browser
 - Automatically check for new chapters every x minutes, this will send a notification to your device (off by default)
+- Fallback to alternate sources
 
 # Download
 https://github.com/Yentis/manga-reader/releases
