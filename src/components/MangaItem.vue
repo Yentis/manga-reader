@@ -155,6 +155,14 @@
               :size="itemSize"
               @click="onLinkingClicked()"
             />
+
+            <q-btn
+              v-if="editing"
+              no-caps
+              label="Alternate Sources"
+              :size="itemSize"
+              @click="onAltSourceClicked()"
+            />
           </q-card-actions>
         </div>
 
@@ -248,6 +256,7 @@ import { SiteName, SiteType } from 'src/enums/siteEnum'
 import { getSite } from 'src/services/siteService'
 import LinkingDialog from './LinkingDialog.vue'
 import ConfirmationDialog from './ConfirmationDialog.vue'
+import AltSourceDialog from './AltSourceDialog.vue'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { Status, StatusIcon } from 'src/enums/statusEnum'
 import { BaseSite } from 'src/classes/sites/baseSite'
@@ -298,9 +307,10 @@ export default defineComponent({
       editing: false,
       newReadNum: -1 as number | undefined,
       newStatus: Status.READING as Status,
-      newLinkedSites: undefined as Record<string, number> | undefined,
       newNotes: '' as string,
       newRating: 0 as number,
+      newLinkedSites: undefined as Record<string, number> | undefined,
+      newSources: undefined as Record<string, string> | undefined,
       image: ''
     }
   },
@@ -365,6 +375,23 @@ export default defineComponent({
       })
     },
 
+    onAltSourceClicked () {
+      this.$q.dialog({
+        component: AltSourceDialog,
+        parent: this,
+        sources: this.newSources || this.manga.altSources || {},
+        initialSearch: this.manga.title,
+        searchPlaceholder: 'Search for a manga',
+        manualPlaceholder: 'Or enter the url manually',
+        confirmButton: 'Confirm'
+      }).onOk((data: {
+        url: string,
+        sources: Record<string, string>
+      }) => {
+        this.newSources = data.sources
+      })
+    },
+
     onDeleteClick () {
       this.$q.dialog({
         component: ConfirmationDialog,
@@ -391,20 +418,21 @@ export default defineComponent({
       this.editing = !this.editing
       this.newReadNum = this.manga.readNum
       this.newStatus = this.manga.status
-      this.newLinkedSites = undefined
       this.newNotes = this.manga.notes || ''
       this.newRating = this.manga.rating || 0
+      this.newLinkedSites = undefined
     },
 
     onSaveEdit () {
       this.editing = !this.editing
       const readNumChanged = this.trySaveNewReadNum()
       const statusChanged = this.trySaveNewStatus()
-      const linkedSitesChanged = this.trySaveNewLinkedSites()
       const notesChanged = this.trySaveNewNotes()
       const ratingChanged = this.trySaveNewRating()
+      const linkedSitesChanged = this.trySaveNewLinkedSites()
+      const sourcesChanged = this.trySaveNewSources()
 
-      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged && !ratingChanged) return
+      if (!readNumChanged && !statusChanged && !linkedSitesChanged && !notesChanged && !ratingChanged && !sourcesChanged) return
 
       this.updateManga(this.manga)
       LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
@@ -447,13 +475,6 @@ export default defineComponent({
       return true
     },
 
-    trySaveNewLinkedSites (): boolean {
-      if (this.newLinkedSites === undefined) return false
-
-      this.manga.linkedSites = this.newLinkedSites
-      return true
-    },
-
     trySaveNewNotes (): boolean {
       const currentNotes = this.manga.notes || ''
       if (this.newNotes === currentNotes) return false
@@ -467,6 +488,20 @@ export default defineComponent({
       if (this.newRating === currentRating) return false
 
       this.manga.rating = this.newRating
+      return true
+    },
+
+    trySaveNewLinkedSites (): boolean {
+      if (this.newLinkedSites === undefined) return false
+
+      this.manga.linkedSites = this.newLinkedSites
+      return true
+    },
+
+    trySaveNewSources (): boolean {
+      if (this.newSources === undefined) return false
+
+      this.manga.altSources = this.newSources
       return true
     },
 

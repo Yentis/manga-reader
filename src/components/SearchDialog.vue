@@ -22,6 +22,7 @@
         :manual-placeholder="manualPlaceholder"
         :initial-search="initialSearch"
         :site-type="siteType"
+        :excluded-urls="excludedUrls"
       />
 
       <q-card-actions>
@@ -79,11 +80,15 @@ export default (Vue as VueConstructor<Vue &
     },
     siteType: {
       type: String,
-      default: ''
+      default: undefined
     },
     confirmButton: {
       type: String,
       default: ''
+    },
+    excludedUrls: {
+      type: Array,
+      default: () => [] as string[]
     }
   },
 

@@ -92,11 +92,25 @@ export function checkSites (): void {
   })
 }
 
-export function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType): Promise <Error | Manga> {
-  const site = siteMap.get(siteType)
-  if (!site) return Promise.resolve(Error('Invalid site type'))
+export async function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType, altSources: Record<string, string> = {}): Promise <Error | Manga> {
+  let error: Error | undefined
 
-  return requestQueue.add(() => site.readUrl(url))
+  const site = siteMap.get(siteType)
+  if (site) {
+    const result = await requestQueue.add(() => site.readUrl(url))
+    if (result instanceof Manga) return result
+    error = result
+  }
+
+  for (const urlSource of Object.keys(altSources)) {
+    const site = siteMap.get(urlSource)
+    if (!site) continue
+
+    const result = await requestQueue.add(() => site.readUrl(altSources[urlSource]))
+    if (!(result instanceof Error)) return result
+  }
+
+  return error || Error('Invalid site type')
 }
 
 export function searchManga (query: string, siteType: SiteType | LinkingSiteType | undefined = undefined): Promise <Manga[]> {

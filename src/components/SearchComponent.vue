@@ -110,7 +110,11 @@ export default defineComponent({
     searchPlaceholder: String,
     manualPlaceholder: String,
     initialSearch: String,
-    siteType: String
+    siteType: String,
+    excludedUrls: {
+      type: Array,
+      default: () => [] as string[]
+    }
   },
 
   data () {
@@ -164,7 +168,9 @@ export default defineComponent({
           const processedResults: string[] = []
 
           const searchResults = result.filter(resultManga => {
-            const alreadyAdded = !(this.mangaList as Manga[]).find(manga => resultManga.url === manga.url) && !processedResults.includes(resultManga.url)
+            const alreadyAdded = !(this.mangaList as Manga[]).find(manga => resultManga.url === manga.url) &&
+                                 !processedResults.includes(resultManga.url) &&
+                                 !this.excludedUrls.includes(resultManga.url)
             processedResults.push(resultManga.url)
 
             return alreadyAdded

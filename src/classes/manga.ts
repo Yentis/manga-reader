@@ -4,6 +4,7 @@ import { SiteType } from '../enums/siteEnum'
 
 export class Manga {
     url: string
+    altSources: Record<string, string> | undefined
     site: SiteType | LinkingSiteType
     chapter = 'Unknown'
     chapterNum = 0
