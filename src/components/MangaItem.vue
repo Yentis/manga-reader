@@ -183,6 +183,12 @@
           />
           <span>{{ siteNames[manga.site] }}</span>
           <q-icon
+            v-if="manga.shouldUpdate"
+            class="q-ml-xs"
+            name="refresh"
+            color="positive"
+          />
+          <q-icon
             class="q-ml-xs"
             :name="hasLinkedSites ? 'link' : 'link_off'"
             :color="hasLinkedSites ? 'positive' : 'negative'"
@@ -426,6 +432,7 @@ export default defineComponent({
       this.newReadNum = this.manga.readNum
       this.newStatus = this.manga.status
       this.newNotes = this.manga.notes || ''
+      this.newShouldUpdate = this.manga.shouldUpdate || false
       this.newRating = this.manga.rating || 0
       this.newLinkedSites = undefined
     },
