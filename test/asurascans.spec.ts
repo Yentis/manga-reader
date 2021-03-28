@@ -14,9 +14,9 @@ describe(SiteName[siteType], function () {
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
     desired.chapter = 'Chapter 19'
-    desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg'
+    desired.image = 'https://www.asurascans.com/wp-content/uploads/2020/09/49754.jpg'
     desired.title = 'Tougen Anki'
-    desired.chapterUrl = 'https://asurascans.com/tougen-anki-chapter-19/'
+    desired.chapterUrl = 'https://www.asurascans.com/tougen-anki-chapter-19/'
     desired.chapterNum = 19
 
     return readUrl(worker, desired, testUrl)
@@ -24,9 +24,9 @@ describe(SiteName[siteType], function () {
 
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.image = 'https://i0.wp.com/asurascans.com/wp-content/uploads/2020/09/49754.jpg?h=80'
+    desired.image = 'https://www.asurascans.com/wp-content/uploads/2020/09/49754-194x300.jpg'
     desired.chapter = '19'
-    desired.url = 'https://asurascans.com/comics/tougen-anki/'
+    desired.url = 'https://www.asurascans.com/comics/tougen-anki/'
 
     return search(worker, query, desired)
   })

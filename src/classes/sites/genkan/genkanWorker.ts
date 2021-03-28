@@ -22,6 +22,8 @@ export class GenkanWorker extends BaseWorker {
         return `${GenkanWorker.getUrl(siteType)}/comics/136750-all-heavenly-days`
       case SiteType.LynxScans:
         return `${GenkanWorker.getUrl(siteType)}/comics/698439-dawn-of-the-eastland`
+      case SiteType.EdelgardeScans:
+        return `${GenkanWorker.getUrl(siteType)}/comics/713627-i-stack-experience-through-writing-books`
     }
 
     return GenkanWorker.getUrl(siteType)
