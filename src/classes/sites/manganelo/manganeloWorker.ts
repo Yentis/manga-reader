@@ -48,7 +48,7 @@ export class ManganeloWorker extends BaseWorker {
     this.image = $('.info-image img').first()
     this.title = $('.story-info-right h1').first()
     this.chapterDate = $('.chapter-time').first()
-    this.currentTime = $('.pn-contacts p').first()
+    this.currentTime = $('.pn-contacts p').last()
 
     return this.buildManga(url)
   }

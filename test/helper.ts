@@ -25,8 +25,8 @@ export function search (worker: BaseWorker, query: string, desired: Manga) {
               manga.url === desired.url
       })
 
-      if (matchingManga.length === 0) reject(Error('No matching result'))
-      else if (matchingManga.length > 1) reject(Error('Too many results'))
+      if (matchingManga.length === 0) reject(Error(`No matching results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(result)}`))
+      else if (matchingManga.length > 1) reject(Error(`Too many results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(result)}`))
       else resolve()
     }).catch(error => reject(error))
   })

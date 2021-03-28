@@ -1,35 +1,32 @@
 import 'ts-jest'
-import { jest } from '@jest/globals'
 import { Manga } from '../src/classes/manga'
 import { SiteName, SiteType } from '../src/enums/siteEnum'
 import { readUrl, search } from './helper'
 import { WordPressWorker } from '../src/classes/sites/wordpress/wordpressWorker'
 
-jest.setTimeout(20000)
-
-const siteType = SiteType.SleepingKnightScans
+const siteType = SiteType.ArangScans
 const worker = new WordPressWorker(siteType)
 
 describe(SiteName[siteType], function () {
   const testUrl = WordPressWorker.getTestUrl(siteType)
-  const query = 'volcanic age'
+  const query = 'leveling up, by only eating!'
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = '139'
-    desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-chronicles-193x278.png'
-    desired.title = 'Chronicles of Heavenly Demon'
-    desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-heavenly-demon/139/'
-    desired.chapterNum = 139
+    desired.chapter = 'Chapter 31'
+    desired.image = 'https://arangscans.com/wp-content/uploads/2021/01/48217-193x278.jpg'
+    desired.title = 'Leveling Up, by Only Eating!'
+    desired.chapterUrl = 'https://arangscans.com/manga/leveling-up-by-only-eating/chapter-31/'
+    desired.chapterNum = 31
 
     return readUrl(worker, desired, testUrl)
   })
 
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-_VA-193x278.jpg'
-    desired.chapter = '167'
-    desired.url = 'https://skscans.com/manga/volcanic-age/'
+    desired.image = 'https://arangscans.com/wp-content/uploads/2021/01/48217-193x278.jpg'
+    desired.chapter = 'Chapter 31'
+    desired.url = 'https://arangscans.com/manga/leveling-up-by-only-eating/'
 
     return search(worker, query, desired)
   })

@@ -102,7 +102,7 @@ export default (Vue as VueConstructor<Vue &
 }
 
 .content {
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
 
 </style>

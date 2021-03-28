@@ -7,7 +7,7 @@ import { SiteType } from '../../../enums/siteEnum'
 
 export class AsuraScansWorker extends BaseWorker {
   static siteType = SiteType.AsuraScans
-  static url = BaseWorker.getUrl(AsuraScansWorker.siteType)
+  static url = `${BaseWorker.urlPrefix}https://www.${AsuraScansWorker.siteType}`
 
   static testUrl = `${AsuraScansWorker.url}/manga/tougen-anki/`
 
