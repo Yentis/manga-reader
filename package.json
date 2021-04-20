@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -15,6 +15,7 @@
     "serve:test:coverage": "quasar serve test/jest/coverage/lcov-report/ --port 8788",
     "concurrently:dev:jest": "concurrently \"quasar dev\" \"jest --watch\"",
     "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m android",
+    "sign:android": "jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore ./dist/cordova/android/apk/release/app-release-unsigned.apk manga_reader",
     "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron"
   },
   "dependencies": {

@@ -29,7 +29,7 @@ export class MangakakalotWorker extends BaseWorker {
   }
 
   getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM-DD-YY')
+    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM-DD-YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {

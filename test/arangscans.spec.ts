@@ -13,11 +13,11 @@ describe(SiteName[siteType], function () {
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = 'Chapter 31'
+    desired.chapter = 'Chapter 32'
     desired.image = 'https://arangscans.com/wp-content/uploads/2021/01/48217-193x278.jpg'
     desired.title = 'Leveling Up, by Only Eating!'
-    desired.chapterUrl = 'https://arangscans.com/manga/leveling-up-by-only-eating/chapter-31/'
-    desired.chapterNum = 31
+    desired.chapterUrl = 'https://arangscans.com/manga/leveling-up-by-only-eating/chapter-32/'
+    desired.chapterNum = 32
 
     return readUrl(worker, desired, testUrl)
   })
@@ -25,7 +25,7 @@ describe(SiteName[siteType], function () {
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
     desired.image = 'https://arangscans.com/wp-content/uploads/2021/01/48217-193x278.jpg'
-    desired.chapter = 'Chapter 31'
+    desired.chapter = 'Chapter 32'
     desired.url = 'https://arangscans.com/manga/leveling-up-by-only-eating/'
 
     return search(worker, query, desired)

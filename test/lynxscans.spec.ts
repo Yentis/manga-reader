@@ -13,11 +13,11 @@ describe(SiteName[siteType], function () {
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = 'Volume 2 Chapter 1'
+    desired.chapter = 'Volume 2 Chapter 2'
     desired.image = 'https://lynxscans.com/storage/comics/8D05F5079B603C1A9CC73689B5EC57670EA64A56782F1850/haF3HtsXzE4ZebquDIeTvGvLZ82sUKOBmKMLWVUf.png'
     desired.title = 'Dawn of the Eastland'
-    desired.chapterUrl = 'https://lynxscans.com/comics/698439-dawn-of-the-eastland/2/1'
-    desired.chapterNum = 66
+    desired.chapterUrl = 'https://lynxscans.com/comics/698439-dawn-of-the-eastland/2/2'
+    desired.chapterNum = 67
 
     return readUrl(worker, desired, testUrl)
   })

@@ -16,7 +16,7 @@ describe(SiteName[siteType], function () {
     desired.chapter = '30'
     desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT-193x278.png'
     desired.title = 'The Throne'
-    desired.chapterUrl = 'https://leviatanscans.com/manga/the-throne/30/'
+    desired.chapterUrl = 'https://leviatanscans.com/lcomic/manga/the-throne/30/'
     desired.chapterNum = 30
 
     return readUrl(worker, desired, testUrl)
@@ -25,8 +25,8 @@ describe(SiteName[siteType], function () {
   it('Search', () => {
     const desired = new Manga(testUrl, siteType)
     desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_MGA-193x278.png'
-    desired.chapter = '92'
-    desired.url = 'https://leviatanscans.com/manga/martial-god-asura/'
+    desired.chapter = '97'
+    desired.url = 'https://leviatanscans.com/lcomic/manga/martial-god-asura/'
 
     return search(worker, query, desired)
   })

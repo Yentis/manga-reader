@@ -16,11 +16,11 @@ describe(SiteName[siteType], function () {
 
   it('Read URL', () => {
     const desired = new Manga(testUrl, siteType)
-    desired.chapter = '139'
+    desired.chapter = '142'
     desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-chronicles-193x278.png'
     desired.title = 'Chronicles of Heavenly Demon'
-    desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-heavenly-demon/139/'
-    desired.chapterNum = 139
+    desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-heavenly-demon/142/'
+    desired.chapterNum = 142
 
     return readUrl(worker, desired, testUrl)
   })
