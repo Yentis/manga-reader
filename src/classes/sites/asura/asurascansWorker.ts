@@ -32,6 +32,10 @@ export class AsuraScansWorker extends BaseWorker {
     }
   }
 
+  getImage (): string {
+    return this.image?.attr('content') || ''
+  }
+
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
@@ -39,7 +43,7 @@ export class AsuraScansWorker extends BaseWorker {
     this.chapter = $('.chapternum').first()
     this.chapterDate = $('.chapterdate').first()
     this.chapterNum = $('#chapterlist li').first()
-    this.image = $('.wp-post-image').first()
+    this.image = $('meta[property="og:image"]').first()
     this.title = $('.entry-title').first()
 
     return this.buildManga(url)

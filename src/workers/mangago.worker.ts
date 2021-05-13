@@ -5,7 +5,7 @@ import { MangagoWorker } from 'src/classes/sites/mangago/mangagoWorker'
 
 addEventListener('message', event => {
   const request = event.data as WorkerRequest
-  const mangagoWorker = new MangagoWorker(request.requestConfig)
+  const mangagoWorker = new MangagoWorker(request.platform, request.requestConfig)
 
   doOperation(request, mangagoWorker)
 })

@@ -41,16 +41,16 @@ export abstract class BaseWorker {
     return this.parseNum(this.chapterNum?.text().trim())
   }
 
+  getChapterDate (): string {
+    return this.getDateFromNow(this.chapterDate?.text())
+  }
+
   getImage (): string {
     return this.image?.attr('src') || ''
   }
 
   getTitle (): string {
     return this.title?.text().trim() || ''
-  }
-
-  getChapterDate (): string {
-    return this.getDateFromNow(this.chapterDate?.text())
   }
 
   getDateFromNow (input: string | undefined): string {

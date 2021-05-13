@@ -4,19 +4,23 @@ import axios, { AxiosRequestConfig } from 'axios'
 import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import qs from 'qs'
+import { LooseDictionary } from 'quasar'
 import { SiteType } from '../../../enums/siteEnum'
 
 export class MangagoWorker extends BaseWorker {
   static siteType = SiteType.Mangago
-  static url = `${BaseWorker.urlPrefix}http://www.${MangagoWorker.siteType}`
+  static url = `${BaseWorker.urlPrefix}https://www.${MangagoWorker.siteType}`
   static testUrl = `${MangagoWorker.url}/read-manga/curtain/`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
+  platform: LooseDictionary | undefined
+
+  constructor (platform: LooseDictionary | undefined = undefined, requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(MangagoWorker.siteType, requestConfig)
+    this.platform = platform
   }
 
   getChapter (): string {
-    return this.chapter?.children('b').text().trim() || 'Unknown'
+    return this.chapter?.text().trim() || 'Unknown'
   }
 
   getChapterNum (): number {
@@ -35,13 +39,26 @@ export class MangagoWorker extends BaseWorker {
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url, this.requestConfig)
     const $ = cheerio.load(response.data)
-    const listingElem = $('.listing a')
+    const mobile = this.platform?.mobile === true
 
-    this.chapter = listingElem.first()
-    this.chapterNum = listingElem.first().children('b')
-    this.chapterDate = $('.listing .no').first()
-    this.image = $('.cover img').first()
-    this.title = listingElem.first().contents().first()
+    if (!mobile) {
+      const listingElem = $('.listing a')
+
+      this.chapter = listingElem.first()
+      this.chapterNum = this.chapter
+      this.chapterDate = $('.listing .no').first()
+      this.image = $('.cover img').first()
+      this.title = $('.w-title h1').first()
+
+      return this.buildManga(url)
+    }
+
+    const columnElem = $('.uk-table tr').first()
+    this.chapter = columnElem.find('.chico').first()
+    this.chapterNum = this.chapter
+    this.chapterDate = columnElem.children().last()
+    this.image = $('.uk-container img').first()
+    this.title = $('.uk-h1').first()
 
     return this.buildManga(url)
   }
