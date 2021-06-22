@@ -69,7 +69,7 @@
         <q-space />
 
         <q-btn
-          color="secondary"
+          color="primary"
           :disable="selected.length === 0"
           :label="confirmButton"
           @click="onOKClick"

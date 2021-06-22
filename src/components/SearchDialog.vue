@@ -29,7 +29,7 @@
         <q-space />
 
         <q-btn
-          color="secondary"
+          color="primary"
           :label="confirmButton"
           @click="onOKClick"
         />

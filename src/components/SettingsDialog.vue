@@ -80,7 +80,7 @@
           <q-space />
 
           <q-btn
-            color="secondary"
+            color="primary"
             label="Confirm"
             type="submit"
           />

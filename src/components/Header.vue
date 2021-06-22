@@ -17,13 +17,13 @@
         />
         <q-btn
           v-if="mobileView"
-          color="secondary"
+          color="primary"
           label="Refresh"
           @click="onRefreshAllManga"
         />
         <q-btn
           v-else
-          color="secondary"
+          color="primary"
           label="Refresh Manga"
           @click="onRefreshAllManga"
         />
@@ -31,7 +31,7 @@
       <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
         <q-btn
           v-if="mobileView"
-          color="info"
+          color="primary"
           icon="backup"
           :loading="exporting"
           :disable="importing"
@@ -40,7 +40,7 @@
         <q-btn
           v-else
           class="q-mr-sm"
-          color="info"
+          color="primary"
           label="Export to Dropbox"
           :loading="exporting"
           :disable="importing"
@@ -48,7 +48,7 @@
         />
         <q-btn
           v-if="mobileView"
-          color="accent"
+          color="primary"
           icon="cloud_download"
           :loading="importing"
           :disable="exporting"
@@ -56,7 +56,7 @@
         />
         <q-btn
           v-else
-          color="accent"
+          color="primary"
           label="Import from Dropbox"
           :loading="importing"
           :disable="exporting"
