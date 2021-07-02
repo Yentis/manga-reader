@@ -74,7 +74,6 @@ import { testWebtoons } from 'src/services/test/webtoons'
 import { testZeroScans } from 'src/services/test/zeroscans'
 import { testFlameScans } from 'src/services/test/flamescans'
 import { useQuasar } from 'quasar'
-import { useStore } from 'src/store'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 
 export default defineComponent({
@@ -82,7 +81,6 @@ export default defineComponent({
 
   setup () {
     const $q = useQuasar()
-    const $store = useStore()
     const testing = ref(false)
     const message = ref('')
 
@@ -94,7 +92,7 @@ export default defineComponent({
       testing.value = true
       message.value = ''
 
-      testAll($q, $store).then((errors) => {
+      testAll($q).then((errors) => {
         if (errors.length === 0) {
           message.value = 'All tests passed!'
           return

@@ -2,7 +2,6 @@ import { QVueGlobals } from 'quasar'
 import { Manga } from 'src/classes/manga'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { SiteType } from 'src/enums/siteEnum'
-import { Store } from 'vuex'
 import { getMangaInfoByUrl } from './siteService'
 import { testArangScans } from './test/arangscans'
 import { testAsuraScans } from './test/asurascans'
@@ -29,8 +28,7 @@ import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 
 export default async function testAll (
-  $q: QVueGlobals,
-  store: Store<unknown>
+  $q: QVueGlobals
 ): Promise<{ site: SiteType | LinkingSiteType, error: unknown }[]> {
   const promises: Promise<void>[] = []
   const errors: { site: SiteType | LinkingSiteType, error: unknown }[] = []
