@@ -1,27 +1,27 @@
 import { LocalStorage } from 'quasar'
-import constants from 'src/boot/constants'
+import { Ref } from 'vue'
 import { Gitlab } from '@gitbeaker/browser'
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import { ComponentRenderProxy } from '@vue/composition-api'
-import { UrlNavigation } from 'src/classes/urlNavigation'
+import { UrlNavigation } from '../classes/urlNavigation'
+import constants from 'src/classes/constants'
 
 const CLIENT_ID = '1ac7147c66b40b6aaae3f3fd0cac5169d26fd4b406e6198f4b3fd1fd29d9816a'
 
-let accessToken: string = LocalStorage.getItem(constants().GITLAB_TOKEN) || ''
+let accessToken: string = LocalStorage.getItem(constants.GITLAB_TOKEN) || ''
 
 export function getAccessToken (): string {
   return accessToken
 }
 
 export function getShareId (): string {
-  return LocalStorage.getItem(constants().SHARE_ID) || ''
+  return LocalStorage.getItem(constants.SHARE_ID) || ''
 }
 
 export function setAccessToken (token: string | undefined) {
   if (!token) return
 
   accessToken = token
-  LocalStorage.set(constants().GITLAB_TOKEN, token)
+  LocalStorage.set(constants.GITLAB_TOKEN, token)
 }
 
 export function getAuthUrl () {
@@ -30,7 +30,7 @@ export function getAuthUrl () {
 
 export function setShareId (id: string | undefined) {
   if (id === undefined) return
-  LocalStorage.set(constants().SHARE_ID, id)
+  LocalStorage.set(constants.SHARE_ID, id)
 }
 
 export async function createList (list: string): Promise<string> {
@@ -71,7 +71,7 @@ export async function updateList (list: string): Promise<void> {
   })
 }
 
-export function getNotifyOptions (componentRenderProxy: ComponentRenderProxy, error: unknown) {
+export function getNotifyOptions (error: unknown, urlNavigation: Ref<UrlNavigation | undefined>) {
   let description = JSON.stringify(error)
 
   if (error instanceof Error) {
@@ -86,7 +86,7 @@ export function getNotifyOptions (componentRenderProxy: ComponentRenderProxy, er
     {
       label: 'Visit',
       handler: () => {
-        componentRenderProxy.$store.commit('reader/pushUrlNavigation', new UrlNavigation('https://gitlab.com/dashboard', false))
+        urlNavigation.value = new UrlNavigation('https://gitlab.com/dashboard', false)
       },
       color: 'white'
     }

@@ -7,7 +7,7 @@ export class Settings {
   darkMode: boolean
   refreshOptions: RefreshOptions
   sortedBy: SortType
-  filters: Array<Status>
+  filters: Status[]
 
   constructor (
     openInBrowser = false,

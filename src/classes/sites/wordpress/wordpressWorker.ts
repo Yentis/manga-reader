@@ -3,7 +3,7 @@ import { BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import { Manga } from '../../manga'
 import axios, { AxiosRequestConfig } from 'axios'
-import cheerio from 'cheerio'
+import cheerio, { Cheerio, CheerioAPI, Element } from 'cheerio'
 import qs from 'qs'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 
@@ -28,21 +28,19 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manga/the-throne/`
       case SiteType.SleepingKnightScans:
         return `${WordPressWorker.getUrl(siteType)}/manga/chronicles-of-heavenly-demon/`
-      case SiteType.ArangScans:
-        return `${WordPressWorker.getUrl(siteType)}/manga/leveling-up-by-only-eating/`
     }
 
     return WordPressWorker.getUrl(siteType)
   }
 
-  volume: cheerio.Cheerio | undefined
+  volume?: Cheerio<Element>
 
   getChapter (): string {
     const volume = this.volume?.text().trim() || 'Vol.01'
     const chapter = this.chapter?.text().trim()
 
     if (!volume.endsWith('.01') && !volume.endsWith(' 1') && chapter) {
-      return `${volume} ${chapter}`
+      return `${volume} | ${chapter}`
     } else if (chapter) {
       return chapter
     } else if (volume) {
@@ -126,16 +124,16 @@ export class WordPressWorker extends BaseWorker {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
 
-    this.volume = $('.parent.has-child a').first()
-    this.chapter = $('.wp-manga-chapter a').first()
-    this.chapterDate = $('.chapter-release-date').first()
-    this.chapterNum = $('.parent.has-child')
-    if (!this.chapter.html() || !this.chapterDate.html()) {
+    this.setVolume($)
+    this.setChapter($)
+
+    if (!this.chapter?.html() || !this.chapterDate?.html()) {
       const mangaId = $('#manga-chapters-holder').first().attr('data-id') || ''
       const error = await this.readChapters(mangaId)
 
       if (error) return error
     }
+
     this.image = $('.summary_image img').first()
     this.title = $('.post-title').first()
 
@@ -192,11 +190,48 @@ export class WordPressWorker extends BaseWorker {
 
     const response = await axios(config)
     const $ = cheerio.load(response.data)
-    this.chapter = $('.wp-manga-chapter a').first()
-    this.chapterDate = $('.chapter-release-date').first()
+
+    this.setVolume($)
+    this.setChapter($)
   }
 
-  private getImageSrc (elem: cheerio.Cheerio | undefined) {
+  private setVolume ($: CheerioAPI) {
+    const volumes = $('.parent.has-child .has-child')
+    let volume: { element: Cheerio<Element>, number: number } | undefined
+
+    volumes.each((_index, element) => {
+      const cheerioElement = $(element)
+      const text = cheerioElement.text().trim()
+      const number = parseInt(text.replace(/\D/g, ''))
+      if (isNaN(number)) return
+
+      if (!volume || volume.number < number) {
+        volume = { element: cheerioElement, number }
+      }
+    })
+
+    this.volume = volume?.element
+  }
+
+  private setChapter ($: CheerioAPI) {
+    const chapterSelector = '.wp-manga-chapter a'
+    const chapterDateSelector = '.chapter-release-date'
+
+    if (this.volume) {
+      const volumeParent = this.volume.parent()
+      this.chapter = volumeParent.find(chapterSelector).first()
+      this.chapterDate = volumeParent.find(chapterDateSelector).first()
+      this.chapterNum = volumeParent
+
+      return
+    }
+
+    this.chapter = $(chapterSelector).first()
+    this.chapterDate = $(chapterDateSelector).first()
+    this.chapterNum = $('.parent.has-child')
+  }
+
+  private getImageSrc (elem: Cheerio<Element> | undefined) {
     return elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
   }
 }

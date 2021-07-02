@@ -1,8 +1,9 @@
 import { BaseSite } from '../baseSite'
 import PQueue from 'p-queue'
-import { ComponentRenderProxy } from '@vue/composition-api'
 import Worker from 'worker-loader!src/workers/mangadex.worker'
 import { MangaDexWorker } from './mangadexWorker'
+import { QVueGlobals } from 'quasar'
+import { Store } from 'vuex'
 
 export class MangaDex extends BaseSite {
   siteType = MangaDexWorker.siteType
@@ -29,7 +30,7 @@ export class MangaDex extends BaseSite {
     })
   }
 
-  getMangaId (_componentRenderProxy: ComponentRenderProxy, url: string): Promise<number | Error> {
+  getMangaId ($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
     const matches = /\/title\/(\d*)/gm.exec(url) || []
     let mangaId = -1
 

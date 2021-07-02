@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-ma-sm">
-    <manga-header />
+    <MangaHeader />
 
     <q-linear-progress
       v-if="refreshing"
@@ -17,15 +17,14 @@
         :key="manga.url"
         class="q-mb-sm full-width manga-item"
       >
-        <manga-item :url="manga.url" />
+        <MangaItem :url="manga.url" />
       </q-intersection>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { mapGetters, mapMutations } from 'vuex'
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, computed, onMounted } from 'vue'
 import moment from 'moment'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { SiteType } from 'src/enums/siteEnum'
@@ -33,9 +32,15 @@ import * as DropboxService from 'src/services/dropboxService'
 import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/MangaItem.vue'
-import { Manga } from 'src/classes/manga'
-import { Settings } from 'src/classes/settings'
-import { InitializeComponents } from 'src/classes/initializeComponents'
+import useUrlNavigation from 'src/composables/useUrlNavigation'
+import useMangaList from 'src/composables/useMangaList'
+import useSettings from 'src/composables/useSettings'
+import useSearchValue from 'src/composables/useSearchValue'
+import useRefreshing from 'src/composables/useRefreshing'
+import useRefreshProgress from 'src/composables/useRefreshProgress'
+import useInitialized from 'src/composables/useInitialized'
+import useNotification from 'src/composables/useNotification'
+import { useQuasar } from 'quasar'
 
 export default defineComponent({
   components: {
@@ -43,68 +48,87 @@ export default defineComponent({
     MangaItem
   },
 
-  computed: {
-    ...mapGetters('reader', {
-      mangaList: 'mangaList',
-      refreshing: 'refreshing',
-      refreshProgress: 'refreshProgress',
-      settings: 'settings',
-      searchValue: 'searchValue',
-      initialized: 'initialized'
-    }),
+  setup () {
+    const $q = useQuasar()
+    const { urlNavigation } = useUrlNavigation()
+    const { mangaList } = useMangaList()
+    const { settings } = useSettings()
+    const { searchValue } = useSearchValue()
+    const { refreshing } = useRefreshing()
+    const { refreshProgress } = useRefreshProgress()
+    const { main: mainInitialized, clearInitialized } = useInitialized()
+    const { notification } = useNotification()
 
-    filteredMangaList () {
-      const settings = this.settings as Settings
-      return ((this.mangaList as unknown) as Manga[]).filter(manga => {
-        return manga.title.toLowerCase().includes(((this.searchValue as unknown) as string).toLowerCase()) &&
-               settings.filters.includes(manga.status)
-      })
+    const getGitlabNotifyOptions = (error: unknown) => {
+      return GitlabService.getNotifyOptions(error, urlNavigation)
     }
-  },
 
-  methods: {
-    ...mapMutations('reader', {
-      pushNotification: 'pushNotification',
-      pushUrlNavigation: 'pushUrlNavigation',
-      updateInitialized: 'updateInitialized'
+    const filteredMangaList = computed(() => {
+      return mangaList.value.filter(manga => {
+        return manga.title.toLowerCase().includes(searchValue.value.toLowerCase()) &&
+               settings.value.filters.includes(manga.status)
+      })
     })
-  },
 
-  mounted () {
-    if (this.$q.platform.is.mobile) {
-      window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'ageGatePass', 'true', () => undefined, (error) => console.error(error))
-      window.cookieMaster.setCookieValue(`.${SiteType.Webtoons}`, 'timezoneOffset', (moment().utcOffset() / 60).toString(), () => undefined, (error) => console.error(error))
+    if ($q.platform.is.mobile) {
+      onMounted(() => {
+        window.cookieMaster.setCookieValue(
+          `.${SiteType.Webtoons}`,
+          'ageGatePass',
+          'true',
+          () => undefined,
+          (error) => console.error(error)
+        )
+        window.cookieMaster.setCookieValue(
+          `.${SiteType.Webtoons}`,
+          'timezoneOffset',
+          (moment().utcOffset() / 60).toString(),
+          () => undefined,
+          (error) => console.error(error)
+        )
 
-      document.addEventListener('resume', () => {
-        if ((this.initialized as InitializeComponents).main) {
-          this.updateInitialized(new InitializeComponents())
+        document.addEventListener('resume', () => {
+          if (!mainInitialized.value) return
+          clearInitialized()
+        })
+      })
+    } else if ($q.platform.is.electron) {
+      onMounted(() => {
+        const electronWindow = window as unknown as {
+          onDropboxToken: ((event: unknown, token?: string) => void),
+          onGitlabToken: ((event: unknown, token?: string) => void)
         }
+
+        electronWindow.onDropboxToken((_event: unknown, token?: string) => {
+          const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
+          notifyOptions.type = 'positive'
+          notification.value = notifyOptions
+          DropboxService.setAccessToken(token)
+        })
+
+        electronWindow.onGitlabToken((_event: unknown, token?: string) => {
+          const notifyOptions = new NotifyOptions('Logged in successfully!')
+          notifyOptions.type = 'positive'
+          notification.value = notifyOptions
+          GitlabService.setAccessToken(token)
+
+          $q.loading.show({
+            delay: 100
+          })
+          GitlabService.createList(JSON.stringify(mangaList.value)).catch(error => {
+            notification.value = getGitlabNotifyOptions(error)
+          }).finally(() => {
+            $q.loading.hide()
+          })
+        })
       })
     }
 
-    if (this.$q.platform.is.electron) {
-      this.$q.electron.ipcRenderer.on('dropbox-token', (event, token) => {
-        const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
-        notifyOptions.type = 'positive'
-        this.pushNotification(notifyOptions)
-        DropboxService.setAccessToken(token)
-      })
-
-      this.$q.electron.ipcRenderer.on('gitlab-token', (event, token) => {
-        const notifyOptions = new NotifyOptions('Logged in successfully!')
-        notifyOptions.type = 'positive'
-        this.pushNotification(notifyOptions)
-        GitlabService.setAccessToken(token)
-
-        this.$q.loading.show({
-          delay: 100
-        })
-        GitlabService.createList(JSON.stringify(this.mangaList)).catch(error => {
-          this.pushNotification(GitlabService.getNotifyOptions(this, error))
-        }).finally(() => {
-          this.$q.loading.hide()
-        })
-      })
+    return {
+      mangaList,
+      filteredMangaList,
+      refreshing,
+      refreshProgress
     }
   }
 })

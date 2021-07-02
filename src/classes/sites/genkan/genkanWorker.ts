@@ -1,9 +1,9 @@
 import { BaseWorker } from '../baseWorker'
-import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import axios from 'axios'
 import { SiteType } from '../../../enums/siteEnum'
 import { LinkingSiteType } from '../../../enums/linkingSiteEnum'
+import cheerio, { Cheerio, Element } from 'cheerio'
 
 export class GenkanWorker extends BaseWorker {
   static getUrl (siteType: SiteType | LinkingSiteType): string {
@@ -29,7 +29,7 @@ export class GenkanWorker extends BaseWorker {
     return GenkanWorker.getUrl(siteType)
   }
 
-  volume: cheerio.Cheerio | undefined
+  volume?: Cheerio<Element>
 
   getChapter (): string {
     const volume = this.volume?.text().trim() || 'Volume 1'
@@ -72,7 +72,7 @@ export class GenkanWorker extends BaseWorker {
       replaceText = ''
     }
 
-    return this.image?.css('background-image')?.replace(new RegExp('url\\("?', 'g'), replaceText)?.replace(new RegExp('"?\\)', 'g'), '') || ''
+    return this.image?.css('background-image')?.replace(/url\("?/g, replaceText)?.replace(/"?\)/g, '') || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {

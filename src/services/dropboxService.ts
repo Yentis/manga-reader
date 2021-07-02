@@ -1,15 +1,15 @@
-import dropbox from 'dropbox'
+import { Dropbox, DropboxAuth } from 'dropbox'
 import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
 import { LocalStorage } from 'quasar'
-import constants from 'src/boot/constants'
 import { getShareId, setShareId } from './gitlabService'
+import constants from 'src/classes/constants'
 
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024
 const CLIENT_ID = 'uoywjq0b8q2208f'
 
-let accessToken: string = LocalStorage.getItem(constants().DROPBOX_TOKEN) || ''
+let accessToken: string = LocalStorage.getItem(constants.DROPBOX_TOKEN) || ''
 
 export function getAccessToken (): string {
   return accessToken
@@ -19,29 +19,15 @@ export function setAccessToken (token: string | undefined) {
   if (!token) return
 
   accessToken = token
-  LocalStorage.set(constants().DROPBOX_TOKEN, token)
+  LocalStorage.set(constants.DROPBOX_TOKEN, token)
 }
 
-export function getAuthUrl () {
-  return new dropbox.Dropbox({
+export async function getAuthUrl (): Promise<string> {
+  const authUrl = await new DropboxAuth({
     clientId: CLIENT_ID
   }).getAuthenticationUrl('http://localhost/redirect')
-}
 
-export function cordovaLogin (): Promise<string> {
-  return new Promise((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    window.open = cordova.InAppBrowser.open
-    new dropbox.Dropbox({
-      clientId: CLIENT_ID
-    }).authenticateWithCordova(token => {
-      delete window.open
-      resolve(token)
-    }, () => {
-      delete window.open
-      reject(Error('Failed to get token'))
-    })
-  })
+  return authUrl.toString()
 }
 
 export function saveList (mangaList: Manga[]): Promise<void> {
@@ -55,11 +41,11 @@ export function saveList (mangaList: Manga[]): Promise<void> {
     const promises = []
 
     promises.push(
-      new dropbox.Dropbox({
+      new Dropbox({
         accessToken,
         fetch
       }).filesUpload({
-        path: `/${constants().MANGA_LIST_FILENAME}`,
+        path: `/${constants.MANGA_LIST_FILENAME}`,
         contents,
         mode: {
           '.tag': 'overwrite'
@@ -70,11 +56,11 @@ export function saveList (mangaList: Manga[]): Promise<void> {
     const shareId = getShareId()
     if (shareId) {
       promises.push(
-        new dropbox.Dropbox({
+        new Dropbox({
           accessToken,
           fetch
         }).filesUpload({
-          path: `/${constants().SHARE_FILENAME}`,
+          path: `/${constants.SHARE_FILENAME}`,
           contents: JSON.stringify({ id: shareId }),
           mode: {
             '.tag': 'overwrite'
@@ -83,7 +69,7 @@ export function saveList (mangaList: Manga[]): Promise<void> {
       )
     }
 
-    Promise.all(promises).then(() => resolve()).catch((error: dropbox.files.Error) => reject(Error(error.response.statusText)))
+    Promise.all(promises).then(() => resolve()).catch((error) => reject(error))
   })
 }
 
@@ -94,26 +80,26 @@ export function readList (): Promise<Manga[]> {
     const promises = []
 
     promises.push(
-      new dropbox.Dropbox({
+      new Dropbox({
         accessToken,
         fetch
       }).filesDownload({
-        path: `/${constants().SHARE_FILENAME}`
+        path: `/${constants.SHARE_FILENAME}`
       })
     )
 
     promises.push(
-      new dropbox.Dropbox({
+      new Dropbox({
         accessToken,
         fetch
       }).filesDownload({
-        path: `/${constants().MANGA_LIST_FILENAME}`
+        path: `/${constants.MANGA_LIST_FILENAME}`
       })
     )
 
     Promise.all(promises).then(responses => {
-      const shareFile = responses[0]
-      const mangaListFile = responses[1]
+      const shareFile = responses[0].result as unknown as { fileBlob: Blob }
+      const mangaListFile = responses[1].result as unknown as { fileBlob: Blob }
 
       const shareReader = new FileReader()
       const mangaListReader = new FileReader()
@@ -130,6 +116,6 @@ export function readList (): Promise<Manga[]> {
 
       shareReader.readAsText(shareFile.fileBlob)
       mangaListReader.readAsText(mangaListFile.fileBlob)
-    }).catch((error: dropbox.files.Error) => reject(Error(error.response.statusText)))
+    }).catch((error) => reject(error))
   })
 }

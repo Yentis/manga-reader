@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -22,8 +22,8 @@
       </div>
 
       <q-table
-        :data="data"
-        :selected.sync="selected"
+        v-model:selected="selected"
+        :rows="rows"
         class="q-mt-sm"
         selection="single"
         hide-header
@@ -32,7 +32,7 @@
         separator="none"
         row-key="name"
       >
-        <template v-slot:body-cell-id="props">
+        <template #body-cell-id="props">
           <q-td :props="props">
             <q-btn
               v-if="props.value && !props.row.deleted"
@@ -40,7 +40,7 @@
               class="full-width"
               color="positive"
               icon="link"
-              @click="onLinkClicked(props.row.value, true)"
+              @click="setLinkDeleted(props.row.value, true)"
             />
             <q-btn
               v-else
@@ -49,15 +49,15 @@
               class="full-width"
               color="negative"
               icon="link_off"
-              @click="onLinkClicked(props.row.value, false)"
+              @click="setLinkDeleted(props.row.value, false)"
             />
           </q-td>
         </template>
-        <template v-slot:body-cell-deleted />
+        <template #body-cell-deleted />
       </q-table>
 
-      <manga-search
-        v-model="url"
+      <MangaSearch
+        v-model:url="url"
         class="q-pt-none"
         :search-placeholder="searchPlaceholder"
         :manual-placeholder="manualPlaceholder"
@@ -84,22 +84,25 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { mapMutations } from 'vuex'
-import { QDialog } from 'quasar'
+import { useDialogPluginComponent } from 'quasar'
+import { defineComponent, ref, Ref, onMounted } from 'vue'
 import { SiteName } from 'src/enums/siteEnum'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import MangaSearch from './SearchComponent.vue'
+import { useClearingSearchResults } from 'src/composables/useSearchResults'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
+interface Rows {
+  name: SiteName,
+  value: string,
+  id: number | string,
+  deleted: boolean
+}
 
+export default defineComponent({
   components: {
     MangaSearch
   },
+
   props: {
     linkedSites: {
       type: Object,
@@ -123,89 +126,70 @@ export default (Vue as VueConstructor<Vue &
     }
   },
 
-  data () {
-    return {
-      url: '',
-      selected: [
-        {
-          name: SiteName[LinkingSiteType.MangaDex],
-          value: LinkingSiteType.MangaDex
+  emits: [...useDialogPluginComponent.emits],
+
+  setup (props) {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const { clearSearchResults } = useClearingSearchResults()
+
+    const rows: Ref<Rows[]> = ref([])
+    const getRows = () => {
+      rows.value = Object.values(LinkingSiteType).map(site => {
+        const linkedSites: Record<string, number> = props.linkedSites
+        const id = linkedSites ? linkedSites[site] : ''
+
+        return {
+          name: SiteName[site],
+          value: site,
+          id,
+          deleted: false
         }
-      ],
-      data: [] as {
-        name: SiteName,
-        value: string,
-        id: number | string,
-        deleted: boolean
-      }[],
-      linkingSiteType: LinkingSiteType
-    }
-  },
-
-  mounted () {
-    this.updateSearchResults([])
-    this.data = Object.values(LinkingSiteType).map(site => {
-      const linkedSites = this.linkedSites as Record<string, number>
-      const id = linkedSites ? linkedSites[site] : ''
-
-      return {
-        name: SiteName[site],
-        value: site,
-        id,
-        deleted: false
-      }
-    })
-  },
-
-  methods: {
-    ...mapMutations('reader', {
-      updateSearchResults: 'updateSearchResults'
-    }),
-
-    show () {
-      this.$refs.dialog.show()
-    },
-
-    hide () {
-      this.updateSearchResults([])
-      this.$refs.dialog.hide()
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok', {
-        url: this.url,
-        siteType: this.selected[0].value,
-        linkedSites: this.getLinkedSites()
       })
-      this.hide()
-    },
+    }
+    onMounted(getRows)
 
-    onCancelClick () {
-      this.hide()
-    },
+    const url = ref('')
+    const selected = ref([{
+      name: SiteName[LinkingSiteType.MangaDex],
+      value: LinkingSiteType.MangaDex
+    }])
 
-    onLinkClicked (siteType: string, enabled: boolean) {
-      const index = this.data.findIndex(site => site.value === siteType)
-      if (index === -1) return
-      const site = this.data[index]
-
-      site.deleted = enabled
-      this.$set(this.data, index, site)
-    },
-
-    getLinkedSites () {
-      const linkedSites = {} as Record<string, number>
-      this.data.filter(site => site.id && !site.deleted).forEach(site => {
+    const getLinkedSites = () => {
+      const linkedSites: Record<string, number> = {}
+      rows.value.filter(site => site.id && !site.deleted).forEach(site => {
         if (typeof site.id === 'number') {
           linkedSites[site.value] = site.id
         }
       })
 
       return linkedSites
+    }
+
+    const setLinkDeleted = (siteType: string, enabled: boolean) => {
+      const index = rows.value.findIndex(site => site.value === siteType)
+      if (index === -1) return
+      rows.value[index].deleted = enabled
+    }
+
+    return {
+      dialogRef,
+      onDialogHide: () => {
+        clearSearchResults()
+        onDialogHide()
+      },
+      onOKClick: () => {
+        onDialogOK({
+          url: url.value,
+          siteType: selected.value[0].value,
+          linkedSites: getLinkedSites()
+        })
+      },
+      onCancelClick: onDialogCancel,
+      linkingSiteType: LinkingSiteType,
+      rows,
+      url,
+      selected,
+      setLinkDeleted
     }
   }
 })

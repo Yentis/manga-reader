@@ -1,12 +1,17 @@
 import { BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
-import cheerio from 'cheerio'
+import cheerio, { Cheerio, Element, Node } from 'cheerio'
 import { Manga } from '../../manga'
 import { LooseDictionary } from 'quasar'
 import { SiteType } from '../../../enums/siteEnum'
 
 const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
+
+interface WebtoonsSearch {
+  query: string[]
+  items: string[][][][]
+}
 
 export class WebtoonsWorker extends BaseWorker {
   static siteType = SiteType.Webtoons
@@ -14,7 +19,7 @@ export class WebtoonsWorker extends BaseWorker {
   static testUrl = `${WebtoonsWorker.url}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
 
   platform: LooseDictionary | undefined
-  chapterUrl: cheerio.Cheerio | undefined
+  chapterUrl?: Cheerio<Element | Node>
 
   constructor (platform: LooseDictionary | undefined = undefined, requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(WebtoonsWorker.siteType, requestConfig)
@@ -44,11 +49,13 @@ export class WebtoonsWorker extends BaseWorker {
 
   async readUrl (url: string): Promise<Error | Manga> {
     const mobile = url.includes('//m.' + this.siteType)
-    const headers = mobile && this.platform?.mobile !== true ? {
-      common: {
-        'User-Agent': MOBILE_USER_AGENT
-      }
-    } : null
+    const headers = mobile && this.platform?.mobile !== true
+      ? {
+          common: {
+            'User-Agent': MOBILE_USER_AGENT
+          }
+        }
+      : null
     const response = await axios.get(url, { headers })
     const $ = cheerio.load(response.data)
 
@@ -93,9 +100,4 @@ export class WebtoonsWorker extends BaseWorker {
     const mangaList = await Promise.all(promises)
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]
   }
-}
-
-interface WebtoonsSearch {
-  query: Array<string>;
-  items: Array<Array<Array<Array<string>>>>
 }

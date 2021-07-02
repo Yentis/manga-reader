@@ -1,17 +1,24 @@
 import { BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
-import cheerio from 'cheerio'
+import cheerio, { Cheerio, Element } from 'cheerio'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
 import qs from 'qs'
+
+interface ManganeloSearch {
+  name: string
+  image: string
+  lastchapter: string
+  'id_encode': string
+}
 
 export class ManganeloWorker extends BaseWorker {
   static siteType = SiteType.Manganelo
   static url = BaseWorker.getUrl(ManganeloWorker.siteType)
   static testUrl = `${ManganeloWorker.url}/manga/pu918807`
 
-  currentTime: cheerio.Cheerio | undefined
+  currentTime?: Cheerio<Element>
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(ManganeloWorker.siteType, requestConfig)
@@ -79,11 +86,4 @@ export class ManganeloWorker extends BaseWorker {
 
     return mangaList
   }
-}
-
-interface ManganeloSearch {
-  name: string
-  image: string
-  lastchapter: string
-  'id_encode': string
 }
