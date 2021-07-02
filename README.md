@@ -25,12 +25,13 @@ Features:
 https://github.com/Yentis/manga-reader/releases
 
 # Preview
-![Preview](https://i.imgur.com/6V07rV3.png)
-![Preview](https://i.imgur.com/gbCwdKD.png)
-![Preview](https://i.imgur.com/cd7J6SX.png)
-![Preview](https://i.imgur.com/YNoNUc7.png)
-![Preview](https://i.imgur.com/iBKh8ad.png)
-![Preview](https://i.imgur.com/sqXJLYB.jpg)
+![Preview](https://i.imgur.com/YYk9av9.png)
+![Preview](https://i.imgur.com/DQaW1uu.png)
+![Preview](https://i.imgur.com/CML3jcX.png)
+![Preview](https://i.imgur.com/sC7T0q6.png)
+![Preview](https://i.imgur.com/gOx4VIZ.png)
+![Preview](https://i.imgur.com/EaiUFkZ.png)
+![Preview](https://i.imgur.com/A0zi4Xf.png)
 
 # Support
 For support contact Yentis#5218 on Discord.
