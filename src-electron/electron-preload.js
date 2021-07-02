@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron')
+const { contextBridge, ipcRenderer, shell } = require('electron')
 
 const whitelist = [
   'http://localhost',
@@ -13,12 +13,16 @@ if (!matchingItem) {
   delete window.module;
 }
 
-contextBridge.exposeInMainWorld('manga-reader', {
+contextBridge.exposeInMainWorld('mangaReader', {
   onDropboxToken: (callback) => {
     ipcRenderer.on('dropbox-token', callback)
   },
 
   onGitlabToken: (callback) => {
     ipcRenderer.on('gitlab-token', callback)
+  },
+
+  openURL: (url) => {
+    shell.openExternal(url)
   }
 })

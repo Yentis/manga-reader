@@ -1,3 +1,4 @@
+import { QVueGlobals } from 'quasar'
 import { Manga } from 'src/classes/manga'
 import { WebtoonsWorker } from 'src/classes/sites/webtoons/webtoonsWorker'
 import { SiteType } from 'src/enums/siteEnum'
@@ -8,13 +9,15 @@ const SITE_TYPE = SiteType.Webtoons
 const TEST_URL = WebtoonsWorker.testUrl
 const QUERY = 'the wolf & red riding hood'
 
-export async function testWebtoons (): Promise<void> {
-  await readUrl()
+export async function testWebtoons ($q: QVueGlobals): Promise<void> {
+  await readUrl($q)
   await readUrlMobile()
   await search()
 }
 
-async function readUrl (): Promise<void> {
+async function readUrl ($q: QVueGlobals): Promise<void> {
+  if ($q.platform.is.mobile) return
+
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Episode 16'

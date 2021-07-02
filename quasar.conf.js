@@ -9,6 +9,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers')
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 
 module.exports = configure(function (ctx) {
   return {
@@ -78,12 +79,7 @@ module.exports = configure(function (ctx) {
       extendWebpack (cfg) {
         // linting is slow in TS projects, we execute it only for production builds
         if (ctx.prod) {
-          cfg.module.rules.push({
-            enforce: 'pre',
-            test: /\.(js|vue)$/,
-            loader: 'eslint-loader',
-            exclude: /node_modules/
-          })
+          cfg.plugins.push(new ESLintPlugin())
         }
         cfg.plugins.push(new NodePolyfillPlugin())
       }

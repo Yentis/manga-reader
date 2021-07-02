@@ -12,6 +12,7 @@ import { setAccessToken as setDropboxAccessToken } from '../services/dropboxServ
 import useNotification from './useNotification'
 import useMangaList from './useMangaList'
 import useSettings from './useSettings'
+import ElectronWindow from 'src/interfaces/electronWindow'
 
 export default function useUrlNavigation () {
   const $store = useStore()
@@ -60,7 +61,7 @@ export function useAppUrlNavigation () {
     notifyOptions.type = 'positive'
     notification.value = notifyOptions
 
-    const queryString = qs.parse(url.replace('http://localhost/redirect_dropbox#', ''))
+    const queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
     setDropboxAccessToken(queryString.access_token as string)
   }
 
@@ -80,7 +81,7 @@ export function useAppUrlNavigation () {
     browser.addEventListener('loadstart', (event) => {
       if (event.url.startsWith('http://localhost/redirect_gitlab')) {
         onGitlabRedirect(event.url)
-      } else if (event.url.startsWith('http://localhost/redirect_dropbox')) {
+      } else if (event.url.startsWith('http://localhost/redirect#access_token')) {
         onDropboxRedirect(event.url)
       } else return
 
@@ -96,6 +97,9 @@ export function useAppUrlNavigation () {
       openInApp(target.url, target.openInApp)
     } else if ($q.platform.is.mobile) {
       window.location.href = target.url
+    } else if ($q.platform.is.electron) {
+      const electronWindow = window as unknown as ElectronWindow
+      electronWindow.mangaReader.openURL(target.url)
     } else {
       openURL(target.url)
     }

@@ -13,7 +13,6 @@ import { testFlameScans } from './test/flamescans'
 import { testGenkanio } from './test/genkanio'
 import { testHatigarmScans } from './test/hatigarmscans'
 import { testHiperDEX } from './test/hiperdex'
-import { testKitsu } from './test/kitsu'
 import { testLeviatanScans } from './test/leviatanscans'
 import { testLynxScans } from './test/lynxscans'
 import { testMangaDex } from './test/mangadex'
@@ -99,14 +98,11 @@ export default async function testAll (
   promises.push(testSleepingKnightScans().catch((error) => {
     errors.push({ site: SiteType.SleepingKnightScans, error: error })
   }))
-  promises.push(testWebtoons().catch((error) => {
+  promises.push(testWebtoons($q).catch((error) => {
     errors.push({ site: SiteType.Webtoons, error: error })
   }))
   promises.push(testZeroScans().catch((error) => {
     errors.push({ site: SiteType.ZeroScans, error: error })
-  }))
-  promises.push(testKitsu($q, store).catch((error) => {
-    errors.push({ site: LinkingSiteType.Kitsu, error: error })
   }))
 
   await Promise.all(promises)

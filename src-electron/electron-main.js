@@ -61,6 +61,7 @@ function createWindow () {
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: process.env.QUASAR_NODE_INTEGRATION,
       nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION,
+      contextIsolation: true,
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
       preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
@@ -84,15 +85,13 @@ function createWindow () {
     name: 'timezoneOffset',
     value: (moment().utcOffset() / 60).toString()
   })
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    onNavigation(event, url)
+  })
   
   mainWindow.webContents.on('will-redirect', (event, url) => {
-    if (url.startsWith('http://localhost/redirect_gitlab')) {
-      handleGitlabOAuth(event, url)
-      return
-    }
-
-    if (!url.startsWith('http://localhost/redirect#')) return
-    handleDropboxOAuth(event, url)
+    onNavigation(event, url)
   })
 
   mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
@@ -100,6 +99,16 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+}
+
+function onNavigation(event, url) {
+  if (url.startsWith('http://localhost/redirect_gitlab')) {
+    handleGitlabOAuth(event, url)
+    return
+  }
+
+  if (!url.startsWith('http://localhost/redirect#')) return
+  handleDropboxOAuth(event, url)
 }
 
 function handleGitlabOAuth(event, url) {

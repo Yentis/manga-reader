@@ -24,7 +24,10 @@ export class MangagoWorker extends BaseWorker {
   }
 
   getChapterUrl (): string {
-    return this.chapter?.parent()?.attr('href') || ''
+    const mobile = this.platform?.mobile === true
+    const chapter = mobile ? this.chapter : this.chapter?.parent()
+
+    return chapter?.attr('href') || ''
   }
 
   getChapterNum (): number {
@@ -48,7 +51,7 @@ export class MangagoWorker extends BaseWorker {
     if (!mobile) {
       const listingElem = $('.listing tbody tr').first()
 
-      this.chapter = listingElem.find('a b').first()
+      this.chapter = listingElem.find('a').first()
       this.chapterNum = this.chapter
       this.chapterDate = listingElem.children().last()
       this.image = $('.cover img').first()

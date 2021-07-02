@@ -73,7 +73,6 @@ import { testSleepingKnightScans } from 'src/services/test/sleepingknightscans'
 import { testWebtoons } from 'src/services/test/webtoons'
 import { testZeroScans } from 'src/services/test/zeroscans'
 import { testFlameScans } from 'src/services/test/flamescans'
-import { testKitsu } from 'src/services/test/kitsu'
 import { useQuasar } from 'quasar'
 import { useStore } from 'src/store'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
@@ -189,16 +188,13 @@ export default defineComponent({
           await doTest(testSleepingKnightScans)
           break
         case SiteType.Webtoons:
-          await doTest(testWebtoons)
+          await doTest(testWebtoons($q))
           break
         case SiteType.ZeroScans:
           await doTest(testZeroScans)
           break
         case SiteType.FlameScans:
           await doTest(testFlameScans)
-          break
-        case LinkingSiteType.Kitsu:
-          await doTest(testKitsu($q, $store))
           break
         default:
           break

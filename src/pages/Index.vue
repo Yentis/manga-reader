@@ -41,6 +41,7 @@ import useRefreshProgress from 'src/composables/useRefreshProgress'
 import useInitialized from 'src/composables/useInitialized'
 import useNotification from 'src/composables/useNotification'
 import { useQuasar } from 'quasar'
+import ElectronWindow from 'src/interfaces/electronWindow'
 
 export default defineComponent({
   components: {
@@ -94,19 +95,16 @@ export default defineComponent({
       })
     } else if ($q.platform.is.electron) {
       onMounted(() => {
-        const electronWindow = window as unknown as {
-          onDropboxToken: ((event: unknown, token?: string) => void),
-          onGitlabToken: ((event: unknown, token?: string) => void)
-        }
+        const electronWindow = window as unknown as ElectronWindow
 
-        electronWindow.onDropboxToken((_event: unknown, token?: string) => {
+        electronWindow.mangaReader.onDropboxToken((_event: unknown, token?: string) => {
           const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
           notifyOptions.type = 'positive'
           notification.value = notifyOptions
           DropboxService.setAccessToken(token)
         })
 
-        electronWindow.onGitlabToken((_event: unknown, token?: string) => {
+        electronWindow.mangaReader.onGitlabToken((_event: unknown, token?: string) => {
           const notifyOptions = new NotifyOptions('Logged in successfully!')
           notifyOptions.type = 'positive'
           notification.value = notifyOptions
