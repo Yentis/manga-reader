@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -22,6 +22,7 @@
         <q-img
           v-if="imageUrl"
           class="q-mt-sm confirmation-image-size"
+          fit="scale-down"
           contain
           :src="imageUrl"
         />
@@ -46,14 +47,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { QDialog } from 'quasar'
+import { useDialogPluginComponent } from 'quasar'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
+export default {
   props: {
     title: {
       type: String,
@@ -70,35 +66,25 @@ export default (Vue as VueConstructor<Vue &
     hideCancel: Boolean
   },
 
-  methods: {
-    show () {
-      this.$refs.dialog.show()
-    },
+  emits: [...useDialogPluginComponent.emits],
 
-    hide () {
-      this.$refs.dialog.hide()
-    },
+  setup () {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
 
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok')
-      this.hide()
-    },
-
-    onCancelClick () {
-      this.hide()
+    return {
+      dialogRef,
+      onDialogHide,
+      onOKClick: onDialogOK,
+      onCancelClick: onDialogCancel
     }
   }
-})
+}
 </script>
 
 <style lang="scss" scoped>
 
 .confirmation-image-size {
-  max-height: 256px
+  max-height: 16em;
 }
 
 .content {

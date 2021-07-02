@@ -2,7 +2,7 @@ import { BaseWorker } from '../baseWorker'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
 import axios, { AxiosRequestConfig } from 'axios'
-import cheerio from 'cheerio'
+import cheerio, { Cheerio, Element } from 'cheerio'
 
 export class GenkanioWorker extends BaseWorker {
   static siteType = SiteType.Genkan
@@ -10,7 +10,7 @@ export class GenkanioWorker extends BaseWorker {
 
   static testUrl = `${GenkanioWorker.url}/manga/8383424626-castle`
 
-  chapterUrl: cheerio.Cheerio | undefined
+  chapterUrl?: Cheerio<Element>
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(GenkanioWorker.siteType, requestConfig)
@@ -29,7 +29,7 @@ export class GenkanioWorker extends BaseWorker {
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
-    const columns = $('table td')
+    const columns = $('tbody tr').first().children()
 
     this.chapter = columns.eq(1)
     this.chapterUrl = columns.last().find('a').first()

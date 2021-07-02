@@ -1,26 +1,51 @@
 import { BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { Manga } from '../../manga'
-import cheerio from 'cheerio'
+import cheerio, { Cheerio, Element } from 'cheerio'
 import { SiteType } from '../../../enums/siteEnum'
+import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+
+interface AsuraScansSearch {
+  series: {
+    all: {
+      'post_title': string,
+      'post_image': string,
+      'post_latest': string,
+      'post_link': string
+    }[]
+  }[]
+}
 
 export class AsuraScansWorker extends BaseWorker {
-  static siteType = SiteType.AsuraScans
-  static url = `${BaseWorker.urlPrefix}https://www.${AsuraScansWorker.siteType}`
+  static getUrl (siteType: SiteType | LinkingSiteType): string {
+    switch (siteType) {
+      case SiteType.AsuraScans:
+        return `${BaseWorker.urlPrefix}https://www.${siteType}`
+    }
 
-  static testUrl = `${AsuraScansWorker.url}/manga/tougen-anki/`
+    return BaseWorker.getUrl(siteType)
+  }
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(AsuraScansWorker.siteType, requestConfig)
+  static getTestUrl (siteType: SiteType | LinkingSiteType) : string {
+    switch (siteType) {
+      case SiteType.AsuraScans:
+        return `${AsuraScansWorker.getUrl(siteType)}/manga/tougen-anki/`
+      case SiteType.FlameScans:
+        return `${AsuraScansWorker.getUrl(siteType)}/series/you-the-one-and-only-and-the-seven-billion-grim-reapers/`
+    }
+
+    return AsuraScansWorker.getUrl(siteType)
+  }
+
+  chapterUrl?: Cheerio<Element>
+
+  getChapterUrl (): string {
+    return this.chapterUrl?.attr('href') || ''
   }
 
   getChapterNum (): number {
     return this.parseNum(this.chapterNum?.attr('data-num'))
-  }
-
-  getChapterUrl (): string {
-    return this.chapter?.parent()?.attr('href') || ''
   }
 
   getChapterDate (): string {
@@ -39,10 +64,12 @@ export class AsuraScansWorker extends BaseWorker {
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
+    const chapterItem = $('#chapterlist li').first()
 
-    this.chapter = $('.chapternum').first()
-    this.chapterDate = $('.chapterdate').first()
-    this.chapterNum = $('#chapterlist li').first()
+    this.chapter = chapterItem.find('.chapternum').first()
+    this.chapterUrl = chapterItem.find('a').first()
+    this.chapterNum = chapterItem.first()
+    this.chapterDate = chapterItem.find('.chapterdate').first()
     this.image = $('meta[property="og:image"]').first()
     this.title = $('.entry-title').first()
 
@@ -53,7 +80,7 @@ export class AsuraScansWorker extends BaseWorker {
     const data = `action=ts_ac_do_search&ts_ac_query=${encodeURIComponent(query)}`
     const response = await axios({
       method: 'post',
-      url: `${AsuraScansWorker.url}/wp-admin/admin-ajax.php`,
+      url: `${AsuraScansWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
       },
@@ -82,13 +109,4 @@ export class AsuraScansWorker extends BaseWorker {
 
     return mangaList
   }
-}
-
-interface AsuraScansSearch {
-  series: Array<{ all: Array< {
-      'post_title': string,
-      'post_image': string,
-      'post_latest': string,
-      'post_link': string
-  } > }>
 }

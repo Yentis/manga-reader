@@ -26,7 +26,10 @@ export class BatotoWorker extends BaseWorker {
   }
 
   getImage (): string {
-    return this.image?.attr('content') || ''
+    const image = this.image?.attr('content')
+    if (image === undefined) return ''
+
+    return this.cleanImageUrl(image)
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
@@ -34,7 +37,7 @@ export class BatotoWorker extends BaseWorker {
     const $ = cheerio.load(response.data)
 
     this.chapter = $('.episode-list a').eq(1)
-    this.chapterDate = $('.episode-list .extra i').first()
+    this.chapterDate = $('.episode-list .extra').first().children().last()
     this.chapterNum = this.chapter
     this.image = $('meta[property="og:image"]').first()
     this.title = $('.item-title').first()
@@ -53,8 +56,11 @@ export class BatotoWorker extends BaseWorker {
 
       const manga = new Manga('', this.siteType)
       manga.title = titleElem.text().trim()
+
       const image = $(elem).find('img').first()
-      manga.image = image.attr('data-cfsrc') || image.attr('src') || ''
+      const imageUrl = image.attr('data-cfsrc') || image.attr('src') || ''
+      manga.image = this.cleanImageUrl(imageUrl)
+
       manga.chapter = $(elem).find('.item-volch a').first().text().trim()
       manga.url = url ? `${BatotoWorker.url}${url}` : ''
 
@@ -64,5 +70,10 @@ export class BatotoWorker extends BaseWorker {
     })
 
     return mangaList
+  }
+
+  private cleanImageUrl (url: string) {
+    // Get rid of the query string
+    return url.substring(0, url.lastIndexOf('?'))
   }
 }

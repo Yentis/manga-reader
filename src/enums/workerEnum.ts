@@ -7,6 +7,6 @@ export enum RequestType {
 export enum KitsuRequestType {
   USER_ID = 'user_id',
   MANGA_SLUG = 'manga_slug',
-  LIBRARY_ID = 'library_id',
+  LIBRARY_INFO = 'library_info',
   LOGIN = 'login'
 }

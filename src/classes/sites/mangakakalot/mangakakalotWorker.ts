@@ -6,6 +6,13 @@ import { Manga } from '../../manga'
 import qs from 'qs'
 import { SiteType } from '../../../enums/siteEnum'
 
+interface MangakakalotSearch {
+  name: string
+  image: string
+  lastchapter: string
+  'story_link': string
+}
+
 export class MangakakalotWorker extends BaseWorker {
   static siteType = SiteType.Mangakakalot
   static url = BaseWorker.getUrl(MangakakalotWorker.siteType)
@@ -75,11 +82,4 @@ export class MangakakalotWorker extends BaseWorker {
 
     return mangaList
   }
-}
-
-interface MangakakalotSearch {
-  name: string
-  image: string
-  lastchapter: string
-  'story_link': string
 }

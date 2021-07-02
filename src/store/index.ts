@@ -1,18 +1,24 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { InjectionKey } from 'vue'
+import { createStore, Store, useStore as baseUseStore } from 'vuex'
+import reader, { ReaderState } from './store-reader'
+import initialized, { InitializedState } from './store-initialized'
 
-import reader from './store-reader'
+export interface State {
+  reader: ReaderState,
+  initialized: InitializedState
+}
 
-Vue.use(Vuex)
+export const key: InjectionKey<Store<State>> = Symbol('vuex-key')
 
-const Store = new Vuex.Store({
+export default createStore<State>({
   modules: {
-    reader
+    reader,
+    initialized
   },
 
-  strict: process.env.DEV === 'true'
+  strict: process.env.DEV?.toString() === 'true'
 })
 
-export default function () {
-  return Store
+export function useStore () {
+  return baseUseStore(key)
 }

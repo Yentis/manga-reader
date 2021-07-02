@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -50,14 +50,10 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { QDialog } from 'quasar'
+import { useDialogPluginComponent } from 'quasar'
+import { ref } from 'vue'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
+export default {
   props: {
     siteName: {
       required: true,
@@ -65,36 +61,26 @@ export default (Vue as VueConstructor<Vue &
     }
   },
 
-  data () {
+  emits: [...useDialogPluginComponent.emits],
+
+  setup () {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+
+    const username = ref('')
+    const password = ref('')
+
     return {
-      username: '',
-      password: ''
-    }
-  },
-
-  methods: {
-    show () {
-      this.$refs.dialog.show()
-    },
-
-    hide () {
-      this.$refs.dialog.hide()
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok', { username: this.username, password: this.password })
-      this.hide()
-    },
-
-    onCancelClick () {
-      this.hide()
+      dialogRef,
+      onDialogHide,
+      onOKClick: () => {
+        onDialogOK({ username: username.value, password: password.value })
+      },
+      onCancelClick: onDialogCancel,
+      username,
+      password
     }
   }
-})
+}
 </script>
 
 <style lang="scss" scoped>

@@ -29,8 +29,8 @@ addEventListener('message', event => {
         postMessage(Error(error))
       })
       return
-    case KitsuRequestType.LIBRARY_ID:
-      kitsuWorker.getLibraryId(request.data.get('mangaId') as string, request.data.get('userId') as string).then(result => {
+    case KitsuRequestType.LIBRARY_INFO:
+      kitsuWorker.getLibraryInfo(request.data.get('mangaId') as string, request.data.get('userId') as string).then(result => {
         // @ts-ignore
         postMessage(result)
       }).catch(error => {

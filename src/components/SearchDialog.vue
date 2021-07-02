@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -15,8 +15,8 @@
         />
       </q-toolbar>
 
-      <manga-search
-        v-model="url"
+      <MangaSearch
+        v-model:url="url"
         :content="content"
         :search-placeholder="searchPlaceholder"
         :manual-placeholder="manualPlaceholder"
@@ -43,16 +43,12 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { mapMutations } from 'vuex'
-import { QDialog } from 'quasar'
+import { useDialogPluginComponent } from 'quasar'
+import { ref } from 'vue'
 import MangaSearch from './SearchComponent.vue'
+import { useClearingSearchResults } from 'src/composables/useSearchResults'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
+export default {
   components: {
     MangaSearch
   },
@@ -88,46 +84,29 @@ export default (Vue as VueConstructor<Vue &
     },
     excludedUrls: {
       type: Array,
-      default: () => [] as string[]
+      default: () => []
     }
   },
 
-  data () {
+  emits: [...useDialogPluginComponent.emits],
+
+  setup () {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const { clearSearchResults } = useClearingSearchResults()
+    const url = ref('')
+
     return {
-      url: ''
-    }
-  },
-
-  mounted () {
-    this.updateSearchResults([])
-  },
-
-  methods: {
-    ...mapMutations('reader', {
-      updateSearchResults: 'updateSearchResults'
-    }),
-
-    show () {
-      this.$refs.dialog.show()
-    },
-
-    hide () {
-      this.updateSearchResults([])
-      this.$refs.dialog.hide()
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok', { url: this.url })
-      this.hide()
-    },
-
-    onCancelClick () {
-      this.hide()
+      dialogRef,
+      onDialogHide: () => {
+        clearSearchResults()
+        onDialogHide()
+      },
+      onOKClick: () => {
+        onDialogOK(url.value)
+      },
+      onCancelClick: onDialogCancel,
+      url
     }
   }
-})
+}
 </script>

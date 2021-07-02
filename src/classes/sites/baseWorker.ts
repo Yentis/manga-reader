@@ -3,6 +3,7 @@ import { Manga } from '../manga'
 import moment from 'moment'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { AxiosRequestConfig } from 'axios'
+import { Cheerio, Element, Node } from 'cheerio'
 
 export abstract class BaseWorker {
   // Use for CORS proxy
@@ -12,12 +13,12 @@ export abstract class BaseWorker {
   }
 
   siteType: SiteType | LinkingSiteType
-  chapter: cheerio.Cheerio | undefined
-  image: cheerio.Cheerio | undefined
-  title: cheerio.Cheerio | undefined
-  chapterDate: cheerio.Cheerio | undefined
-  chapterNum: cheerio.Cheerio | undefined
-  requestConfig: AxiosRequestConfig | undefined
+  chapter?: Cheerio<Element | Node>
+  image?: Cheerio<Element>
+  title?: Cheerio<Element | Node>
+  chapterDate?: Cheerio<Element>
+  chapterNum?: Cheerio<Element | Node>
+  requestConfig?: AxiosRequestConfig
 
   constructor (siteType: SiteType | LinkingSiteType, requestConfig: AxiosRequestConfig | undefined = undefined) {
     this.siteType = siteType

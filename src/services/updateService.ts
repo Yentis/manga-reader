@@ -23,6 +23,19 @@ export async function getChangelog (): Promise<string | undefined> {
   return changelog
 }
 
+export interface Asset {
+    name: string
+    'browser_download_url': string
+}
+
+export interface GithubRelease {
+    name: string
+    'tag_name': string
+    'html_url': string
+    assets: Asset[],
+    body: string
+}
+
 export async function checkUpdates (): Promise<GithubRelease | undefined> {
   const latestRelease = (await getReleases())[0]
   if (latestRelease.tag_name !== version) {
@@ -32,7 +45,7 @@ export async function checkUpdates (): Promise<GithubRelease | undefined> {
 
 async function getReleases (): Promise<GithubRelease[]> {
   const response = await axios.get('https://api.github.com/repos/Yentis/manga-reader/releases')
-  return response.data as Array<GithubRelease>
+  return response.data as GithubRelease[]
 }
 
 export function getApkAsset (githubRelease: GithubRelease): Asset | undefined {
@@ -47,17 +60,4 @@ export function getElectronAsset (githubRelease: GithubRelease): Asset | undefin
     return asset.name.endsWith('.zip')
   })
   return zipAsset
-}
-
-export interface GithubRelease {
-    name: string
-    'tag_name': string
-    'html_url': string
-    assets: Array<Asset>,
-    body: string
-}
-
-export interface Asset {
-    name: string
-    'browser_download_url': string
 }

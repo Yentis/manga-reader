@@ -3,34 +3,20 @@
     <div :class="{ 'header': true, 'q-mb-sm': mobileView }">
       <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
         <q-btn
-          v-if="mobileView"
-          color="primary"
-          label="Add"
+          :class="{ 'q-mr-sm': !mobileView }"
+          color="secondary"
+          icon="add"
           @click="onAddManga"
         />
         <q-btn
-          v-else
-          class="q-mr-sm"
           color="primary"
-          label="Add Manga"
-          @click="onAddManga"
-        />
-        <q-btn
-          v-if="mobileView"
-          color="primary"
-          label="Refresh"
-          @click="onRefreshAllManga"
-        />
-        <q-btn
-          v-else
-          color="primary"
-          label="Refresh Manga"
-          @click="onRefreshAllManga"
+          icon="refresh"
+          @click="refreshAllManga"
         />
       </div>
       <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
         <q-btn
-          v-if="mobileView"
+          :class="{ 'q-mr-sm': !mobileView }"
           color="primary"
           icon="backup"
           :loading="exporting"
@@ -38,26 +24,8 @@
           @click="onExportList"
         />
         <q-btn
-          v-else
-          class="q-mr-sm"
-          color="primary"
-          label="Export to Dropbox"
-          :loading="exporting"
-          :disable="importing"
-          @click="onExportList"
-        />
-        <q-btn
-          v-if="mobileView"
           color="primary"
           icon="cloud_download"
-          :loading="importing"
-          :disable="exporting"
-          @click="onImportList"
-        />
-        <q-btn
-          v-else
-          color="primary"
-          label="Import from Dropbox"
           :loading="importing"
           :disable="exporting"
           @click="onImportList"
@@ -67,28 +35,27 @@
         flat
         round
         icon="settings"
-        @click="onSettingsClick"
+        @click="showSettingsDialog"
       />
     </div>
 
     <div>
       <q-input
-        v-model="newSearch"
+        v-model="searchValue"
         dense
         outlined
         class="q-mb-sm full-width"
-        @input="updateSearchValue(newSearch)"
       >
-        <template v-slot:append>
+        <template #append>
           <q-icon
-            v-if="newSearch === ''"
+            v-if="searchValue === ''"
             name="search"
           />
           <q-icon
             v-else
             name="clear"
             class="cursor-pointer"
-            @click="newSearch = ''; updateSearchValue(newSearch)"
+            @click="searchValue = ''"
           />
         </template>
       </q-input>
@@ -105,7 +72,7 @@
           <q-item
             v-close-popup
             clickable
-            @click="updateSortedBy(type)"
+            @click="setSortedBy(type)"
           >
             <q-item-section>
               <q-item-label>{{ type }}</q-item-label>
@@ -117,7 +84,7 @@
       <q-btn-dropdown
         no-caps
         label="Filters"
-        @input="updateFilters"
+        @update:model-value="setFilters(newFilters)"
       >
         <q-option-group
           v-model="newFilters"
@@ -131,333 +98,124 @@
 </template>
 
 <script lang="ts">
-import { LocalStorage } from 'quasar'
-import { mapGetters, mapMutations } from 'vuex'
-import { defineComponent } from '@vue/composition-api'
-import pEachSeries from 'p-each-series'
-import { NotifyOptions } from 'src/classes/notifyOptions'
-import { Manga } from 'src/classes/manga'
-import { UrlNavigation } from 'src/classes/urlNavigation'
-import { SiteType } from 'src/enums/siteEnum'
+import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
 import { Status } from 'src/enums/statusEnum'
 import { SortType } from 'src/enums/sortingEnum'
-import { getMangaInfo } from 'src/services/siteService'
-import { saveList, readList, getAuthUrl, setAccessToken, getAccessToken, cordovaLogin } from 'src/services/dropboxService'
-import SearchDialog from './SearchDialog.vue'
-import SiteDialog from './SiteDialog.vue'
-import ConfirmationDialog from './ConfirmationDialog.vue'
-import SettingsDialog from './SettingsDialog.vue'
 import { Settings } from 'src/classes/settings'
-import { RefreshOptions } from 'src/classes/refreshOptions'
-
-interface CordovaNotificationOptions {
-  title: string
-  text: string
-  icon: string
-  smallIcon: string
-  foreground: boolean
-}
-
-interface CordovaNotification {
-  notification: {
-    local: {
-      schedule: (options: CordovaNotificationOptions) => void
-    }
-  }
-}
+import useSettings from 'src/composables/useSettings'
+import useRefreshing from 'src/composables/useRefreshing'
+import useMangaList from 'src/composables/useMangaList'
+import useMobileView from 'src/composables/useMobileView'
+import useSearchValue from 'src/composables/useSearchValue'
+import useCloudSync from 'src/composables/useCloudSync'
 
 export default defineComponent({
-  name: 'manga-header',
+  name: 'MangaHeader',
 
-  data () {
-    return {
-      exporting: false,
-      importing: false,
-      autoRefreshing: false,
-      refreshInterval: undefined as NodeJS.Timeout | undefined,
-      sortTypes: SortType,
-      status: Status,
-      newFilters: [] as Array<Status>,
-      newSearch: ''
+  setup () {
+    const { importList, exportList } = useCloudSync()
+
+    const {
+      addManga,
+      storeManga,
+      showAddMangaDialog,
+      fetchManga
+    } = useMangaList()
+
+    const {
+      refreshing,
+      refreshInterval,
+      createRefreshInterval,
+      refreshAllManga
+    } = useRefreshing()
+
+    const onAddManga = async () => {
+      const url = await showAddMangaDialog()
+      if (url === null) return
+
+      refreshing.value = true
+      const manga = await fetchManga(url)
+      refreshing.value = false
+      if (manga === null) return
+
+      const added = addManga(manga)
+      if (added) {
+        storeManga()
+      }
+      refreshing.value = false
     }
-  },
 
-  computed: {
-    ...mapGetters('reader', {
-      mangaList: 'mangaList',
-      refreshing: 'refreshing',
-      refreshProgress: 'refreshProgress',
-      mobileView: 'mobileView',
-      settings: 'settings'
-    }),
+    const newFilters: Ref<Status[]> = ref([])
+    const {
+      settings,
+      showSettingsDialog,
+      setSortedBy,
+      setFilters
+    } = useSettings()
 
-    statusList () {
-      return Object.values(Status).map(value => {
+    onMounted(() => {
+      createRefreshInterval(settings.value.refreshOptions)
+      newFilters.value = settings.value.filters
+    })
+
+    watch(settings, (newSettings: Settings) => {
+      if (refreshInterval.value !== undefined) {
+        clearInterval(refreshInterval.value)
+        refreshInterval.value = undefined
+      }
+
+      createRefreshInterval(newSettings.refreshOptions)
+    })
+
+    const importing = ref(false)
+    const onImportList = () => {
+      importing.value = true
+
+      importList().finally(() => {
+        importing.value = false
+      })
+    }
+
+    const exporting = ref(false)
+    const onExportList = () => {
+      exporting.value = true
+
+      exportList().finally(() => {
+        exporting.value = false
+      })
+    }
+
+    const { mobileView } = useMobileView()
+    const { searchValue } = useSearchValue()
+    const statusList = Object.values(Status)
+      .map(value => {
         return {
           label: value,
           value: value
         }
       })
-    }
-  },
 
-  watch: {
-    settings (settings: Settings) {
-      if (this.refreshInterval) {
-        clearInterval(this.refreshInterval)
-        this.refreshInterval = undefined
-      }
+    return {
+      sortTypes: SortType,
+      status: Status,
 
-      this.createRefreshInterval(settings.refreshOptions)
-    }
-  },
+      mobileView,
+      searchValue,
+      statusList,
 
-  mounted () {
-    this.newFilters = (this.settings as Settings).filters
-    this.createRefreshInterval((this.settings as Settings).refreshOptions)
-  },
+      importing,
+      exporting,
+      onImportList,
+      onExportList,
 
-  methods: {
-    ...mapMutations('reader', {
-      updateRefreshing: 'updateRefreshing',
-      updateRefreshProgress: 'updateRefreshProgress',
-      incrementRefreshProgress: 'incrementRefreshProgress',
-      pushNotification: 'pushNotification',
-      updateMangaList: 'updateMangaList',
-      addManga: 'addManga',
-      updateManga: 'updateManga',
-      pushUrlNavigation: 'pushUrlNavigation',
-      updateSettings: 'updateSettings',
-      updateSearchValue: 'updateSearchValue'
-    }),
+      newFilters,
+      settings,
+      showSettingsDialog,
+      setSortedBy,
+      setFilters,
 
-    createRefreshInterval (refreshOptions: RefreshOptions) {
-      this.refreshInterval = setInterval(() => {
-        if (!refreshOptions.enabled || this.refreshing) return
-        this.autoRefreshing = true
-        this.onRefreshAllManga()
-      }, refreshOptions.period * 60 * 1000)
-    },
-
-    onAddManga () {
-      this.$q.dialog({
-        component: SearchDialog,
-        parent: this,
-        title: 'Add manga',
-        searchPlaceholder: 'Search for a manga',
-        manualPlaceholder: 'Or enter a manga url manually',
-        confirmButton: 'Add'
-      }).onOk((data: { url: string }) => {
-        this.onMangaSelected(data.url)
-      }).onDismiss(() => {
-        if (siteDialog) {
-          siteDialog.hide()
-        }
-      })
-
-      const siteDialog = this.$q.dialog({
-        component: SiteDialog,
-        parent: this
-      })
-    },
-
-    onMangaSelected (url: string) {
-      const site = Object.values(SiteType).find(site => url.includes(site))
-      if (site === undefined) {
-        this.pushNotification(new NotifyOptions(Error('Valid site not found')))
-        return
-      }
-
-      this.updateRefreshing(true)
-      getMangaInfo(url, site)
-        .then(manga => {
-          if (manga instanceof Error) {
-            this.pushNotification(new NotifyOptions(manga))
-          } else {
-            manga.read = '0'
-            manga.readNum = 0
-            this.onMangaRetrieved(manga)
-          }
-        })
-        .catch(error => this.pushNotification(new NotifyOptions(error)))
-        .finally(() => this.updateRefreshing(false))
-    },
-
-    onMangaRetrieved (manga: Manga) {
-      for (const entry of this.mangaList as Manga[]) {
-        if (entry.url === manga.url) {
-          this.pushNotification(new NotifyOptions(Error('Manga already exists')))
-          return
-        }
-      }
-
-      this.addManga(manga)
-      LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
-      this.updateRefreshing(false)
-    },
-
-    onRefreshAllManga () {
-      if (this.refreshing) return
-      this.updateRefreshProgress(0.01)
-      this.updateRefreshing(true)
-
-      const filteredMangaList = (this.mangaList as Manga[]).filter(manga => manga.status === Status.READING || manga.shouldUpdate)
-      const promises = filteredMangaList.map(manga => getMangaInfo(manga.url, manga.site, manga.altSources))
-      const step = promises.length > 0 ? (1 / promises.length) : 0
-      pEachSeries(promises, (result, index) => {
-        const manga = filteredMangaList[index]
-
-        if (result instanceof Error) {
-          const notifyOptions = new NotifyOptions(result, `Failed to refresh ${manga.title}`)
-          notifyOptions.actions = [{
-            label: 'Visit',
-            handler: () => {
-              this.pushUrlNavigation(new UrlNavigation(manga.url, true))
-            },
-            color: 'white'
-          }]
-
-          this.pushNotification(notifyOptions)
-        } else {
-          if (this.autoRefreshing && manga.chapter !== result.chapter) {
-            this.sendPushNotification(result)
-          }
-
-          manga.title = result.title
-          manga.chapter = result.chapter
-          manga.chapterUrl = result.chapterUrl
-          manga.chapterNum = result.chapterNum
-          manga.chapterDate = result.chapterDate
-          manga.image = result.image
-
-          this.updateManga(manga)
-        }
-
-        this.incrementRefreshProgress(step)
-      }).catch((error: Error) => {
-        this.pushNotification(new NotifyOptions(error))
-      }).finally(() => {
-        LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
-        this.autoRefreshing = false
-        this.updateRefreshing(false)
-        this.updateRefreshProgress(0)
-      })
-    },
-
-    onImportList () {
-      if (!getAccessToken()) {
-        this.startDropboxLogin()
-      } else {
-        this.importing = true
-
-        readList().then(mangaList => {
-          this.$q.dialog({
-            component: ConfirmationDialog,
-            title: 'Import from Dropbox',
-            content: `Are you sure you want to import ${mangaList.length} titles from Dropbox?\nYou currently have ${(this.mangaList as Manga[]).length} titles.`
-          }).onOk(() => {
-            const notifyOptions = new NotifyOptions('Imported!')
-            notifyOptions.type = 'positive'
-            this.pushNotification(notifyOptions)
-            this.updateMangaList(mangaList)
-            LocalStorage.set(this.$constants.MANGA_LIST_KEY, this.mangaList)
-          })
-        }).catch((error: Error) => {
-          if (error.message === 'Unauthorized') {
-            this.startDropboxLogin()
-          } else {
-            this.pushNotification(new NotifyOptions(error))
-          }
-        }).finally(() => {
-          this.importing = false
-        })
-      }
-    },
-
-    onExportList () {
-      if (!getAccessToken()) {
-        this.startDropboxLogin()
-      } else {
-        this.$q.dialog({
-          component: ConfirmationDialog,
-          title: 'Export to Dropbox',
-          content: `Are you sure you want to export ${(this.mangaList as Manga[]).length} titles to Dropbox?`
-        }).onOk(() => {
-          this.exporting = true
-
-          saveList(this.mangaList).then(() => {
-            const notifyOptions = new NotifyOptions('Exported!')
-            notifyOptions.type = 'positive'
-            this.pushNotification(notifyOptions)
-          }).catch((error: Error) => {
-            if (error.message === 'Unauthorized') {
-              this.startDropboxLogin()
-            } else {
-              this.pushNotification(new NotifyOptions(error))
-            }
-          }).finally(() => {
-            this.exporting = false
-          })
-        })
-      }
-    },
-
-    onSettingsClick () {
-      this.$q.dialog({
-        component: SettingsDialog,
-        parent: this
-      })
-    },
-
-    startDropboxLogin () {
-      if (this.$q.platform.is.mobile) {
-        cordovaLogin()
-          .then(token => {
-            const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
-            notifyOptions.type = 'positive'
-            this.pushNotification(notifyOptions)
-            setAccessToken(token)
-          })
-          .catch(error => this.pushNotification(new NotifyOptions(error)))
-      } else {
-        this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
-      }
-    },
-
-    sendPushNotification (manga: Manga) {
-      if (this.$q.platform.is.electron) {
-        const notification = new Notification(manga.title, {
-          body: manga.chapter,
-          icon: manga.image
-        })
-
-        notification.onclick = () => {
-          this.pushUrlNavigation(new UrlNavigation(manga.url, false))
-        }
-      } else if (this.$q.platform.is.mobile) {
-        (this.$q.cordova.plugins as CordovaNotification).notification.local.schedule({
-          title: manga.title,
-          text: manga.chapter,
-          smallIcon: 'res://notification_icon',
-          icon: manga.image,
-          foreground: true
-        })
-      }
-    },
-
-    updateSortedBy (sortType: SortType) {
-      const newSettings = Settings.clone(this.settings as Settings)
-      newSettings.sortedBy = sortType
-
-      this.updateSettings(newSettings)
-    },
-
-    updateFilters (showing: boolean) {
-      if (showing) return
-      const newSettings = Settings.clone(this.settings as Settings)
-      newSettings.filters = this.newFilters
-
-      this.updateSettings(newSettings)
+      onAddManga,
+      refreshAllManga
     }
   }
 })

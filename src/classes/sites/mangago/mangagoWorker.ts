@@ -23,6 +23,13 @@ export class MangagoWorker extends BaseWorker {
     return this.chapter?.text().trim() || 'Unknown'
   }
 
+  getChapterUrl (): string {
+    const mobile = this.platform?.mobile === true
+    const chapter = mobile ? this.chapter : this.chapter?.parent()
+
+    return chapter?.attr('href') || ''
+  }
+
   getChapterNum (): number {
     return this.parseNum(this.chapterNum?.text().split('Ch.')[1])
   }
@@ -42,11 +49,11 @@ export class MangagoWorker extends BaseWorker {
     const mobile = this.platform?.mobile === true
 
     if (!mobile) {
-      const listingElem = $('.listing a')
+      const listingElem = $('.listing tbody tr').first()
 
-      this.chapter = listingElem.first()
+      this.chapter = listingElem.find('a').first()
       this.chapterNum = this.chapter
-      this.chapterDate = $('.listing .no').first()
+      this.chapterDate = listingElem.children().last()
       this.image = $('.cover img').first()
       this.title = $('.w-title h1').first()
 
@@ -75,7 +82,7 @@ export class MangagoWorker extends BaseWorker {
     const missingChapterUrls: string[] = []
     const promises: Promise<Error | Manga>[] = []
 
-    $('#search_list li').each((_index: number, element: cheerio.Element) => {
+    $('#search_list li').each((_index: number, element) => {
       const manga = new Manga('', this.siteType)
       const titleElem = $(element).find('.tit a')
       manga.title = titleElem.first().text().trim() || ''

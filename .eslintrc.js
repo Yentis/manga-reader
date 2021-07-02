@@ -41,7 +41,7 @@ module.exports = {
     // See https://eslint.vuejs.org/rules/#available-rules
     // 'plugin:vue/essential', // Priority A: Essential (Error Prevention)
     // 'plugin:vue/strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
-    'plugin:vue/recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+    'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
     'standard'
 
@@ -93,6 +93,8 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
 
     'no-void': 'off',
-    'import/no-webpack-loader-syntax': 'off'
+    'import/no-webpack-loader-syntax': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn']
   }
 }

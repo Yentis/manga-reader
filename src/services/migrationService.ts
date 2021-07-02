@@ -1,5 +1,5 @@
 import { LocalStorage } from 'quasar'
-import constants from 'src/boot/constants'
+import constants from 'src/classes/constants'
 import { RefreshOptions } from 'src/classes/refreshOptions'
 import { Settings } from 'src/classes/settings'
 import { SiteType } from 'src/enums/siteEnum'
@@ -19,21 +19,21 @@ interface MigrationManga {
 }
 
 export function getMigrationVersion () {
-  return LocalStorage.getItem(constants().MIGRATION_VERSION) || ''
+  return LocalStorage.getItem(constants.MIGRATION_VERSION) || ''
 }
 
 export function tryMigrateMangaList () {
   if (getMigrationVersion() === version) return
-  const mangaList: MigrationManga[] | null = LocalStorage.getItem(constants().MANGA_LIST_KEY)
+  const mangaList: MigrationManga[] | null = LocalStorage.getItem(constants.MANGA_LIST_KEY)
 
   if (mangaList !== null) {
-    LocalStorage.set(constants().MANGA_LIST_KEY, doMigration(mangaList))
+    LocalStorage.set(constants.MANGA_LIST_KEY, doMigration(mangaList))
   }
 }
 
 export function tryMigrateSettings () {
   if (getMigrationVersion() === version) return
-  const settings: Settings = LocalStorage.getItem(constants().SETTINGS) || new Settings()
+  const settings: Settings = LocalStorage.getItem(constants.SETTINGS) || new Settings()
   const openInBrowser: boolean | null = LocalStorage.getItem(OPEN_BROWSER_KEY)
   const darkMode: boolean | null = LocalStorage.getItem(DARK_MODE_KEY)
   const refreshOptions: RefreshOptions | null = LocalStorage.getItem(REFRESH_OPTIONS_KEY)
@@ -53,7 +53,7 @@ export function tryMigrateSettings () {
     LocalStorage.remove(REFRESH_OPTIONS_KEY)
   }
 
-  LocalStorage.set(constants().SETTINGS, settings)
+  LocalStorage.set(constants.SETTINGS, settings)
 }
 
 export function migrateInput (input: string): string {
@@ -64,7 +64,7 @@ export function migrateInput (input: string): string {
 function doMigration (mangaList: MigrationManga[]) {
   mangaList.forEach(item => {
     if (item.linkedSites === undefined) {
-      const linkedSites = {} as Record<string, number>
+      const linkedSites: Record<string, number> = {}
       if (item.mangaDexId !== undefined) {
         linkedSites[SiteType.MangaDex] = item.mangaDexId
       }
