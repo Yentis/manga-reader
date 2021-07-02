@@ -45,6 +45,9 @@ import {
 } from '../enums/linkingSiteEnum'
 import { AxiosRequestConfig } from 'axios'
 import PQueue from 'p-queue'
+import {
+  ArangScans
+} from '../classes/sites/arang/arangscans'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -60,7 +63,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
-  [SiteType.AsuraScans, new AsuraScans()],
+  [SiteType.AsuraScans, new AsuraScans(SiteType.AsuraScans)],
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
@@ -68,14 +71,18 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ZeroScans, new Genkan(SiteType.ZeroScans)],
   [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
-  [SiteType.ArangScans, new WordPress(SiteType.ArangScans)],
+  [SiteType.ArangScans, new ArangScans()],
   [SiteType.EdelgardeScans, new Genkan(SiteType.EdelgardeScans)],
-  [SiteType.Genkan, new Genkanio()]
+  [SiteType.Genkan, new Genkanio()],
+  [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
   [LinkingSiteType.Kitsu, new Kitsu()]
 ])
+const siteAliases = [
+  { url: 'manganato.com', site: SiteType.Manganelo }
+]
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
   const timeoutPromise: Promise<Error | Manga[]> = new Promise(resolve => setTimeout(() => resolve(Error('Timed out')), 10000))
@@ -96,6 +103,23 @@ export function checkSites (): void {
     void site.checkLogin()
     void site.checkState()
   })
+}
+
+export function getSiteByUrl (url: string): SiteType | undefined {
+  const site = Object.values(SiteType).find(site => url.includes(site))
+  if (site !== undefined) return site
+
+  const siteAlias = siteAliases.find((alias) => url.includes(alias.url))?.site
+  return siteAlias
+}
+
+export async function getMangaInfoByUrl (url: string): Promise <Error | Manga> {
+  const site = getSiteByUrl(url)
+  if (site === undefined) {
+    return new Error('Valid site not found')
+  }
+
+  return getMangaInfo(url, site)
 }
 
 export async function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType, altSources: Record<string, string> = {}): Promise <Error | Manga> {

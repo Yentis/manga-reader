@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -51,7 +51,7 @@
           <a
             class="ellipsis"
             :href="`${sitePrefix}${shareId}`"
-            @click.prevent="onUrlClick(`${sitePrefix}${shareId}`)"
+            @click.prevent="navigate(`${sitePrefix}${shareId}`)"
           >
             {{ `${sitePrefix}${shareId}` }}
           </a>
@@ -76,11 +76,15 @@
           />
         </q-card-actions>
 
+        <q-card-actions v-if="dev">
+          <TestComponent />
+        </q-card-actions>
+
         <q-card-actions>
           <q-space />
 
           <q-btn
-            color="secondary"
+            color="primary"
             label="Confirm"
             type="submit"
           />
@@ -95,110 +99,80 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { mapGetters, mapMutations } from 'vuex'
-import { QDialog, copyToClipboard } from 'quasar'
+import { useDialogPluginComponent, copyToClipboard } from 'quasar'
+import { defineComponent, onMounted, ref } from 'vue'
 import { Settings } from 'src/classes/settings'
-import { UrlNavigation } from 'src/classes/urlNavigation'
-import { createList, getAuthUrl, getNotifyOptions, getShareId } from 'src/services/gitlabService'
-import ConfirmationDialog from 'src/components/ConfirmationDialog.vue'
+import { getShareId } from 'src/services/gitlabService'
 import { NotifyOptions } from 'src/classes/notifyOptions'
+import useUrlNavigation from 'src/composables/useUrlNavigation'
+import useNotification from 'src/composables/useNotification'
+import useSettings from 'src/composables/useSettings'
+import TestComponent from 'src/components/TestComponent.vue'
+import useSharing from 'src/composables/useSharing'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
-  data () {
-    return {
-      newSettings: new Settings(),
-      shareId: '',
-      loading: false,
-      sitePrefix: 'https://yentis.github.io/mangalist?id='
+export default defineComponent({
+  components: { TestComponent },
+
+  emits: [...useDialogPluginComponent.emits],
+
+  setup () {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const { navigate } = useUrlNavigation()
+    const { notification } = useNotification()
+    const { settings } = useSettings()
+    const { showShareDialog } = useSharing()
+
+    const loading = ref(false)
+
+    const newSettings = ref(new Settings())
+    const getNewSettings = () => {
+      newSettings.value = Settings.clone(settings.value)
     }
-  },
 
-  computed: {
-    ...mapGetters('reader', {
-      settings: 'settings',
-      mangaList: 'mangaList'
-    })
-  },
+    onMounted(getNewSettings)
 
-  mounted () {
-    this.newSettings = Settings.clone(this.settings as Settings)
-    this.shareId = getShareId()
-  },
+    const shareId = ref('')
+    const updateShareId = () => {
+      shareId.value = getShareId()
+    }
 
-  methods: {
-    ...mapMutations('reader', {
-      updateSettings: 'updateSettings',
-      pushNotification: 'pushNotification',
-      pushUrlNavigation: 'pushUrlNavigation'
-    }),
+    onMounted(updateShareId)
 
-    show () {
-      this.$refs.dialog.show()
-    },
+    const onShareList = async () => {
+      loading.value = true
+      shareId.value = await showShareDialog()
+      loading.value = false
+    }
 
-    hide () {
-      this.$refs.dialog.hide()
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.updateSettings(this.newSettings)
-      this.$emit('ok')
-      this.hide()
-    },
-
-    onCancelClick () {
-      this.hide()
-    },
-
-    onUrlClick (url: string) {
-      this.pushUrlNavigation(new UrlNavigation(url, false))
-    },
-
-    onShareList () {
-      this.$q.dialog({
-        component: ConfirmationDialog,
-        title: 'List sharing',
-        content: 'Your list will be uploaded to Gitlab as a Snippet and a shareable URL will be generated.\nThis shareable list will be updated periodically or whenever the app is opened.'
-      }).onOk(async () => {
-        this.loading = true
-
-        try {
-          const shareId = await createList(JSON.stringify(this.mangaList))
-          this.shareId = shareId
-        } catch (error) {
-          const notifyOptions = getNotifyOptions(this, error)
-
-          if (notifyOptions.caption?.includes('Not logged in')) {
-            this.pushUrlNavigation(new UrlNavigation(getAuthUrl(), true))
-          } else {
-            this.pushNotification(notifyOptions)
-            console.error(error)
-          }
-        }
-
-        this.loading = false
-      })
-    },
-
-    onCopyToClipboard () {
-      copyToClipboard(`${this.sitePrefix}${this.shareId}`)
+    const sitePrefix = 'https://yentis.github.io/mangalist?id='
+    const onCopyToClipboard = () => {
+      copyToClipboard(`${sitePrefix}${shareId.value}`)
         .then(() => {
           const notifyOptions = new NotifyOptions('Copied to clipboard!')
           notifyOptions.type = 'positive'
-          this.pushNotification(notifyOptions)
+          notification.value = notifyOptions
         })
         .catch(error => {
-          this.pushNotification(new NotifyOptions(error, 'Failed to copy to clipboard'))
+          notification.value = new NotifyOptions(error, 'Failed to copy to clipboard')
         })
+    }
+
+    return {
+      dialogRef,
+      onDialogHide,
+      onOKClick: () => {
+        settings.value = newSettings.value
+        onDialogOK()
+      },
+      onCancelClick: onDialogCancel,
+      sitePrefix,
+      dev: process.env.DEV?.toString() === 'true',
+      loading,
+      newSettings,
+      shareId,
+      navigate,
+      onShareList,
+      onCopyToClipboard
     }
   }
 })

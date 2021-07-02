@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     no-focus
     no-refocus
     seamless
@@ -15,7 +15,7 @@
           round
           icon="refresh"
           :loading="refreshing"
-          @click="onRefreshSites"
+          @click="refreshSites"
         />
         <q-toolbar-title class="q-pl-xs">
           Supported sites
@@ -35,7 +35,7 @@
               'bg-warning': !item.site.statusOK() && item.site.state !== siteState.OFFLINE,
               'text-black': !item.site.statusOK() && $q.dark.isActive
             }"
-            @click="item.site.loggedIn ? item.site.statusOK() ? onLinkClicked(item.site.getUrl()) : onLinkClicked(item.site.getUrl(), true) : onLinkClicked(item.site.getLoginUrl(), true)"
+            @click="item.site.loggedIn ? item.site.statusOK() ? navigate(item.site.getUrl()) : navigate(item.site.getUrl(), true) : navigate(item.site.getLoginUrl(), true)"
           >
             <q-item-section v-if="!item.refreshing">
               <q-item-label :class="{ 'full-width': mobileView }">
@@ -71,30 +71,15 @@
 </template>
 
 <script lang="ts">
-import pEachSeries from 'p-each-series'
-import Vue, { VueConstructor } from 'vue'
-import { mapGetters, mapMutations } from 'vuex'
-import { QDialog } from 'quasar'
-import { BaseSite } from 'src/classes/sites/baseSite'
-import { UrlNavigation } from 'src/classes/urlNavigation'
-import { getSiteMap } from 'src/services/siteService'
+import { useDialogPluginComponent } from 'quasar'
+import { defineComponent } from 'vue'
 import { SiteName, SiteState } from 'src/enums/siteEnum'
-import { InitializeComponents } from 'src/classes/initializeComponents'
+import useSiteList from 'src/composables/useSiteList'
+import useSiteListVisible from 'src/composables/useSiteListVisible'
+import useUrlNavigation from 'src/composables/useUrlNavigation'
+import { useSearchResults } from 'src/composables/useSearchResults'
 
-interface DisplayedSite {
-   site: BaseSite
-   refreshing: boolean
-}
-
-function siteSort (a: DisplayedSite, b: DisplayedSite): number {
-  return a.site.compare(b.site)
-}
-
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
+export default defineComponent({
   props: {
     title: {
       type: String,
@@ -110,119 +95,29 @@ export default (Vue as VueConstructor<Vue &
     }
   },
 
-  data () {
+  emits: [...useDialogPluginComponent.emits],
+
+  setup () {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const { siteList, refreshing, refreshSites } = useSiteList()
+    const { mobileView, visible } = useSiteListVisible()
+    const { navigate } = useUrlNavigation()
+    const { searchResults } = useSearchResults()
+
     return {
-      visible: true,
-      refreshing: false,
-      siteList: [] as DisplayedSite[],
+      dialogRef,
+      onDialogHide,
+      onOKClick: onDialogOK,
+      onCancelClick: onDialogCancel,
       siteNames: SiteName,
-      windowSize: [] as Array<number>,
-      siteState: SiteState
-    }
-  },
-
-  computed: {
-    ...mapGetters('reader', {
-      searchResults: 'searchResults',
-      mobileView: 'mobileView',
-      initialized: 'initialized'
-    })
-  },
-
-  watch: {
-    windowSize (value: Array<number>) {
-      if (value[0] <= 700 && !this.mobileView) this.visible = false
-      else if (value[1] <= 500 && this.mobileView) this.visible = false
-      else this.visible = true
-    }
-  },
-
-  mounted () {
-    this.updateSiteList()
-    this.windowSize = [window.innerWidth, window.innerHeight]
-
-    this.$nextTick(() => {
-      window.addEventListener('resize', () => {
-        this.windowSize = [window.innerWidth, window.innerHeight]
-      })
-    })
-
-    const initialized = this.initialized as InitializeComponents
-    if (!initialized.siteState) {
-      this.onRefreshSites()
-
-      initialized.siteState = true
-      this.updateInitialized(initialized)
-    }
-  },
-
-  methods: {
-    ...mapMutations('reader', {
-      pushUrlNavigation: 'pushUrlNavigation',
-      updateInitialized: 'updateInitialized'
-    }),
-
-    updateSiteList () {
-      this.siteList = Array.from(getSiteMap().values()).map(site => {
-        return {
-          site,
-          refreshing: false
-        }
-      }).sort(siteSort)
-    },
-
-    show () {
-      this.$refs.dialog.show()
-    },
-
-    hide () {
-      this.$refs.dialog.hide()
-    },
-
-    onLinkClicked (url: string, openInApp = false) {
-      this.pushUrlNavigation(new UrlNavigation(url, openInApp))
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok')
-      this.hide()
-    },
-
-    onCancelClick () {
-      this.hide()
-    },
-
-    onRefreshSites () {
-      this.refreshing = true
-      this.siteList.forEach(item => {
-        item.refreshing = true
-      })
-
-      const promises = [] as Promise<void>[]
-      const siteMap = [] as BaseSite[]
-
-      getSiteMap().forEach(site => {
-        siteMap.push(site)
-        promises.push(site.checkState())
-      })
-      pEachSeries(promises, (result, index) => {
-        const site = siteMap[index]
-        const siteItem = this.siteList.find(item => item.site.siteType === site.siteType)
-
-        if (siteItem) {
-          siteItem.site = site
-          siteItem.refreshing = false
-        }
-      }).catch((error: Error) => {
-        console.error(error)
-      }).finally(() => {
-        this.refreshing = false
-        this.siteList.sort(siteSort)
-      })
+      siteState: SiteState,
+      siteList,
+      mobileView,
+      visible,
+      refreshing,
+      refreshSites,
+      searchResults,
+      navigate
     }
   }
 })

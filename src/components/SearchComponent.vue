@@ -7,16 +7,16 @@
     >
       <template
         v-if="search"
-        v-slot:append
+        #append
       >
         <q-icon
           name="cancel"
           class="cursor-pointer"
-          @click.stop="search = ''; updateSearchResults([])"
+          @click.stop="search = ''; searchResults = []"
         />
       </template>
 
-      <template v-slot:after>
+      <template #after>
         <q-btn
           round
           dense
@@ -44,7 +44,7 @@
             v-for="manga in searchResults"
             :key="manga.url"
             clickable
-            @click="$emit('change', manga.url); mangaTitle = manga.title"
+            @click="$emit('update:url', manga.url); mangaTitle = manga.title"
           >
             <q-item-section avatar>
               <q-img
@@ -70,148 +70,74 @@
 
     <q-input
       v-if="searchResults.length === 0"
-      :value="url"
+      :model-value="url"
       :placeholder="manualPlaceholder"
-      @change="$emit('change', $event.target.value)"
+      @update:model-value="(value) => { $emit('update:url', value) }"
     />
   </q-card-section>
 </template>
 
 <script lang="ts">
-import relevancy from 'relevancy'
-import { mapGetters, mapMutations } from 'vuex'
-import { defineComponent } from '@vue/composition-api'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
-import { getSite, searchManga } from 'src/services/siteService'
-import { Manga } from 'src/classes/manga'
-import { NotifyOptions } from 'src/classes/notifyOptions'
-import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-
-const mangaSearchSorter = new relevancy.Sorter({
-  comparator: (a: Manga, b: Manga) => {
-    return mangaSort(a, b)
-  }
-})
-
-function mangaSort (a: Manga, b: Manga): number {
-  return a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
-}
+import { defineComponent, ref } from 'vue'
+import { SiteName } from 'src/enums/siteEnum'
+import useMangaList from 'src/composables/useMangaList'
+import { useSearchResults } from 'src/composables/useSearchResults'
+import useMobileView from 'src/composables/useMobileView'
 
 export default defineComponent({
-  name: 'manga-search',
-
-  model: {
-    prop: 'url',
-    event: 'change'
-  },
+  name: 'MangaSearch',
 
   props: {
-    url: String,
-    searchPlaceholder: String,
-    manualPlaceholder: String,
-    initialSearch: String,
-    siteType: String,
+    url: {
+      type: String,
+      default: ''
+    },
+    searchPlaceholder: {
+      type: String,
+      default: ''
+    },
+    manualPlaceholder: {
+      type: String,
+      default: ''
+    },
+    initialSearch: {
+      type: String,
+      default: ''
+    },
+    siteType: {
+      type: String,
+      default: ''
+    },
     excludedUrls: {
       type: Array,
-      default: () => [] as string[]
+      default: () => []
     }
   },
 
-  data () {
+  emits: ['update:url'],
+
+  setup (props) {
+    const search = ref(props.initialSearch)
+    const mangaTitle = ref('')
+    const searchDropdownShown = ref(true)
+    const { findManga } = useMangaList()
+    const { searchResults } = useSearchResults()
+    const { mobileView } = useMobileView()
+    const excludedUrls = props.excludedUrls.filter((url) => typeof url === 'string') as string[]
+
+    const onSearch = async (siteTypeName = '') => {
+      const foundManga = await findManga(siteTypeName, search.value, excludedUrls)
+      if (foundManga) searchDropdownShown.value = true
+    }
+
     return {
-      search: '',
-      mangaTitle: '',
       siteNames: SiteName,
-      searchDropdownShown: true
-    }
-  },
-
-  mounted () {
-    this.search = this.initialSearch || ''
-  },
-
-  computed: {
-    ...mapGetters('reader', {
-      mangaList: 'mangaList',
-      searchResults: 'searchResults',
-      mobileView: 'mobileView'
-    })
-  },
-
-  methods: {
-    ...mapMutations('reader', {
-      pushNotification: 'pushNotification',
-      updateSearchResults: 'updateSearchResults'
-    }),
-
-    onSearch (siteTypeName: string | undefined = undefined) {
-      const siteType = Object.values(SiteType).find(siteType => siteTypeName === siteType) ||
-                       Object.values(LinkingSiteType).find(siteType => siteTypeName === siteType)
-
-      if (siteTypeName !== undefined) {
-        if (siteType === undefined) return
-        const loggedIn = this.handleSingleSite(siteType)
-        if (!loggedIn) return
-      }
-
-      if (!this.search) return
-
-      this.$q.loading.show({
-        delay: 100
-      })
-
-      searchManga(this.search, siteType)
-        .then(result => {
-          this.searchDropdownShown = true
-
-          // Some websites return results from other websites...
-          const processedResults: string[] = []
-
-          const searchResults = result.filter(resultManga => {
-            const alreadyAdded = !(this.mangaList as Manga[]).find(manga => resultManga.url === manga.url) &&
-                                 !processedResults.includes(resultManga.url) &&
-                                 !this.excludedUrls.includes(resultManga.url)
-            processedResults.push(resultManga.url)
-
-            return alreadyAdded
-          })
-
-          if (searchResults.length === 0) {
-            this.pushNotification(new NotifyOptions('No results found'))
-          }
-
-          this.updateSearchResults(mangaSearchSorter.sort(searchResults, this.search, (obj, calc) => {
-            return calc(obj.title)
-          }))
-        })
-        .catch(error => this.pushNotification(new NotifyOptions(error)))
-        .finally(() => {
-          this.$q.loading.hide()
-        })
-    },
-
-    handleSingleSite (siteType: SiteType | LinkingSiteType): boolean {
-      const site = getSite(siteType)
-      if (!site) return false
-
-      if (!site.loggedIn) {
-        site.openLogin(this).then((loggedIn) => {
-          if (loggedIn === true) {
-            const notifyOptions = new NotifyOptions('Logged in successfully!')
-            notifyOptions.type = 'positive'
-            this.pushNotification(notifyOptions)
-            this.onSearch(siteType)
-          } else if (loggedIn instanceof Error) {
-            this.pushNotification(new NotifyOptions(loggedIn))
-          }
-        }).catch((error) => {
-          this.pushNotification(new NotifyOptions(error))
-        })
-
-        return false
-      }
-
-      return true
+      search,
+      mangaTitle,
+      searchDropdownShown,
+      searchResults,
+      mobileView,
+      onSearch
     }
   }
 })

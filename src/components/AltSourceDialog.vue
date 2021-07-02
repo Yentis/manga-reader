@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    ref="dialog"
+    ref="dialogRef"
     @hide="onDialogHide"
   >
     <q-card>
@@ -39,7 +39,7 @@
               flat
               color="negative"
               icon="delete"
-              @click="onDeleteClicked(source.url)"
+              @click="removeUrl(source.url)"
             />
           </q-item-section>
         </q-item>
@@ -53,7 +53,7 @@
           class="q-pr-xs"
           color="positive"
           icon="add"
-          @click="onAddClicked"
+          @click="showAddDialog"
         />
       </q-card-actions>
 
@@ -61,7 +61,7 @@
         <q-space />
 
         <q-btn
-          color="secondary"
+          color="primary"
           :label="confirmButton"
           @click="onOKClick"
         />
@@ -75,19 +75,16 @@
 </template>
 
 <script lang="ts">
-import Vue, { VueConstructor } from 'vue'
-import { mapMutations } from 'vuex'
-import { QDialog } from 'quasar'
+import { useDialogPluginComponent, useQuasar } from 'quasar'
+import { defineComponent, ref, Ref, onMounted } from 'vue'
 import { SiteName, SiteType } from 'src/enums/siteEnum'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import SearchDialog from './SearchDialog.vue'
+import { useClearingSearchResults } from 'src/composables/useSearchResults'
+import useNotification from 'src/composables/useNotification'
+import { getSiteByUrl } from 'src/services/siteService'
 
-export default (Vue as VueConstructor<Vue &
-  { $refs:
-    { dialog: QDialog },
-  }
->).extend({
-
+export default defineComponent({
   props: {
     sources: {
       type: Object,
@@ -111,96 +108,77 @@ export default (Vue as VueConstructor<Vue &
     }
   },
 
-  data () {
-    return {
-      url: '',
-      data: [] as {
-        name: SiteName,
-        site: SiteType,
-        url: string
-      }[]
-    }
-  },
+  emits: [...useDialogPluginComponent.emits],
 
-  mounted () {
-    this.updateSearchResults([])
-    const sources = this.sources as Record<string, string>
-    this.data = Object.keys(sources).map(source => {
-      const siteType = source as SiteType
+  setup (props) {
+    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
+    const { clearSearchResults } = useClearingSearchResults()
+    const { notification } = useNotification()
 
-      return {
-        name: SiteName[siteType],
-        site: siteType,
-        url: sources[source]
-      }
-    })
-  },
+    const data: Ref<{ name: SiteName, site: SiteType, url: string }[]> = ref([])
+    const sources: Ref<Record<string, string>> = ref(props.sources)
 
-  methods: {
-    ...mapMutations('reader', {
-      updateSearchResults: 'updateSearchResults',
-      pushNotification: 'pushNotification'
-    }),
-
-    show () {
-      this.$refs.dialog.show()
-    },
-
-    hide () {
-      this.updateSearchResults([])
-      this.$refs.dialog.hide()
-    },
-
-    onDialogHide () {
-      this.$emit('hide')
-    },
-
-    onOKClick () {
-      this.$emit('ok', {
-        url: this.url,
-        sources: this.getSources()
+    const getSources = () => {
+      sources.value = {}
+      data.value.forEach(item => {
+        sources.value[item.site] = item.url
       })
-      this.hide()
-    },
+    }
 
-    onAddClicked () {
-      this.$q.dialog({
+    const getData = () => {
+      data.value = Object.keys(sources.value).map(source => {
+        const siteType = source as SiteType
+
+        return {
+          name: SiteName[siteType],
+          site: siteType,
+          url: sources.value[source]
+        }
+      })
+    }
+    onMounted(getData)
+
+    const $q = useQuasar()
+    const showAddDialog = () => {
+      $q.dialog({
         component: SearchDialog,
-        parent: this,
-        title: 'Add manga',
-        initialSearch: this.initialSearch,
-        searchPlaceholder: this.searchPlaceholder,
-        manualPlaceholder: this.manualPlaceholder,
-        confirmButton: this.confirmButton,
-        excludedUrls: this.data.map((item) => item.url)
-      }).onOk((data: { url: string }) => {
-        const site = Object.values(SiteType).find(site => data.url.includes(site))
+        componentProps: {
+          title: 'Add manga',
+          initialSearch: props.initialSearch,
+          searchPlaceholder: props.searchPlaceholder,
+          manualPlaceholder: props.manualPlaceholder,
+          confirmButton: props.confirmButton,
+          excludedUrls: data.value.map((item) => item.url)
+        }
+      }).onOk((url: string) => {
+        const site = getSiteByUrl(url)
         if (site === undefined) {
-          this.pushNotification(new NotifyOptions(Error('Valid site not found')))
+          notification.value = new NotifyOptions(Error('Valid site not found'))
           return
         }
 
-        this.data.push({ name: SiteName[site], site, url: data.url })
+        data.value.push({ name: SiteName[site], site, url })
       })
-    },
+    }
 
-    onCancelClick () {
-      this.hide()
-    },
+    const removeUrl = (url: string) => {
+      data.value = data.value.filter((site) => site.url !== url)
+    }
 
-    onDeleteClicked (url: string) {
-      const index = this.data.findIndex(site => site.url === url)
-      if (index === -1) return
-      this.data.splice(index, 1)
-    },
-
-    getSources () {
-      const sources = {} as Record<string, string>
-      this.data.forEach(item => {
-        sources[item.site] = item.url
-      })
-
-      return sources
+    return {
+      dialogRef,
+      onDialogHide: () => {
+        clearSearchResults()
+        onDialogHide()
+      },
+      onOKClick: () => {
+        getSources()
+        onDialogOK(sources.value)
+      },
+      onCancelClick: onDialogCancel,
+      data,
+      showAddDialog,
+      removeUrl
     }
   }
 })

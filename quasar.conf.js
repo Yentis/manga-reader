@@ -8,14 +8,22 @@
 /* eslint-env node */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
 
 module.exports = configure(function (ctx) {
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
     supportTS: {
       tsCheckerConfig: {
-        eslint: true,
-        memoryLimit: 8192
+        eslint: {
+          enabled: true,
+          files: './src/**/*.{ts,tsx,js,jsx,vue}',
+          memoryLimit: 8192
+        },
+        typescript: {
+          memoryLimit: 8192
+        }
       }
     },
 
@@ -26,8 +34,7 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
-      'composition-api',
-      'constants'
+      'stateInterface'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -50,6 +57,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+      env: require('dotenv').config().parsed,
 
       // transpile: false,
 
@@ -71,13 +79,9 @@ module.exports = configure(function (ctx) {
       extendWebpack (cfg) {
         // linting is slow in TS projects, we execute it only for production builds
         if (ctx.prod) {
-          cfg.module.rules.push({
-            enforce: 'pre',
-            test: /\.(js|vue)$/,
-            loader: 'eslint-loader',
-            exclude: /node_modules/
-          })
+          cfg.plugins.push(new ESLintPlugin())
         }
+        cfg.plugins.push(new NodePolyfillPlugin())
       }
     },
 
@@ -91,13 +95,8 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       iconSet: 'material-icons', // Quasar icon set
-      lang: 'en-us', // Quasar language pack
+      lang: 'en-US', // Quasar language pack
       config: {},
-
-      // Possible values for "importStrategy":
-      // * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
-      // * 'all'  - Manually specify what to import
-      importStrategy: 'auto',
 
       // For special cases outside of where "auto" importStrategy can have an impact
       // (like functional components as one of the examples),

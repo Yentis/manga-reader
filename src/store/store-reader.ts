@@ -1,11 +1,11 @@
-import { InitializeComponents } from 'src/classes/initializeComponents'
-import { Manga } from 'src/classes/manga'
-import { NotifyOptions } from 'src/classes/notifyOptions'
-import { Settings } from 'src/classes/settings'
-import { UrlNavigation } from 'src/classes/urlNavigation'
-import { mangaSort } from 'src/services/sortService'
+import { Status } from 'src/enums/statusEnum'
+import { Manga } from '../classes/manga'
+import { NotifyOptions } from '../classes/notifyOptions'
+import { Settings } from '../classes/settings'
+import { UrlNavigation } from '../classes/urlNavigation'
+import { mangaSort } from '../services/sortService'
 
-class ReaderState {
+export class ReaderState {
     mangaList: Manga[] = []
     refreshing = false
     refreshProgress = 0
@@ -15,13 +15,16 @@ class ReaderState {
     mobileView = false
     settings = new Settings()
     searchValue = ''
-    initialized = new InitializeComponents()
 }
 
 function doSort (mangaList: Manga[]): Manga[] {
   return mangaList.sort((a, b) => {
     return mangaSort(a, b, state.settings.sortedBy)
   })
+}
+
+function getMangaByUrl (state: ReaderState, url: string): Manga | undefined {
+  return state.mangaList.find((manga) => url === manga.url)
 }
 
 const state = new ReaderState()
@@ -38,25 +41,97 @@ const mutations = {
     state.mangaList = doSort(state.mangaList)
   },
   removeManga (state: ReaderState, url: string) {
-    const index = state.mangaList.findIndex(manga => manga.url === url)
-    if (index === -1) return
-    state.mangaList.splice(index, 1)
+    state.mangaList = state.mangaList.filter((manga) => manga.url !== url)
     state.mangaList = doSort(state.mangaList)
   },
-  updateManga (state: ReaderState, manga: Manga) {
-    const index = state.mangaList.findIndex(curManga => manga.url === curManga.url)
+  updateManga (state: ReaderState, data: { url: string, manga: Manga }) {
+    const index = state.mangaList.findIndex(curManga => data.url === curManga.url)
     if (index === -1) return
-    state.mangaList[index] = manga
+    state.mangaList[index] = data.manga
     state.mangaList = doSort(state.mangaList)
+  },
+  updateMangaAltSources (state: ReaderState, data: { url: string, altSources: Record<string, string> | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.altSources = data.altSources
+  },
+  updateMangaChapter (state: ReaderState, data: { url: string, chapter: string }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.chapter = data.chapter
+    state.mangaList = doSort(state.mangaList)
+  },
+  updateMangaChapterNum (state: ReaderState, data: { url: string, chapterNum: number }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.chapterNum = data.chapterNum
+  },
+  updateMangaChapterUrl (state: ReaderState, data: { url: string, chapterUrl: string }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.chapterUrl = data.chapterUrl
+  },
+  updateMangaChapterDate (state: ReaderState, data: { url: string, chapterDate: string }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.chapterDate = data.chapterDate
+  },
+  updateMangaImage (state: ReaderState, data: { url: string, image: string }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.image = data.image
+  },
+  updateMangaTitle (state: ReaderState, data: { url: string, title: string }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.title = data.title
+  },
+  updateMangaRead (state: ReaderState, data: { url: string, read: string | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.read = data.read
+    state.mangaList = doSort(state.mangaList)
+  },
+  updateMangaReadNum (state: ReaderState, data: { url: string, readNum: number | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.readNum = data.readNum
+  },
+  updateMangaReadUrl (state: ReaderState, data: { url: string, readUrl: string | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.readUrl = data.readUrl
+  },
+  updateMangaLinkedSites (state: ReaderState, data: { url: string, linkedSites: Record<string, number> }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.linkedSites = data.linkedSites
+  },
+  updateMangaStatus (state: ReaderState, data: { url: string, status: Status }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.status = data.status
+  },
+  updateMangaNotes (state: ReaderState, data: { url: string, notes: string | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.notes = data.notes
+  },
+  updateMangaRating (state: ReaderState, data: { url: string, rating: number | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.rating = data.rating
+  },
+  updateMangaShouldUpdate (state: ReaderState, data: { url: string, shouldUpdate: boolean | undefined }) {
+    const manga = getMangaByUrl(state, data.url)
+    if (manga === undefined) return
+    manga.shouldUpdate = data.shouldUpdate
   },
   updateRefreshing (state: ReaderState, refreshing: boolean) {
     state.refreshing = refreshing
   },
   updateRefreshProgress (state: ReaderState, refreshProgress: number) {
     state.refreshProgress = refreshProgress
-  },
-  incrementRefreshProgress (state: ReaderState, increment: number) {
-    state.refreshProgress += increment
   },
   pushNotification (state: ReaderState, notification: NotifyOptions) {
     state.notification = notification
@@ -75,18 +150,12 @@ const mutations = {
   },
   updateSearchValue (state: ReaderState, searchValue: string) {
     state.searchValue = searchValue
-  },
-  updateInitialized (state: ReaderState, initialized: InitializeComponents) {
-    state.initialized = initialized
   }
 }
 
 const getters = {
   mangaList: (state: ReaderState) => {
     return state.mangaList
-  },
-  manga: (state: ReaderState) => (url: string) => {
-    return state.mangaList.find(manga => manga.url === url)
   },
   refreshing: (state: ReaderState) => {
     return state.refreshing
@@ -111,9 +180,6 @@ const getters = {
   },
   searchValue: (state: ReaderState) => {
     return state.searchValue
-  },
-  initialized: (state: ReaderState) => {
-    return state.initialized
   }
 }
 

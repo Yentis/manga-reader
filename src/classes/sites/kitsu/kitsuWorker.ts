@@ -4,6 +4,47 @@ import { Manga } from '../../manga'
 import qs from 'qs'
 import axios, { AxiosRequestConfig } from 'axios'
 
+export interface LoginResponse {
+  'access_token': string
+}
+
+interface BasicResponse {
+  data: { id: string }[]
+}
+
+export interface Data {
+  id: string,
+  links: {
+    self: string
+  },
+  attributes: {
+    progress: number
+  },
+  relationships: {
+    manga: {
+      data: {
+        id: string
+      }
+    }
+  }
+}
+
+interface LibraryEntriesResponse {
+  data: Data[]
+  included: {
+    id: string,
+    links: {
+      self: string
+    },
+    attributes: {
+      titles: Record<string, string | undefined>,
+      posterImage: {
+        small: string
+      }
+    }
+  }[] | undefined
+}
+
 export class KitsuWorker extends BaseWorker {
   static siteType = LinkingSiteType.Kitsu
   static url = BaseWorker.getUrl(KitsuWorker.siteType)
@@ -127,55 +168,16 @@ export class KitsuWorker extends BaseWorker {
     return mangaResponse.data[0].id
   }
 
-  async getLibraryId (mangaId: string, userId: string): Promise<Error | string> {
+  async getLibraryInfo (mangaId: string, userId: string): Promise<Error | Data> {
     const queryString = qs.stringify({
       'filter[manga_id]': mangaId,
       'filter[user_id]': userId
     })
 
     const response = await axios.get(`${KitsuWorker.url}/api/edge/library-entries?${queryString}`)
-    const libraryResponse = response.data as BasicResponse
+    const libraryResponse = response.data as LibraryEntriesResponse
 
-    if (libraryResponse.data.length === 0) return Error('Response did not contain ID')
-    return libraryResponse.data[0].id
+    if (libraryResponse.data.length === 0) return Error('Response did not contain info')
+    return libraryResponse.data[0]
   }
-}
-
-export interface LoginResponse {
-  'access_token': string
-}
-
-interface BasicResponse {
-  data: { id: string }[]
-}
-
-interface LibraryEntriesResponse {
-  data: {
-    id: string,
-    links: {
-      self: string
-    },
-    attributes: {
-      progress: number
-    },
-    relationships: {
-      manga: {
-        data: {
-          id: string
-        }
-      }
-    }
-  }[]
-  included: {
-    id: string,
-    links: {
-      self: string
-    },
-    attributes: {
-      titles: Record<string, string | undefined>,
-      posterImage: {
-        small: string
-      }
-    }
-  }[] | undefined
 }

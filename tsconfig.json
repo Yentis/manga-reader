@@ -6,8 +6,19 @@
     "typeRoots": [
       "node_modules/@types",
       "./typings"
+    ],
+    "esModuleInterop": true,
+    "types": [
+      "quasar"
     ]
   },
+  "exclude": [
+    "node_modules",
+    ".quasar",
+    "dist",
+    "public",
+    "src-cordova"
+  ],
   "ts-node": {
     "files": true
   }

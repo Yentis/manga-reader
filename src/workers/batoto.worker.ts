@@ -1,6 +1,6 @@
 import { Worker } from '../classes/worker'
 import { WorkerRequest } from '../classes/workerRequest'
-import { BatotoWorker } from '../classes/sites/batoto/batotoworker'
+import { BatotoWorker } from '../classes/sites/batoto/batotoWorker'
 import { doOperation } from './helper'
 
 addEventListener('message', event => {

@@ -5,7 +5,7 @@ import { doOperation } from './helper'
 
 addEventListener('message', event => {
   const request = event.data as WorkerRequest
-  const worker = new AsuraScansWorker(request.requestConfig)
+  const worker = new AsuraScansWorker(request.siteType, request.requestConfig)
 
   doOperation(request, worker)
 })

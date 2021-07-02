@@ -6,10 +6,10 @@ import { RequestType } from '../../enums/workerEnum'
 import { LinkingSiteType } from '../../enums/linkingSiteEnum'
 import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
 import { AxiosRequestConfig } from 'axios'
-import { ComponentRenderProxy } from '@vue/composition-api'
 import PQueue from 'p-queue'
 import { BaseWorker } from './baseWorker'
-import { Platform } from 'quasar'
+import { Platform, QVueGlobals } from 'quasar'
+import { Store } from 'vuex'
 
 export abstract class BaseSite {
   abstract siteType: SiteType | LinkingSiteType
@@ -40,12 +40,12 @@ export abstract class BaseSite {
     return Promise.resolve(true)
   }
 
-  openLogin (componentRenderProxy: ComponentRenderProxy): Promise<boolean | Error> {
-    componentRenderProxy.$store.commit('reader/pushUrlNavigation', new UrlNavigation(this.getLoginUrl(), true))
+  openLogin ($q: QVueGlobals, store: Store<unknown>): Promise<boolean | Error> {
+    store.commit('reader/pushUrlNavigation', new UrlNavigation(this.getLoginUrl(), true))
     return Promise.resolve(false)
   }
 
-  getMangaId (_componentRenderProxy: ComponentRenderProxy, url: string): Promise<number | Error> {
+  getMangaId ($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
     const parsedUrl = parseInt(url)
     if (!isNaN(parsedUrl)) return Promise.resolve(parsedUrl)
 
@@ -56,7 +56,11 @@ export abstract class BaseSite {
     return new Promise(resolve => {
       const worker = new this.WorkerClass()
       worker.onmessage = event => {
-        resolve(event.data)
+        if (event.data instanceof Error) {
+          resolve(event.data)
+        } else {
+          resolve()
+        }
       }
       const data = new Map()
       data.set('mangaId', mangaId)
@@ -77,8 +81,14 @@ export abstract class BaseSite {
     return this.addToQueue(() => {
       return new Promise(resolve => {
         const worker = new this.WorkerClass()
-        worker.onmessage = event => {
-          resolve(event.data)
+        worker.onmessage = (event) => {
+          if (event.data instanceof Error) {
+            resolve(event.data)
+          } else if (typeof event.data === 'object') {
+            resolve(Manga.clone(event.data as Manga))
+          } else {
+            resolve(Error('Unknown response received'))
+          }
         }
         const data = new Map()
         data.set('url', url)
@@ -92,7 +102,13 @@ export abstract class BaseSite {
       return new Promise(resolve => {
         const worker = new this.WorkerClass()
         worker.onmessage = event => {
-          resolve(event.data)
+          if (event.data instanceof Error) {
+            resolve(event.data)
+          } else if (Array.isArray(event.data)) {
+            resolve(event.data.map((item) => Manga.clone(item)))
+          } else {
+            resolve(Error('Unknown response received'))
+          }
         }
         const data = new Map()
         data.set('query', query)
