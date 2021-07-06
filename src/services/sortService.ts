@@ -3,9 +3,6 @@ import { SortType } from 'src/enums/sortingEnum'
 import { Status } from 'src/enums/statusEnum'
 
 export function mangaSort (a: Manga, b: Manga, sortedBy: SortType): number {
-  const isARead = a.chapter === a.read || (a.chapterNum === a.readNum && a.readNum !== undefined)
-  const isBRead = b.chapter === b.read || (b.chapterNum === b.readNum && b.readNum !== undefined)
-
   if ((a.status !== Status.READING || undefined) && (b.status === Status.READING || undefined)) {
     return 1
   }
@@ -34,6 +31,9 @@ export function mangaSort (a: Manga, b: Manga, sortedBy: SortType): number {
     return -1
   }
 
+  const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
+  const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
+
   if (!isARead && isBRead) {
     return -1
   }
@@ -53,6 +53,10 @@ export function mangaSort (a: Manga, b: Manga, sortedBy: SortType): number {
     default:
       return sortTitle(a, b)
   }
+}
+
+export function isMangaRead (chapter: string, chapterNum: number, read?: string, readNum?: number): boolean {
+  return chapter === read || (readNum !== undefined && chapterNum <= readNum)
 }
 
 function sortSite (a: Manga, b: Manga) {

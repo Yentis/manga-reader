@@ -24,6 +24,10 @@ export abstract class BaseSite {
     return this.loggedIn && this.state === SiteState.REACHABLE
   }
 
+  hasSearch (): boolean {
+    return true
+  }
+
   async checkState (): Promise<void> {
     try {
       const response = await this.readUrl(this.getTestUrl())

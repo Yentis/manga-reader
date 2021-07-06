@@ -6,6 +6,10 @@ export class Genkanio extends BaseSite {
   siteType = GenkanioWorker.siteType
   WorkerClass = Worker
 
+  hasSearch (): boolean {
+    return false
+  }
+
   getTestUrl (): string {
     return GenkanioWorker.testUrl
   }

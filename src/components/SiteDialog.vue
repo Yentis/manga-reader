@@ -33,7 +33,7 @@
             :class="{
               'bg-negative': !item.site.statusOK() && item.site.state === siteState.OFFLINE,
               'bg-warning': !item.site.statusOK() && item.site.state !== siteState.OFFLINE,
-              'text-black': !item.site.statusOK() && $q.dark.isActive
+              'text-black': !item.site.statusOK()
             }"
             @click="item.site.loggedIn ? item.site.statusOK() ? navigate(item.site.getUrl()) : navigate(item.site.getUrl(), true) : navigate(item.site.getLoginUrl(), true)"
           >
@@ -42,18 +42,21 @@
                 {{ siteNames[item.site.siteType] }}
               </q-item-label>
               <q-item-label
-                v-if="!item.site.loggedIn"
-                :class="{ 'text-grey-8': $q.dark.isActive }"
+                :class="{
+                  'text-black': !item.site.statusOK() && $q.dark.isActive,
+                  'text-warning': item.site.statusOK()
+                }"
                 caption
               >
-                Click to login
-              </q-item-label>
-              <q-item-label
-                v-else-if="!item.site.statusOK()"
-                :class="{ 'text-grey-8': $q.dark.isActive }"
-                caption
-              >
-                {{ item.site.state }}
+                {{
+                  !item.site.loggedIn
+                    ? 'Click to login'
+                    : !item.site.statusOK()
+                      ? item.site.state
+                      : !item.site.hasSearch()
+                        ? 'Search not supported'
+                        : ''
+                }}
               </q-item-label>
             </q-item-section>
 

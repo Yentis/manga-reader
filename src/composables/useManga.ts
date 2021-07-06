@@ -1,5 +1,5 @@
 import useMangaList from './useMangaList'
-import { computed, ref, Ref } from 'vue'
+import { computed, ref, Ref, watch } from 'vue'
 import { Manga } from '../classes/manga'
 import { SiteType } from '../enums/siteEnum'
 import { useQuasar } from 'quasar'
@@ -164,9 +164,9 @@ export function useMangaItem (url: string) {
 
   const editing = ref(false)
 
-  const saveManga = () => {
+  const saveManga = async () => {
     editing.value = !editing.value
-    const urlChanged = saveUrl()
+    const urlChanged = await saveUrl()
     const readNumChanged = saveReadNum()
     const statusChanged = saveStatus()
     const notesChanged = saveNotes()
@@ -206,12 +206,18 @@ export function useMangaItem (url: string) {
     newSources.value = undefined
   }
 
-  const saveUrl = (): boolean => {
+  const saveUrl = (): Promise<boolean> => {
     const currentUrl = manga.url.value || ''
-    if (newUrl.value === currentUrl) return false
+    if (newUrl.value === currentUrl) return Promise.resolve(false)
 
-    manga.url.value = newUrl.value
-    return true
+    return new Promise((resolve) => {
+      const stopWatching = watch(manga.url, () => {
+        resolve(true)
+        stopWatching()
+      })
+
+      manga.url.value = newUrl.value
+    })
   }
 
   const saveReadNum = (): boolean => {

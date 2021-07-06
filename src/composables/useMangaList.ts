@@ -92,15 +92,16 @@ export default function useMangaList () {
   }
 
   const $q = useQuasar()
-  const showAddMangaDialog = (): Promise<string | null> => {
+  const showMangaDialog = (type: string, query = ''): Promise<string | null> => {
     return new Promise((resolve) => {
       $q.dialog({
         component: SearchDialog,
         componentProps: {
-          title: 'Add manga',
+          title: `${type} manga`,
           searchPlaceholder: 'Search for a manga',
           manualPlaceholder: 'Or enter a manga url manually',
-          confirmButton: 'Add'
+          confirmButton: type,
+          initialSearch: query
         }
       }).onOk((url: string) => {
         resolve(url)
@@ -116,6 +117,9 @@ export default function useMangaList () {
       })
     })
   }
+
+  const showAddMangaDialog = () => showMangaDialog('Add')
+  const showUpdateMangaDialog = (query: string) => showMangaDialog('Update', query)
 
   const fetchManga = async (url: string): Promise<Manga | null> => {
     let manga: Manga | Error
@@ -235,6 +239,7 @@ export default function useMangaList () {
     updateMangaShouldUpdate,
     storeManga,
     showAddMangaDialog,
+    showUpdateMangaDialog,
     fetchManga,
     findManga
   }

@@ -111,6 +111,7 @@ const mutations = {
     const manga = getMangaByUrl(state, data.url)
     if (manga === undefined) return
     manga.status = data.status
+    state.mangaList = doSort(state.mangaList)
   },
   updateMangaNotes (state: ReaderState, data: { url: string, notes: string | undefined }) {
     const manga = getMangaByUrl(state, data.url)

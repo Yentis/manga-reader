@@ -102,12 +102,24 @@
               class="q-mb-sm"
             />
 
-            <q-input
-              v-model="newUrl"
-              stack-label
-              label="URL:"
-              class="q-mb-sm"
-            />
+            <q-card-actions
+              class="q-pl-none"
+            >
+              <q-input
+                v-model="newUrl"
+                stack-label
+                label="URL:"
+                class="q-mb-sm"
+              />
+
+              <q-btn
+                flat
+                class="q-ml-xs"
+                icon="search"
+                :size="itemSize"
+                @click="openSearchDialog()"
+              />
+            </q-card-actions>
 
             <q-checkbox
               v-if="mangaStatus !== status.READING"
@@ -262,7 +274,7 @@
         <q-space />
 
         <q-btn
-          v-if="mangaChapter !== mangaRead && !editing"
+          v-if="isUnread && !editing"
           color="secondary"
           icon="done"
           :size="itemSize"
@@ -290,6 +302,8 @@ import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { useMangaItem } from 'src/composables/useManga'
 import useProgressLinking from 'src/composables/useProgressLinking'
 import useAltSources from 'src/composables/useAltSources'
+import useMangaList from 'src/composables/useMangaList'
+import { isMangaRead } from 'src/services/sortService'
 
 export default defineComponent({
   name: 'MangaItem',
@@ -306,6 +320,7 @@ export default defineComponent({
     const { mobileView } = useMobileView()
     const { openLinkingDialog } = useProgressLinking(props.url, manga.newLinkedSites)
     const { openAltSourceDialog } = useAltSources(props.url, manga.newSources)
+    const { showUpdateMangaDialog } = useMangaList()
 
     const itemSize = computed(() => {
       return mobileView.value ? 'sm' : 'md'
@@ -316,8 +331,12 @@ export default defineComponent({
     })
     const isUnread = computed(() => {
       return manga.status.value === Status.READING &&
-        manga.chapter.value !== manga.read.value &&
-        (manga.readNum.value === undefined || manga.chapterNum.value !== manga.readNum.value)
+      !isMangaRead(
+        manga.chapter.value,
+        manga.chapterNum.value,
+        manga.read.value,
+        manga.readNum.value
+      )
     })
 
     const image = ref(manga.image.value)
@@ -341,6 +360,13 @@ export default defineComponent({
     }
 
     const { navigate } = useUrlNavigation()
+
+    const openSearchDialog = async () => {
+      const url = await showUpdateMangaDialog(manga.title.value)
+      if (url === null) return
+
+      manga.newUrl.value = url
+    }
 
     return {
       siteNames: SiteName,
@@ -377,6 +403,7 @@ export default defineComponent({
       hasLinkedSites,
       openLinkingDialog,
       openAltSourceDialog,
+      openSearchDialog,
 
       isUnread,
       deleteManga: manga.deleteManga,
