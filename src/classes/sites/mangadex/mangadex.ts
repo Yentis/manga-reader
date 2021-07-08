@@ -8,7 +8,7 @@ import { Store } from 'vuex'
 export class MangaDex extends BaseSite {
   siteType = MangaDexWorker.siteType
   WorkerClass = Worker
-  requestQueue = new PQueue({ interval: 1000, intervalCap: 1 })
+  requestQueue = new PQueue({ interval: 1000, intervalCap: 5 })
 
   constructor () {
     super()

@@ -85,7 +85,7 @@ export default defineComponent({
     const message = ref('')
 
     let sortedSites: (SiteType | LinkingSiteType)[] = Object.values(SiteType)
-    sortedSites = sortedSites.concat(Object.values(LinkingSiteType)).sort()
+    sortedSites = sortedSites.concat(Object.values(LinkingSiteType).filter((site) => !sortedSites.includes(site))).sort()
     const selectedSite: Ref<SiteType | LinkingSiteType> = ref(sortedSites[0])
 
     const testAllSites = () => {

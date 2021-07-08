@@ -2,6 +2,7 @@ import { LocalStorage } from 'quasar'
 import constants from 'src/classes/constants'
 import { RefreshOptions } from 'src/classes/refreshOptions'
 import { Settings } from 'src/classes/settings'
+import { MangaDexWorker } from 'src/classes/sites/mangadex/mangadexWorker'
 import { SiteType } from 'src/enums/siteEnum'
 import { Status } from 'src/enums/statusEnum'
 import { version } from '../../package.json'
@@ -16,18 +17,20 @@ interface MigrationManga {
   completed: boolean | undefined
   status: Status | undefined
   site: string
+  url: string
 }
 
 export function getMigrationVersion () {
   return LocalStorage.getItem(constants.MIGRATION_VERSION) || ''
 }
 
-export function tryMigrateMangaList () {
+export async function tryMigrateMangaList () {
   if (getMigrationVersion() === version) return
   const mangaList: MigrationManga[] | null = LocalStorage.getItem(constants.MANGA_LIST_KEY)
 
   if (mangaList !== null) {
-    LocalStorage.set(constants.MANGA_LIST_KEY, doMigration(mangaList))
+    const migratedMangaList = await doMigration(mangaList)
+    LocalStorage.set(constants.MANGA_LIST_KEY, migratedMangaList)
   }
 }
 
@@ -61,8 +64,10 @@ export function migrateInput (input: string): string {
   return JSON.stringify(doMigration(mangaList))
 }
 
-function doMigration (mangaList: MigrationManga[]) {
-  mangaList.forEach(item => {
+async function doMigration (mangaList: MigrationManga[]) {
+  const legacyMangaDexManga: { index: number, id: number }[] = []
+
+  mangaList.forEach((item, index) => {
     if (item.linkedSites === undefined) {
       const linkedSites: Record<string, number> = {}
       if (item.mangaDexId !== undefined) {
@@ -81,7 +86,29 @@ function doMigration (mangaList: MigrationManga[]) {
     if (item.site === 'secretscans.co') {
       item.site = SiteType.LynxScans
     }
+
+    if (item.site === SiteType.MangaDex) {
+      const split = item.url.replace(`${MangaDexWorker.url}/title/`, '').split('/')
+      if (split.length > 1) {
+        const id = split[0]
+        legacyMangaDexManga.push({ index, id: parseInt(id) })
+      }
+    }
   })
+
+  if (legacyMangaDexManga.length === 0) return mangaList
+
+  try {
+    const newMangaDexIdMap = await MangaDexWorker.convertLegacyIds(legacyMangaDexManga.map((item) => item.id))
+    legacyMangaDexManga.forEach((item) => {
+      const newId = newMangaDexIdMap[item.id]
+      if (!newId) return
+
+      mangaList[item.index].url = `${MangaDexWorker.url}/title/${newId}`
+    })
+  } catch (error) {
+    console.error(error)
+  }
 
   return mangaList
 }

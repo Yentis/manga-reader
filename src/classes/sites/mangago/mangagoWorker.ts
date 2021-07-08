@@ -24,10 +24,7 @@ export class MangagoWorker extends BaseWorker {
   }
 
   getChapterUrl (): string {
-    const mobile = this.platform?.mobile === true
-    const chapter = mobile ? this.chapter : this.chapter?.parent()
-
-    return chapter?.attr('href') || ''
+    return this.chapter?.attr('href') || ''
   }
 
   getChapterNum (): number {

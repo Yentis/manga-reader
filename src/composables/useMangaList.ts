@@ -248,8 +248,12 @@ export default function useMangaList () {
 export function useAppMangaList () {
   const { mangaList } = useMangaList()
 
-  onMounted(() => {
-    tryMigrateMangaList()
+  onMounted(async () => {
+    try {
+      await tryMigrateMangaList()
+    } catch (error) {
+      console.error(error)
+    }
 
     const localMangaList: Manga[] = LocalStorage.getItem(constants.MANGA_LIST_KEY) || []
     mangaList.value = localMangaList

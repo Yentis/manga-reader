@@ -41,29 +41,8 @@ export class GenkanioWorker extends BaseWorker {
     return this.buildManga(url)
   }
 
-  async search (query: string): Promise<Error | Manga[]> {
-    const response = await axios.get(`${GenkanioWorker.url}/manga?search=${encodeURIComponent(query)}`)
-    const $ = cheerio.load(response.data)
-    const mangaList: Manga[] = []
-
-    $('div ul li').each((_index, elem) => {
-      const manga = new Manga('', this.siteType)
-      manga.title = $(elem).text().trim()
-      manga.url = $(elem).find('a').first().attr('href') || ''
-
-      if (this.titleContainsQuery(query, manga.title)) {
-        mangaList.push(manga)
-      }
-    })
-
-    const fullMangaList: Manga[] = []
-    for (const manga of mangaList) {
-      const detailedManga = await this.readUrl(manga.url)
-      if (detailedManga instanceof Error) continue
-
-      fullMangaList.push(detailedManga)
-    }
-
-    return fullMangaList
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  search (_query: string): Promise<Error | Manga[]> {
+    return Promise.resolve([])
   }
 }
