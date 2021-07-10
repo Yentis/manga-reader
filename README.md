@@ -34,4 +34,10 @@ https://github.com/Yentis/manga-reader/releases
 ![Preview](https://i.imgur.com/A0zi4Xf.png)
 
 # Support
-For support contact Yentis#5218 on Discord.
+For support contact Yentis#5218 on Discord.  
+
+When building locally there is an issue with isomorphic-git on cordova where it will throw an error on cloning the repository.  
+Go to node_modules/isomorphic-git/index.js and change  
+for (const [i, start] of offsetArray.entries()) { }  
+to  
+offsetArray.forEach((start, i) => { }

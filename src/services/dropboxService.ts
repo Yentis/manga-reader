@@ -109,9 +109,10 @@ export function readList (): Promise<Manga[]> {
         setShareId((JSON.parse(this.result) as { id: string }).id)
       }
 
-      mangaListReader.onload = function () {
+      mangaListReader.onload = async function () {
         if (typeof this.result !== 'string') return reject(Error('Failed to read file'))
-        resolve(JSON.parse(migrateInput(this.result)))
+        const mangaList = await migrateInput(this.result)
+        resolve(JSON.parse(mangaList))
       }
 
       shareReader.readAsText(shareFile.fileBlob)

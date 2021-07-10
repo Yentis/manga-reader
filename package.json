@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.22.2",
     "@gitbeaker/browser": "^28.0.2",
+    "@isomorphic-git/lightning-fs": "^4.4.1",
     "@quasar/cli": "^1.1.2",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.19.2",
@@ -22,6 +23,7 @@
     "dropbox": "^10.1.0",
     "form-data": "^3.0.0",
     "isomorphic-fetch": "^2.2.1",
+    "isomorphic-git": "^1.9.1",
     "moment": "^2.27.0",
     "node-polyfill-webpack-plugin": "^1.1.3",
     "p-each-series": "^2.1.0",
@@ -33,8 +35,10 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.0.0",
     "@quasar/app": "3",
+    "@types/": "isomorphic-git/lightning-fs",
     "@types/cheerio": "^0.22.29",
     "@types/isomorphic-fetch": "0.0.35",
+    "@types/isomorphic-git__lightning-fs": "^4.4.2",
     "@types/node": "^10.17.15",
     "@types/tough-cookie": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^4.28.0",

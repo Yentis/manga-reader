@@ -59,9 +59,10 @@ export function tryMigrateSettings () {
   LocalStorage.set(constants.SETTINGS, settings)
 }
 
-export function migrateInput (input: string): string {
+export async function migrateInput (input: string): Promise<string> {
   const mangaList = JSON.parse(input) as MigrationManga[]
-  return JSON.stringify(doMigration(mangaList))
+  const migratedMangaList = await doMigration(mangaList)
+  return JSON.stringify(migratedMangaList)
 }
 
 async function doMigration (mangaList: MigrationManga[]) {

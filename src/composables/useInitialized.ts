@@ -1,5 +1,5 @@
 import { useStore } from '../store/index'
-import { computed, watchEffect, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { getChangelog } from '../services/updateService'
 import { LocalStorage, useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
@@ -55,9 +55,12 @@ export function useAppInitialized () {
     startShareSyncInterval()
   }
 
-  watchEffect(() => {
+  const checkInitialize = () => {
     if (main.value) return
     initialize().catch((error) => console.error(error))
     main.value = true
-  })
+  }
+
+  onMounted(checkInitialize)
+  watch(main, checkInitialize)
 }
