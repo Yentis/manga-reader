@@ -11,7 +11,7 @@
         <q-btn
           color="primary"
           icon="refresh"
-          @click="refreshAllManga"
+          @click="refreshAllManga()"
         />
       </div>
       <div>
