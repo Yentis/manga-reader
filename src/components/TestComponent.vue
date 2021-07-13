@@ -75,6 +75,7 @@ import { testZeroScans } from 'src/services/test/zeroscans'
 import { testFlameScans } from 'src/services/test/flamescans'
 import { useQuasar } from 'quasar'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { testResetScans } from 'src/services/test/resetscans'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -193,6 +194,9 @@ export default defineComponent({
           break
         case SiteType.FlameScans:
           await doTest(testFlameScans)
+          break
+        case SiteType.ResetScans:
+          await doTest(testResetScans)
           break
         default:
           break

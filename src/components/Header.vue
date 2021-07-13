@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div :class="{ 'header': true, 'q-mb-sm': mobileView }">
-      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+    <div class="header">
+      <div>
         <q-btn
-          :class="{ 'q-mr-sm': !mobileView }"
+          class="q-mr-sm"
           color="secondary"
           icon="add"
           @click="onAddManga"
@@ -14,9 +14,9 @@
           @click="refreshAllManga"
         />
       </div>
-      <div :class="{ 'flex-column-between': mobileView, 'q-gutter-sm': mobileView }">
+      <div>
         <q-btn
-          :class="{ 'q-mr-sm': !mobileView }"
+          class="q-mr-sm"
           color="primary"
           icon="backup"
           :loading="exporting"

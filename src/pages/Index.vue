@@ -27,7 +27,7 @@
 import { defineComponent, computed, onMounted } from 'vue'
 import moment from 'moment'
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import { SiteType } from 'src/enums/siteEnum'
+import { SiteName, SiteType } from 'src/enums/siteEnum'
 import * as DropboxService from 'src/services/dropboxService'
 import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
@@ -66,8 +66,30 @@ export default defineComponent({
 
     const filteredMangaList = computed(() => {
       return mangaList.value.filter(manga => {
-        return manga.title.toLowerCase().includes(searchValue.value.toLowerCase()) &&
-               settings.value.filters.includes(manga.status)
+        if (!settings.value.filters.includes(manga.status)) return false
+
+        const searchWords = searchValue.value.split(' ')
+        let title = true
+        let notes = true
+        let site = true
+
+        return searchWords.every((word) => {
+          const lowerCaseWord = word.toLowerCase()
+
+          if (!manga.title.toLowerCase().includes(lowerCaseWord)) {
+            title = false
+          }
+
+          if (!manga.notes?.toLowerCase().includes(lowerCaseWord)) {
+            notes = false
+          }
+
+          if (!SiteName[manga.site].toLowerCase().includes(lowerCaseWord)) {
+            site = false
+          }
+
+          return title || notes || site
+        })
       })
     })
 

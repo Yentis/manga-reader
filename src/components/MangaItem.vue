@@ -5,37 +5,55 @@
       'on-hold-container': mangaStatus === status.ON_HOLD,
       'plan-to-read-container': mangaStatus === status.PLAN_TO_READ,
       'dropped-container': mangaStatus === status.DROPPED,
-      'unread-container': isUnread
+      'unread-container': isUnread,
+      'read-container': mangaStatus === status.READING && !isUnread
     }"
   >
     <q-card-section
-      class="manga-item"
-      horizontal
+      class="q-pa-none"
     >
-      <q-img
-        contain
-        class="manga-image q-ma-sm"
-        fit="scale-down"
-        :src="image"
-        @error="updateImageSource($event.target.src)"
+      <q-card-section
+        class="manga-item q-pa-none"
+        horizontal
       >
-        <template #error>
-          <q-icon
-            class="full-width full-height"
-            size="xl"
-            name="image_not_supported"
-          />
-        </template>
-      </q-img>
+        <q-img
+          contain
+          class="manga-image q-my-sm q-ml-xs q-mr-sm"
+          fit="scale-down"
+          :src="mangaImage"
+          @error="offerRefresh"
+        >
+          <template #error>
+            <q-icon
+              class="full-width full-height"
+              size="xl"
+              name="image_not_supported"
+            />
+          </template>
+        </q-img>
 
-      <q-card-section class="q-pb-none q-pl-sm q-pr-none flex-column-between">
-        <div class="q-mb-sm">
-          <div :class="{ 'text-subtitle2': mobileView, 'text-h6': !mobileView }">
+        <q-card-section
+          class="full-width q-pl-none q-pt-sm q-pb-none q-pr-sm column"
+        >
+          <q-card-section
+            horizontal
+            :class="{ 'text-subtitle2': mobileView, 'text-h6': !mobileView }"
+          >
             <a
               :href="url"
               @click.prevent="navigate(url)"
             >{{ mangaTitle }}</a>
-          </div>
+
+            <q-space />
+
+            <q-btn
+              v-if="editing"
+              flat
+              icon="close"
+              :size="itemSize"
+              @click="toggleEditing()"
+            />
+          </q-card-section>
 
           <div v-if="!editing">
             <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
@@ -81,11 +99,9 @@
             />
           </div>
 
-          <q-card-actions
-            v-else
-            class="q-pa-none"
-            align="left"
-            vertical
+          <div
+            v-if="editing"
+            style="max-width: 75%"
           >
             <q-input
               v-model="newReadNum"
@@ -103,170 +119,225 @@
             />
 
             <q-card-actions
-              class="q-pl-none"
+              class="q-px-none"
             >
               <q-input
                 v-model="newUrl"
                 stack-label
                 label="URL:"
                 class="q-mb-sm"
+                style="flex-grow: 1"
               />
 
               <q-btn
-                flat
+                color="button"
+                text-color="button"
                 class="q-ml-xs"
+                padding="sm md"
                 icon="search"
                 :size="itemSize"
                 @click="openSearchDialog()"
               />
             </q-card-actions>
+          </div>
 
-            <q-checkbox
-              v-if="mangaStatus !== status.READING"
-              v-model="newShouldUpdate"
-              label="Check on refresh"
+          <q-space />
+
+          <div
+            v-if="!editing"
+            class="status-text"
+          >
+            <span>{{ isUnread ? 'New Chapter' : mangaStatus }}</span>
+            <q-icon
+              v-if="isUnread"
+              class="q-ml-xs"
+              name="celebration"
+              size="xs"
             />
+          </div>
 
-            <q-btn-dropdown
-              no-caps
-              class="q-mb-xs"
-              :size="itemSize"
-              :label="newStatus"
+          <q-card-section
+            class="q-mb-sm"
+            horizontal
+          >
+            <div
+              v-if="!editing"
+              :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }"
+              style="align-self: flex-end"
             >
-              <q-list
-                v-for="curStatus in Object.values(status)"
-                :key="curStatus"
+              <q-icon
+                class="q-mr-xs q-mb-xs"
+                :name="statusIcon[mangaStatus]"
+                size="xs"
+              />
+              <span>{{ siteNames[mangaSite] }}</span>
+              <q-icon
+                v-if="mangaShouldUpdate"
+                class="q-ml-xs"
+                name="refresh"
+                color="positive"
+              />
+              <q-icon
+                class="q-ml-xs"
+                :name="hasLinkedSites ? 'link' : 'link_off'"
+                :color="hasLinkedSites ? 'positive' : 'negative'"
+              />
+              <span
+                v-for="(id, site) in mangaLinkedSites"
+                :key="site"
+                class="q-ml-xs"
               >
-                <q-item
-                  v-close-popup
-                  clickable
-                  @click="newStatus = curStatus"
+                <q-img
+                  class="q-ma-none q-pa-none"
+                  height="1rem"
+                  width="1rem"
+                  :src="'https://' + site + '/favicon.ico'"
                 >
-                  <q-icon
-                    size="sm"
-                    class="q-mr-sm vertical-center"
-                    :name="statusIcon[curStatus]"
-                  />
-                  <span class="full-width vertical-center text-center">{{ curStatus }}</span>
-                </q-item>
-              </q-list>
-            </q-btn-dropdown>
+                  <template #error>
+                    <q-icon
+                      class="absolute-full full-height full-width"
+                      name="image_not_supported"
+                    />
+                  </template>
+                </q-img>
+              </span>
+            </div>
 
-            <q-card-actions class="q-pl-none">
-              <q-btn-dropdown
-                no-caps
-                :label="'Rating: ' + newRating"
+            <q-space />
+
+            <div
+              v-if="!editing"
+            >
+              <q-btn
+                color="button"
+                text-color="button"
+                padding="sm md"
+                icon="edit"
                 :size="itemSize"
-              >
-                <q-list
-                  v-for="index in 10"
-                  :key="index"
-                >
-                  <q-item
-                    v-close-popup
-                    dense
-                    clickable
-                    @click="newRating = index"
-                  >
-                    <q-item-section>
-                      <q-item-label>{{ index }}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
+                @click="toggleEditing()"
+              />
 
               <q-btn
-                v-if="newRating > 0"
-                icon="close"
+                v-if="isUnread"
+                color="unread"
+                text-color="button"
+                class="q-ml-sm"
+                padding="sm md"
+                icon="done"
                 :size="itemSize"
-                @click="newRating = 0"
+                @click="readManga()"
               />
-            </q-card-actions>
-
-            <q-btn
-              no-caps
-              label="Progress Linking"
-              :size="itemSize"
-              @click="openLinkingDialog()"
-            />
-
-            <q-btn
-              no-caps
-              label="Alternate Sources"
-              :size="itemSize"
-              @click="openAltSourceDialog()"
-            />
-          </q-card-actions>
-        </div>
-
-        <div
-          v-if="!editing"
-          :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }"
-        >
-          <q-icon
-            class="q-mr-xs q-mb-xs"
-            :name="statusIcon[mangaStatus]"
-            size="xs"
-          />
-          <span>{{ siteNames[mangaSite] }}</span>
-          <q-icon
-            v-if="mangaShouldUpdate"
-            class="q-ml-xs"
-            name="refresh"
-            color="positive"
-          />
-          <q-icon
-            class="q-ml-xs"
-            :name="hasLinkedSites ? 'link' : 'link_off'"
-            :color="hasLinkedSites ? 'positive' : 'negative'"
-          />
-          <span
-            v-for="(id, site) in mangaLinkedSites"
-            :key="site"
-            class="q-ml-xs"
-          >
-            <q-img
-              class="q-ma-none q-pa-none"
-              height="1rem"
-              width="1rem"
-              :src="'https://' + site + '/favicon.ico'"
-            >
-              <template #error>
-                <q-icon
-                  class="absolute-full full-height full-width"
-                  name="image_not_supported"
-                />
-              </template>
-            </q-img>
-          </span>
-        </div>
+            </div>
+          </q-card-section>
+        </q-card-section>
       </q-card-section>
+    </q-card-section>
+
+    <q-card-section
+      v-if="editing"
+      horizontal
+    >
+      <q-card-actions
+        align="left"
+        vertical
+      >
+        <q-checkbox
+          v-if="mangaStatus !== status.READING"
+          v-model="newShouldUpdate"
+          dense
+          class="q-mb-xs"
+          :size="itemSize"
+          label="Check on refresh"
+        />
+
+        <q-btn-dropdown
+          no-caps
+          class="editing-box"
+          :size="itemSize"
+          :label="newStatus"
+        >
+          <q-list
+            v-for="curStatus in Object.values(status)"
+            :key="curStatus"
+          >
+            <q-item
+              v-close-popup
+              clickable
+              @click="newStatus = curStatus"
+            >
+              <q-icon
+                size="sm"
+                class="q-mr-sm vertical-center"
+                :name="statusIcon[curStatus]"
+              />
+              <span class="full-width vertical-center text-center">{{ curStatus }}</span>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+
+        <q-card-actions
+          class="q-pa-none"
+        >
+          <q-btn-dropdown
+            no-caps
+            class="editing-box q-mt-xs"
+            :label="'Rating: ' + newRating"
+            :size="itemSize"
+          >
+            <q-list
+              v-for="index in 10"
+              :key="index"
+            >
+              <q-item
+                v-close-popup
+                dense
+                clickable
+                @click="newRating = index"
+              >
+                <q-item-section>
+                  <q-item-label>{{ index }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+
+          <q-btn
+            v-if="newRating > 0"
+            flat
+            icon="close"
+            :size="itemSize"
+            @click="newRating = 0"
+          />
+        </q-card-actions>
+
+        <q-btn
+          no-caps
+          class="editing-box q-mt-xs"
+          label="Progress Linking"
+          :size="itemSize"
+          @click="openLinkingDialog()"
+        />
+
+        <q-btn
+          no-caps
+          class="editing-box"
+          label="Alternate Sources"
+          :size="itemSize"
+          @click="openAltSourceDialog()"
+        />
+      </q-card-actions>
 
       <q-space />
 
       <q-card-actions
-        class="q-pl-none"
         vertical
       >
         <q-btn
-          v-if="editing"
-          flat
-          icon="close"
-          :size="itemSize"
-          @click="toggleEditing()"
-        />
-
-        <q-btn
-          v-if="!editing"
-          flat
-          icon="edit"
-          :size="itemSize"
-          @click="toggleEditing()"
-        />
-        <q-btn
-          v-else
-          flat
+          color="unread"
+          text-color="button"
+          padding="sm md"
           icon="save"
+          :loading="saving"
           :size="itemSize"
           @click="saveManga()"
         />
@@ -274,15 +345,9 @@
         <q-space />
 
         <q-btn
-          v-if="isUnread && !editing"
-          color="secondary"
-          icon="done"
-          :size="itemSize"
-          @click="readManga()"
-        />
-        <q-btn
-          v-if="editing"
           color="negative"
+          text-color="button"
+          padding="sm md"
           icon="delete"
           :size="itemSize"
           @click="deleteManga()"
@@ -293,10 +358,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref, watch } from 'vue'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
+import { defineComponent, computed } from 'vue'
+import { SiteName } from 'src/enums/siteEnum'
 import { Status, StatusIcon } from 'src/enums/statusEnum'
-import { MangaDexWorker } from 'src/classes/sites/mangadex/mangadexWorker'
 import useMobileView from 'src/composables/useMobileView'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { useMangaItem } from 'src/composables/useManga'
@@ -304,6 +368,7 @@ import useProgressLinking from 'src/composables/useProgressLinking'
 import useAltSources from 'src/composables/useAltSources'
 import useMangaList from 'src/composables/useMangaList'
 import { isMangaRead } from 'src/services/sortService'
+import useRefreshing from 'src/composables/useRefreshing'
 
 export default defineComponent({
   name: 'MangaItem',
@@ -321,6 +386,7 @@ export default defineComponent({
     const { openLinkingDialog } = useProgressLinking(props.url, manga.newLinkedSites)
     const { openAltSourceDialog } = useAltSources(props.url, manga.newSources)
     const { showUpdateMangaDialog } = useMangaList()
+    const { offerRefresh } = useRefreshing()
 
     const itemSize = computed(() => {
       return mobileView.value ? 'sm' : 'md'
@@ -339,26 +405,6 @@ export default defineComponent({
       )
     })
 
-    const image = ref(manga.image.value)
-    watch(manga.image, (newImage) => {
-      image.value = newImage
-    })
-
-    const updateImageSource = (src: string) => {
-      if (!manga.linkedSites.value[SiteType.MangaDex]) return
-
-      const baseUrl = `${MangaDexWorker.url}/images/manga/${manga.linkedSites.value[SiteType.MangaDex]}`
-      if (!src.includes(SiteType.MangaDex)) {
-        image.value = `${baseUrl}.jpg`
-      } else if (src.endsWith('jpg')) {
-        image.value = `${baseUrl}.jpeg`
-      } else if (src.endsWith('jpeg')) {
-        image.value = `${baseUrl}.png`
-      } else if (src.endsWith('png')) {
-        image.value = `${baseUrl}.gif`
-      }
-    }
-
     const { navigate } = useUrlNavigation()
 
     const openSearchDialog = async () => {
@@ -373,6 +419,7 @@ export default defineComponent({
       status: Status,
       statusIcon: StatusIcon,
       editing: manga.editing,
+      saving: manga.saving,
 
       newUrl: manga.newUrl,
       newReadNum: manga.newReadNum,
@@ -393,12 +440,12 @@ export default defineComponent({
       mangaNotes: manga.notes,
       mangaRating: manga.rating,
       mangaShouldUpdate: manga.shouldUpdate,
+      mangaImage: manga.image,
 
       mobileView,
       itemSize,
-      image,
       navigate,
-      updateImageSource,
+      offerRefresh,
 
       hasLinkedSites,
       openLinkingDialog,
@@ -418,51 +465,196 @@ export default defineComponent({
 <style lang="scss" scoped>
 
 .body--light {
+  .read-container {
+    border: $read-light 0.25em solid;
+    border-left: $read-light 1em solid;
+
+    a {
+      color: $read-light;
+    }
+
+    .status-text {
+      color: $read-light;
+    }
+  }
+
   .unread-container {
-    background-color: $grey-4;
+    border: $unread-light 0.25em solid;
+    border-left: $unread-light 1em solid;
+
+    a {
+      color: $unread-light;
+    }
+
+    .status-text {
+      color: $unread-light;
+    }
   }
 
   .completed-container {
-    background-color: $green-3;
+    border: $completed 0.25em solid;
+    border-left: $completed 1em solid;
+
+    a {
+      color: $completed;
+    }
+
+    .status-text {
+      color: $completed;
+    }
   }
 
   .on-hold-container {
-    background-color: $lime-4;
+    border: $on-hold 0.25em solid;
+    border-left: $on-hold 1em solid;
+
+    a {
+      color: $on-hold;
+    }
+
+    .status-text {
+      color: $on-hold;
+    }
   }
 
   .plan-to-read-container {
-    background-color: $blue-11;
+    border: $plan-to-read-light 0.25em solid;
+    border-left: $plan-to-read-light 1em solid;
+
+    a {
+      color: $plan-to-read-light;
+    }
+
+    .status-text {
+      color: $plan-to-read-light;
+    }
   }
 
   .dropped-container {
-    background-color: $red-4;
+    border: $dropped 0.25em solid;
+    border-left: $dropped 1em solid;
+
+    a {
+      color: $dropped;
+    }
+
+    .status-text {
+      color: $dropped;
+    }
+  }
+
+  .bg-unread {
+    background: $unread-light;
+  }
+
+  .bg-button {
+    background: $completed;
+  }
+
+  .text-button {
+    color: white;
+  }
+
+  .editing-box {
+    color: white;
+    background: $completed;
   }
 }
 
 .body--dark {
+  .read-container {
+    border: $read 0.25em solid;
+    border-left: $read 1em solid;
+
+    a {
+      color: $read;
+    }
+
+    .status-text {
+      color: $read;
+    }
+  }
+
   .unread-container {
-    background-color: $grey-9;
+    border: $unread 0.25em solid;
+    border-left: $unread 1em solid;
+
+    a {
+      color: $unread;
+    }
+
+    .status-text {
+      color: $unread;
+    }
   }
 
   .completed-container {
-    background-color: $teal-10;
+    border: $completed 0.25em solid;
+    border-left: $completed 1em solid;
+
+    a {
+      color: $completed;
+    }
+
+    .status-text {
+      color: $completed;
+    }
   }
 
   .on-hold-container {
-    background-color: $lime-10;
+    border: $on-hold 0.25em solid;
+    border-left: $on-hold 1em solid;
+
+    a {
+      color: $on-hold;
+    }
+
+    .status-text {
+      color: $on-hold;
+    }
   }
 
   .plan-to-read-container {
-    background-color: $blue-10;
+    border: $plan-to-read 0.25em solid;
+    border-left: $plan-to-read 1em solid;
+
+    a {
+      color: $plan-to-read;
+    }
+
+    .status-text {
+      color: $plan-to-read;
+    }
   }
 
   .dropped-container {
-    background-color: $brown-10;
-  }
-}
+    border: $dropped 0.25em solid;
+    border-left: $dropped 1em solid;
 
-.unread-container a {
-  color: $secondary;
+    a {
+      color: $dropped;
+    }
+
+    .status-text {
+      color: $dropped;
+    }
+  }
+
+  .bg-unread {
+    background: $unread;
+  }
+
+  .bg-button {
+    background: white;
+  }
+
+  .text-button {
+    color: black;
+  }
+
+  .editing-box {
+    border: white 0.125em solid;
+  }
 }
 
 .manga-image {

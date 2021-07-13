@@ -62,7 +62,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
   [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
-  [SiteType.ReaperScans, new Genkan(SiteType.ReaperScans)],
+  [SiteType.ReaperScans, new WordPress(SiteType.ReaperScans)],
   [SiteType.AsuraScans, new AsuraScans(SiteType.AsuraScans)],
   [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
@@ -74,7 +74,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ArangScans, new ArangScans()],
   [SiteType.EdelgardeScans, new Genkan(SiteType.EdelgardeScans)],
   [SiteType.Genkan, new Genkanio()],
-  [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)]
+  [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
+  [SiteType.ResetScans, new WordPress(SiteType.ResetScans)]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

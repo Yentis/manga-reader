@@ -28,6 +28,10 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manga/the-throne/`
       case SiteType.SleepingKnightScans:
         return `${WordPressWorker.getUrl(siteType)}/manga/chronicles-of-heavenly-demon/`
+      case SiteType.ReaperScans:
+        return `${WordPressWorker.getUrl(siteType)}/series/aire/`
+      case SiteType.ResetScans:
+        return `${WordPressWorker.getUrl(siteType)}/manga/madou-no-keifu/`
     }
 
     return WordPressWorker.getUrl(siteType)
@@ -232,6 +236,9 @@ export class WordPressWorker extends BaseWorker {
   }
 
   private getImageSrc (elem: Cheerio<Element> | undefined) {
-    return elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
+    let url = elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
+    if (url.startsWith('//')) url = `https:${url}`
+
+    return url
   }
 }

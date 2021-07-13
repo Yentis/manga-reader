@@ -163,10 +163,19 @@ export function useMangaItem (url: string) {
   }
 
   const editing = ref(false)
+  const saving = ref(false)
 
   const saveManga = async () => {
-    editing.value = !editing.value
-    const urlChanged = await saveUrl()
+    saving.value = true
+
+    let urlChanged = false
+    try {
+      urlChanged = await saveUrl()
+    } catch (error) {
+      saving.value = false
+      throw error
+    }
+
     const readNumChanged = saveReadNum()
     const statusChanged = saveStatus()
     const notesChanged = saveNotes()
@@ -174,6 +183,8 @@ export function useMangaItem (url: string) {
     const ratingChanged = saveRating()
     const linkedSitesChanged = saveLinkedSites()
     const sourcesChanged = saveSources()
+
+    editing.value = !editing.value
 
     if (!urlChanged &&
         !readNumChanged &&
@@ -271,6 +282,7 @@ export function useMangaItem (url: string) {
     readManga,
     toggleEditing,
     editing,
+    saving,
     newUrl,
     newReadNum,
     newStatus,

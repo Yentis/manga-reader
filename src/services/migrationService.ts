@@ -90,7 +90,7 @@ async function doMigration (mangaList: MigrationManga[]) {
 
     if (item.site === SiteType.MangaDex) {
       const split = item.url.replace(`${MangaDexWorker.url}/title/`, '').split('/')
-      if (split.length > 1) {
+      if (split.length !== 0 && split[0].length < 10) {
         const id = split[0]
         legacyMangaDexManga.push({ index, id: parseInt(id) })
       }

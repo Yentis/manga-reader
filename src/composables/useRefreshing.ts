@@ -6,11 +6,11 @@ import useMangaList from './useMangaList'
 import { Status } from 'src/enums/statusEnum'
 import { getMangaInfo } from 'src/services/siteService'
 import useNotification from 'src/composables/useNotification'
-import pEachSeries from 'p-each-series'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import usePushNotification from 'src/composables/usePushNotification'
+import { SiteName } from 'src/enums/siteEnum'
 
 export default function useRefreshing () {
   const autoRefreshing = ref(false)
@@ -36,52 +36,59 @@ export default function useRefreshing () {
     set: (val) => $store.commit('reader/updateRefreshing', val)
   })
 
-  const refreshAllManga = () => {
+  const refreshAllManga = (forceRefresh = false) => {
     if (refreshing.value) return
     refreshProgress.value = 0.01
     refreshing.value = true
 
-    const filteredMangaList = mangaList.value.filter(manga => manga.status === Status.READING || manga.shouldUpdate)
-    const promises = filteredMangaList.map(manga => getMangaInfo(manga.url, manga.site, manga.altSources))
-    const step = promises.length > 0 ? (1 / promises.length) : 0
-    pEachSeries(promises, (result, index) => {
-      const manga = filteredMangaList[index]
+    const filteredMangaList = mangaList.value.filter(manga => {
+      // Force refresh will check all manga that don't get updated with a regular refresh
+      if (!forceRefresh) return manga.status === Status.READING || manga.shouldUpdate
+      else return manga.status !== Status.READING && !manga.shouldUpdate
+    })
+    const promises = filteredMangaList.map(manga => {
+      const promise = getMangaInfo(manga.url, manga.site, manga.altSources).then((result) => {
+        if (result instanceof Error) {
+          const notifyOptions = new NotifyOptions(`${SiteName[manga.site]} | ${result.message}`, `Failed to refresh ${manga.title}`)
+          notifyOptions.actions = [{
+            label: 'Visit',
+            handler: () => {
+              urlNavigation.value = new UrlNavigation(manga.url, true)
+            },
+            color: 'white'
+          }]
 
-      if (result instanceof Error) {
-        const notifyOptions = new NotifyOptions(result, `Failed to refresh ${manga.title}`)
-        notifyOptions.actions = [{
-          label: 'Visit',
-          handler: () => {
-            urlNavigation.value = new UrlNavigation(manga.url, true)
-          },
-          color: 'white'
-        }]
+          notification.value = notifyOptions
+        } else {
+          if (autoRefreshing.value && manga.chapter !== result.chapter) {
+            sendPushNotification(result)
+          }
 
-        notification.value = notifyOptions
-      } else {
-        if (autoRefreshing.value && manga.chapter !== result.chapter) {
-          sendPushNotification(result)
+          updateMangaTitle(manga.url, result.title)
+          updateMangaChapter(manga.url, result.chapter)
+          updateMangaChapterUrl(manga.url, result.chapterUrl)
+          updateMangaChapterNum(manga.url, result.chapterNum)
+          updateMangaChapterDate(manga.url, result.chapterDate)
+          updateMangaImage(manga.url, result.image)
+
+          sortMangaList()
         }
 
-        updateMangaTitle(manga.url, result.title)
-        updateMangaChapter(manga.url, result.chapter)
-        updateMangaChapterUrl(manga.url, result.chapterUrl)
-        updateMangaChapterNum(manga.url, result.chapterNum)
-        updateMangaChapterDate(manga.url, result.chapterDate)
-        updateMangaImage(manga.url, result.image)
+        incrementRefreshProgress(step)
+      })
 
-        sortMangaList()
-      }
-
-      incrementRefreshProgress(step)
-    }).catch((error: Error) => {
-      notification.value = new NotifyOptions(error)
-    }).finally(() => {
-      storeManga()
-      autoRefreshing.value = false
-      refreshing.value = false
-      refreshProgress.value = 0
+      return promise
     })
+    const step = promises.length > 0 ? (1 / promises.length) : 0
+
+    Promise.all(promises)
+      .catch((error) => console.error(error))
+      .finally(() => {
+        storeManga()
+        autoRefreshing.value = false
+        refreshing.value = false
+        refreshProgress.value = 0
+      })
   }
 
   const refreshInterval: Ref<ReturnType<typeof setInterval> | undefined> = ref()
@@ -93,10 +100,23 @@ export default function useRefreshing () {
     }, refreshOptions.period * 60 * 1000)
   }
 
+  const offerRefresh = () => {
+    const notifyOptions = new NotifyOptions('Would you like to do a full refresh?', 'Broken image detected')
+    notifyOptions.type = 'warning'
+    notifyOptions.actions = [{
+      label: 'Refresh',
+      handler: () => refreshAllManga(true),
+      color: 'black'
+    }]
+
+    notification.value = notifyOptions
+  }
+
   return {
     refreshing,
     refreshInterval,
     createRefreshInterval,
-    refreshAllManga
+    refreshAllManga,
+    offerRefresh
   }
 }
