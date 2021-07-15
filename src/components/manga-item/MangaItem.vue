@@ -143,70 +143,77 @@
 
           <q-space />
 
-          <div
-            v-if="!editing"
-            class="status-text"
-          >
-            <span>{{ isUnread ? 'New Chapter' : mangaStatus }}</span>
-            <q-icon
-              v-if="isUnread"
-              class="q-ml-xs"
-              name="celebration"
-              size="xs"
-            />
-          </div>
-
           <q-card-section
-            class="q-mb-sm"
             horizontal
+            class="q-mb-sm"
           >
-            <div
-              v-if="!editing"
-              :class="{ 'text-caption': mobileView, 'text-body2': !mobileView }"
-              style="align-self: flex-end"
+            <q-card-section
+              class="q-pa-none"
             >
-              <q-icon
-                class="q-mr-xs q-mb-xs"
-                :name="statusIcon[mangaStatus]"
-                size="xs"
-              />
-              <span>{{ siteNames[mangaSite] }}</span>
-              <q-icon
-                v-if="mangaShouldUpdate"
-                class="q-ml-xs"
-                name="refresh"
-                color="positive"
-              />
-              <q-icon
-                class="q-ml-xs"
-                :name="hasLinkedSites ? 'link' : 'link_off'"
-                :color="hasLinkedSites ? 'positive' : 'negative'"
-              />
-              <span
-                v-for="(id, site) in mangaLinkedSites"
-                :key="site"
-                class="q-ml-xs"
+              <q-card-section
+                v-if="!editing"
+                horizontal
+                class="status-text"
               >
-                <q-img
-                  class="q-ma-none q-pa-none"
-                  height="1rem"
-                  width="1rem"
-                  :src="'https://' + site + '/favicon.ico'"
+                <span>{{ isUnread ? 'New Chapter' : mangaStatus }}</span>
+                <q-icon
+                  v-if="isUnread"
+                  class="q-ml-xs"
+                  name="celebration"
+                  size="xs"
+                />
+              </q-card-section>
+
+              <div
+                v-if="!editing"
+                :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'end-self': true }"
+              >
+                <q-icon
+                  class="q-mr-xs q-mb-xs"
+                  :name="statusIcon[mangaStatus]"
+                  size="xs"
+                />
+                <span>{{ siteNames[mangaSite] }}</span>
+
+                <q-icon
+                  v-if="mangaShouldUpdate"
+                  class="q-ml-xs center-self"
+                  name="refresh"
+                  color="positive"
+                />
+                <q-icon
+                  class="q-ml-xs center-self"
+                  :name="hasLinkedSites ? 'link' : 'link_off'"
+                  :color="hasLinkedSites ? 'positive' : 'negative'"
+                />
+                <span
+                  v-for="(id, site) in mangaLinkedSites"
+                  :key="site"
+                  class="q-mx-xs"
                 >
-                  <template #error>
-                    <q-icon
-                      class="absolute-full full-height full-width"
-                      name="image_not_supported"
-                    />
-                  </template>
-                </q-img>
-              </span>
-            </div>
+                  <q-img
+                    class="q-ma-none q-pa-none"
+                    height="1rem"
+                    width="1rem"
+                    :src="'https://' + site + '/favicon.ico'"
+                  >
+                    <template #error>
+                      <q-icon
+                        class="absolute-full full-height full-width"
+                        name="image_not_supported"
+                      />
+                    </template>
+                  </q-img>
+                </span>
+              </div>
+            </q-card-section>
 
             <q-space />
 
-            <div
+            <q-card-section
               v-if="!editing"
+              horizontal
+              class="q-gutter-sm end-self"
             >
               <q-btn
                 color="button"
@@ -221,13 +228,12 @@
                 v-if="isUnread"
                 color="unread"
                 text-color="button"
-                class="q-ml-sm"
                 padding="sm md"
                 icon="done"
                 :size="itemSize"
                 @click="readManga()"
               />
-            </div>
+            </q-card-section>
           </q-card-section>
         </q-card-section>
       </q-card-section>
@@ -263,14 +269,15 @@
             <q-item
               v-close-popup
               clickable
+              class="center-items"
               @click="newStatus = curStatus"
             >
               <q-icon
                 size="sm"
-                class="q-mr-sm vertical-center"
+                class="q-mr-sm"
                 :name="statusIcon[curStatus]"
               />
-              <span class="full-width vertical-center text-center">{{ curStatus }}</span>
+              <span class="full-width text-center">{{ curStatus }}</span>
             </q-item>
           </q-list>
         </q-btn-dropdown>
@@ -462,218 +469,4 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
-
-.body--light {
-  .read-container {
-    border: $read-light 0.25em solid;
-    border-left: $read-light 1em solid;
-
-    a {
-      color: $read-light;
-    }
-
-    .status-text {
-      color: $read-light;
-    }
-  }
-
-  .unread-container {
-    border: $unread-light 0.25em solid;
-    border-left: $unread-light 1em solid;
-
-    a {
-      color: $unread-light;
-    }
-
-    .status-text {
-      color: $unread-light;
-    }
-  }
-
-  .completed-container {
-    border: $completed 0.25em solid;
-    border-left: $completed 1em solid;
-
-    a {
-      color: $completed;
-    }
-
-    .status-text {
-      color: $completed;
-    }
-  }
-
-  .on-hold-container {
-    border: $on-hold 0.25em solid;
-    border-left: $on-hold 1em solid;
-
-    a {
-      color: $on-hold;
-    }
-
-    .status-text {
-      color: $on-hold;
-    }
-  }
-
-  .plan-to-read-container {
-    border: $plan-to-read-light 0.25em solid;
-    border-left: $plan-to-read-light 1em solid;
-
-    a {
-      color: $plan-to-read-light;
-    }
-
-    .status-text {
-      color: $plan-to-read-light;
-    }
-  }
-
-  .dropped-container {
-    border: $dropped 0.25em solid;
-    border-left: $dropped 1em solid;
-
-    a {
-      color: $dropped;
-    }
-
-    .status-text {
-      color: $dropped;
-    }
-  }
-
-  .bg-unread {
-    background: $unread-light;
-  }
-
-  .bg-button {
-    background: $completed;
-  }
-
-  .text-button {
-    color: white;
-  }
-
-  .editing-box {
-    color: white;
-    background: $completed;
-  }
-}
-
-.body--dark {
-  .read-container {
-    border: $read 0.25em solid;
-    border-left: $read 1em solid;
-
-    a {
-      color: $read;
-    }
-
-    .status-text {
-      color: $read;
-    }
-  }
-
-  .unread-container {
-    border: $unread 0.25em solid;
-    border-left: $unread 1em solid;
-
-    a {
-      color: $unread;
-    }
-
-    .status-text {
-      color: $unread;
-    }
-  }
-
-  .completed-container {
-    border: $completed 0.25em solid;
-    border-left: $completed 1em solid;
-
-    a {
-      color: $completed;
-    }
-
-    .status-text {
-      color: $completed;
-    }
-  }
-
-  .on-hold-container {
-    border: $on-hold 0.25em solid;
-    border-left: $on-hold 1em solid;
-
-    a {
-      color: $on-hold;
-    }
-
-    .status-text {
-      color: $on-hold;
-    }
-  }
-
-  .plan-to-read-container {
-    border: $plan-to-read 0.25em solid;
-    border-left: $plan-to-read 1em solid;
-
-    a {
-      color: $plan-to-read;
-    }
-
-    .status-text {
-      color: $plan-to-read;
-    }
-  }
-
-  .dropped-container {
-    border: $dropped 0.25em solid;
-    border-left: $dropped 1em solid;
-
-    a {
-      color: $dropped;
-    }
-
-    .status-text {
-      color: $dropped;
-    }
-  }
-
-  .bg-unread {
-    background: $unread;
-  }
-
-  .bg-button {
-    background: white;
-  }
-
-  .text-button {
-    color: black;
-  }
-
-  .editing-box {
-    border: white 0.125em solid;
-  }
-}
-
-.manga-image {
-  min-width: 96px;
-  width: 96px;
-}
-
-.manga-subtitle {
-  display: -webkit-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-}
-
-.vertical-center {
-  margin-top: auto;
-  margin-bottom: auto;
-  height: 100%;
-}
-
-</style>
+<style lang="scss" scoped src="./manga-item.scss"></style>

@@ -1,0 +1,230 @@
+.body--light {
+  .q-card {
+    background-color: #f3f4f5;
+    box-shadow: none;
+  }
+
+  .read-container {
+    border: $read-light 0.1em solid;
+    border-left: $read-light 1em solid;
+
+    a {
+      color: $read-light;
+    }
+
+    .status-text {
+      color: $read-light;
+    }
+  }
+
+  .unread-container {
+    border: $unread-light 0.1em solid;
+    border-left: $unread-light 1em solid;
+
+    a {
+      color: $unread-light;
+    }
+
+    .status-text {
+      color: $unread-light;
+    }
+  }
+
+  .completed-container {
+    border: $completed 0.1em solid;
+    border-left: $completed 1em solid;
+
+    a {
+      color: $completed;
+    }
+
+    .status-text {
+      color: $completed;
+    }
+  }
+
+  .on-hold-container {
+    border: $on-hold 0.1em solid;
+    border-left: $on-hold 1em solid;
+
+    a {
+      color: $on-hold;
+    }
+
+    .status-text {
+      color: $on-hold;
+    }
+  }
+
+  .plan-to-read-container {
+    border: $plan-to-read-light 0.1em solid;
+    border-left: $plan-to-read-light 1em solid;
+
+    a {
+      color: $plan-to-read-light;
+    }
+
+    .status-text {
+      color: $plan-to-read-light;
+    }
+  }
+
+  .dropped-container {
+    border: $dropped 0.1em solid;
+    border-left: $dropped 1em solid;
+
+    a {
+      color: $dropped;
+    }
+
+    .status-text {
+      color: $dropped;
+    }
+  }
+
+  .bg-unread {
+    background: $unread-light;
+  }
+
+  .bg-button {
+    background: $completed;
+  }
+
+  .text-button {
+    color: white;
+  }
+
+  .editing-box {
+    color: white;
+    background: $completed;
+  }
+}
+
+.body--dark {
+  .read-container {
+    border: $read 0.1em solid;
+    border-left: $read 1em solid;
+
+    a {
+      color: $read;
+    }
+
+    .status-text {
+      color: $read;
+    }
+  }
+
+  .unread-container {
+    border: $unread 0.1em solid;
+    border-left: $unread 1em solid;
+
+    a {
+      color: $unread;
+    }
+
+    .status-text {
+      color: $unread;
+    }
+  }
+
+  .completed-container {
+    border: $completed 0.1em solid;
+    border-left: $completed 1em solid;
+
+    a {
+      color: $completed;
+    }
+
+    .status-text {
+      color: $completed;
+    }
+  }
+
+  .on-hold-container {
+    border: $on-hold 0.1em solid;
+    border-left: $on-hold 1em solid;
+
+    a {
+      color: $on-hold;
+    }
+
+    .status-text {
+      color: $on-hold;
+    }
+  }
+
+  .plan-to-read-container {
+    border: $plan-to-read 0.1em solid;
+    border-left: $plan-to-read 1em solid;
+
+    a {
+      color: $plan-to-read;
+    }
+
+    .status-text {
+      color: $plan-to-read;
+    }
+  }
+
+  .dropped-container {
+    border: $dropped 0.1em solid;
+    border-left: $dropped 1em solid;
+
+    a {
+      color: $dropped;
+    }
+
+    .status-text {
+      color: $dropped;
+    }
+  }
+
+  .bg-unread {
+    background: $unread;
+  }
+
+  .bg-button {
+    background: white;
+  }
+
+  .text-button {
+    color: black;
+  }
+
+  .editing-box {
+    border: white 0.125em solid;
+  }
+}
+
+.manga-image {
+  min-width: 96px;
+  width: 96px;
+}
+
+.manga-subtitle {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+.center-self {
+  align-self: center;
+}
+
+.center-items {
+  align-items: center;
+}
+
+.end-self {
+  align-self: flex-end;
+}
+
+.q-card {
+  border-radius: 10px;
+}
+
+.q-btn {
+  border-radius: 8px;
+}

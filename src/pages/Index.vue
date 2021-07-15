@@ -15,7 +15,7 @@
       <q-intersection
         v-for="manga in filteredMangaList"
         :key="manga.url"
-        class="q-mb-sm full-width manga-item"
+        class="q-mb-xs full-width manga-item"
       >
         <MangaItem :url="manga.url" />
       </q-intersection>
@@ -31,7 +31,7 @@ import { SiteName, SiteType } from 'src/enums/siteEnum'
 import * as DropboxService from 'src/services/dropboxService'
 import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
-import MangaItem from 'src/components/MangaItem.vue'
+import MangaItem from 'src/components/manga-item/MangaItem.vue'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import useMangaList from 'src/composables/useMangaList'
 import useSettings from 'src/composables/useSettings'
