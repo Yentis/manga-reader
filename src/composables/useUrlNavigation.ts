@@ -71,7 +71,7 @@ export function useAppUrlNavigation () {
       return
     }
 
-    const browser = cordova.InAppBrowser.open(url)
+    const browser = cordova.InAppBrowser.open(url, '_blank')
     if (!forced) return
 
     browser.addEventListener('exit', () => {
