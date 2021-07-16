@@ -40,7 +40,6 @@ export default function useSiteList () {
       const promise = site.checkState().then(() => {
         const siteItem = siteList.value.find(item => item.site.siteType === site.siteType)
         if (!siteItem) return
-        console.log(`${siteItem.site.getUrl()} done`)
 
         siteItem.site = site
         siteItem.refreshing = false

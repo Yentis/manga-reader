@@ -10,26 +10,6 @@ export class MangaDex extends BaseSite {
   WorkerClass = Worker
   requestQueue = new PQueue({ interval: 1000, intervalCap: 5 })
 
-  constructor () {
-    super()
-    this.checkLogin().then(loggedIn => {
-      this.loggedIn = loggedIn
-    }).catch(error => {
-      console.error(error)
-      this.loggedIn = false
-    })
-  }
-
-  checkLogin (): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.search('together with the rain').then(results => {
-        resolve(!(results instanceof Error))
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  }
-
   getMangaId ($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
     const matches = /\/title\/(\d*)/gm.exec(url) || []
     let mangaId = -1
