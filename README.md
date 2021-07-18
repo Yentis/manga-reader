@@ -38,7 +38,7 @@ For support contact Yentis#5218 on Discord.
 
 # Building
 
-npm install -g @quasar/cli  
+yarn global add @quasar/cli  
 yarn install  
 quasar dev
 
