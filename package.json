@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
@@ -24,7 +24,7 @@
     "dropbox": "^10.1.0",
     "form-data": "^3.0.0",
     "isomorphic-fetch": "^2.2.1",
-    "isomorphic-git": "^1.9.1",
+    "isomorphic-git": "https://github.com/Yentis/isomorphic-git.git",
     "moment": "^2.27.0",
     "node-polyfill-webpack-plugin": "^1.1.3",
     "p-queue": "^6.6.2",

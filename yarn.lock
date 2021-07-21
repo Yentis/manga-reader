@@ -5870,10 +5870,9 @@ isomorphic-fetch@^2.2.1:
     node-fetch "^1.0.1"
     whatwg-fetch ">=0.10.0"
 
-isomorphic-git@^1.9.1:
+"isomorphic-git@https://github.com/Yentis/isomorphic-git.git":
   version "1.9.1"
-  resolved "https://registry.yarnpkg.com/isomorphic-git/-/isomorphic-git-1.9.1.tgz#f91bec27ed556a9b8b1f97c3e0d2c84e01d558b8"
-  integrity sha512-vzceJaiBdaJI5aT1di4dxWWf6sao3WQFQJ6UTi1tXO4zyDfsuyIadVOA4YQzdwKhLilV9msgM8HIvpOE94kmQg==
+  resolved "https://github.com/Yentis/isomorphic-git.git#c6b8e288f823f86a19232d292abf09db3f0de58c"
   dependencies:
     async-lock "^1.1.0"
     clean-git-ref "^2.0.1"

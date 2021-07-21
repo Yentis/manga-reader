@@ -171,9 +171,8 @@ export function useMangaItem (url: string) {
     let urlChanged = false
     try {
       urlChanged = await saveUrl()
-    } catch (error) {
+    } finally {
       saving.value = false
-      throw error
     }
 
     const readNumChanged = saveReadNum()
