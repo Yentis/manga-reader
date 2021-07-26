@@ -76,6 +76,7 @@ import { testFlameScans } from 'src/services/test/flamescans'
 import { useQuasar } from 'quasar'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { testResetScans } from 'src/services/test/resetscans'
+import { testCatManga } from 'src/services/test/catmanga'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -135,11 +136,17 @@ export default defineComponent({
         case SiteType.Batoto:
           await doTest(testBatoto)
           break
+        case SiteType.CatManga:
+          await doTest(testCatManga)
+          break
         case SiteType.EdelgardeScans:
           await doTest(testEdelgardeScans)
           break
         case SiteType.FirstKissManga:
           await doTest(testFirstKissManga)
+          break
+        case SiteType.FlameScans:
+          await doTest(testFlameScans)
           break
         case SiteType.Genkan:
           await doTest(testGenkanio)
@@ -183,6 +190,9 @@ export default defineComponent({
         case SiteType.ReaperScans:
           await doTest(testReaperScans)
           break
+        case SiteType.ResetScans:
+          await doTest(testResetScans)
+          break
         case SiteType.SleepingKnightScans:
           await doTest(testSleepingKnightScans)
           break
@@ -191,12 +201,6 @@ export default defineComponent({
           break
         case SiteType.ZeroScans:
           await doTest(testZeroScans)
-          break
-        case SiteType.FlameScans:
-          await doTest(testFlameScans)
-          break
-        case SiteType.ResetScans:
-          await doTest(testResetScans)
           break
         default:
           break

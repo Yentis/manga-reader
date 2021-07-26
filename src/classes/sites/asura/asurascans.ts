@@ -7,11 +7,14 @@ import PQueue from 'p-queue'
 export class AsuraScans extends BaseSite {
   siteType: SiteType
   WorkerClass = Worker
-  requestQueue = new PQueue({ interval: 1000, intervalCap: 1 })
 
   constructor (siteType: SiteType) {
     super()
     this.siteType = siteType
+
+    if (siteType === SiteType.AsuraScans) {
+      this.requestQueue = new PQueue({ interval: 2000, intervalCap: 1 })
+    }
   }
 
   getTestUrl (): string {

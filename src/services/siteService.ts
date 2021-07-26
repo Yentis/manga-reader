@@ -48,6 +48,8 @@ import PQueue from 'p-queue'
 import {
   ArangScans
 } from '../classes/sites/arang/arangscans'
+import { CatManga } from 'src/classes/sites/catmanga/catmanga'
+import constants from 'src/classes/constants'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -75,7 +77,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.EdelgardeScans, new Genkan(SiteType.EdelgardeScans)],
   [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
-  [SiteType.ResetScans, new WordPress(SiteType.ResetScans)]
+  [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
+  [SiteType.CatManga, new CatManga()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
@@ -114,22 +117,30 @@ export function getSiteByUrl (url: string): SiteType | undefined {
   return siteAlias
 }
 
-export async function getMangaInfoByUrl (url: string): Promise <Error | Manga> {
+export async function getMangaInfoByUrl (url: string, altSources: Record<string, string> = {}, redirectCount = 0): Promise <Error | Manga> {
   const site = getSiteByUrl(url)
   if (site === undefined) {
-    return new Error('Valid site not found')
+    return Error('Valid site not found')
   }
 
-  return getMangaInfo(url, site)
+  return getMangaInfo(url, site, altSources, redirectCount)
 }
 
-export async function getMangaInfo (url: string, siteType: SiteType | LinkingSiteType, altSources: Record<string, string> = {}): Promise <Error | Manga> {
+export async function getMangaInfo (
+  url: string,
+  siteType: SiteType | LinkingSiteType,
+  altSources: Record<string, string> = {},
+  redirectCount = 0
+): Promise <Error | Manga> {
   let error: Error | undefined
 
   const site = siteMap.get(siteType)
   if (site) {
     const result = await requestQueue.add(() => site.readUrl(url))
     if (result instanceof Manga) return result
+    if (result.message.startsWith(constants.REDIRECT_PREFIX) && redirectCount < 5) {
+      return getMangaInfoByUrl(result.message.replace(constants.REDIRECT_PREFIX, ''), altSources, redirectCount + 1)
+    }
     error = result
   }
 

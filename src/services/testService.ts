@@ -6,6 +6,7 @@ import { getMangaInfoByUrl } from './siteService'
 import { testArangScans } from './test/arangscans'
 import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
+import { testCatManga } from './test/catmanga'
 import { testEdelgardeScans } from './test/edelgardescans'
 import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
@@ -23,6 +24,7 @@ import { testMangaTx } from './test/mangatx'
 import { testManhwaClub } from './test/manhwaclub'
 import { testMethodScans } from './test/methodscans'
 import { testReaperScans } from './test/reaperscans'
+import { testResetScans } from './test/resetscans'
 import { testSleepingKnightScans } from './test/sleepingknightscans'
 import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
@@ -41,6 +43,9 @@ export default async function testAll (
   }))
   promises.push(testBatoto().catch((error) => {
     errors.push({ site: SiteType.Batoto, error: error })
+  }))
+  promises.push(testCatManga().catch((error) => {
+    errors.push({ site: SiteType.CatManga, error: error })
   }))
   promises.push(testEdelgardeScans().catch((error) => {
     errors.push({ site: SiteType.EdelgardeScans, error: error })
@@ -93,6 +98,9 @@ export default async function testAll (
   promises.push(testReaperScans().catch((error) => {
     errors.push({ site: SiteType.ReaperScans, error: error })
   }))
+  promises.push(testResetScans().catch((error) => {
+    errors.push({ site: SiteType.ResetScans, error: error })
+  }))
   promises.push(testSleepingKnightScans().catch((error) => {
     errors.push({ site: SiteType.SleepingKnightScans, error: error })
   }))
@@ -109,7 +117,8 @@ export default async function testAll (
 
 export function mangaEqual (
   actual: Manga | Error,
-  desired: Manga
+  desired: Manga,
+  checkDate = true
 ): void {
   if (actual instanceof Error) throw actual
 
@@ -121,7 +130,7 @@ export function mangaEqual (
   else if (actual.chapterUrl !== desired.chapterUrl) throw Error(`Failed ${desired.url}\nExpected chapter url: ${desired.chapterUrl}\nActual: ${actual.chapterUrl}`)
   else if (actual.read !== desired.read) throw Error(`Failed ${desired.url}\nExpected read: ${desired.read || 'undefined'}\nActual: ${actual.read || 'undefined'}`)
   else if (actual.readUrl !== desired.read) throw Error(`Failed ${desired.url}\nExpected read url: ${desired.readUrl || 'undefined'}\nActual: ${actual.readUrl || 'undefined'}`)
-  else if (!actual.chapterDate.includes('ago')) throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
+  else if (checkDate && !actual.chapterDate.includes('ago')) throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
   else if (actual.chapterNum !== desired.chapterNum) throw Error(`Failed ${desired.url}\nExpected chapter num: ${desired.chapterNum}\nActual: ${actual.chapterNum}`)
 }
 

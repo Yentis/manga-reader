@@ -22,11 +22,12 @@ export enum SiteType {
     EdelgardeScans = 'edelgardescans.com',
     Genkan = 'genkan.io',
     FlameScans = 'flamescans.org',
-    ResetScans = 'reset-scans.com'
+    ResetScans = 'reset-scans.com',
+    CatManga = 'catmanga.org'
 }
 
 export enum SiteName {
-    'manganelo.com' = 'Manganelo',
+    'manganelo.com' = 'Manganato',
     'webtoons.com' = 'Webtoons',
     'hatigarmscanz.net' = 'Hatigarm Scans',
     '1stkissmanga.com' = '1st Kiss Manga',
@@ -50,7 +51,8 @@ export enum SiteName {
     'edelgardescans.com' = 'Edelgarde Scans',
     'genkan.io' = 'Genkan',
     'flamescans.org' = 'Flame Scans',
-    'reset-scans.com' = 'Reset Scans'
+    'reset-scans.com' = 'Reset Scans',
+    'catmanga.org' = 'CatManga'
 }
 
 export enum SiteState {

@@ -5,6 +5,7 @@ import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import qs from 'qs'
 import { SiteType } from '../../../enums/siteEnum'
+import constants from 'src/classes/constants'
 
 interface MangakakalotSearch {
   name: string
@@ -47,6 +48,12 @@ export class MangakakalotWorker extends BaseWorker {
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
+
+    const script = $('script').html()?.trim()
+    if (script?.startsWith('window.location.assign')) {
+      const target = script.replace('window.location.assign("', '').replace('");', '')
+      return Error(`${constants.REDIRECT_PREFIX}${target}`)
+    }
 
     this.chapter = $('.chapter-list a').first()
     this.image = $('.manga-info-pic img').first()

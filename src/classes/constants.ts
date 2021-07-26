@@ -7,5 +7,6 @@ export default {
   GITLAB_TOKEN: 'gitlab_token',
   MANGA_LIST_FILENAME: 'manga-reader.json',
   SHARE_FILENAME: 'share.json',
-  DROPBOX_TOKEN: 'dropbox_token'
+  DROPBOX_TOKEN: 'dropbox_token',
+  REDIRECT_PREFIX: 'REDIRECT:'
 }

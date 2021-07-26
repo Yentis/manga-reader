@@ -29,7 +29,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-_VA-193x278.jpg'
-  desired.chapter = '178'
+  desired.chapter = '179'
   desired.url = 'https://skscans.com/manga/volcanic-age/'
 
   return searchValid(results, desired, QUERY)
