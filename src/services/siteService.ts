@@ -50,6 +50,7 @@ import {
 } from '../classes/sites/arang/arangscans'
 import { CatManga } from 'src/classes/sites/catmanga/catmanga'
 import constants from 'src/classes/constants'
+import { ManhwaClub } from 'src/classes/sites/manhwaclub/manhwaclub'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -66,7 +67,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new WordPress(SiteType.ReaperScans)],
   [SiteType.AsuraScans, new AsuraScans(SiteType.AsuraScans)],
-  [SiteType.ManhwaClub, new WordPress(SiteType.ManhwaClub)],
+  [SiteType.ManhwaClub, new ManhwaClub()],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],

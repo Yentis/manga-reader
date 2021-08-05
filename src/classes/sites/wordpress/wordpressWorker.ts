@@ -20,8 +20,6 @@ export class WordPressWorker extends BaseWorker {
         return `${WordPressWorker.getUrl(siteType)}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${WordPressWorker.getUrl(siteType)}/manga/arata-primal-the-new-primitive/`
-      case SiteType.ManhwaClub:
-        return `${WordPressWorker.getUrl(siteType)}/manhwa/settia/`
       case SiteType.MangaTx:
         return `${WordPressWorker.getUrl(siteType)}/manga/grandest-wedding/`
       case SiteType.LeviatanScans:
