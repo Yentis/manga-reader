@@ -136,7 +136,12 @@ export class WordPressWorker extends BaseWorker {
       if (error) return error
     }
 
-    this.image = $('.summary_image img').first()
+    const ogImage = $('meta[property="og:image"]')
+    if (ogImage.length > 0) {
+      this.image = ogImage.first()
+    } else {
+      this.image = $('.summary_image img').first()
+    }
     this.title = $('.post-title').first()
 
     return this.buildManga(url)
@@ -234,7 +239,7 @@ export class WordPressWorker extends BaseWorker {
   }
 
   private getImageSrc (elem: Cheerio<Element> | undefined) {
-    let url = elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
+    let url = elem?.attr('content') || elem?.attr('data-src') || elem?.attr('data-lazy-src') || elem?.attr('data-cfsrc') || elem?.attr('src') || ''
     if (url.startsWith('//')) url = `https:${url}`
 
     return url

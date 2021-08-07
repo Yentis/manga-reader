@@ -18,9 +18,9 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = '30'
-  desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT-193x278.png'
+  desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT.png'
   desired.title = 'The Throne'
-  desired.chapterUrl = 'https://leviatanscans.com/eng/manga/the-throne/30/'
+  desired.chapterUrl = 'https://leviatanscans.com/m/manga/the-throne/30/'
   desired.chapterNum = 30
 
   mangaEqual(manga, desired)

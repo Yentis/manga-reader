@@ -16,11 +16,11 @@ export async function testReaperScans (): Promise<void> {
 async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.chapter = 'Chapter 27'
+  desired.chapter = 'Chapter 29'
   desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/AnyConv.com__AIRE.webp'
   desired.title = 'Aire'
-  desired.chapterUrl = 'https://reaperscans.com/series/aire/chapter-27/'
-  desired.chapterNum = 27
+  desired.chapterUrl = 'https://reaperscans.com/series/aire/chapter-29/'
+  desired.chapterNum = 29
 
   mangaEqual(manga, desired)
 }
@@ -29,7 +29,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/AnyConv.com__AIRE-193x278.webp'
-  desired.chapter = 'Chapter 27'
+  desired.chapter = 'Chapter 29'
   desired.url = 'https://reaperscans.com/series/aire/'
 
   return searchValid(results, desired, QUERY)

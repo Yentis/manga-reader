@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = '151 - 2nd Season End'
-  desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-chronicles-193x278.png'
+  desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-chronicles.png'
   desired.title = 'Chronicles of Heavenly Demon'
   desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-heavenly-demon/151/'
   desired.chapterNum = 151
@@ -29,7 +29,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://skscans.com/wp-content/uploads/2021/03/cover-_VA-193x278.jpg'
-  desired.chapter = '179'
+  desired.chapter = '180'
   desired.url = 'https://skscans.com/manga/volcanic-age/'
 
   return searchValid(results, desired, QUERY)
