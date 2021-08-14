@@ -43,9 +43,3 @@ yarn install
 quasar dev
 
 See package.json for build targets
-
-When building locally there is an issue with isomorphic-git on cordova where it will throw an error on cloning the repository.  
-Go to node_modules/isomorphic-git/index.js and change  
-for (const [i, start] of offsetArray.entries()) { }  
-to  
-offsetArray.forEach((start, i) => { }
