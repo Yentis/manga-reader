@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Manga } from '../../manga'
@@ -24,35 +24,45 @@ interface SearchResponse {
   data: ComicResponse[]
 }
 
+class ManhwaClubData extends BaseData {
+  comicId: string
+  comic: ComicResponse
+  latestChapter?: ChaptersResponse
+
+  constructor (url: string, comicId: string, comic: ComicResponse, latestChapter?: ChaptersResponse) {
+    super(url)
+
+    this.comicId = comicId
+    this.comic = comic
+    this.latestChapter = latestChapter
+  }
+}
+
 export class ManhwaClubWorker extends BaseWorker {
   static siteType = SiteType.ManhwaClub
   static url = BaseWorker.getUrl(ManhwaClubWorker.siteType)
 
   static testUrl = `${ManhwaClubWorker.url}/en/comic/my-uncle`
 
-  comicId?: string
-  latestChapter?: ChaptersResponse
-  comic?: ComicResponse
-
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(ManhwaClubWorker.siteType, requestConfig)
   }
 
-  getChapter (): string {
-    return this.latestChapter?.name || 'Unknown'
+  getChapter (data: ManhwaClubData): string {
+    return data.latestChapter?.name || 'Unknown'
   }
 
-  getChapterUrl (): string {
-    if (this.comicId === undefined || this.latestChapter === undefined) return ''
-    return `${ManhwaClubWorker.url}/comic/${this.comicId}/${this.latestChapter.slug}/reader`
+  getChapterUrl (data: ManhwaClubData): string {
+    if (data.latestChapter === undefined) return ''
+    return `${ManhwaClubWorker.url}/comic/${data.comicId}/${data.latestChapter.slug}/reader`
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.latestChapter?.name.replace(/\D/g, ''))
+  getChapterNum (data: ManhwaClubData): number {
+    return this.parseNum(data.latestChapter?.name.replace(/\D/g, ''))
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.latestChapter?.added_at, 'YYYY-MM-DD')
+  getChapterDate (data: ManhwaClubData): string {
+    const chapterDate = moment(data.latestChapter?.added_at, 'YYYY-MM-DD')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -60,30 +70,31 @@ export class ManhwaClubWorker extends BaseWorker {
     }
   }
 
-  getImage (): string {
-    return this.comic?.thumb_url || ''
+  getImage (data: ManhwaClubData): string {
+    return data.comic.thumb_url
   }
 
-  getTitle (): string {
-    return this.comic?.title || ''
+  getTitle (data: ManhwaClubData): string {
+    return data.comic.title
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
     const comicId = url.substring(url.lastIndexOf(COMIC_PREFIX)).replace(COMIC_PREFIX, '')
-    this.comicId = comicId
     const apiUrl = `${ManhwaClubWorker.url}/api/comics/${comicId}`
 
     const chaptersResponse = await axios.get(`${apiUrl}/chapters`)
     const chapters = chaptersResponse.data as ChaptersResponse[]
 
     const comicResponse = await axios.get(apiUrl)
-    this.comic = comicResponse.data as ComicResponse
+    const comic = comicResponse.data as ComicResponse
 
+    let latestChapter: ChaptersResponse | undefined
     if (chapters !== undefined && chapters.length > 0) {
-      this.latestChapter = chapters[0]
+      latestChapter = chapters[0]
     }
 
-    return this.buildManga(url)
+    const data = new ManhwaClubData(url, comicId, comic, latestChapter)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

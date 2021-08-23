@@ -5,6 +5,19 @@ import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { AxiosRequestConfig } from 'axios'
 import { Cheerio, Element, Node } from 'cheerio'
 
+export class BaseData {
+  url: string
+  chapter?: Cheerio<Element | Node>
+  chapterNum?: Cheerio<Element | Node>
+  chapterDate?: Cheerio<Element>
+  image?: Cheerio<Element>
+  title?: Cheerio<Element | Node>
+
+  constructor (url: string) {
+    this.url = url
+  }
+}
+
 export abstract class BaseWorker {
   // Use for CORS proxy
   static urlPrefix = ''
@@ -13,14 +26,9 @@ export abstract class BaseWorker {
   }
 
   siteType: SiteType | LinkingSiteType
-  chapter?: Cheerio<Element | Node>
-  image?: Cheerio<Element>
-  title?: Cheerio<Element | Node>
-  chapterDate?: Cheerio<Element>
-  chapterNum?: Cheerio<Element | Node>
   requestConfig?: AxiosRequestConfig
 
-  constructor (siteType: SiteType | LinkingSiteType, requestConfig: AxiosRequestConfig | undefined = undefined) {
+  constructor (siteType: SiteType | LinkingSiteType, requestConfig?: AxiosRequestConfig) {
     this.siteType = siteType
     this.requestConfig = requestConfig
   }
@@ -30,31 +38,31 @@ export abstract class BaseWorker {
     return Promise.resolve()
   }
 
-  getChapter (): string {
-    return this.chapter?.text().trim() || 'Unknown'
+  getChapter (data: BaseData): string {
+    return data.chapter?.text().trim() || 'Unknown'
   }
 
-  getChapterUrl (): string {
-    return this.chapter?.attr('href') || ''
+  getChapterUrl (data: BaseData): string {
+    return data.chapter?.attr('href') || ''
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterNum?.text().trim())
+  getChapterNum (data: BaseData): number {
+    return this.parseNum(data.chapterNum?.text().trim())
   }
 
-  getChapterDate (): string {
-    return this.getDateFromNow(this.chapterDate?.text())
+  getChapterDate (data: BaseData): string {
+    return this.getDateFromNow(data.chapterDate?.text())
   }
 
-  getImage (): string {
-    return this.image?.attr('src') || ''
+  getImage (data: BaseData): string {
+    return data.image?.attr('src') || ''
   }
 
-  getTitle (): string {
-    return this.title?.text().trim() || ''
+  getTitle (data: BaseData): string {
+    return data.title?.text().trim() || ''
   }
 
-  getDateFromNow (input: string | undefined): string {
+  getDateFromNow (input?: string): string {
     const date = moment()
     const chapterDate = input?.trim().split(' ') || []
     let amount = -1
@@ -87,14 +95,14 @@ export abstract class BaseWorker {
     return ''
   }
 
-  buildManga (url: string): Manga {
-    const manga = new Manga(url, this.siteType)
-    manga.chapter = this.getChapter()
-    manga.chapterUrl = this.getChapterUrl()
-    manga.image = this.getImage()
-    manga.title = this.getTitle()
-    manga.chapterDate = this.getChapterDate()
-    manga.chapterNum = this.getChapterNum()
+  buildManga (data: BaseData): Manga {
+    const manga = new Manga(data.url, this.siteType)
+    manga.chapter = this.getChapter(data)
+    manga.chapterUrl = this.getChapterUrl(data)
+    manga.image = this.getImage(data)
+    manga.title = this.getTitle(data)
+    manga.chapterDate = this.getChapterDate(data)
+    manga.chapterNum = this.getChapterNum(data)
 
     if (manga.title === '') {
       throw Error('Could not parse site')
@@ -102,7 +110,7 @@ export abstract class BaseWorker {
     return manga
   }
 
-  parseNum (elem: string | undefined): number {
+  parseNum (elem?: string): number {
     const parsedInt = parseFloat(elem || '0')
     if (isNaN(parsedInt)) {
       return 0
@@ -111,7 +119,7 @@ export abstract class BaseWorker {
     }
   }
 
-  protected titleContainsQuery (query: string, title: string | undefined): boolean {
+  protected titleContainsQuery (query: string, title?: string): boolean {
     if (!title) return false
 
     query = query.replace('’', '\'')

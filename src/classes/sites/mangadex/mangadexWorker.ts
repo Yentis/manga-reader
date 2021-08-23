@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import { SiteType } from '../../../enums/siteEnum'
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import { Manga } from '../..//manga'
 import relevancy from 'relevancy'
@@ -25,9 +25,7 @@ interface MangaResult {
   data: {
     id: string,
     attributes: {
-      title: {
-        en: string
-      }
+      title: Record<string, string>
     }
   },
   relationships: {
@@ -51,13 +49,26 @@ interface LegacyIdResponse {
   }
 }
 
+class MangaDexData extends BaseData {
+  url: string
+
+  chapterResult: ChapterResult
+
+  mangaResult: MangaResult
+
+  constructor (url: string, chapterResult: ChapterResult, mangaResult: MangaResult) {
+    super(url)
+
+    this.url = url
+    this.chapterResult = chapterResult
+    this.mangaResult = mangaResult
+  }
+}
+
 export class MangaDexWorker extends BaseWorker {
   static siteType = SiteType.MangaDex
   static url = BaseWorker.getUrl(MangaDexWorker.siteType)
   static testUrl = `${MangaDexWorker.url}/title/1044287a-73df-48d0-b0b2-5327f32dd651`
-
-  private mangaResult?: MangaResult
-  private chapterResult?: ChapterResult
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(MangaDexWorker.siteType, requestConfig)
@@ -86,8 +97,8 @@ export class MangaDexWorker extends BaseWorker {
     }
   }
 
-  getChapter (): string {
-    const attributes = this.chapterResult?.data.attributes
+  getChapter (data: MangaDexData): string {
+    const attributes = data.chapterResult.data.attributes
     if (!attributes) return 'Unknown'
 
     const chapter = attributes.chapter
@@ -98,19 +109,19 @@ export class MangaDexWorker extends BaseWorker {
     return chapterText
   }
 
-  getChapterUrl (): string {
-    const chapterId = this.chapterResult?.data.id
+  getChapterUrl (data: MangaDexData): string {
+    const chapterId = data.chapterResult.data.id
     if (!chapterId) return ''
 
     return `${MangaDexWorker.url}/chapter/${chapterId}`
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterResult?.data.attributes.chapter)
+  getChapterNum (data: MangaDexData): number {
+    return this.parseNum(data.chapterResult.data.attributes.chapter)
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment.utc(this.chapterResult?.data.attributes.updatedAt)
+  getChapterDate (data: MangaDexData): string {
+    const chapterDate = moment.utc(data.chapterResult.data.attributes.updatedAt)
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -118,20 +129,28 @@ export class MangaDexWorker extends BaseWorker {
     }
   }
 
-  getImage (): string {
-    const coverFileName = this.mangaResult?.relationships.find((relationship) => {
+  getImage (data: MangaDexData): string {
+    const coverFileName = data.mangaResult.relationships.find((relationship) => {
       return relationship.type === 'cover_art'
     })?.attributes?.fileName
     if (!coverFileName) return ''
 
-    const mangaId = this.mangaResult?.data.id
+    const mangaId = data.mangaResult.data.id
     if (!mangaId) return ''
 
     return `https://uploads.${MangaDexWorker.siteType}/covers/${mangaId}/${coverFileName}`
   }
 
-  getTitle (): string {
-    return this.mangaResult?.data.attributes.title.en || 'Unknown'
+  getTitle (data: MangaDexData): string {
+    return this.getTitleFromAttributes(data.mangaResult.data.attributes)
+  }
+
+  private getTitleFromAttributes (attributes: MangaResult['data']['attributes']) {
+    const titleObj = attributes?.title
+    if (!titleObj) return ''
+
+    // Use the first title we find
+    return Object.values(titleObj).find(() => true) || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
@@ -145,16 +164,16 @@ export class MangaDexWorker extends BaseWorker {
 
     const chapterResponse = await axios.get(`https://api.${MangaDexWorker.siteType}/chapter?${chapterQueryString}`)
     const chapterData = chapterResponse.data as ChapterResponse
-    this.chapterResult = chapterData.results[0]
+    const chapterResult = chapterData.results[0]
 
     const mangaQueryString = qs.stringify({
       'includes[]': 'cover_art'
     })
 
     const mangaResponse = await axios.get(`https://api.${MangaDexWorker.siteType}/manga/${mangaId}?${mangaQueryString}`)
-    this.mangaResult = mangaResponse.data as MangaResult
+    const mangaResult = mangaResponse.data as MangaResult
 
-    return this.buildManga(url)
+    return this.buildManga(new MangaDexData(url, chapterResult, mangaResult))
   }
 
   static async convertLegacyIds (ids: number[]): Promise<Record<number, string>> {
@@ -182,7 +201,8 @@ export class MangaDexWorker extends BaseWorker {
     const promises: Promise<Error | Manga>[] = []
 
     let candidateUrls = mangaData.results.filter((result) => {
-      return this.titleContainsQuery(query, result.data.attributes.title.en)
+      const title = this.getTitleFromAttributes(result.data.attributes)
+      return this.titleContainsQuery(query, title)
     }).map((result) => {
       return `${MangaDexWorker.url}/title/${result.data.id}`
     })

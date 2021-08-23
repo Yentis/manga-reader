@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Manga } from '../../manga'
 import cheerio from 'cheerio'
@@ -14,19 +14,19 @@ export class BatotoWorker extends BaseWorker {
     super(BatotoWorker.siteType, requestConfig)
   }
 
-  getChapterUrl (): string {
-    const url = this.chapter?.attr('href')
+  getChapterUrl (data: BaseData): string {
+    const url = data.chapter?.attr('href')
     if (!url) return ''
 
     return `${BatotoWorker.url}${url}`
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterNum?.text().trim().split(' ')[1])
+  getChapterNum (data: BaseData): number {
+    return this.parseNum(data.chapterNum?.text().trim().split(' ')[1])
   }
 
-  getImage (): string {
-    const image = this.image?.attr('content')
+  getImage (data: BaseData): string {
+    const image = data.image?.attr('content')
     if (image === undefined) return ''
 
     return this.cleanImageUrl(image)
@@ -36,13 +36,14 @@ export class BatotoWorker extends BaseWorker {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
 
-    this.chapter = $('.episode-list a').eq(1)
-    this.chapterDate = $('.episode-list .extra').first().children().last()
-    this.chapterNum = this.chapter
-    this.image = $('meta[property="og:image"]').first()
-    this.title = $('.item-title').first()
+    const data = new BaseData(url)
+    data.chapter = $('.episode-list a').eq(1)
+    data.chapterDate = $('.episode-list .extra').first().children().last()
+    data.chapterNum = data.chapter
+    data.image = $('meta[property="og:image"]').first()
+    data.title = $('.item-title').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

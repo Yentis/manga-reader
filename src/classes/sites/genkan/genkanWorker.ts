@@ -1,9 +1,13 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import { Manga } from '../../manga'
 import axios from 'axios'
 import { SiteType } from '../../../enums/siteEnum'
 import { LinkingSiteType } from '../../../enums/linkingSiteEnum'
 import cheerio, { Cheerio, Element } from 'cheerio'
+
+class GenkanData extends BaseData {
+  volume?: Cheerio<Element>
+}
 
 export class GenkanWorker extends BaseWorker {
   static getUrl (siteType: SiteType | LinkingSiteType): string {
@@ -27,11 +31,9 @@ export class GenkanWorker extends BaseWorker {
     return GenkanWorker.getUrl(siteType)
   }
 
-  volume?: Cheerio<Element>
-
-  getChapter (): string {
-    const volume = this.volume?.text().trim() || 'Volume 1'
-    const chapter = this.chapter?.text().trim()
+  getChapter (data: GenkanData): string {
+    const volume = data.volume?.text().trim() || 'Volume 1'
+    const chapter = data.chapter?.text().trim()
 
     if (!volume.endsWith(' 1') && chapter) {
       return `${volume} ${chapter}`
@@ -44,15 +46,15 @@ export class GenkanWorker extends BaseWorker {
     }
   }
 
-  getChapterNum (): number {
-    if (!this.chapterNum) return 0
-    const html = this.chapterNum?.html()
+  getChapterNum (data: BaseData): number {
+    if (!data.chapterNum) return 0
+    const html = data.chapterNum?.html()
     if (!html) return 0
     const $ = cheerio.load(html)
 
     let chapterNum = 0
 
-    this.chapterNum.each((_index, element) => {
+    data.chapterNum.each((_index, element) => {
       const chapterElement = $(element).find('.list-item.col-sm-3 span').first()
       const chapterOfVolume = this.parseNum(chapterElement?.text().trim())
 
@@ -62,30 +64,31 @@ export class GenkanWorker extends BaseWorker {
     return chapterNum
   }
 
-  getImage (): string {
-    const backgroundImage = this.image?.css('background-image')
+  getImage (data: BaseData): string {
+    const backgroundImage = data.image?.css('background-image')
     let replaceText = GenkanWorker.getUrl(this.siteType)
 
     if (backgroundImage && backgroundImage.includes('https://')) {
       replaceText = ''
     }
 
-    return this.image?.css('background-image')?.replace(/url\("?/g, replaceText)?.replace(/"?\)/g, '') || ''
+    return data.image?.css('background-image')?.replace(/url\("?/g, replaceText)?.replace(/"?\)/g, '') || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
 
+    const data = new GenkanData(url)
     const chapterElem = $('.list-item.col-sm-3 a')
-    this.volume = $('h6.text-highlight').eq(1)
-    this.chapter = chapterElem.first()
-    this.chapterDate = chapterElem.eq(1)
-    this.chapterNum = $('.row.py-2')
-    this.image = $('.media-content').first()
-    this.title = $('.text-highlight').first()
+    data.volume = $('h6.text-highlight').eq(1)
+    data.chapter = chapterElem.first()
+    data.chapterDate = chapterElem.eq(1)
+    data.chapterNum = $('.row.py-2')
+    data.image = $('.media-content').first()
+    data.title = $('.text-highlight').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

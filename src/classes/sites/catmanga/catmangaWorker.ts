@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Manga } from '../../manga'
 import cheerio from 'cheerio'
@@ -31,21 +31,29 @@ interface MangaListData {
   }
 }
 
+class CatMangaData extends BaseData {
+  mangaData: MangaData
+
+  constructor (url: string, mangaData: MangaData) {
+    super(url)
+
+    this.mangaData = mangaData
+  }
+}
+
 export class CatMangaWorker extends BaseWorker {
   static siteType = SiteType.CatManga
   static url = BaseWorker.getUrl(CatMangaWorker.siteType)
 
   static testUrl = `${CatMangaWorker.url}/series/fechi`
 
-  mangaData?: MangaData
-
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(CatMangaWorker.siteType, requestConfig)
   }
 
-  getChapter (): string {
+  getChapter (data: BaseData): string {
     const textList: string[] = []
-    this.chapter?.find('p').each((_i, element) => {
+    data.chapter?.find('p').each((_i, element) => {
       const text = cheerio(element).text().trim()
       if (!text) return
 
@@ -56,17 +64,15 @@ export class CatMangaWorker extends BaseWorker {
     return textList.join(' - ')
   }
 
-  getChapterUrl (): string {
-    const url = this.chapter?.attr('href')
+  getChapterUrl (data: BaseData): string {
+    const url = data.chapter?.attr('href')
     if (!url) return ''
 
     return `${CatMangaWorker.url}${url}`
   }
 
-  getChapterNum (): number {
-    const chapters = this.mangaData?.props.pageProps.series.chapters
-    if (!chapters) return 0
-
+  getChapterNum (data: CatMangaData): number {
+    const chapters = data.mangaData.props.pageProps.series.chapters
     return chapters[chapters.length - 1].number
   }
 
@@ -75,12 +81,12 @@ export class CatMangaWorker extends BaseWorker {
     return ''
   }
 
-  getImage (): string {
-    return this.mangaData?.props.pageProps.series.cover_art.source || ''
+  getImage (data: CatMangaData): string {
+    return data.mangaData.props.pageProps.series.cover_art.source
   }
 
-  getTitle (): string {
-    return this.mangaData?.props.pageProps.series.title || ''
+  getTitle (data: CatMangaData): string {
+    return data.mangaData.props.pageProps.series.title
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
@@ -90,10 +96,10 @@ export class CatMangaWorker extends BaseWorker {
     const json = $('#__NEXT_DATA__').first().html()
     if (!json) return Error('Could not parse site')
 
-    this.mangaData = JSON.parse(json) as MangaData
-    this.chapter = $('a>p').first().parent()
+    const data = new CatMangaData(url, JSON.parse(json) as MangaData)
+    data.chapter = $('a>p').first().parent()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

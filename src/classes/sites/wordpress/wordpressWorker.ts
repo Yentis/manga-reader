@@ -1,11 +1,15 @@
 import { SiteType } from '../../../enums/siteEnum'
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import { Manga } from '../../manga'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio, { Cheerio, CheerioAPI, Element } from 'cheerio'
 import qs from 'qs'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+
+class WordPressData extends BaseData {
+  volume?: Cheerio<Element>
+}
 
 export class WordPressWorker extends BaseWorker {
   static getUrl (siteType: SiteType | LinkingSiteType): string {
@@ -35,11 +39,10 @@ export class WordPressWorker extends BaseWorker {
     return WordPressWorker.getUrl(siteType)
   }
 
-  volume?: Cheerio<Element>
-
-  getChapter (): string {
-    const volume = this.volume?.text().trim() || 'Vol.01'
-    const chapter = this.chapter?.text().trim()
+  getChapter (data: WordPressData): string {
+    const volume = data.volume?.text().trim() || 'Vol.01'
+    const chapterDate = data.chapterDate?.text().trim() || ''
+    const chapter = data.chapter?.text().replace(chapterDate, '').trim()
 
     if (!volume.endsWith('.01') && !volume.endsWith(' 1') && chapter) {
       return `${volume} | ${chapter}`
@@ -52,15 +55,15 @@ export class WordPressWorker extends BaseWorker {
     }
   }
 
-  getChapterNum (): number {
-    if (!this.chapterNum) return this.getSimpleChapterNum(this.getChapter())
-    const html = this.chapterNum?.html()
-    if (!html) return this.getSimpleChapterNum(this.getChapter())
+  getChapterNum (data: WordPressData): number {
+    if (!data.chapterNum) return this.getSimpleChapterNum(this.getChapter(data))
+    const html = data.chapterNum?.html()
+    if (!html) return this.getSimpleChapterNum(this.getChapter(data))
     const $ = cheerio.load(html)
 
     let chapterNum = 0
 
-    this.chapterNum.each((index, element) => {
+    data.chapterNum.each((index, element) => {
       const chapterElement = $(element).find('.wp-manga-chapter a').first()
       const chapterText = chapterElement.text().trim()
       const chapterOfVolume = this.getSimpleChapterNum(chapterText)
@@ -93,7 +96,7 @@ export class WordPressWorker extends BaseWorker {
     return num
   }
 
-  getChapterDate (): string {
+  getChapterDate (data: BaseData): string {
     let format
 
     switch (this.siteType) {
@@ -105,46 +108,48 @@ export class WordPressWorker extends BaseWorker {
         break
     }
 
-    const chapterDateText = this.chapterDate?.text().trim()
+    const chapterDateText = data.chapterDate?.text().trim()
     const chapterDate = moment(chapterDateText, format)
     if (!chapterDateText?.endsWith('ago') && chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return this.getDateFromNow(this.chapterDate?.text()) || this.getDateFromNow(this.chapterDate?.find('a').attr('title'))
+      return this.getDateFromNow(data.chapterDate?.text()) || this.getDateFromNow(data.chapterDate?.find('a').attr('title'))
     }
   }
 
-  getImage (): string {
-    return this.getImageSrc(this.image)
+  getImage (data: BaseData): string {
+    return this.getImageSrc(data.image)
   }
 
-  getTitle (): string {
-    return this.title?.text().replace(this.title.find('span').text(), '').trim() || ''
+  getTitle (data: BaseData): string {
+    return data.title?.text().replace(data.title.find('span').text(), '').trim() || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
 
-    this.setVolume($)
-    this.setChapter($)
+    let data = new WordPressData(url)
+    data = this.setVolume($, data)
+    data = this.setChapter($, data)
 
-    if (!this.chapter?.html() || !this.chapterDate?.html()) {
+    if (!data.chapter?.html() || !data.chapterDate?.html()) {
       const mangaId = $('#manga-chapters-holder').first().attr('data-id') || ''
-      const error = await this.readChapters(mangaId)
+      const result = await this.readChapters(mangaId, data)
 
-      if (error) return error
+      if (result instanceof Error) return result
+      data = result
     }
 
-    const ogImage = $('meta[property="og:image"]')
-    if (ogImage.length > 0) {
-      this.image = ogImage.first()
+    const summaryImage = $('.summary_image img')
+    if (summaryImage.length > 0) {
+      data.image = summaryImage.first()
     } else {
-      this.image = $('.summary_image img').first()
+      data.image = $('meta[property="og:image"]').first()
     }
-    this.title = $('.post-title').first()
+    data.title = $('.post-title').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {
@@ -180,29 +185,39 @@ export class WordPressWorker extends BaseWorker {
     return mangaList
   }
 
-  private async readChapters (mangaId: string): Promise<void | Error> {
-    const data = qs.stringify({
+  private async readChapters (mangaId: string, data: WordPressData): Promise<WordPressData | Error> {
+    const queryString = qs.stringify({
       action: 'manga_get_chapters',
       manga: mangaId
     })
 
+    let url: string
+    if (this.siteType === SiteType.LeviatanScans) {
+      const baseUrl = data.url.endsWith('/') ? data.url : `${data.url}/`
+      url = `${baseUrl}ajax/chapters`
+    } else {
+      url = `${WordPressWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`
+    }
+
     const config: AxiosRequestConfig = {
       method: 'post',
-      url: `${WordPressWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`,
+      url,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      data
+      data: queryString
     }
 
     const response = await axios(config)
     const $ = cheerio.load(response.data)
 
-    this.setVolume($)
-    this.setChapter($)
+    let newData = this.setVolume($, data)
+    newData = this.setChapter($, newData)
+
+    return newData
   }
 
-  private setVolume ($: CheerioAPI) {
+  private setVolume ($: CheerioAPI, data: WordPressData): WordPressData {
     const volumes = $('.parent.has-child .has-child')
     let volume: { element: Cheerio<Element>, number: number } | undefined
 
@@ -217,25 +232,28 @@ export class WordPressWorker extends BaseWorker {
       }
     })
 
-    this.volume = volume?.element
+    data.volume = volume?.element
+    return data
   }
 
-  private setChapter ($: CheerioAPI) {
+  private setChapter ($: CheerioAPI, data: WordPressData): WordPressData {
     const chapterSelector = '.wp-manga-chapter a'
     const chapterDateSelector = '.chapter-release-date'
 
-    if (this.volume) {
-      const volumeParent = this.volume.parent()
-      this.chapter = volumeParent.find(chapterSelector).first()
-      this.chapterDate = volumeParent.find(chapterDateSelector).first()
-      this.chapterNum = volumeParent
+    if (data.volume) {
+      const volumeParent = data.volume.parent()
+      data.chapter = volumeParent.find(chapterSelector).first()
+      data.chapterDate = volumeParent.find(chapterDateSelector).first()
+      data.chapterNum = volumeParent
 
-      return
+      return data
     }
 
-    this.chapter = $(chapterSelector).first()
-    this.chapterDate = $(chapterDateSelector).first()
-    this.chapterNum = $('.parent.has-child')
+    data.chapter = $(chapterSelector).first()
+    data.chapterDate = $(chapterDateSelector).first()
+    data.chapterNum = $('.parent.has-child')
+
+    return data
   }
 
   private getImageSrc (elem: Cheerio<Element> | undefined) {

@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio from 'cheerio'
@@ -19,20 +19,20 @@ export class MangagoWorker extends BaseWorker {
     this.platform = platform
   }
 
-  getChapter (): string {
-    return this.chapter?.text().trim() || 'Unknown'
+  getChapter (data: BaseData): string {
+    return data.chapter?.text().trim() || 'Unknown'
   }
 
-  getChapterUrl (): string {
-    return this.chapter?.attr('href') || ''
+  getChapterUrl (data: BaseData): string {
+    return data.chapter?.attr('href') || ''
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterNum?.text().split('Ch.')[1])
+  getChapterNum (data: BaseData): number {
+    return this.parseNum(data.chapterNum?.text().split('Ch.')[1])
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.text().trim(), 'MMM DD, YYYY')
+  getChapterDate (data: BaseData): string {
+    const chapterDate = moment(data.chapterDate?.text().trim(), 'MMM DD, YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -44,27 +44,28 @@ export class MangagoWorker extends BaseWorker {
     const response = await axios.get(url, this.requestConfig)
     const $ = cheerio.load(response.data)
     const mobile = this.platform?.mobile === true
+    const data = new BaseData(url)
 
     if (!mobile) {
       const listingElem = $('.listing tbody tr').first()
 
-      this.chapter = listingElem.find('a').first()
-      this.chapterNum = this.chapter
-      this.chapterDate = listingElem.children().last()
-      this.image = $('.cover img').first()
-      this.title = $('.w-title h1').first()
+      data.chapter = listingElem.find('a').first()
+      data.chapterNum = data.chapter
+      data.chapterDate = listingElem.children().last()
+      data.image = $('.cover img').first()
+      data.title = $('.w-title h1').first()
 
-      return this.buildManga(url)
+      return this.buildManga(data)
     }
 
     const columnElem = $('.uk-table tr').first()
-    this.chapter = columnElem.find('.chico').first()
-    this.chapterNum = this.chapter
-    this.chapterDate = columnElem.children().last()
-    this.image = $('.uk-container img').first()
-    this.title = $('.uk-h1').first()
+    data.chapter = columnElem.find('.chico').first()
+    data.chapterNum = data.chapter
+    data.chapterDate = columnElem.children().last()
+    data.image = $('.uk-container img').first()
+    data.title = $('.uk-h1').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

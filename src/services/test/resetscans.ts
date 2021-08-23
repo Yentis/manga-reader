@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 04'
-  desired.image = 'https://reset-scans.com/wp-content/uploads/2021/04/truth-weavers-696x1024.png'
+  desired.image = 'https://reset-scans.com/wp-content/uploads/2021/04/truth-weaver-cover-193x278.png'
   desired.title = 'Madou no Keifu'
   desired.chapterUrl = 'https://reset-scans.com/manga/madou-no-keifu/chapter-04/'
   desired.chapterNum = 4

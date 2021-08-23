@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio from 'cheerio'
@@ -23,8 +23,8 @@ export class MangakakalotWorker extends BaseWorker {
     super(MangakakalotWorker.siteType, requestConfig)
   }
 
-  getChapterNum (): number {
-    const chapter = this.getChapter()
+  getChapterNum (data: BaseData): number {
+    const chapter = this.getChapter(data)
     const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
     let num = 0
 
@@ -36,12 +36,12 @@ export class MangakakalotWorker extends BaseWorker {
     return num
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM-DD-YYYY')
+  getChapterDate (data: BaseData): string {
+    const chapterDate = moment(data.chapterDate?.attr('title'), 'MMM-DD-YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return this.getDateFromNow(this.chapterDate?.attr('title'))
+      return this.getDateFromNow(data.chapterDate?.attr('title'))
     }
   }
 
@@ -55,12 +55,13 @@ export class MangakakalotWorker extends BaseWorker {
       return Error(`${constants.REDIRECT_PREFIX}${target}`)
     }
 
-    this.chapter = $('.chapter-list a').first()
-    this.image = $('.manga-info-pic img').first()
-    this.title = $('.manga-info-text h1').first()
-    this.chapterDate = $('.chapter-list .row').first().find('span').last()
+    const data = new BaseData(url)
+    data.chapter = $('.chapter-list a').first()
+    data.image = $('.manga-info-pic img').first()
+    data.title = $('.manga-info-text h1').first()
+    data.chapterDate = $('.chapter-list .row').first().find('span').last()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

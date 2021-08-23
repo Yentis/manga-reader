@@ -11,7 +11,7 @@ const QUERY = 'the wolf & red riding hood'
 
 export async function testWebtoons ($q: QVueGlobals): Promise<void> {
   await readUrl($q)
-  await readUrlMobile()
+  await readUrlMobile($q)
   await search()
 }
 
@@ -29,7 +29,9 @@ async function readUrl ($q: QVueGlobals): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function readUrlMobile (): Promise<void> {
+async function readUrlMobile ($q: QVueGlobals): Promise<void> {
+  if (!$q.platform.is.mobile) return
+
   const url = 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)

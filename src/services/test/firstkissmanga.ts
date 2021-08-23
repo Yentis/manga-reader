@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 99'
-  desired.image = 'https://1stkissmanga.com/wp-content/uploads/2019/12/Hades-Delivery-Shop.jpg'
+  desired.image = 'https://1stkissmanga.com/wp-content/uploads/2019/12/Hades-Delivery-Shop-193x278.jpg'
   desired.title = 'Ripples Of Love'
   desired.chapterUrl = 'https://1stkissmanga.com/manga/ripples-of-love/chapter-99/'
   desired.chapterNum = 99

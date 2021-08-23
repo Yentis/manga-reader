@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Manga } from '../../manga'
@@ -15,20 +15,20 @@ export class ArangScansWorker extends BaseWorker {
     super(ArangScansWorker.siteType, requestConfig)
   }
 
-  getChapterUrl (): string {
-    const chapterUrl = this.chapter?.attr('href')
+  getChapterUrl (data: BaseData): string {
+    const chapterUrl = data.chapter?.attr('href')
     if (chapterUrl === undefined) return ''
 
     return `${ArangScansWorker.url}${chapterUrl}`
   }
 
-  getChapterNum (): number {
-    const chapterNum = this.chapterNum?.text().trim().replace('Chapter ', '')
+  getChapterNum (data: BaseData): number {
+    const chapterNum = data.chapterNum?.text().trim().replace('Chapter ', '')
     return this.parseNum(chapterNum)
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.text(), 'YYYY-MM-DD')
+  getChapterDate (data: BaseData): string {
+    const chapterDate = moment(data.chapterDate?.text(), 'YYYY-MM-DD')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -36,8 +36,8 @@ export class ArangScansWorker extends BaseWorker {
     }
   }
 
-  getImage (): string {
-    const image = this.image?.attr('src')
+  getImage (data: BaseData): string {
+    const image = data.image?.attr('src')
     if (image === undefined) return ''
 
     return `${ArangScansWorker.url}${image}`
@@ -48,13 +48,14 @@ export class ArangScansWorker extends BaseWorker {
     const $ = cheerio.load(response.data)
     const chaptersElem = $('#chapters').first()
 
-    this.chapter = chaptersElem.find('.content').first().find('a').last()
-    this.chapterNum = this.chapter
-    this.chapterDate = chaptersElem.find('.description').first()
-    this.image = $('.image img').first()
-    this.title = $('.header').first()
+    const data = new BaseData(url)
+    data.chapter = chaptersElem.find('.content').first().find('a').last()
+    data.chapterNum = data.chapter
+    data.chapterDate = chaptersElem.find('.description').first()
+    data.image = $('.image img').first()
+    data.title = $('.header').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

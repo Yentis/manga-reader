@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio, { Cheerio, Element, Node } from 'cheerio'
@@ -13,29 +13,32 @@ interface WebtoonsSearch {
   items: string[][][][]
 }
 
+class WebtoonsData extends BaseData {
+  chapterUrl?: Cheerio<Element | Node>
+}
+
 export class WebtoonsWorker extends BaseWorker {
   static siteType = SiteType.Webtoons
   static url = `${BaseWorker.urlPrefix}https://www.${WebtoonsWorker.siteType}`
   static testUrl = `${WebtoonsWorker.url}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
 
   platform: LooseDictionary | undefined
-  chapterUrl?: Cheerio<Element | Node>
 
   constructor (platform: LooseDictionary | undefined = undefined, requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(WebtoonsWorker.siteType, requestConfig)
     this.platform = platform
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterNum?.attr('data-episode-no'))
+  getChapterNum (data: BaseData): number {
+    return this.parseNum(data.chapterNum?.attr('data-episode-no'))
   }
 
-  getChapterUrl (): string {
-    return this.chapterUrl?.attr('href') || ''
+  getChapterUrl (data: WebtoonsData): string {
+    return data.chapterUrl?.attr('href') || ''
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.text().trim(), 'MMM DD, YYYY')
+  getChapterDate (data: BaseData): string {
+    const chapterDate = moment(data.chapterDate?.text().trim(), 'MMM DD, YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -43,8 +46,8 @@ export class WebtoonsWorker extends BaseWorker {
     }
   }
 
-  getImage (): string {
-    return this.image?.attr('content') || ''
+  getImage (data: BaseData): string {
+    return data.image?.attr('content') || ''
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
@@ -59,22 +62,23 @@ export class WebtoonsWorker extends BaseWorker {
     const response = await axios.get(url, { headers })
     const $ = cheerio.load(response.data)
 
-    this.image = $('meta[property="og:image"]').first()
-    this.chapterDate = $('.date').first()
+    const data = new WebtoonsData(url)
+    data.image = $('meta[property="og:image"]').first()
+    data.chapterDate = $('.date').first()
 
     if (mobile || this.platform?.mobile === true) {
-      this.chapter = $('.sub_title span').first()
-      this.chapterUrl = $('li[data-episode-no] a').first()
-      this.chapterNum = $('#_episodeList li[data-episode-no]').first()
-      this.title = $('._btnInfo .subj').first()
+      data.chapter = $('.sub_title span').first()
+      data.chapterUrl = $('li[data-episode-no] a').first()
+      data.chapterNum = $('#_episodeList li[data-episode-no]').first()
+      data.title = $('._btnInfo .subj').first()
     } else {
-      this.chapter = $('#_listUl .subj span').first()
-      this.chapterUrl = $('#_listUl a').first()
-      this.chapterNum = $('#_listUl li').first()
-      this.title = $('.info .subj').first()
+      data.chapter = $('#_listUl .subj span').first()
+      data.chapterUrl = $('#_listUl a').first()
+      data.chapterNum = $('#_listUl li').first()
+      data.title = $('.info .subj').first()
     }
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

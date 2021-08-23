@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio, { Cheerio, Element } from 'cheerio'
@@ -13,20 +13,22 @@ interface ManganeloSearch {
   'id_encode': string
 }
 
+class ManganeloData extends BaseData {
+  currentTime?: Cheerio<Element>
+}
+
 export class ManganeloWorker extends BaseWorker {
   static siteType = SiteType.Manganelo
   static url = BaseWorker.getUrl(ManganeloWorker.siteType)
   static testUrl = `${ManganeloWorker.url}/manga/pu918807`
 
-  currentTime?: Cheerio<Element>
-
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(ManganeloWorker.siteType, requestConfig)
   }
 
-  getChapterDate (): string {
-    const curTime = moment(this.currentTime?.text(), '[Current Time is] MMM DD,YYYY - hh:mm:ss A')
-    const chapterDate = moment(this.chapterDate?.attr('title'), 'MMM DD,YYYY hh:mm')
+  getChapterDate (data: ManganeloData): string {
+    const curTime = moment(data.currentTime?.text(), '[Current Time is] MMM DD,YYYY - hh:mm:ss A')
+    const chapterDate = moment(data.chapterDate?.attr('title'), 'MMM DD,YYYY hh:mm')
     if (chapterDate.isValid()) {
       return chapterDate.from(curTime)
     } else {
@@ -34,8 +36,8 @@ export class ManganeloWorker extends BaseWorker {
     }
   }
 
-  getChapterNum (): number {
-    const chapter = this.getChapter()
+  getChapterNum (data: BaseData): number {
+    const chapter = this.getChapter(data)
     const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
     let num = 0
 
@@ -51,13 +53,14 @@ export class ManganeloWorker extends BaseWorker {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
 
-    this.chapter = $('.chapter-name').first()
-    this.image = $('.info-image img').first()
-    this.title = $('.story-info-right h1').first()
-    this.chapterDate = $('.chapter-time').first()
-    this.currentTime = $('.pn-contacts p').last()
+    const data = new ManganeloData(url)
+    data.chapter = $('.chapter-name').first()
+    data.image = $('.info-image img').first()
+    data.title = $('.story-info-right h1').first()
+    data.chapterDate = $('.chapter-time').first()
+    data.currentTime = $('.pn-contacts p').last()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {

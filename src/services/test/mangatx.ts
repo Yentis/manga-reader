@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 169 [End]'
-  desired.image = 'https://mangatx.com/wp-content/uploads/2019/10/85012.png'
+  desired.image = 'https://mangatx.com/wp-content/uploads/2019/10/85012-193x278.png'
   desired.title = 'Grandest Wedding'
   desired.chapterUrl = 'https://mangatx.com/manga/grandest-wedding/chapter-169-end/'
   desired.chapterNum = 169

@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = '35 [END]'
-  desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Arata-Primal.jpg'
+  desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Arata-Primal-193x278.jpg'
   desired.title = 'Arata Primal'
   desired.chapterUrl = 'https://hiperdex.com/manga/arata-primal-the-new-primitive/35-end/'
   desired.chapterNum = 35

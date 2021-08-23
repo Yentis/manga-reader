@@ -28,8 +28,8 @@ async function readUrl (): Promise<void> {
 async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.image = 'https://flamescans.org/eternalflame/2021/01/Berserk_of_Gluttony_Title_Cover_-_Barak-1-246x350.png'
-  desired.chapter = '35'
+  desired.image = 'https://flamescans.org/eternalflame/2021/01/berserk-of-gluttony-cover-1-237x350.png'
+  desired.chapter = '37'
   desired.url = 'https://flamescans.org/series/berserk-of-gluttony/'
 
   return searchValid(results, desired, QUERY)

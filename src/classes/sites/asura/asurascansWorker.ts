@@ -1,4 +1,4 @@
-import { BaseWorker } from '../baseWorker'
+import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
 import axios from 'axios'
 import { Manga } from '../../manga'
@@ -15,6 +15,10 @@ interface AsuraScansSearch {
       'post_link': string
     }[]
   }[]
+}
+
+class AsuraScansData extends BaseData {
+  chapterUrl?: Cheerio<Element>
 }
 
 export class AsuraScansWorker extends BaseWorker {
@@ -38,18 +42,16 @@ export class AsuraScansWorker extends BaseWorker {
     return AsuraScansWorker.getUrl(siteType)
   }
 
-  chapterUrl?: Cheerio<Element>
-
-  getChapterUrl (): string {
-    return this.chapterUrl?.attr('href') || ''
+  getChapterUrl (data: AsuraScansData): string {
+    return data.chapterUrl?.attr('href') || ''
   }
 
-  getChapterNum (): number {
-    return this.parseNum(this.chapterNum?.attr('data-num'))
+  getChapterNum (data: BaseData): number {
+    return this.parseNum(data.chapterNum?.attr('data-num'))
   }
 
-  getChapterDate (): string {
-    const chapterDate = moment(this.chapterDate?.text(), 'MMMM DD, YYYY')
+  getChapterDate (data: BaseData): string {
+    const chapterDate = moment(data.chapterDate?.text(), 'MMMM DD, YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -62,14 +64,15 @@ export class AsuraScansWorker extends BaseWorker {
     const $ = cheerio.load(response.data)
     const chapterItem = $('#chapterlist li').first()
 
-    this.chapter = chapterItem.find('.chapternum').first()
-    this.chapterUrl = chapterItem.find('a').first()
-    this.chapterNum = chapterItem.first()
-    this.chapterDate = chapterItem.find('.chapterdate').first()
-    this.image = $('div[itemprop="image"] img').first()
-    this.title = $('.entry-title').first()
+    const data = new AsuraScansData(url)
+    data.chapter = chapterItem.find('.chapternum').first()
+    data.chapterUrl = chapterItem.find('a').first()
+    data.chapterNum = chapterItem.first()
+    data.chapterDate = chapterItem.find('.chapterdate').first()
+    data.image = $('div[itemprop="image"] img').first()
+    data.title = $('.entry-title').first()
 
-    return this.buildManga(url)
+    return this.buildManga(data)
   }
 
   async search (query: string): Promise<Error | Manga[]> {
