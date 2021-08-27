@@ -30,11 +30,11 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   const url = 'https://leviatanscans.com/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = 'Season 2 | 103'
+  desired.chapter = 'Season 2 | 104'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-SK-193x278.png'
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
-  desired.chapterUrl = 'https://leviatanscans.com/lv/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/103/'
-  desired.chapterNum = 103
+  desired.chapterUrl = 'https://leviatanscans.com/lv/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/104/'
+  desired.chapterNum = 104
 
   mangaEqual(manga, desired)
 }

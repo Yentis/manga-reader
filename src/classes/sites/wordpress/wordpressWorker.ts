@@ -135,7 +135,12 @@ export class WordPressWorker extends BaseWorker {
 
     if (!data.chapter?.html() || !data.chapterDate?.html()) {
       const mangaId = $('#manga-chapters-holder').first().attr('data-id') || ''
-      const result = await this.readChapters(mangaId, data)
+      let result = await this.readChapters(mangaId, data, `${WordPressWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`)
+
+      if (result instanceof Error) {
+        const baseUrl = data.url.endsWith('/') ? data.url : `${data.url}/`
+        result = await this.readChapters(mangaId, data, `${baseUrl}ajax/chapters`)
+      }
 
       if (result instanceof Error) return result
       data = result
@@ -185,31 +190,28 @@ export class WordPressWorker extends BaseWorker {
     return mangaList
   }
 
-  private async readChapters (mangaId: string, data: WordPressData): Promise<WordPressData | Error> {
+  private async readChapters (mangaId: string, data: WordPressData, chapterPath: string): Promise<WordPressData | Error> {
     const queryString = qs.stringify({
       action: 'manga_get_chapters',
       manga: mangaId
     })
 
-    let url: string
-    if (this.siteType === SiteType.LeviatanScans) {
-      const baseUrl = data.url.endsWith('/') ? data.url : `${data.url}/`
-      url = `${baseUrl}ajax/chapters`
-    } else {
-      url = `${WordPressWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`
-    }
-
     const config: AxiosRequestConfig = {
       method: 'post',
-      url,
+      url: chapterPath,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       data: queryString
     }
 
-    const response = await axios(config)
-    const $ = cheerio.load(response.data)
+    let $: CheerioAPI
+    try {
+      const response = await axios(config)
+      $ = cheerio.load(response.data)
+    } catch (error) {
+      return error instanceof Error ? error : Error(error)
+    }
 
     let newData = this.setVolume($, data)
     newData = this.setChapter($, newData)
