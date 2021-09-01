@@ -1,5 +1,5 @@
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/workers/webtoons.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { WebtoonsWorker } from './webtoonsWorker'
 
 export class Webtoons extends BaseSite {

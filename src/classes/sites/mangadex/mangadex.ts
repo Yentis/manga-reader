@@ -1,6 +1,6 @@
 import { BaseSite } from '../baseSite'
 import PQueue from 'p-queue'
-import Worker from 'worker-loader!src/workers/mangadex.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { MangaDexWorker } from './mangadexWorker'
 import { QVueGlobals } from 'quasar'
 import { Store } from 'vuex'

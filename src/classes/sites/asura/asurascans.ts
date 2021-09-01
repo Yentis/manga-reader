@@ -1,6 +1,6 @@
 import { BaseSite } from '../baseSite'
 import { AsuraScansWorker } from './asurascansWorker'
-import Worker from 'worker-loader!src/workers/asurascans.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { SiteType } from 'src/enums/siteEnum'
 import PQueue from 'p-queue'
 

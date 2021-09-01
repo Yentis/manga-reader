@@ -1,6 +1,6 @@
 import { SiteType } from '../../../enums/siteEnum'
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/workers/wordpress.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { WordPressWorker } from './wordpressWorker'
 import PQueue from 'p-queue'
 

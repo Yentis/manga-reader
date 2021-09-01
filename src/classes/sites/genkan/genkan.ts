@@ -1,6 +1,6 @@
 import { SiteType } from '../../../enums/siteEnum'
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/workers/genkan.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { GenkanWorker } from './genkanWorker'
 
 export class Genkan extends BaseSite {
