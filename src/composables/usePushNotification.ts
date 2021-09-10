@@ -1,7 +1,10 @@
 import { useQuasar } from 'quasar'
 import { Manga } from '../classes/manga'
 import { UrlNavigation } from '../classes/urlNavigation'
+import useSettings from './useSettings'
 import useUrlNavigation from './useUrlNavigation'
+import { watch } from 'vue'
+import { Settings } from 'src/classes/settings'
 
 interface CordovaNotificationOptions {
   title: string
@@ -24,7 +27,15 @@ export default function usePushNotification () {
   const { urlNavigation } = useUrlNavigation()
 
   const sendPushNotification = (manga: Manga) => {
-    if ($q.platform.is.electron) {
+    if ($q.platform.is.cordova) {
+      (cordova.plugins as CordovaNotification).notification.local.schedule({
+        title: manga.title,
+        text: manga.chapter,
+        smallIcon: 'res://notification_icon',
+        icon: manga.image,
+        foreground: true
+      })
+    } else {
       const notification = new Notification(manga.title, {
         body: manga.chapter,
         icon: manga.image
@@ -33,16 +44,21 @@ export default function usePushNotification () {
       notification.onclick = () => {
         urlNavigation.value = new UrlNavigation(manga.url, false)
       }
-    } else if ($q.platform.is.cordova) {
-      (cordova.plugins as CordovaNotification).notification.local.schedule({
-        title: manga.title,
-        text: manga.chapter,
-        smallIcon: 'res://notification_icon',
-        icon: manga.image,
-        foreground: true
-      })
     }
   }
 
   return { sendPushNotification }
+}
+
+export function useAppPushNotification () {
+  const $q = useQuasar()
+  const { settings } = useSettings()
+
+  watch(settings, (newSettings: Settings) => {
+    if ($q.platform.is.cordova || $q.platform.is.electron) return
+    if (!newSettings.refreshOptions.enabled) return
+    if (Notification.permission === 'denied') return
+
+    Notification.requestPermission().catch((error) => console.error(error))
+  })
 }
