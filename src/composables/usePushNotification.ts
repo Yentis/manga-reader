@@ -33,7 +33,7 @@ export default function usePushNotification () {
       notification.onclick = () => {
         urlNavigation.value = new UrlNavigation(manga.url, false)
       }
-    } else if ($q.platform.is.mobile) {
+    } else if ($q.platform.is.cordova) {
       (cordova.plugins as CordovaNotification).notification.local.schedule({
         title: manga.title,
         text: manga.chapter,
