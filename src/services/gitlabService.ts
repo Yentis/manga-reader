@@ -1,6 +1,5 @@
 import { LocalStorage } from 'quasar'
 import { Ref } from 'vue'
-import { Gitlab } from '@gitbeaker/browser'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from '../classes/urlNavigation'
 import constants from 'src/classes/constants'
@@ -8,10 +7,16 @@ import git from 'isomorphic-git'
 import http from 'isomorphic-git/http/web'
 import { configure, BFSRequire } from 'browserfs/dist/node/index'
 import { FSModule } from 'browserfs/dist/node/core/FS'
+import axios from 'axios'
+import qs from 'qs'
 
 const CLIENT_ID = '1ac7147c66b40b6aaae3f3fd0cac5169d26fd4b406e6198f4b3fd1fd29d9816a'
 const GITLAB_DIR = '/gitlab'
 const SNIPPET_FILE_NAME = 'manga_list.json'
+
+interface SnippetResponse {
+  id: number
+}
 
 configure({
   fs: 'InMemory',
@@ -107,17 +112,31 @@ export async function createList (list: string): Promise<string> {
   if (shareId) {
     return Promise.resolve(shareId)
   }
+
   const accessToken = getAccessToken()
   if (!accessToken) {
     throw Error('Not logged in')
   }
 
-  const gitlab = new Gitlab({
-    oauthToken: accessToken
+  const queryString = qs.stringify({
+    access_token: getAccessToken()
   })
 
-  const response = await gitlab.Snippets.create('My Manga List', SNIPPET_FILE_NAME, getModifiedList(list), 'public')
-  const id = response.id as string
+  const response = await axios.post(`https://gitlab.com/api/v4/snippets?${queryString}`, {
+    title: 'My Manga List',
+    files: [{
+      file_path: SNIPPET_FILE_NAME,
+      content: getModifiedList(list)
+    }],
+    visibility: 'public'
+  }, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+
+  const snippetResponse = response.data as SnippetResponse
+  const id = snippetResponse.id.toString()
   setShareId(id)
 
   return id

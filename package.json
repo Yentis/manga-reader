@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.22.2",
-    "@gitbeaker/browser": "^28.0.2",
     "@quasar/cli": "^1.2.1",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.19.2",
