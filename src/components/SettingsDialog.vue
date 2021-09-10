@@ -19,7 +19,7 @@
         <q-card-actions vertical>
           <q-toggle
             v-model="newSettings.openInBrowser"
-            label="Open in browser"
+            :label="($q.platform.is.electron || $q.platform.is.cordova) ? 'Open in browser' : 'Open in new tab'"
           />
           <q-toggle
             v-model="newSettings.darkMode"
