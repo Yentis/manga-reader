@@ -1,55 +1,48 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { WorkerRequest } from 'src/classes/workerRequest'
-import { doOperation } from './helper'
-import { KitsuRequestType } from 'src/enums/workerEnum'
-import { Worker } from 'src/classes/worker'
 import { KitsuWorker } from 'src/classes/sites/kitsu/kitsuWorker'
+import { WorkerRequest } from 'src/classes/workerRequest'
+import { KitsuRequestType } from 'src/enums/workerEnum'
 
-addEventListener('message', event => {
-  const request = event.data as WorkerRequest
-  const kitsuWorker = new KitsuWorker(request.data.get('token') as string, request.requestConfig)
-
+export default function handleKitsuRequest (request: WorkerRequest, worker: KitsuWorker): boolean {
   switch (request.type) {
     case KitsuRequestType.USER_ID:
-      kitsuWorker.getUserId().then(result => {
+      worker.getUserId().then(result => {
         // @ts-ignore
         postMessage(result)
       }).catch(error => {
         // @ts-ignore
         postMessage(Error(error))
       })
-      return
+      return true
     case KitsuRequestType.MANGA_SLUG:
-      kitsuWorker.searchMangaSlug(request.data.get('url') as string).then(result => {
+      worker.searchMangaSlug(request.data.get('url') as string).then(result => {
         // @ts-ignore
         postMessage(result)
       }).catch(error => {
         // @ts-ignore
         postMessage(Error(error))
       })
-      return
+      return true
     case KitsuRequestType.LIBRARY_INFO:
-      kitsuWorker.getLibraryInfo(request.data.get('mangaId') as string, request.data.get('userId') as string).then(result => {
+      worker.getLibraryInfo(request.data.get('mangaId') as string, request.data.get('userId') as string).then(result => {
         // @ts-ignore
         postMessage(result)
       }).catch(error => {
         // @ts-ignore
         postMessage(Error(error))
       })
-      return
+      return true
     case KitsuRequestType.LOGIN:
-      kitsuWorker.doLogin({ username: request.data.get('username') as string, password: request.data.get('password') as string }).then(result => {
+      worker.doLogin({ username: request.data.get('username') as string, password: request.data.get('password') as string }).then(result => {
         // @ts-ignore
         postMessage(result)
       }).catch(error => {
         // @ts-ignore
         postMessage(Error(error))
       })
-      return
+      return true
+    default:
+      return false
   }
-
-  doOperation(request, kitsuWorker)
-})
-
-export default Worker
+}

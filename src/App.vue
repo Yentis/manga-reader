@@ -11,6 +11,7 @@ import { useAppNotification } from './composables/useNotification'
 import { useAppMangaList } from './composables/useMangaList'
 import { useAppWindowSize } from './composables/useWindowSize'
 import { useAppInitialized } from './composables/useInitialized'
+import { useAppPushNotification } from './composables/usePushNotification'
 
 export default defineComponent({
   name: 'App',
@@ -22,6 +23,7 @@ export default defineComponent({
     useAppUrlNavigation()
     useAppWindowSize()
     useAppInitialized()
+    useAppPushNotification()
   }
 })
 </script>

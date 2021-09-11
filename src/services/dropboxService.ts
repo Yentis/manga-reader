@@ -2,9 +2,11 @@ import { Dropbox, DropboxAuth } from 'dropbox'
 import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
-import { LocalStorage } from 'quasar'
+import { LocalStorage, QVueGlobals } from 'quasar'
 import { getShareId, setShareId } from './gitlabService'
 import constants from 'src/classes/constants'
+import { getPlatform } from './platformService'
+import { Platform } from 'src/enums/platformEnum'
 
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024
 const CLIENT_ID = 'uoywjq0b8q2208f'
@@ -22,10 +24,13 @@ export function setAccessToken (token: string | undefined) {
   LocalStorage.set(constants.DROPBOX_TOKEN, token)
 }
 
-export async function getAuthUrl (): Promise<string> {
+export async function getAuthUrl ($q: QVueGlobals): Promise<string> {
+  const baseUrl = getPlatform($q) !== Platform.Static ? 'http://localhost/' : `${document.location.href}`
+  const redirectUrl = baseUrl.endsWith('/') ? `${baseUrl}redirect` : `${baseUrl}/redirect`
+
   const authUrl = await new DropboxAuth({
     clientId: CLIENT_ID
-  }).getAuthenticationUrl('http://localhost/redirect')
+  }).getAuthenticationUrl(redirectUrl)
 
   return authUrl.toString()
 }

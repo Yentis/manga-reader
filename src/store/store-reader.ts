@@ -6,18 +6,18 @@ import { UrlNavigation } from '../classes/urlNavigation'
 import { mangaSort } from '../services/sortService'
 
 export class ReaderState {
-    mangaList: Manga[] = []
-    refreshing = false
-    refreshProgress = 0
-    notification: NotifyOptions | undefined = undefined
-    searchResults: Manga[] = []
-    urlNavigation: UrlNavigation | undefined = undefined
-    mobileView = false
-    settings = new Settings()
-    searchValue = ''
+  mangaList: Manga[] = []
+  refreshing = false
+  refreshProgress = 0
+  notification: NotifyOptions | undefined = undefined
+  searchResults: Manga[] = []
+  urlNavigation: UrlNavigation | undefined = undefined
+  mobileView = false
+  settings = new Settings()
+  searchValue = ''
 }
 
-function doSort (mangaList: Manga[]): Manga[] {
+function doSort (state: ReaderState, mangaList: Manga[] = state.mangaList): Manga[] {
   return mangaList.sort((a, b) => {
     return mangaSort(a, b, state.settings.sortedBy)
   })
@@ -31,24 +31,24 @@ const state = new ReaderState()
 
 const mutations = {
   updateMangaList (state: ReaderState, mangaList: Manga[]) {
-    state.mangaList = doSort(mangaList)
+    state.mangaList = doSort(state, mangaList)
   },
   sortMangaList (state: ReaderState) {
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   addManga (state: ReaderState, manga: Manga) {
     state.mangaList.unshift(manga)
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   removeManga (state: ReaderState, url: string) {
     state.mangaList = state.mangaList.filter((manga) => manga.url !== url)
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   updateManga (state: ReaderState, data: { url: string, manga: Manga }) {
     const index = state.mangaList.findIndex(curManga => data.url === curManga.url)
     if (index === -1) return
     state.mangaList[index] = data.manga
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   updateMangaAltSources (state: ReaderState, data: { url: string, altSources: Record<string, string> | undefined }) {
     const manga = getMangaByUrl(state, data.url)
@@ -59,7 +59,7 @@ const mutations = {
     const manga = getMangaByUrl(state, data.url)
     if (manga === undefined) return
     manga.chapter = data.chapter
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   updateMangaChapterNum (state: ReaderState, data: { url: string, chapterNum: number }) {
     const manga = getMangaByUrl(state, data.url)
@@ -90,7 +90,7 @@ const mutations = {
     const manga = getMangaByUrl(state, data.url)
     if (manga === undefined) return
     manga.read = data.read
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   updateMangaReadNum (state: ReaderState, data: { url: string, readNum: number | undefined }) {
     const manga = getMangaByUrl(state, data.url)
@@ -111,7 +111,7 @@ const mutations = {
     const manga = getMangaByUrl(state, data.url)
     if (manga === undefined) return
     manga.status = data.status
-    state.mangaList = doSort(state.mangaList)
+    state.mangaList = doSort(state)
   },
   updateMangaNotes (state: ReaderState, data: { url: string, notes: string | undefined }) {
     const manga = getMangaByUrl(state, data.url)

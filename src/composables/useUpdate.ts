@@ -17,11 +17,11 @@ export default function useUpdate () {
     notifyOptions.actions = [{
       label: 'Download',
       handler: () => {
-        if ($q.platform.is.mobile) {
+        if ($q.platform.is.cordova) {
           const apkAsset = getApkAsset(githubRelease)
           if (!apkAsset) return
           window.location.href = apkAsset.browser_download_url
-        } else {
+        } else if ($q.platform.is.electron) {
           const electronAsset = getElectronAsset(githubRelease)
           if (!electronAsset) return
           urlNavigation.value = new UrlNavigation(electronAsset.browser_download_url, false)

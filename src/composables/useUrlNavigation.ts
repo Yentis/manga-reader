@@ -5,14 +5,9 @@ import { computed, watch } from 'vue'
 import { UrlNavigation } from '../classes/urlNavigation'
 import { openURL, useQuasar } from 'quasar'
 import { checkSites } from '../services/siteService'
-import { NotifyOptions } from '../classes/notifyOptions'
-import qs from 'qs'
-import { createList, getNotifyOptions, setAccessToken as setGitlabAccessToken } from '../services/gitlabService'
-import { setAccessToken as setDropboxAccessToken } from '../services/dropboxService'
-import useNotification from './useNotification'
-import useMangaList from './useMangaList'
 import useSettings from './useSettings'
 import ElectronWindow from 'src/interfaces/electronWindow'
+import { useCordovaAuth } from './useAuthCallback'
 
 export default function useUrlNavigation () {
   const $store = useStore()
@@ -31,46 +26,15 @@ export default function useUrlNavigation () {
 export function useAppUrlNavigation () {
   const $q = useQuasar()
   const { urlNavigation } = useUrlNavigation()
-  const { notification } = useNotification()
-  const { mangaList } = useMangaList()
   const { settings } = useSettings()
 
-  const onGitlabRedirect = (url: string) => {
-    const notifyOptions = new NotifyOptions('Logged in successfully!')
-    notifyOptions.type = 'positive'
-    notification.value = notifyOptions
-
-    const queryString = qs.parse(url.replace('http://localhost/redirect_gitlab#', ''))
-    setGitlabAccessToken(queryString.access_token as string)
-
-    $q.loading.show({
-      delay: 100
-    })
-
-    createList(JSON.stringify(mangaList.value))
-      .catch(error => {
-        notification.value = getNotifyOptions(error, urlNavigation)
-      })
-      .finally(() => {
-        $q.loading.hide()
-      })
-  }
-
-  const onDropboxRedirect = (url: string) => {
-    const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
-    notifyOptions.type = 'positive'
-    notification.value = notifyOptions
-
-    const queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
-    setDropboxAccessToken(queryString.access_token as string)
-  }
-
   const openInApp = (url: string, forced: boolean) => {
-    if (!$q.platform.is.mobile) {
+    if (!$q.platform.is.cordova) {
       window.location.href = url
       return
     }
 
+    const { onUrlLoadStart } = useCordovaAuth()
     const browser = cordova.InAppBrowser.open(url, '_blank')
     if (!forced) return
 
@@ -79,13 +43,8 @@ export function useAppUrlNavigation () {
     })
 
     browser.addEventListener('loadstart', (event) => {
-      if (event.url.startsWith('http://localhost/redirect_gitlab')) {
-        onGitlabRedirect(event.url)
-      } else if (event.url.startsWith('http://localhost/redirect#access_token')) {
-        onDropboxRedirect(event.url)
-      } else return
-
-      browser.close()
+      const shouldClose = onUrlLoadStart(event.url)
+      if (shouldClose) browser.close()
     })
   }
 
@@ -95,7 +54,7 @@ export function useAppUrlNavigation () {
 
     if (target.openInApp || !openInBrowser) {
       openInApp(target.url, target.openInApp)
-    } else if ($q.platform.is.mobile) {
+    } else if ($q.platform.is.cordova) {
       window.location.href = target.url
     } else if ($q.platform.is.electron) {
       const electronWindow = window as unknown as ElectronWindow

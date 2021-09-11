@@ -8,6 +8,7 @@ import { useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
 
 export default function useSharing () {
+  const $q = useQuasar()
   const { urlNavigation } = useUrlNavigation()
   const { mangaList } = useMangaList()
   const { notification } = useNotification()
@@ -34,7 +35,7 @@ export default function useSharing () {
             {
               label: 'Relog',
               handler: () => {
-                urlNavigation.value = new UrlNavigation(getAuthUrl(), true)
+                urlNavigation.value = new UrlNavigation(getAuthUrl($q), true)
               },
               color: 'white'
             }
@@ -59,7 +60,6 @@ export default function useSharing () {
     }, 5 * 60 * 1000)
   }
 
-  const $q = useQuasar()
   const showShareDialog = (): Promise<string> => {
     return new Promise((resolve) => {
       $q.dialog({
@@ -78,7 +78,7 @@ export default function useSharing () {
           const notifyOptions = getGitlabNotifyOptions(error)
 
           if (notifyOptions.caption?.includes('Not logged in')) {
-            urlNavigation.value = new UrlNavigation(getAuthUrl(), true)
+            urlNavigation.value = new UrlNavigation(getAuthUrl($q), true)
           } else {
             notification.value = notifyOptions
             console.error(error)

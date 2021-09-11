@@ -10,15 +10,16 @@
     "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m android",
     "build:ios": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m ios",
     "sign:android": "jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore ./dist/cordova/android/apk/release/app-release-unsigned.apk manga_reader",
-    "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron"
+    "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron",
+    "build:ssg": "quasar ssg generate",
+    "serve:ssg": "quasar ssg serve dist/ssg"
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.22.2",
-    "@gitbeaker/browser": "^28.0.2",
-    "@isomorphic-git/lightning-fs": "^4.4.1",
-    "@quasar/cli": "^1.1.2",
+    "@quasar/cli": "^1.2.1",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.19.2",
+    "browserfs": "^1.4.3",
     "cheerio": "^1.0.0-rc.3",
     "core-js": "^3.6.5",
     "dropbox": "^10.1.0",
@@ -35,10 +36,8 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.0.0",
     "@quasar/app": "3",
-    "@types/": "isomorphic-git/lightning-fs",
     "@types/cheerio": "^0.22.29",
     "@types/isomorphic-fetch": "0.0.35",
-    "@types/isomorphic-git__lightning-fs": "^4.4.2",
     "@types/node": "^10.17.15",
     "@types/tough-cookie": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^4.28.0",
@@ -61,6 +60,7 @@
     "eslint-plugin-vue": "^7.0.0",
     "eslint-webpack-plugin": "^2.4.0",
     "jsdom-global": "^3.0.2",
+    "quasar-app-extension-ssg": "^3.0.1",
     "tough-cookie": "^4.0.0",
     "ts-node": "^8.10.2",
     "worker-loader": "^3.0.7"

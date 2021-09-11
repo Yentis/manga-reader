@@ -1,5 +1,5 @@
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/workers/manganelo.worker'
+import Worker from 'worker-loader!src/worker/site.worker'
 import { ManganeloWorker } from './manganeloWorker'
 
 const LOGIN_URL = `https://user.${ManganeloWorker.siteType}/login?l=manganelo`

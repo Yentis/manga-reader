@@ -26,22 +26,17 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted } from 'vue'
 import moment from 'moment'
-import { NotifyOptions } from 'src/classes/notifyOptions'
 import { SiteName, SiteType } from 'src/enums/siteEnum'
-import * as DropboxService from 'src/services/dropboxService'
-import * as GitlabService from 'src/services/gitlabService'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/manga-item/MangaItem.vue'
-import useUrlNavigation from 'src/composables/useUrlNavigation'
 import useMangaList from 'src/composables/useMangaList'
 import useSettings from 'src/composables/useSettings'
 import useSearchValue from 'src/composables/useSearchValue'
 import useRefreshing from 'src/composables/useRefreshing'
 import useRefreshProgress from 'src/composables/useRefreshProgress'
 import useInitialized from 'src/composables/useInitialized'
-import useNotification from 'src/composables/useNotification'
+import { useElectronAuth, useStaticAuth } from 'src/composables/useAuthCallback'
 import { useQuasar } from 'quasar'
-import ElectronWindow from 'src/interfaces/electronWindow'
 
 export default defineComponent({
   components: {
@@ -51,18 +46,12 @@ export default defineComponent({
 
   setup () {
     const $q = useQuasar()
-    const { urlNavigation } = useUrlNavigation()
     const { mangaList } = useMangaList()
     const { settings } = useSettings()
     const { searchValue } = useSearchValue()
     const { refreshing } = useRefreshing()
     const { refreshProgress } = useRefreshProgress()
     const { main: mainInitialized, clearInitialized } = useInitialized()
-    const { notification } = useNotification()
-
-    const getGitlabNotifyOptions = (error: unknown) => {
-      return GitlabService.getNotifyOptions(error, urlNavigation)
-    }
 
     const filteredMangaList = computed(() => {
       return mangaList.value.filter(manga => {
@@ -93,7 +82,7 @@ export default defineComponent({
       })
     })
 
-    if ($q.platform.is.mobile) {
+    if ($q.platform.is.cordova) {
       onMounted(() => {
         window.cookieMaster.setCookieValue(
           `.${SiteType.Webtoons}`,
@@ -116,32 +105,9 @@ export default defineComponent({
         })
       })
     } else if ($q.platform.is.electron) {
-      onMounted(() => {
-        const electronWindow = window as unknown as ElectronWindow
-
-        electronWindow.mangaReader.onDropboxToken((_event: unknown, token?: string) => {
-          const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
-          notifyOptions.type = 'positive'
-          notification.value = notifyOptions
-          DropboxService.setAccessToken(token)
-        })
-
-        electronWindow.mangaReader.onGitlabToken((_event: unknown, token?: string) => {
-          const notifyOptions = new NotifyOptions('Logged in successfully!')
-          notifyOptions.type = 'positive'
-          notification.value = notifyOptions
-          GitlabService.setAccessToken(token)
-
-          $q.loading.show({
-            delay: 100
-          })
-          GitlabService.createList(JSON.stringify(mangaList.value)).catch(error => {
-            notification.value = getGitlabNotifyOptions(error)
-          }).finally(() => {
-            $q.loading.hide()
-          })
-        })
-      })
+      useElectronAuth()
+    } else {
+      useStaticAuth()
     }
 
     return {

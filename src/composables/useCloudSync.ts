@@ -9,19 +9,19 @@ import useMangaList from './useMangaList'
 import { Manga } from 'src/classes/manga'
 
 export default function useCloudSync () {
+  const $q = useQuasar()
   const { urlNavigation } = useUrlNavigation()
   const { notification } = useNotification()
   const { mangaList, storeManga } = useMangaList()
 
   const openDropboxLogin = () => {
-    getAuthUrl().then((authUrl) => {
+    getAuthUrl($q).then((authUrl) => {
       urlNavigation.value = new UrlNavigation(authUrl, true)
     }).catch((error) => {
       notification.value = new NotifyOptions(error)
     })
   }
 
-  const $q = useQuasar()
   const importList = async () => {
     if (!getAccessToken()) {
       openDropboxLogin()

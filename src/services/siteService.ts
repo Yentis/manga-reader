@@ -56,12 +56,12 @@ const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
 const siteMap = new Map<string, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
-  [SiteType.HatigarmScans, new Genkan(SiteType.HatigarmScans)],
   [SiteType.Webtoons, new Webtoons()],
+  [SiteType.HatigarmScans, new Genkan(SiteType.HatigarmScans)],
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
-  [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.Mangakakalot, new Mangakakalot()],
   [SiteType.MangaDex, mangaDex],
+  [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.MethodScans, new Genkan(SiteType.MethodScans)],
   [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
