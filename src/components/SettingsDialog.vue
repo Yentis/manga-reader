@@ -19,7 +19,7 @@
         <q-card-actions vertical>
           <q-toggle
             v-model="newSettings.openInBrowser"
-            :label="($q.platform.is.electron || $q.platform.is.cordova) ? 'Open in browser' : 'Open in new tab'"
+            :label="isStatic() ? 'Open in new tab' : 'Open in browser'"
           />
           <q-toggle
             v-model="newSettings.darkMode"
@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import { useDialogPluginComponent, copyToClipboard } from 'quasar'
+import { useDialogPluginComponent, copyToClipboard, useQuasar } from 'quasar'
 import { defineComponent, onMounted, ref } from 'vue'
 import { Settings } from 'src/classes/settings'
 import { getShareId } from 'src/services/gitlabService'
@@ -109,6 +109,8 @@ import useNotification from 'src/composables/useNotification'
 import useSettings from 'src/composables/useSettings'
 import TestComponent from 'src/components/TestComponent.vue'
 import useSharing from 'src/composables/useSharing'
+import { getPlatform } from 'src/services/platformService'
+import { Platform } from 'src/enums/platformEnum'
 
 export default defineComponent({
   components: { TestComponent },
@@ -116,6 +118,7 @@ export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
 
   setup () {
+    const $q = useQuasar()
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
     const { navigate } = useUrlNavigation()
     const { notification } = useNotification()
@@ -157,6 +160,10 @@ export default defineComponent({
         })
     }
 
+    const isStatic = () => {
+      return getPlatform($q) === Platform.Static
+    }
+
     return {
       dialogRef,
       onDialogHide,
@@ -172,7 +179,8 @@ export default defineComponent({
       shareId,
       navigate,
       onShareList,
-      onCopyToClipboard
+      onCopyToClipboard,
+      isStatic
     }
   }
 })

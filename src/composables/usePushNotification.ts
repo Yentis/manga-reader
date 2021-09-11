@@ -5,6 +5,8 @@ import useSettings from './useSettings'
 import useUrlNavigation from './useUrlNavigation'
 import { watch } from 'vue'
 import { Settings } from 'src/classes/settings'
+import { getPlatform } from 'src/services/platformService'
+import { Platform } from 'src/enums/platformEnum'
 
 interface CordovaNotificationOptions {
   title: string
@@ -55,7 +57,7 @@ export function useAppPushNotification () {
   const { settings } = useSettings()
 
   watch(settings, (newSettings: Settings) => {
-    if ($q.platform.is.cordova || $q.platform.is.electron) return
+    if (getPlatform($q) !== Platform.Static) return
     if (!newSettings.refreshOptions.enabled) return
     if (Notification.permission === 'denied') return
 

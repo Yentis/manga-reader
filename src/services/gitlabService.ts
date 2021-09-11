@@ -1,4 +1,4 @@
-import { LocalStorage } from 'quasar'
+import { LocalStorage, QVueGlobals } from 'quasar'
 import { Ref } from 'vue'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from '../classes/urlNavigation'
@@ -9,6 +9,8 @@ import { configure, BFSRequire } from 'browserfs/dist/node/index'
 import { FSModule } from 'browserfs/dist/node/core/FS'
 import axios from 'axios'
 import qs from 'qs'
+import { getPlatform } from './platformService'
+import { Platform } from 'src/enums/platformEnum'
 
 const CLIENT_ID = '1ac7147c66b40b6aaae3f3fd0cac5169d26fd4b406e6198f4b3fd1fd29d9816a'
 const GITLAB_DIR = '/gitlab'
@@ -98,8 +100,11 @@ export function setAccessToken (token: string | undefined) {
   LocalStorage.set(constants.GITLAB_TOKEN, token)
 }
 
-export function getAuthUrl () {
-  return `https://gitlab.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=http://localhost/redirect_gitlab&response_type=token&scope=api`
+export function getAuthUrl ($q: QVueGlobals) {
+  const baseUrl = getPlatform($q) !== Platform.Static ? 'http://localhost/' : `${document.location.href}`
+  const redirectUrl = baseUrl.endsWith('/') ? `${baseUrl}redirect_gitlab` : `${baseUrl}/redirect_gitlab`
+
+  return `https://gitlab.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${redirectUrl}&response_type=token&scope=api`
 }
 
 export function setShareId (id: string | undefined) {
