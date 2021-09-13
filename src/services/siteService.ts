@@ -86,7 +86,8 @@ const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.Kitsu, new Kitsu()]
 ])
 const siteAliases = [
-  { url: 'manganato.com', site: SiteType.Manganelo }
+  { url: 'manganato.com', site: SiteType.Manganelo },
+  { url: '1stkissmanga.io', site: SiteType.FirstKissManga }
 ]
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {

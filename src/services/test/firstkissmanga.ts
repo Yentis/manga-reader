@@ -17,9 +17,9 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 99'
-  desired.image = 'https://1stkissmanga.com/wp-content/uploads/2019/12/Hades-Delivery-Shop-193x278.jpg'
+  desired.image = 'https://1stkissmanga.io/wp-content/uploads/2019/12/Hades-Delivery-Shop-193x278.jpg'
   desired.title = 'Ripples Of Love'
-  desired.chapterUrl = 'https://1stkissmanga.com/manga/ripples-of-love/chapter-99/'
+  desired.chapterUrl = 'https://1stkissmanga.io/manga/ripples-of-love/chapter-99/'
   desired.chapterNum = 99
 
   mangaEqual(manga, desired)
@@ -28,9 +28,9 @@ async function readUrl (): Promise<void> {
 async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.image = 'https://1stkissmanga.com/wp-content/uploads/2019/12/Cajole-a-Childe-Into-Being-My-Boyfriend-193x278.jpg'
+  desired.image = 'https://1stkissmanga.io/wp-content/uploads/2019/12/Cajole-a-Childe-Into-Being-My-Boyfriend-193x278.jpg'
   desired.chapter = 'Chapter 155'
-  desired.url = 'https://1stkissmanga.com/manga/cajole-a-childe-into-being-my-boyfriend/'
+  desired.url = 'https://1stkissmanga.io/manga/cajole-a-childe-into-being-my-boyfriend/'
 
   return searchValid(results, desired, QUERY)
 }

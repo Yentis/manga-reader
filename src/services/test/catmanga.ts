@@ -29,7 +29,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://images.catmanga.org/series/cuckoo/covers/05.jpg'
-  desired.chapter = 'Chapter 76'
+  desired.chapter = 'Chapter 78'
   desired.url = 'https://catmanga.org/series/cuckoo'
 
   return searchValid(results, desired, QUERY)

@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 9'
-  desired.image = 'https://flamescans.org/eternalflame/2021/02/7-6.jpg'
+  desired.image = 'https://flamescans.org/wp-content/uploads/2021/02/7-6.jpg'
   desired.title = 'You, the One and Only, and the Seven Billion Grim Reapers'
   desired.chapterUrl = 'https://flamescans.org/you-the-one-and-only-and-the-seven-billion-grim-reapers-chapter-9-epilogue/'
   desired.chapterNum = 9
@@ -28,7 +28,7 @@ async function readUrl (): Promise<void> {
 async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.image = 'https://flamescans.org/eternalflame/2021/01/berserk-of-gluttony-cover-1-237x350.png'
+  desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/berserk-of-gluttony-cover-1-237x350.png'
   desired.chapter = '37'
   desired.url = 'https://flamescans.org/series/berserk-of-gluttony/'
 

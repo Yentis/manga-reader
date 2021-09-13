@@ -42,7 +42,7 @@ export class ManhwaClubWorker extends BaseWorker {
   static siteType = SiteType.ManhwaClub
   static url = BaseWorker.getUrl(ManhwaClubWorker.siteType)
 
-  static testUrl = `${ManhwaClubWorker.url}/en/comic/my-uncle`
+  static testUrl = `${ManhwaClubWorker.url}/comic/real-man-dogado`
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(ManhwaClubWorker.siteType, requestConfig)

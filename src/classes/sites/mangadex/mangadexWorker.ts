@@ -7,26 +7,22 @@ import relevancy from 'relevancy'
 import qs from 'qs'
 
 interface ChapterResult {
-  data: {
-    id: string,
-    attributes: {
-      title: string,
-      chapter: string,
-      updatedAt: string
-    }
+  id: string,
+  attributes: {
+    title: string,
+    chapter: string,
+    updatedAt: string
   }
 }
 
 interface ChapterResponse {
-  results: ChapterResult[]
+  data: ChapterResult[]
 }
 
 interface MangaResult {
-  data: {
-    id: string,
-    attributes: {
-      title: Record<string, string>
-    }
+  id: string,
+  attributes: {
+    title: Record<string, string>
   },
   relationships: {
     type: string,
@@ -37,7 +33,11 @@ interface MangaResult {
 }
 
 interface MangaResponse {
-  results: MangaResult[]
+  data: MangaResult
+}
+
+interface SearchResponse {
+  data: MangaResult[]
 }
 
 interface LegacyIdResponse {
@@ -68,7 +68,7 @@ class MangaDexData extends BaseData {
 export class MangaDexWorker extends BaseWorker {
   static siteType = SiteType.MangaDex
   static url = BaseWorker.getUrl(MangaDexWorker.siteType)
-  static testUrl = `${MangaDexWorker.url}/title/1044287a-73df-48d0-b0b2-5327f32dd651`
+  static testUrl = `${MangaDexWorker.url}/title/1044287a-73df-48d0-b0b2-5327f32dd651/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored`
 
   constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
     super(MangaDexWorker.siteType, requestConfig)
@@ -98,7 +98,7 @@ export class MangaDexWorker extends BaseWorker {
   }
 
   getChapter (data: MangaDexData): string {
-    const attributes = data.chapterResult.data.attributes
+    const attributes = data.chapterResult.attributes
     if (!attributes) return 'Unknown'
 
     const chapter = attributes.chapter
@@ -110,18 +110,18 @@ export class MangaDexWorker extends BaseWorker {
   }
 
   getChapterUrl (data: MangaDexData): string {
-    const chapterId = data.chapterResult.data.id
+    const chapterId = data.chapterResult.id
     if (!chapterId) return ''
 
     return `${MangaDexWorker.url}/chapter/${chapterId}`
   }
 
   getChapterNum (data: MangaDexData): number {
-    return this.parseNum(data.chapterResult.data.attributes.chapter)
+    return this.parseNum(data.chapterResult.attributes.chapter)
   }
 
   getChapterDate (data: MangaDexData): string {
-    const chapterDate = moment.utc(data.chapterResult.data.attributes.updatedAt)
+    const chapterDate = moment.utc(data.chapterResult.attributes.updatedAt)
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -130,22 +130,22 @@ export class MangaDexWorker extends BaseWorker {
   }
 
   getImage (data: MangaDexData): string {
-    const coverFileName = data.mangaResult.relationships.find((relationship) => {
+    const coverFileName = data.mangaResult.relationships?.find((relationship) => {
       return relationship.type === 'cover_art'
     })?.attributes?.fileName
     if (!coverFileName) return ''
 
-    const mangaId = data.mangaResult.data.id
+    const mangaId = data.mangaResult.id
     if (!mangaId) return ''
 
     return `https://uploads.${MangaDexWorker.siteType}/covers/${mangaId}/${coverFileName}`
   }
 
   getTitle (data: MangaDexData): string {
-    return this.getTitleFromAttributes(data.mangaResult.data.attributes)
+    return this.getTitleFromAttributes(data.mangaResult.attributes)
   }
 
-  private getTitleFromAttributes (attributes: MangaResult['data']['attributes']) {
+  private getTitleFromAttributes (attributes: MangaResult['attributes']) {
     const titleObj = attributes?.title
     if (!titleObj) return ''
 
@@ -154,7 +154,7 @@ export class MangaDexWorker extends BaseWorker {
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
-    const mangaId = url.replace(`${MangaDexWorker.url}/title/`, '')
+    const mangaId = url.replace(`${MangaDexWorker.url}/title/`, '').split('/')[0]
     const chapterQueryString = qs.stringify({
       manga: mangaId,
       'order[chapter]': 'desc',
@@ -164,14 +164,14 @@ export class MangaDexWorker extends BaseWorker {
 
     const chapterResponse = await axios.get(`https://api.${MangaDexWorker.siteType}/chapter?${chapterQueryString}`)
     const chapterData = chapterResponse.data as ChapterResponse
-    const chapterResult = chapterData.results[0]
+    const chapterResult = chapterData.data[0]
 
     const mangaQueryString = qs.stringify({
       'includes[]': 'cover_art'
     })
 
     const mangaResponse = await axios.get(`https://api.${MangaDexWorker.siteType}/manga/${mangaId}?${mangaQueryString}`)
-    const mangaResult = mangaResponse.data as MangaResult
+    const mangaResult = (mangaResponse.data as MangaResponse).data
 
     return this.buildManga(new MangaDexData(url, chapterResult, mangaResult))
   }
@@ -197,14 +197,14 @@ export class MangaDexWorker extends BaseWorker {
       title: query
     })
     const response = await axios.get(`https://api.${MangaDexWorker.siteType}/manga?${queryString}`)
-    const mangaData = response.data as MangaResponse
+    const mangaData = response.data as SearchResponse
     const promises: Promise<Error | Manga>[] = []
 
-    let candidateUrls = mangaData.results.filter((result) => {
-      const title = this.getTitleFromAttributes(result.data.attributes)
+    let candidateUrls = mangaData.data.filter((result) => {
+      const title = this.getTitleFromAttributes(result.attributes)
       return this.titleContainsQuery(query, title)
     }).map((result) => {
-      return `${MangaDexWorker.url}/title/${result.data.id}`
+      return `${MangaDexWorker.url}/title/${result.id}`
     })
     candidateUrls = relevancy.sort(candidateUrls, query)
 
