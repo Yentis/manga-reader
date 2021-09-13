@@ -1,5 +1,5 @@
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/worker/site.worker'
+import Worker from 'worker-loader!src/workers/catmanga.worker'
 import { CatMangaWorker } from './catmangaWorker'
 
 export class CatManga extends BaseSite {

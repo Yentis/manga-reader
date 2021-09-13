@@ -76,7 +76,8 @@
 
 <script lang="ts">
 import { useDialogPluginComponent, useQuasar } from 'quasar'
-import { defineComponent, ref, Ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { SiteName, SiteType } from 'src/enums/siteEnum'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import SearchDialog from './SearchDialog.vue'

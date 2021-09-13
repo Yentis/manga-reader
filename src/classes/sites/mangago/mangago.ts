@@ -1,5 +1,5 @@
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/worker/site.worker'
+import Worker from 'worker-loader!src/workers/mangago.worker'
 import { MangagoWorker } from './mangagoWorker'
 
 export class Mangago extends BaseSite {

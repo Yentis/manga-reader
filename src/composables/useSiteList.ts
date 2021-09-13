@@ -1,5 +1,6 @@
 import { BaseSite } from '../classes/sites/baseSite'
-import { Ref, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { getSiteMap } from '../services/siteService'
 import useInitialized from './useInitialized'
 

@@ -3,7 +3,7 @@ import moment from 'moment'
 import axios, { AxiosRequestConfig } from 'axios'
 import cheerio, { Cheerio, Element, Node } from 'cheerio'
 import { Manga } from '../../manga'
-import { LooseDictionary } from 'quasar'
+import { LooseDictionary } from 'quasar/dist/types'
 import { SiteType } from '../../../enums/siteEnum'
 
 const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'

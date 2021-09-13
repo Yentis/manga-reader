@@ -1,4 +1,4 @@
-import { InjectionKey } from 'vue'
+import { InjectionKey } from '@vue/runtime-core/dist/runtime-core'
 import { createStore, Store, useStore as baseUseStore } from 'vuex'
 import reader, { ReaderState } from './store-reader'
 import initialized, { InitializedState } from './store-initialized'

@@ -1,4 +1,4 @@
-import { QVueGlobals } from 'quasar'
+import { QVueGlobals } from 'quasar/dist/types'
 import { Platform } from 'src/enums/platformEnum'
 
 export function getPlatform ($q: QVueGlobals): Platform {

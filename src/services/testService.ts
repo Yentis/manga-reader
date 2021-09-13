@@ -1,4 +1,4 @@
-import { QVueGlobals } from 'quasar'
+import { QVueGlobals } from 'quasar/dist/types'
 import { Manga } from 'src/classes/manga'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { SiteType } from 'src/enums/siteEnum'

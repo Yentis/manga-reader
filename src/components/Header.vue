@@ -98,7 +98,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted, Ref } from 'vue'
+import { defineComponent, ref, watch, onMounted } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { Status } from 'src/enums/statusEnum'
 import { SortType } from 'src/enums/sortingEnum'
 import { Settings } from 'src/classes/settings'

@@ -1,5 +1,6 @@
 import useMangaList from './useMangaList'
-import { computed, ref, Ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { Manga } from '../classes/manga'
 import { SiteType } from '../enums/siteEnum'
 import { useQuasar } from 'quasar'

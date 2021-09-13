@@ -1,5 +1,6 @@
 import { useStore } from 'src/store/index'
-import { computed, Ref, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { RefreshOptions } from 'src/classes/refreshOptions'
 import useRefreshProgress from './useRefreshProgress'
 import useMangaList from './useMangaList'

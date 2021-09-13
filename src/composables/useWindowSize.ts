@@ -1,4 +1,5 @@
-import { Ref, ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import WindowSize from '../classes/windowSize'
 import useMobileView from './useMobileView'
 

@@ -85,7 +85,8 @@
 
 <script lang="ts">
 import { useDialogPluginComponent } from 'quasar'
-import { defineComponent, ref, Ref, onMounted } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { SiteName } from 'src/enums/siteEnum'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import MangaSearch from './SearchComponent.vue'

@@ -47,7 +47,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import testAll from 'src/services/testService'
 import { SiteType } from 'src/enums/siteEnum'
 import { testArangScans } from 'src/services/test/arangscans'

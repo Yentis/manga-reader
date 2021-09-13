@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import qs from 'qs'
-import { LooseDictionary } from 'quasar'
+import { LooseDictionary } from 'quasar/dist/types'
 import { SiteType } from '../../../enums/siteEnum'
 
 export class MangagoWorker extends BaseWorker {

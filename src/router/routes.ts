@@ -1,4 +1,4 @@
-import { RouteRecordRaw } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router/dist/vue-router'
 
 const routes: RouteRecordRaw[] = [
   {

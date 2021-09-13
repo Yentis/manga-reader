@@ -8,7 +8,8 @@ import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
 import { AxiosRequestConfig } from 'axios'
 import PQueue from 'p-queue'
 import { BaseWorker } from './baseWorker'
-import { Platform, QVueGlobals } from 'quasar'
+import { Platform } from 'quasar'
+import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
 
 export abstract class BaseSite {

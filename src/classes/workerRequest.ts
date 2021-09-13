@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import { LooseDictionary } from 'quasar'
+import { LooseDictionary } from 'quasar/dist/types'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { SiteType } from 'src/enums/siteEnum'
 import { BaseSite } from './sites/baseSite'

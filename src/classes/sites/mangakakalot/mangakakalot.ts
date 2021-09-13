@@ -1,5 +1,5 @@
 import { BaseSite } from '../baseSite'
-import Worker from 'worker-loader!src/worker/site.worker'
+import Worker from 'worker-loader!src/workers/mangakakalot.worker'
 import { MangakakalotWorker } from './mangakakalotWorker'
 import { ManganeloWorker } from '../manganelo/manganeloWorker'
 

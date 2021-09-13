@@ -3,7 +3,8 @@ import { createList, getAuthUrl, getNotifyOptions, setShareId, updateList } from
 import useMangaList from './useMangaList'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
-import { ref, Ref } from 'vue'
+import { ref } from 'vue'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
 

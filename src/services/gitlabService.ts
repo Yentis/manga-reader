@@ -1,5 +1,6 @@
-import { LocalStorage, QVueGlobals } from 'quasar'
-import { Ref } from 'vue'
+import { LocalStorage } from 'quasar'
+import { QVueGlobals } from 'quasar/dist/types'
+import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from '../classes/urlNavigation'
 import constants from 'src/classes/constants'

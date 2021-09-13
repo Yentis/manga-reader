@@ -1,4 +1,4 @@
-import { QVueGlobals } from 'quasar'
+import { QVueGlobals } from 'quasar/dist/types'
 import { Manga } from 'src/classes/manga'
 import { WebtoonsWorker } from 'src/classes/sites/webtoons/webtoonsWorker'
 import { SiteType } from 'src/enums/siteEnum'
