@@ -102,7 +102,6 @@
 import { useDialogPluginComponent, copyToClipboard, useQuasar } from 'quasar'
 import { defineComponent, onMounted, ref } from 'vue'
 import { Settings } from 'src/classes/settings'
-import { getShareId } from 'src/services/gitlabService'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import useNotification from 'src/composables/useNotification'
@@ -111,6 +110,7 @@ import TestComponent from 'src/components/TestComponent.vue'
 import useSharing from 'src/composables/useSharing'
 import { getPlatform } from 'src/services/platformService'
 import { Platform } from 'src/enums/platformEnum'
+import { getShareId } from 'src/services/rentryService'
 
 export default defineComponent({
   components: { TestComponent },

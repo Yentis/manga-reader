@@ -1,5 +1,4 @@
-import { UrlNavigation } from '../classes/urlNavigation'
-import { createList, getAuthUrl, getNotifyOptions, setShareId, updateList } from '../services/gitlabService'
+import { createList, getNotifyOptions, updateList } from '../services/rentryService'
 import useMangaList from './useMangaList'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
@@ -14,37 +13,15 @@ export default function useSharing () {
   const { mangaList } = useMangaList()
   const { notification } = useNotification()
 
-  const getGitlabNotifyOptions = (error: unknown) => {
+  const getRentryNotifyOptions = (error: unknown) => {
     return getNotifyOptions(error, urlNavigation)
   }
 
   const updateShareList = () => {
     updateList(JSON.stringify(mangaList.value))
       .catch(error => {
-        const notifyOptions = getGitlabNotifyOptions(error)
-
-        if (notifyOptions.caption?.includes('404') || notifyOptions.caption?.includes('id is invalid')) {
-          setShareId('')
-          return
-        } else if (notifyOptions.caption?.includes('spam')) {
-          return
-        }
-
-        const actions = notifyOptions.actions || []
-        if (notifyOptions.caption?.includes('401 Unauthorized') || notifyOptions.caption?.includes('Not logged in')) {
-          actions.push(
-            {
-              label: 'Relog',
-              handler: () => {
-                urlNavigation.value = new UrlNavigation(getAuthUrl($q), true)
-              },
-              color: 'white'
-            }
-          )
-        }
-
-        notifyOptions.actions = actions
-        notification.value = notifyOptions
+        notification.value = getRentryNotifyOptions(error)
+        console.error(error)
       })
   }
 
@@ -67,7 +44,7 @@ export default function useSharing () {
         component: ConfirmationDialog,
         componentProps: {
           title: 'List sharing',
-          content: 'Your list will be uploaded to Gitlab as a Snippet and a shareable URL will be generated.\nThis shareable list will be updated periodically and whenever the app is opened.'
+          content: 'Your list will be uploaded to Rentry and a shareable URL will be generated.\nThis shareable list will be updated periodically and whenever the app is opened.'
         }
       }).onOk(async () => {
         try {
@@ -76,14 +53,8 @@ export default function useSharing () {
 
           return
         } catch (error) {
-          const notifyOptions = getGitlabNotifyOptions(error)
-
-          if (notifyOptions.caption?.includes('Not logged in')) {
-            urlNavigation.value = new UrlNavigation(getAuthUrl($q), true)
-          } else {
-            notification.value = notifyOptions
-            console.error(error)
-          }
+          notification.value = getRentryNotifyOptions(error)
+          console.error(error)
         }
 
         resolve('')

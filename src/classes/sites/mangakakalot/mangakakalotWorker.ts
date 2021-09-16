@@ -6,6 +6,7 @@ import { Manga } from '../../manga'
 import qs from 'qs'
 import { SiteType } from '../../../enums/siteEnum'
 import constants from 'src/classes/constants'
+import { ContentType } from 'src/enums/contentTypeEnum'
 
 interface MangakakalotSearch {
   name: string
@@ -70,7 +71,7 @@ export class MangakakalotWorker extends BaseWorker {
     })
     const response = await axios.post(`${MangakakalotWorker.url}/home_json_search`, data, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': ContentType.URLENCODED
       }
     })
 

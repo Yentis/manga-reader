@@ -3,6 +3,7 @@ import { BaseWorker } from '../baseWorker'
 import { Manga } from '../../manga'
 import qs from 'qs'
 import axios, { AxiosRequestConfig } from 'axios'
+import { ContentType } from 'src/enums/contentTypeEnum'
 
 export interface LoginResponse {
   'access_token': string
@@ -64,7 +65,7 @@ export class KitsuWorker extends BaseWorker {
       password: data.password
     }, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': ContentType.JSON
       }
     })
 
@@ -87,7 +88,7 @@ export class KitsuWorker extends BaseWorker {
     }, {
       headers: {
         Authorization: `Bearer ${this.token}`,
-        'Content-Type': 'application/vnd.api+json'
+        'Content-Type': ContentType.VND_API_JSON
       }
     })
   }

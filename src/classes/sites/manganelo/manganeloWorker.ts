@@ -5,6 +5,7 @@ import cheerio, { Cheerio, Element } from 'cheerio'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
 import qs from 'qs'
+import { ContentType } from 'src/enums/contentTypeEnum'
 
 interface ManganeloSearch {
   name: string
@@ -69,7 +70,7 @@ export class ManganeloWorker extends BaseWorker {
     })
     const response = await axios.post(`${ManganeloWorker.url}/getstorysearchjson`, data, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': ContentType.URLENCODED
       }
     })
 

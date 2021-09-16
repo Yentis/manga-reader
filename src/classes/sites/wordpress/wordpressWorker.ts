@@ -6,6 +6,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import cheerio, { Cheerio, CheerioAPI, Element } from 'cheerio'
 import qs from 'qs'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { ContentType } from 'src/enums/contentTypeEnum'
 
 class WordPressData extends BaseData {
   volume?: Cheerio<Element>
@@ -200,7 +201,7 @@ export class WordPressWorker extends BaseWorker {
       method: 'post',
       url: chapterPath,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': ContentType.URLENCODED
       },
       data: queryString
     }

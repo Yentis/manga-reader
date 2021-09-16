@@ -36,6 +36,6 @@ app.whenReady().then(() => {
         console.info('An error occurred: ', err)
       })
   }, 250)
-})
+}).catch((error) => console.error(error))
 
 import './electron-main'

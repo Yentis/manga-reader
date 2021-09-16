@@ -16,7 +16,7 @@ Features:
 - Mark status, add notes, add ratings
 - Sort, filter and search
 - Link reading progress with MangaDex or Kitsu
-- Share list using Gitlab
+- Share list using [Rentry](https://rentry.co/)
 - Export to / import from Dropbox
 - Dark mode, read in browser
 - Automatically check for new chapters every x minutes, this will send a notification to your device (off by default)

@@ -1,13 +1,15 @@
-import { app, BrowserWindow, nativeTheme, session, Menu } from 'electron'
+import { app, BrowserWindow, nativeTheme, session, Menu, ipcMain, net, Event } from 'electron'
 import { ElectronBlocker } from '@cliqz/adblocker-electron'
 import qs from 'qs'
 import fetch from 'isomorphic-fetch'
 import moment from 'moment'
 import path from 'path'
+import fs from 'fs'
+import HttpRequest from 'src/interfaces/httpRequest'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
-    require('fs').unlinkSync(require('path').join(app.getPath('userData'), 'DevTools Extensions'))
+    fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
 } catch (_) { }
 
@@ -16,12 +18,14 @@ try {
  * The reason we are setting it here is that the path needs to be evaluated at runtime
  */
 if (process.env.PROD) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   global.__statics = __dirname
 }
 
-let mainWindow
-let queryString
-let oauthType
+let mainWindow: BrowserWindow | undefined
+let queryString: qs.ParsedQs | undefined
+let oauthType: string | undefined
 
 app.userAgentFallback = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) old-airport-include/1.0.0 Chrome Electron/7.1.7 Safari/537.36'
 
@@ -29,23 +33,27 @@ function createWindow () {
   const menu = Menu.buildFromTemplate([{
     label: '<',
     click: (_item, window) => {
-      window.webContents.goBack()
+      window?.webContents.goBack()
     }
   }, {
     label: '>',
     click: (_item, window) => {
-      window.webContents.goForward()
+      window?.webContents.goForward()
     }
   }, {
     label: 'Manga list',
     click: (_item, window) => {
-      window.webContents.goToIndex(0)
+      window?.webContents.goToIndex(0)
     }
   }, {
     label: '',
-    role: "toggleDevTools",
+    role: 'toggleDevTools',
     visible: false
   }])
+
+  const nodeIntegration = process.env.QUASAR_NODE_INTEGRATION === 'true'
+  const preloadFile = process.env.QUASAR_ELECTRON_PRELOAD
+  const preload = preloadFile ? path.resolve(__dirname, preloadFile) : undefined
 
   /**
    * Initial window options
@@ -59,12 +67,12 @@ function createWindow () {
     webPreferences: {
       // Change from /quasar.conf.js > electron > nodeIntegration;
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
-      nodeIntegration: process.env.QUASAR_NODE_INTEGRATION,
-      nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION,
+      nodeIntegration,
+      nodeIntegrationInWorker: nodeIntegration,
       contextIsolation: true,
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-      preload: path.resolve(__dirname, process.env.QUASAR_ELECTRON_PRELOAD)
+      preload
     }
   })
 
@@ -72,68 +80,62 @@ function createWindow () {
 
   ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then(blocker => {
     blocker.enableBlockingInSession(session.defaultSession)
-  })
+  }).catch((error) => console.error(error))
 
   session.defaultSession.cookies.set({
     url: 'https://www.webtoons.com/',
     name: 'ageGatePass',
     value: 'true'
-  })
-  
+  }).catch((error) => console.error(error))
+
   session.defaultSession.cookies.set({
     url: 'https://www.webtoons.com/',
     name: 'timezoneOffset',
     value: (moment().utcOffset() / 60).toString()
-  })
+  }).catch((error) => console.error(error))
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
     onNavigation(event, url)
   })
-  
+
   mainWindow.webContents.on('will-redirect', (event, url) => {
     onNavigation(event, url)
   })
 
-  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
+  loadAppUrl()
 
   mainWindow.on('closed', () => {
-    mainWindow = null
+    mainWindow = undefined
   })
 }
 
-function onNavigation(event, url) {
-  if (url.startsWith('http://localhost/redirect_gitlab')) {
-    handleGitlabOAuth(event, url)
+function loadAppUrl () {
+  if (!process.env.APP_URL) {
+    console.error(Error('APP_URL environment variable not found!'))
     return
   }
+  mainWindow?.loadURL(process.env.APP_URL).catch(error => console.error(error))
+}
 
+function onNavigation (event: Event, url: string) {
   if (!url.startsWith('http://localhost/redirect#')) return
   handleDropboxOAuth(event, url)
 }
 
-function handleGitlabOAuth(event, url) {
-  event.preventDefault()
-  queryString = qs.parse(url.replace('http://localhost/redirect_gitlab#', ''))
-  oauthType = 'gitlab'
-
-  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
-  mainWindow.webContents.on('did-finish-load', onFinishLoad)
-}
-
-function handleDropboxOAuth(event, url) {
+function handleDropboxOAuth (event: Event, url: string) {
   event.preventDefault()
   queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
   oauthType = 'dropbox'
 
-  mainWindow.loadURL(process.env.APP_URL).catch(error => console.error(error))
-  mainWindow.webContents.on('did-finish-load', onFinishLoad)
+  loadAppUrl()
+  mainWindow?.webContents.on('did-finish-load', onFinishLoad)
 }
 
-function onFinishLoad() {
-  if (!queryString) return
+function onFinishLoad () {
+  if (!queryString || !oauthType) return
 
-  mainWindow.webContents.send(`${oauthType}-token`, queryString.access_token)
-  mainWindow.webContents.removeListener('did-finish-load', onFinishLoad)
+  mainWindow?.webContents.send(`${oauthType}-token`, queryString.access_token)
+  mainWindow?.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 
 app.setAppUserModelId('Manga Reader')
@@ -150,4 +152,45 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on('net', (_event, key: number, options: HttpRequest) => {
+  app.whenReady().then(() => {
+    const request = net.request({
+      method: options.method,
+      url: options.url
+    })
+
+    request.on('response', (response) => {
+      let data = ''
+
+      response.on('data', (chunk) => {
+        data += chunk.toString()
+      })
+
+      response.on('end', () => {
+        mainWindow?.webContents.send('net-response', key, {
+          headers: response.headers,
+          data
+        })
+      })
+    })
+
+    request.on('error', (error) => {
+      mainWindow?.webContents.send('net-error', key, error)
+    })
+
+    const headers = options.headers || {}
+    Object.keys(headers).forEach((header) => {
+      request.setHeader(header, headers[header])
+    })
+
+    if (options.data) {
+      request.write(options.data)
+    }
+
+    request.end()
+  }).catch((error) => {
+    mainWindow?.webContents.send('net-error', key, error)
+  })
 })

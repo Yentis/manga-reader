@@ -5,6 +5,7 @@ import { Manga } from '../../manga'
 import cheerio, { Cheerio, Element } from 'cheerio'
 import { SiteType } from '../../../enums/siteEnum'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { ContentType } from 'src/enums/contentTypeEnum'
 
 interface AsuraScansSearch {
   series: {
@@ -81,7 +82,7 @@ export class AsuraScansWorker extends BaseWorker {
       method: 'post',
       url: `${AsuraScansWorker.getUrl(this.siteType)}/wp-admin/admin-ajax.php`,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8`
       },
       data
     })
