@@ -2,8 +2,9 @@ import { SiteType } from 'src/enums/siteEnum'
 import { Manga } from '../manga'
 import moment from 'moment'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-import { AxiosRequestConfig } from 'axios'
 import { Cheerio, Element, Node } from 'cheerio'
+import { BaseWorkerMessage } from '../workerMessage/baseMessage'
+import { RequestData, RequestType } from 'src/enums/workerEnum'
 
 export class BaseData {
   url: string
@@ -26,11 +27,9 @@ export abstract class BaseWorker {
   }
 
   siteType: SiteType | LinkingSiteType
-  requestConfig?: AxiosRequestConfig
 
-  constructor (siteType: SiteType | LinkingSiteType, requestConfig?: AxiosRequestConfig) {
+  constructor (siteType: SiteType | LinkingSiteType) {
     this.siteType = siteType
-    this.requestConfig = requestConfig
   }
 
   syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
@@ -127,6 +126,41 @@ export abstract class BaseWorker {
     const querySplit = query.toLowerCase().split(' ')
 
     return querySplit.every(word => title?.toLowerCase().includes(word))
+  }
+
+  protected sendWorkerMessage <T> (requestType: RequestType, input?: unknown): Promise<T> {
+    const data = new Map()
+    if (input) data.set(RequestData.DATA, input)
+
+    return new Promise((resolve, reject) => {
+      const callback: (event: MessageEvent<unknown>) => void = (event) => {
+        const message = event.data as BaseWorkerMessage
+        if (message.type !== requestType) return
+
+        if (message.data.has(RequestData.ERROR)) {
+          reject(message.data.get(RequestData.ERROR))
+          removeEventListener('message', callback)
+          return
+        }
+
+        if (message.data.has(RequestData.DATA)) {
+          resolve(message.data.get(RequestData.DATA) as T)
+          removeEventListener('message', callback)
+          return
+        }
+
+        reject(Error('No data found'))
+        removeEventListener('message', callback)
+      }
+      addEventListener('message', callback)
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      postMessage(new BaseWorkerMessage(
+        requestType,
+        data
+      ))
+    })
   }
 
   abstract readUrl (url: string): Promise<Error | Manga>

@@ -1,52 +1,33 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
-import { WorkerRequest } from 'src/classes/workerRequest'
-import { doOperation } from './helper'
-import { KitsuRequestType } from 'src/enums/workerEnum'
+import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
+import { doOperation, handlePromise } from './helper'
+import { KitsuRequestType, RequestType } from 'src/enums/workerEnum'
 import { Worker } from 'src/classes/worker'
 import { KitsuWorker } from 'src/classes/sites/kitsu/kitsuWorker'
 
 addEventListener('message', event => {
-  const request = event.data as WorkerRequest
-  const kitsuWorker = new KitsuWorker(request.data.get('token') as string, request.requestConfig)
+  const request = event.data as SiteWorkerMessage
+  if (request.type.toUpperCase() in RequestType) return
+  const kitsuWorker = new KitsuWorker(request.data.get('token') as string)
 
+  let promise: Promise<unknown> | undefined
   switch (request.type) {
     case KitsuRequestType.USER_ID:
-      kitsuWorker.getUserId().then(result => {
-        // @ts-ignore
-        postMessage(result)
-      }).catch(error => {
-        // @ts-ignore
-        postMessage(Error(error))
-      })
-      return
+      promise = kitsuWorker.getUserId()
+      break
     case KitsuRequestType.MANGA_SLUG:
-      kitsuWorker.searchMangaSlug(request.data.get('url') as string).then(result => {
-        // @ts-ignore
-        postMessage(result)
-      }).catch(error => {
-        // @ts-ignore
-        postMessage(Error(error))
-      })
-      return
+      promise = kitsuWorker.searchMangaSlug(request.data.get('url') as string)
+      break
     case KitsuRequestType.LIBRARY_INFO:
-      kitsuWorker.getLibraryInfo(request.data.get('mangaId') as string, request.data.get('userId') as string).then(result => {
-        // @ts-ignore
-        postMessage(result)
-      }).catch(error => {
-        // @ts-ignore
-        postMessage(Error(error))
-      })
-      return
+      promise = kitsuWorker.getLibraryInfo(request.data.get('mangaId') as string, request.data.get('userId') as string)
+      break
     case KitsuRequestType.LOGIN:
-      kitsuWorker.doLogin({ username: request.data.get('username') as string, password: request.data.get('password') as string }).then(result => {
-        // @ts-ignore
-        postMessage(result)
-      }).catch(error => {
-        // @ts-ignore
-        postMessage(Error(error))
-      })
-      return
+      promise = kitsuWorker.doLogin({ username: request.data.get('username') as string, password: request.data.get('password') as string })
+      break
+  }
+
+  if (promise) {
+    handlePromise(request.type, promise)
+    return
   }
 
   doOperation(request, kitsuWorker)

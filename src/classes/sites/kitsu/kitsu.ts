@@ -4,8 +4,8 @@ import { BaseSite } from '../baseSite'
 import { NotifyOptions } from '../../notifyOptions'
 import LoginDialog from '../../../components/LoginDialog.vue'
 import { SiteName } from '../../../enums/siteEnum'
-import { KitsuRequestType, RequestType } from '../../../enums/workerEnum'
-import { WorkerRequest } from '../../workerRequest'
+import { KitsuRequestType, SiteRequestType } from '../../../enums/workerEnum'
+import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import Worker from 'worker-loader!src/workers/kitsu.worker'
 import { Manga } from '../../manga'
 import { Data, KitsuWorker, LoginResponse } from './kitsuWorker'
@@ -151,7 +151,7 @@ export class Kitsu extends BaseSite {
         const data = new Map()
         data.set('username', loginInfo.username)
         data.set('password', loginInfo.password)
-        worker.postMessage(new WorkerRequest(KitsuRequestType.LOGIN, data, this))
+        worker.postMessage(new SiteWorkerMessage(KitsuRequestType.LOGIN, data, this))
       })
     })
   }
@@ -171,7 +171,7 @@ export class Kitsu extends BaseSite {
         data.set('mangaId', mangaId)
         data.set('chapterNum', chapterNum)
         data.set('token', this.token)
-        worker.postMessage(new WorkerRequest(RequestType.SYNC_CHAPTER, data, this))
+        worker.postMessage(new SiteWorkerMessage(SiteRequestType.SYNC_CHAPTER, data, this))
       })
     })
   }
@@ -192,7 +192,7 @@ export class Kitsu extends BaseSite {
         const data = new Map()
         data.set('query', query)
         data.set('token', this.token)
-        worker.postMessage(new WorkerRequest(RequestType.SEARCH, data, this))
+        worker.postMessage(new SiteWorkerMessage(SiteRequestType.SEARCH, data, this))
       })
     })
   }
@@ -210,7 +210,7 @@ export class Kitsu extends BaseSite {
         }
         const data = new Map()
         data.set('token', this.token)
-        worker.postMessage(new WorkerRequest(KitsuRequestType.USER_ID, data, this))
+        worker.postMessage(new SiteWorkerMessage(KitsuRequestType.USER_ID, data, this))
       })
     })
   }
@@ -228,7 +228,7 @@ export class Kitsu extends BaseSite {
         }
         const data = new Map()
         data.set('url', url)
-        worker.postMessage(new WorkerRequest(KitsuRequestType.MANGA_SLUG, data, this))
+        worker.postMessage(new SiteWorkerMessage(KitsuRequestType.MANGA_SLUG, data, this))
       })
     })
   }
@@ -247,7 +247,7 @@ export class Kitsu extends BaseSite {
         const data = new Map()
         data.set('mangaId', mangaId)
         data.set('userId', userId)
-        worker.postMessage(new WorkerRequest(KitsuRequestType.LIBRARY_INFO, data, this))
+        worker.postMessage(new SiteWorkerMessage(KitsuRequestType.LIBRARY_INFO, data, this))
       })
     })
   }

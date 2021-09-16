@@ -60,6 +60,10 @@ export class AsuraScansWorker extends BaseWorker {
     }
   }
 
+  getImage (data: BaseData): string {
+    return data.image?.attr('content') || ''
+  }
+
   async readUrl (url: string): Promise<Error | Manga> {
     const response = await axios.get(url)
     const $ = cheerio.load(response.data)
@@ -70,7 +74,7 @@ export class AsuraScansWorker extends BaseWorker {
     data.chapterUrl = chapterItem.find('a').first()
     data.chapterNum = chapterItem.first()
     data.chapterDate = chapterItem.find('.chapterdate').first()
-    data.image = $('div[itemprop="image"] img').first()
+    data.image = $('meta[property="og:image"]').first()
     data.title = $('.entry-title').first()
 
     return this.buildManga(data)

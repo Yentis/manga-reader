@@ -15,7 +15,7 @@ export default function useCloudSync () {
   const { mangaList, storeManga } = useMangaList()
 
   const openDropboxLogin = () => {
-    getAuthUrl($q).then((authUrl) => {
+    getAuthUrl().then((authUrl) => {
       urlNavigation.value = new UrlNavigation(authUrl, true)
     }).catch((error) => {
       notification.value = new NotifyOptions(error)

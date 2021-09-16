@@ -1,16 +1,16 @@
 import { Manga } from '../manga'
 import { UrlNavigation } from '../urlNavigation'
-import { WorkerRequest } from '../workerRequest'
+import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import { Worker } from '../worker'
-import { RequestType } from '../../enums/workerEnum'
 import { LinkingSiteType } from '../../enums/linkingSiteEnum'
 import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
-import { AxiosRequestConfig } from 'axios'
 import PQueue from 'p-queue'
 import { BaseWorker } from './baseWorker'
-import { Platform } from 'quasar'
 import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
+import { RequestData, RequestType, SiteRequestType } from 'src/enums/workerEnum'
+import { BaseWorkerMessage } from '../workerMessage/baseMessage'
+import { getPlatform } from 'src/services/platformService'
 
 export abstract class BaseSite {
   abstract siteType: SiteType | LinkingSiteType
@@ -19,7 +19,6 @@ export abstract class BaseSite {
   requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
   loggedIn = true
   state = SiteState.REACHABLE
-  requestConfig: AxiosRequestConfig | undefined
 
   statusOK (): boolean {
     return this.loggedIn && this.state === SiteState.REACHABLE
@@ -60,17 +59,15 @@ export abstract class BaseSite {
   syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
     return new Promise(resolve => {
       const worker = new this.WorkerClass()
-      worker.onmessage = event => {
-        if (event.data instanceof Error) {
-          resolve(event.data)
-        } else {
-          resolve()
-        }
-      }
+      this.startWorkerListener(worker, (error) => {
+        resolve(error)
+      }, () => {
+        resolve()
+      })
       const data = new Map()
       data.set('mangaId', mangaId)
       data.set('chapterNum', chapterNum)
-      worker.postMessage(new WorkerRequest(RequestType.SYNC_CHAPTER, data, this))
+      worker.postMessage(new SiteWorkerMessage(SiteRequestType.SYNC_CHAPTER, data, this))
     })
   }
 
@@ -86,18 +83,18 @@ export abstract class BaseSite {
     return this.addToQueue(() => {
       return new Promise(resolve => {
         const worker = new this.WorkerClass()
-        worker.onmessage = (event) => {
-          if (event.data instanceof Error) {
-            resolve(event.data)
-          } else if (typeof event.data === 'object') {
-            resolve(Manga.clone(event.data as Manga))
+        this.startWorkerListener(worker, (error) => {
+          resolve(error)
+        }, (data) => {
+          if (typeof data === 'object') {
+            resolve(Manga.clone(data as Manga))
           } else {
             resolve(Error('Unknown response received'))
           }
-        }
+        })
         const data = new Map()
         data.set('url', url)
-        worker.postMessage(new WorkerRequest(RequestType.READ_URL, data, this, Platform.is))
+        worker.postMessage(new SiteWorkerMessage(SiteRequestType.READ_URL, data, this))
       })
     })
   }
@@ -106,18 +103,18 @@ export abstract class BaseSite {
     return this.addToQueue(async () => {
       return new Promise(resolve => {
         const worker = new this.WorkerClass()
-        worker.onmessage = event => {
-          if (event.data instanceof Error) {
-            resolve(event.data)
-          } else if (Array.isArray(event.data)) {
-            resolve(event.data.map((item) => Manga.clone(item)))
+        this.startWorkerListener(worker, (error) => {
+          resolve(error)
+        }, (data) => {
+          if (Array.isArray(data)) {
+            resolve(data.map((item) => Manga.clone(item)))
           } else {
             resolve(Error('Unknown response received'))
           }
-        }
+        })
         const data = new Map()
         data.set('query', query)
-        worker.postMessage(new WorkerRequest(RequestType.SEARCH, data, this, Platform.is))
+        worker.postMessage(new SiteWorkerMessage(SiteRequestType.SEARCH, data, this))
       })
     })
   }
@@ -152,6 +149,47 @@ export abstract class BaseSite {
         }
       }
     })
+  }
+
+  private startWorkerListener (
+    worker: Worker,
+    onError: (error: Error) => void,
+    onData: (data: unknown) => void
+  ) {
+    worker.onmessage = (event) => {
+      const message = event.data as BaseWorkerMessage
+      if (!(message.type.toUpperCase() in RequestType)) {
+        if (message.data.has(RequestData.ERROR)) {
+          onError(message.data.get(RequestData.ERROR) as Error)
+          return
+        }
+
+        if (message.data.has(RequestData.DATA)) {
+          onData(message.data.get(RequestData.DATA))
+        }
+        return
+      }
+
+      switch (message.type) {
+        case RequestType.PLATFORM: {
+          worker.postMessage(this.handlePlatformMessage())
+          break
+        }
+        default:
+          break
+      }
+    }
+  }
+
+  private handlePlatformMessage (): BaseWorkerMessage {
+    const data = new Map()
+    const platform = getPlatform()
+
+    data.set(RequestData.DATA, platform)
+    return new BaseWorkerMessage(
+      RequestType.PLATFORM,
+      data
+    )
   }
 
   abstract getTestUrl(): string

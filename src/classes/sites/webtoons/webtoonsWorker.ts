@@ -1,10 +1,11 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import cheerio, { Cheerio, Element, Node } from 'cheerio'
 import { Manga } from '../../manga'
-import { LooseDictionary } from 'quasar/dist/types'
 import { SiteType } from '../../../enums/siteEnum'
+import { Platform } from 'src/enums/platformEnum'
+import { RequestType } from 'src/enums/workerEnum'
 
 const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
 
@@ -22,11 +23,8 @@ export class WebtoonsWorker extends BaseWorker {
   static url = `${BaseWorker.urlPrefix}https://www.${WebtoonsWorker.siteType}`
   static testUrl = `${WebtoonsWorker.url}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
 
-  platform: LooseDictionary | undefined
-
-  constructor (platform: LooseDictionary | undefined = undefined, requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(WebtoonsWorker.siteType, requestConfig)
-    this.platform = platform
+  constructor () {
+    super(WebtoonsWorker.siteType)
   }
 
   getChapterNum (data: BaseData): number {
@@ -52,7 +50,8 @@ export class WebtoonsWorker extends BaseWorker {
 
   async readUrl (url: string): Promise<Error | Manga> {
     const mobile = url.includes('//m.' + this.siteType)
-    const headers = mobile && this.platform?.mobile !== true
+    const platform: Platform = await this.sendWorkerMessage(RequestType.PLATFORM)
+    const headers = mobile && platform !== Platform.Cordova
       ? {
           common: {
             'User-Agent': MOBILE_USER_AGENT
@@ -66,7 +65,7 @@ export class WebtoonsWorker extends BaseWorker {
     data.image = $('meta[property="og:image"]').first()
     data.chapterDate = $('.date').first()
 
-    if (mobile || this.platform?.mobile === true) {
+    if (mobile || platform === Platform.Cordova) {
       data.chapter = $('.sub_title span').first()
       data.chapterUrl = $('li[data-episode-no] a').first()
       data.chapterNum = $('#_episodeList li[data-episode-no]').first()

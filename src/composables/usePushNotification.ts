@@ -53,11 +53,10 @@ export default function usePushNotification () {
 }
 
 export function useAppPushNotification () {
-  const $q = useQuasar()
   const { settings } = useSettings()
 
   watch(settings, (newSettings: Settings) => {
-    if (getPlatform($q) !== Platform.Static) return
+    if (getPlatform() !== Platform.Static) return
     if (!newSettings.refreshOptions.enabled) return
     if (Notification.permission === 'denied') return
 

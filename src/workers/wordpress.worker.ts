@@ -1,11 +1,13 @@
-import { WorkerRequest } from 'src/classes/workerRequest'
+import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import { doOperation } from './helper'
 import { WordPressWorker } from 'src/classes/sites/wordpress/wordpressWorker'
 import { Worker } from '../classes/worker'
+import { RequestType } from 'src/enums/workerEnum'
 
 addEventListener('message', event => {
-  const request = event.data as WorkerRequest
-  const wordPressWorker = new WordPressWorker(request.siteType, request.requestConfig)
+  const request = event.data as SiteWorkerMessage
+  if (request.type.toUpperCase() in RequestType) return
+  const wordPressWorker = new WordPressWorker(request.siteType)
 
   doOperation(request, wordPressWorker)
 })

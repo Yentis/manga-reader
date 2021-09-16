@@ -1,6 +1,6 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { Manga } from '../../manga'
 import cheerio from 'cheerio'
 import { SiteType } from '../../../enums/siteEnum'
@@ -11,8 +11,8 @@ export class ArangScansWorker extends BaseWorker {
 
   static testUrl = `${ArangScansWorker.url}/titles/08d93994-4f13-422a-8693-4e1b1f154a77`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(ArangScansWorker.siteType, requestConfig)
+  constructor () {
+    super(ArangScansWorker.siteType)
   }
 
   getChapterUrl (data: BaseData): string {

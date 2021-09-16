@@ -2,7 +2,7 @@ import { LinkingSiteType } from '../../../enums/linkingSiteEnum'
 import { BaseWorker } from '../baseWorker'
 import { Manga } from '../../manga'
 import qs from 'qs'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { ContentType } from 'src/enums/contentTypeEnum'
 
 export interface LoginResponse {
@@ -53,8 +53,8 @@ export class KitsuWorker extends BaseWorker {
 
   token: string
 
-  constructor (token: string, requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(KitsuWorker.siteType, requestConfig)
+  constructor (token: string) {
+    super(KitsuWorker.siteType)
     this.token = token
   }
 

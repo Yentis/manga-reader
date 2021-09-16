@@ -1,5 +1,5 @@
 import { BaseData, BaseWorker } from '../baseWorker'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { Manga } from '../../manga'
 import cheerio from 'cheerio'
 import { SiteType } from '../../../enums/siteEnum'
@@ -47,8 +47,8 @@ export class CatMangaWorker extends BaseWorker {
 
   static testUrl = `${CatMangaWorker.url}/series/fechi`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(CatMangaWorker.siteType, requestConfig)
+  constructor () {
+    super(CatMangaWorker.siteType)
   }
 
   getChapter (data: BaseData): string {

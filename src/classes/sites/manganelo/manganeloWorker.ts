@@ -1,6 +1,6 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import cheerio, { Cheerio, Element } from 'cheerio'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
@@ -23,8 +23,8 @@ export class ManganeloWorker extends BaseWorker {
   static url = BaseWorker.getUrl(ManganeloWorker.siteType)
   static testUrl = `${ManganeloWorker.url}/manga/pu918807`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(ManganeloWorker.siteType, requestConfig)
+  constructor () {
+    super(ManganeloWorker.siteType)
   }
 
   getChapterDate (data: ManganeloData): string {

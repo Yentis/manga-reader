@@ -3,7 +3,6 @@ import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
 import { LocalStorage } from 'quasar'
-import { QVueGlobals } from 'quasar/dist/types'
 import { getShareId, setShareId } from './rentryService'
 import constants from 'src/classes/constants'
 import { getPlatform } from './platformService'
@@ -25,8 +24,8 @@ export function setAccessToken (token: string | undefined) {
   LocalStorage.set(constants.DROPBOX_TOKEN, token)
 }
 
-export async function getAuthUrl ($q: QVueGlobals): Promise<string> {
-  const baseUrl = getPlatform($q) !== Platform.Static ? 'http://localhost/' : `${document.location.href}`
+export async function getAuthUrl (): Promise<string> {
+  const baseUrl = getPlatform() !== Platform.Static ? 'http://localhost/' : `${document.location.href}`
   const redirectUrl = baseUrl.endsWith('/') ? `${baseUrl}redirect` : `${baseUrl}/redirect`
 
   const authUrl = await new DropboxAuth({

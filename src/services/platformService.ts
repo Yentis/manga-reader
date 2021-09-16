@@ -1,8 +1,8 @@
-import { QVueGlobals } from 'quasar/dist/types'
-import { Platform } from 'src/enums/platformEnum'
+import { Platform } from 'quasar'
+import { Platform as PlatformType } from 'src/enums/platformEnum'
 
-export function getPlatform ($q: QVueGlobals): Platform {
-  if ($q.platform.is.cordova) return Platform.Cordova
-  if ($q.platform.is.electron) return Platform.Electron
-  return Platform.Static
+export function getPlatform (): PlatformType {
+  if (Platform.is.cordova) return PlatformType.Cordova
+  if (Platform.is.electron) return PlatformType.Electron
+  return PlatformType.Static
 }

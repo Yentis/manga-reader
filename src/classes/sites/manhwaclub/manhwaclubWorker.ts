@@ -1,6 +1,6 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
 import qs from 'qs'
@@ -44,8 +44,8 @@ export class ManhwaClubWorker extends BaseWorker {
 
   static testUrl = `${ManhwaClubWorker.url}/comic/real-man-dogado`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(ManhwaClubWorker.siteType, requestConfig)
+  constructor () {
+    super(ManhwaClubWorker.siteType)
   }
 
   getChapter (data: ManhwaClubData): string {

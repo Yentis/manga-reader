@@ -1,6 +1,6 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import qs from 'qs'
@@ -20,8 +20,8 @@ export class MangakakalotWorker extends BaseWorker {
   static url = BaseWorker.getUrl(MangakakalotWorker.siteType)
   static testUrl = `${MangakakalotWorker.url}/read-qu4wd158504821675`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(MangakakalotWorker.siteType, requestConfig)
+  constructor () {
+    super(MangakakalotWorker.siteType)
   }
 
   getChapterNum (data: BaseData): number {

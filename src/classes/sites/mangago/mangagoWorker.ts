@@ -1,22 +1,20 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import cheerio from 'cheerio'
 import { Manga } from '../../manga'
 import qs from 'qs'
-import { LooseDictionary } from 'quasar/dist/types'
 import { SiteType } from '../../../enums/siteEnum'
+import { RequestType } from 'src/enums/workerEnum'
+import { Platform } from 'src/enums/platformEnum'
 
 export class MangagoWorker extends BaseWorker {
   static siteType = SiteType.Mangago
   static url = `${BaseWorker.urlPrefix}https://www.${MangagoWorker.siteType}`
   static testUrl = `${MangagoWorker.url}/read-manga/curtain/`
 
-  platform: LooseDictionary | undefined
-
-  constructor (platform: LooseDictionary | undefined = undefined, requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(MangagoWorker.siteType, requestConfig)
-    this.platform = platform
+  constructor () {
+    super(MangagoWorker.siteType)
   }
 
   getChapter (data: BaseData): string {
@@ -41,12 +39,12 @@ export class MangagoWorker extends BaseWorker {
   }
 
   async readUrl (url: string): Promise<Error | Manga> {
-    const response = await axios.get(url, this.requestConfig)
+    const response = await axios.get(url)
     const $ = cheerio.load(response.data)
-    const mobile = this.platform?.mobile === true
+    const platform: Platform = await this.sendWorkerMessage(RequestType.PLATFORM)
     const data = new BaseData(url)
 
-    if (!mobile) {
+    if (platform !== Platform.Cordova) {
       const listingElem = $('.listing tbody tr').first()
 
       data.chapter = listingElem.find('a').first()
@@ -73,7 +71,7 @@ export class MangagoWorker extends BaseWorker {
       name: query
     })
 
-    const response = await axios.get(`${MangagoWorker.url}/r/l_search/?${queryString}`, this.requestConfig)
+    const response = await axios.get(`${MangagoWorker.url}/r/l_search/?${queryString}`)
     const $ = cheerio.load(response.data)
     const mangaList: Manga[] = []
 

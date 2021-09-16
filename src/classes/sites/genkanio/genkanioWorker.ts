@@ -1,7 +1,7 @@
 import { BaseData, BaseWorker } from '../baseWorker'
 import { Manga } from '../../manga'
 import { SiteType } from '../../../enums/siteEnum'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import cheerio, { Cheerio, Element } from 'cheerio'
 
 class GenkanioData extends BaseData {
@@ -14,8 +14,8 @@ export class GenkanioWorker extends BaseWorker {
 
   static testUrl = `${GenkanioWorker.url}/manga/8383424626-castle`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(GenkanioWorker.siteType, requestConfig)
+  constructor () {
+    super(GenkanioWorker.siteType)
   }
 
   getChapter (data: BaseData): string {

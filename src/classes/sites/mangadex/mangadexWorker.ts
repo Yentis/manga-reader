@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { SiteType } from '../../../enums/siteEnum'
 import { BaseData, BaseWorker } from '../baseWorker'
 import moment from 'moment'
@@ -70,8 +70,8 @@ export class MangaDexWorker extends BaseWorker {
   static url = BaseWorker.getUrl(MangaDexWorker.siteType)
   static testUrl = `${MangaDexWorker.url}/title/1044287a-73df-48d0-b0b2-5327f32dd651/jojo-s-bizarre-adventure-part-7-steel-ball-run-official-colored`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(MangaDexWorker.siteType, requestConfig)
+  constructor () {
+    super(MangaDexWorker.siteType)
   }
 
   async syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {

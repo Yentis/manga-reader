@@ -99,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import { useDialogPluginComponent, copyToClipboard, useQuasar } from 'quasar'
+import { useDialogPluginComponent, copyToClipboard } from 'quasar'
 import { defineComponent, onMounted, ref } from 'vue'
 import { Settings } from 'src/classes/settings'
 import { NotifyOptions } from 'src/classes/notifyOptions'
@@ -118,7 +118,6 @@ export default defineComponent({
   emits: [...useDialogPluginComponent.emits],
 
   setup () {
-    const $q = useQuasar()
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
     const { navigate } = useUrlNavigation()
     const { notification } = useNotification()
@@ -161,7 +160,7 @@ export default defineComponent({
     }
 
     const isStatic = () => {
-      return getPlatform($q) === Platform.Static
+      return getPlatform() === Platform.Static
     }
 
     return {

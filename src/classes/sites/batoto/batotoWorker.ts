@@ -1,5 +1,5 @@
 import { BaseData, BaseWorker } from '../baseWorker'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { Manga } from '../../manga'
 import cheerio from 'cheerio'
 import { SiteType } from '../../../enums/siteEnum'
@@ -10,8 +10,8 @@ export class BatotoWorker extends BaseWorker {
 
   static testUrl = `${BatotoWorker.url}/series/72315/doctor-elise-the-royal-lady-with-the-lamp`
 
-  constructor (requestConfig: AxiosRequestConfig | undefined = undefined) {
-    super(BatotoWorker.siteType, requestConfig)
+  constructor () {
+    super(BatotoWorker.siteType)
   }
 
   getChapterUrl (data: BaseData): string {

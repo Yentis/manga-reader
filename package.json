@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -d -m android",
+    "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m android",
     "build:ios": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m ios",
     "sign:android": "jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore ./dist/cordova/android/apk/release/app-release-unsigned.apk manga_reader",
     "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron",

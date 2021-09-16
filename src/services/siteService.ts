@@ -43,7 +43,6 @@ import {
 import {
   LinkingSiteType
 } from '../enums/linkingSiteEnum'
-import { AxiosRequestConfig } from 'axios'
 import PQueue from 'p-queue'
 import {
   ArangScans
@@ -96,12 +95,6 @@ function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]
     promise,
     timeoutPromise
   ])
-}
-
-export function setRequestConfig (requestConfig: AxiosRequestConfig) {
-  siteMap.forEach(site => {
-    site.requestConfig = requestConfig
-  })
 }
 
 export function checkSites (): void {

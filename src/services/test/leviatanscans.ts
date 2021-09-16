@@ -20,7 +20,7 @@ async function readUrl (): Promise<void> {
   desired.chapter = '30'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT-193x278.png'
   desired.title = 'The Throne'
-  desired.chapterUrl = 'https://leviatanscans.com/levi/manga/the-throne/30/'
+  desired.chapterUrl = 'https://leviatanscans.com/alli/manga/the-throne/30/'
   desired.chapterNum = 30
 
   mangaEqual(manga, desired)
@@ -33,7 +33,7 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   desired.chapter = 'Season 2 | 105'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-SK-193x278.png'
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
-  desired.chapterUrl = 'https://leviatanscans.com/levi/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/105/'
+  desired.chapterUrl = 'https://leviatanscans.com/alli/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/105/'
   desired.chapterNum = 105
 
   mangaEqual(manga, desired)
@@ -44,7 +44,7 @@ async function search (): Promise<void> {
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover_BE-193x278.png'
   desired.chapter = '188'
-  desired.url = 'https://leviatanscans.com/levi/manga/burning-effect/'
+  desired.url = 'https://leviatanscans.com/alli/manga/burning-effect/'
 
   return searchValid(results, desired, QUERY)
 }

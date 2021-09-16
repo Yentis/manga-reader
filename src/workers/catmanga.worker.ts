@@ -1,11 +1,13 @@
 import { Worker } from '../classes/worker'
-import { WorkerRequest } from '../classes/workerRequest'
+import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import { doOperation } from './helper'
 import { CatMangaWorker } from 'src/classes/sites/catmanga/catmangaWorker'
+import { RequestType } from 'src/enums/workerEnum'
 
 addEventListener('message', event => {
-  const request = event.data as WorkerRequest
-  const worker = new CatMangaWorker(request.requestConfig)
+  const request = event.data as SiteWorkerMessage
+  if (request.type.toUpperCase() in RequestType) return
+  const worker = new CatMangaWorker()
 
   doOperation(request, worker)
 })
