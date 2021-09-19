@@ -5,13 +5,12 @@ import { RefreshOptions } from 'src/classes/refreshOptions'
 import useRefreshProgress from './useRefreshProgress'
 import useMangaList from './useMangaList'
 import { Status } from 'src/enums/statusEnum'
-import { getMangaInfo } from 'src/services/siteService'
+import { getMangaInfo, getSiteNameByUrl } from 'src/services/siteService'
 import useNotification from 'src/composables/useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import usePushNotification from 'src/composables/usePushNotification'
-import { SiteName } from 'src/enums/siteEnum'
 
 export default function useRefreshing () {
   const autoRefreshing = ref(false)
@@ -50,7 +49,7 @@ export default function useRefreshing () {
     const promises = filteredMangaList.map(manga => {
       const promise = getMangaInfo(manga.url, manga.site, manga.altSources).then((result) => {
         if (result instanceof Error) {
-          const notifyOptions = new NotifyOptions(`${SiteName[manga.site]} | ${result.message}`, `Failed to refresh ${manga.title}`)
+          const notifyOptions = new NotifyOptions(`${getSiteNameByUrl(manga.site) || 'Unknown site'} | ${result.message}`, `Failed to refresh ${manga.title}`)
           notifyOptions.actions = [{
             label: 'Visit',
             handler: () => {

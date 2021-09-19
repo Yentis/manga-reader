@@ -74,8 +74,13 @@ export class AsuraScansWorker extends BaseWorker {
     data.chapterUrl = chapterItem.find('a').first()
     data.chapterNum = chapterItem.first()
     data.chapterDate = chapterItem.find('.chapterdate').first()
-    data.image = $('meta[property="og:image"]').first()
     data.title = $('.entry-title').first()
+
+    let image = $('meta[property="og:image"]')
+    if (image.length === 0) {
+      image = $('meta[name="twitter:image"]').first()
+    } else image = image.first()
+    data.image = image
 
     return this.buildManga(data)
   }

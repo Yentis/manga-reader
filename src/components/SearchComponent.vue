@@ -61,7 +61,7 @@
               <div class="text-body2">
                 {{ manga.chapter }}
               </div>
-              <div>{{ siteNames[manga.site] }}</div>
+              <div>{{ getSiteNameByUrl(manga.site) || 'Unknown site' }}</div>
             </q-item-section>
           </q-item>
         </q-list>
@@ -79,10 +79,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { SiteName } from 'src/enums/siteEnum'
 import useMangaList from 'src/composables/useMangaList'
 import { useSearchResults } from 'src/composables/useSearchResults'
 import useMobileView from 'src/composables/useMobileView'
+import { getSiteNameByUrl } from 'src/services/siteService'
 
 export default defineComponent({
   name: 'MangaSearch',
@@ -131,13 +131,13 @@ export default defineComponent({
     }
 
     return {
-      siteNames: SiteName,
       search,
       mangaTitle,
       searchDropdownShown,
       searchResults,
       mobileView,
-      onSearch
+      onSearch,
+      getSiteNameByUrl
     }
   }
 })

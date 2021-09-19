@@ -26,7 +26,7 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted } from 'vue'
 import moment from 'moment'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
+import { SiteType } from 'src/enums/siteEnum'
 import MangaHeader from 'src/components/Header.vue'
 import MangaItem from 'src/components/manga-item/MangaItem.vue'
 import useMangaList from 'src/composables/useMangaList'
@@ -37,6 +37,7 @@ import useRefreshProgress from 'src/composables/useRefreshProgress'
 import useInitialized from 'src/composables/useInitialized'
 import { useElectronAuth, useStaticAuth } from 'src/composables/useAuthCallback'
 import { useQuasar } from 'quasar'
+import { getSiteNameByUrl } from 'src/services/siteService'
 
 export default defineComponent({
   components: {
@@ -73,7 +74,8 @@ export default defineComponent({
             notes = false
           }
 
-          if (!SiteName[manga.site].toLowerCase().includes(lowerCaseWord)) {
+          const siteName = getSiteNameByUrl(manga.site)
+          if (!siteName?.toLowerCase().includes(lowerCaseWord)) {
             site = false
           }
 
@@ -86,7 +88,7 @@ export default defineComponent({
       onMounted(() => {
         window.cookieMaster.setCookieValue(
           `.${SiteType.Webtoons}`,
-          'ageGatePass',
+          'pagGDPR',
           'true',
           () => undefined,
           (error) => console.error(error)

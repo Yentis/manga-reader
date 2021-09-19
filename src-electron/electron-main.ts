@@ -84,7 +84,7 @@ function createWindow () {
 
   session.defaultSession.cookies.set({
     url: 'https://www.webtoons.com/',
-    name: 'ageGatePass',
+    name: 'pagGDPR',
     value: 'true'
   }).catch((error) => console.error(error))
 

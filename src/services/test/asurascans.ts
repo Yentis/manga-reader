@@ -10,6 +10,7 @@ const QUERY = 'tougen anki'
 
 export async function testAsuraScans (): Promise<void> {
   await readUrl()
+  await readUrlAdvanced()
   await search()
 }
 
@@ -21,6 +22,19 @@ async function readUrl (): Promise<void> {
   desired.title = 'Tougen Anki'
   desired.chapterUrl = 'https://www.asurascans.com/tougen-anki-chapter-19/'
   desired.chapterNum = 19
+
+  mangaEqual(manga, desired)
+}
+
+async function readUrlAdvanced (): Promise<void> {
+  const testUrl = 'https://www.asurascans.com/comics/solo-bug-player/'
+  const manga = await getMangaInfo(testUrl, SITE_TYPE)
+  const desired = new Manga(testUrl, SITE_TYPE)
+  desired.chapter = 'Chapter 78'
+  desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ezgif.com-gif-maker-1.gif'
+  desired.title = 'Solo Bug Player'
+  desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-78/'
+  desired.chapterNum = 78
 
   mangaEqual(manga, desired)
 }

@@ -3,7 +3,6 @@ import { QVueGlobals } from 'quasar/dist/types'
 import { BaseSite } from '../baseSite'
 import { NotifyOptions } from '../../notifyOptions'
 import LoginDialog from '../../../components/LoginDialog.vue'
-import { SiteName } from '../../../enums/siteEnum'
 import { KitsuRequestType, SiteRequestType } from '../../../enums/workerEnum'
 import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import Worker from 'worker-loader!src/workers/kitsu.worker'
@@ -11,6 +10,7 @@ import { Manga } from '../../manga'
 import { Data, KitsuWorker, LoginResponse } from './kitsuWorker'
 import { Store } from 'vuex'
 import constants from 'src/classes/constants'
+import { getSiteNameByUrl } from 'src/services/siteService'
 
 export class Kitsu extends BaseSite {
   token: string = LocalStorage.getItem(constants.KITSU_TOKEN) || ''
@@ -39,10 +39,16 @@ export class Kitsu extends BaseSite {
 
   openLogin ($q: QVueGlobals, store: Store<unknown>): Promise<Error | boolean> {
     return new Promise((resolve) => {
+      const siteName = getSiteNameByUrl(this.siteType)
+      if (siteName === undefined) {
+        resolve(Error('Valid site not found'))
+        return
+      }
+
       $q.dialog({
         component: LoginDialog,
         componentProps: {
-          siteName: SiteName[this.siteType]
+          siteName
         }
       }).onOk((data: { username: string, password: string }) => {
         $q.loading.show({

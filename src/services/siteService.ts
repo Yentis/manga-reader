@@ -2,6 +2,7 @@ import {
   Manga
 } from '../classes/manga'
 import {
+  SiteName,
   SiteType
 } from '../enums/siteEnum'
 import {
@@ -86,7 +87,8 @@ const linkingSiteMap = new Map<string, BaseSite>([
 ])
 const siteAliases = [
   { url: 'manganato.com', site: SiteType.Manganelo },
-  { url: '1stkissmanga.io', site: SiteType.FirstKissManga }
+  { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
+  { url: '1stkissmanga.com', site: SiteType.FirstKissManga }
 ]
 
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
@@ -105,11 +107,21 @@ export function checkSites (): void {
 }
 
 export function getSiteByUrl (url: string): SiteType | undefined {
-  const site = Object.values(SiteType).find(site => url.includes(site))
+  const site = Object.values(SiteType).find((site) => url.includes(site))
   if (site !== undefined) return site
 
   const siteAlias = siteAliases.find((alias) => url.includes(alias.url))?.site
   return siteAlias
+}
+
+export function getSiteNameByUrl (url: string): SiteName | undefined {
+  let siteType: LinkingSiteType | SiteType | undefined = getSiteByUrl(url)
+  if (siteType === undefined) {
+    siteType = Object.values(LinkingSiteType).find((site) => url.includes(site))
+    if (siteType === undefined) return undefined
+  }
+
+  return SiteName[siteType]
 }
 
 export async function getMangaInfoByUrl (url: string, altSources: Record<string, string> = {}, redirectCount = 0): Promise <Error | Manga> {

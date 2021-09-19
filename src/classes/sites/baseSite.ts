@@ -3,7 +3,7 @@ import { UrlNavigation } from '../urlNavigation'
 import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
 import { Worker } from '../worker'
 import { LinkingSiteType } from '../../enums/linkingSiteEnum'
-import { SiteName, SiteState, SiteType } from '../../enums/siteEnum'
+import { SiteState, SiteType } from '../../enums/siteEnum'
 import PQueue from 'p-queue'
 import { BaseWorker } from './baseWorker'
 import { QVueGlobals } from 'quasar/dist/types'
@@ -11,6 +11,7 @@ import { Store } from 'vuex'
 import { RequestData, RequestType, SiteRequestType } from 'src/enums/workerEnum'
 import { BaseWorkerMessage } from '../workerMessage/baseMessage'
 import { getPlatform } from 'src/services/platformService'
+import { getSiteNameByUrl } from 'src/services/siteService'
 
 export abstract class BaseSite {
   abstract siteType: SiteType | LinkingSiteType
@@ -133,7 +134,14 @@ export abstract class BaseSite {
     } else if (b.state === SiteState.OFFLINE && this.state !== SiteState.OFFLINE) {
       return 1
     } else {
-      return SiteName[this.siteType] > SiteName[b.siteType] ? 1 : -1
+      const siteName = getSiteNameByUrl(this.siteType)
+      const siteNameB = getSiteNameByUrl(b.siteType)
+
+      if (siteName === undefined && siteNameB === undefined) return 0
+      if (siteNameB === undefined) return -1
+      if (siteName === undefined) return 1
+
+      return siteName > siteNameB ? 1 : -1
     }
   }
 
@@ -143,7 +151,7 @@ export abstract class BaseSite {
         return await task()
       } catch (error) {
         if (!(error instanceof Error)) {
-          return Error(error)
+          return Error(error as string)
         } else {
           return error
         }

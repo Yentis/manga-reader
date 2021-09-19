@@ -39,7 +39,7 @@
           >
             <q-item-section v-if="!item.refreshing">
               <q-item-label :class="{ 'full-width': mobileView }">
-                {{ siteNames[item.site.siteType] }}
+                {{ getSiteNameByUrl(item.site.siteType) || 'Unknown site' }}
               </q-item-label>
               <q-item-label
                 :class="{
@@ -76,11 +76,12 @@
 <script lang="ts">
 import { useDialogPluginComponent } from 'quasar'
 import { defineComponent } from 'vue'
-import { SiteName, SiteState } from 'src/enums/siteEnum'
+import { SiteState } from 'src/enums/siteEnum'
 import useSiteList from 'src/composables/useSiteList'
 import useSiteListVisible from 'src/composables/useSiteListVisible'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { useSearchResults } from 'src/composables/useSearchResults'
+import { getSiteNameByUrl } from 'src/services/siteService'
 
 export default defineComponent({
   props: {
@@ -112,7 +113,6 @@ export default defineComponent({
       onDialogHide,
       onOKClick: onDialogOK,
       onCancelClick: onDialogCancel,
-      siteNames: SiteName,
       siteState: SiteState,
       siteList,
       mobileView,
@@ -120,7 +120,8 @@ export default defineComponent({
       refreshing,
       refreshSites,
       searchResults,
-      navigate
+      navigate,
+      getSiteNameByUrl
     }
   }
 })

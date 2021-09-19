@@ -1,8 +1,8 @@
 import { useQuasar } from 'quasar'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
-import { getSite } from 'src/services/siteService'
+import { SiteType } from 'src/enums/siteEnum'
+import { getSite, getSiteNameByUrl } from 'src/services/siteService'
 import { useStore } from 'src/store'
 import useNotification from './useNotification'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
@@ -90,7 +90,7 @@ export default function useProgressLinking (url: string, newLinkedSites: Ref<Rec
         return
       }
 
-      const notifyOptions = new NotifyOptions(`Synced with ${SiteName[site.siteType]}`)
+      const notifyOptions = new NotifyOptions(`Synced with ${getSiteNameByUrl(site.siteType) || 'unknown site'}`)
       notifyOptions.type = 'positive'
       notification.value = notifyOptions
     }).catch(error => {
@@ -99,7 +99,7 @@ export default function useProgressLinking (url: string, newLinkedSites: Ref<Rec
   }
 
   const showSyncError = (error: string | Error, site: BaseSite, mangaId: number, chapterNum: number) => {
-    const notifyOptions = new NotifyOptions(error, `Failed to sync with ${SiteName[site.siteType]}`)
+    const notifyOptions = new NotifyOptions(error, `Failed to sync with ${getSiteNameByUrl(site.siteType) || 'unknown site'}`)
 
     notifyOptions.actions = [{
       label: 'Relog',
