@@ -29,7 +29,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/berserk-of-gluttony-cover-1-237x350.png'
-  desired.chapter = '37'
+  desired.chapter = '38'
   desired.url = 'https://flamescans.org/series/berserk-of-gluttony/'
 
   return searchValid(results, desired, QUERY)

@@ -17,7 +17,7 @@ async function readUrl (): Promise<void> {
   const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.chapter = 'Chapter 143 [END]'
-  desired.image = 'https://xfs-000.animemark.net/pictures/W600/bab/babb58b5b128acf2a01d5710f77d67e1af8a6fe7_420_610_328588.jpeg'
+  desired.image = 'https://xfs-000.animemark.com/pictures/W600/bab/babb58b5b128acf2a01d5710f77d67e1af8a6fe7_420_610_328588.jpeg'
   desired.title = 'Doctor Elise: The Royal Lady with the Lamp'
   desired.chapterUrl = 'https://bato.to/chapter/1629009'
   desired.chapterNum = 143
@@ -28,7 +28,7 @@ async function readUrl (): Promise<void> {
 async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.image = 'https://xfs-000.animemark.net/pictures/W300/cd4/cd43759af3efabf4e16729443a0244b9d76df0fe_420_610_295421.jpg'
+  desired.image = 'https://xfs-000.animemark.com/pictures/W300/cd4/cd43759af3efabf4e16729443a0244b9d76df0fe_420_610_295421.jpg'
   desired.chapter = 'Ch.88'
   desired.url = 'https://bato.to/series/75371/i-found-somebody-to-love'
 

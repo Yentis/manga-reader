@@ -30,11 +30,11 @@ async function readUrlAdvanced (): Promise<void> {
   const testUrl = 'https://www.asurascans.com/comics/solo-bug-player/'
   const manga = await getMangaInfo(testUrl, SITE_TYPE)
   const desired = new Manga(testUrl, SITE_TYPE)
-  desired.chapter = 'Chapter 78'
+  desired.chapter = 'Chapter 80'
   desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ezgif.com-gif-maker-1.gif'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-78/'
-  desired.chapterNum = 78
+  desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-80/'
+  desired.chapterNum = 80
 
   mangaEqual(manga, desired)
 }

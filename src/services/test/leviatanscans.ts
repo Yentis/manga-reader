@@ -11,6 +11,7 @@ const QUERY = 'burning effect'
 export async function testLeviatanScans (): Promise<void> {
   await readUrl()
   await readUrlWrongSeasonOrder()
+  await readUrlCorrectSeasonOrder()
   await search()
 }
 
@@ -20,7 +21,7 @@ async function readUrl (): Promise<void> {
   desired.chapter = '30'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT-193x278.png'
   desired.title = 'The Throne'
-  desired.chapterUrl = 'https://leviatanscans.com/alli/manga/the-throne/30/'
+  desired.chapterUrl = 'https://leviatanscans.com/bg/manga/the-throne/30/'
   desired.chapterNum = 30
 
   mangaEqual(manga, desired)
@@ -33,8 +34,21 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   desired.chapter = 'Season 2 | 105'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-SK-193x278.png'
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
-  desired.chapterUrl = 'https://leviatanscans.com/alli/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/105/'
+  desired.chapterUrl = 'https://leviatanscans.com/bg/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-2/105/'
   desired.chapterNum = 105
+
+  mangaEqual(manga, desired)
+}
+
+async function readUrlCorrectSeasonOrder (): Promise<void> {
+  const url = 'https://leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
+  const manga = await getMangaInfo(url, SITE_TYPE)
+  const desired = new Manga(url, SITE_TYPE)
+  desired.chapter = '71 - Season 2 - Ch 8'
+  desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TSRC-193x278.png'
+  desired.title = 'Tale of a Scribe Who Retires to the Countryside'
+  desired.chapterUrl = 'https://leviatanscans.com/bg/manga/tale-of-a-scribe-who-retires-to-the-countryside/71/'
+  desired.chapterNum = 71
 
   mangaEqual(manga, desired)
 }
@@ -44,7 +58,7 @@ async function search (): Promise<void> {
   const desired = new Manga(TEST_URL, SITE_TYPE)
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover_BE-193x278.png'
   desired.chapter = '188'
-  desired.url = 'https://leviatanscans.com/alli/manga/burning-effect/'
+  desired.url = 'https://leviatanscans.com/bg/manga/burning-effect/'
 
   return searchValid(results, desired, QUERY)
 }

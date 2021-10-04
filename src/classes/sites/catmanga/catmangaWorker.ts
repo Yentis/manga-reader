@@ -73,7 +73,7 @@ export class CatMangaWorker extends BaseWorker {
 
   getChapterNum (data: CatMangaData): number {
     const chapters = data.mangaData.props.pageProps.series.chapters
-    return chapters[chapters.length - 1].number
+    return chapters[0].number
   }
 
   getChapterDate (): string {
@@ -97,7 +97,13 @@ export class CatMangaWorker extends BaseWorker {
     if (!json) return Error('Could not parse site')
 
     const data = new CatMangaData(url, JSON.parse(json) as MangaData)
-    data.chapter = $('a>p').first().parent()
+    $('a').each((_index, node) => {
+      if (!node.attribs.href.includes('series')) return
+      const element = $(node)
+
+      data.chapter = element
+      return false
+    })
 
     return this.buildManga(data)
   }

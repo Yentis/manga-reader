@@ -81,12 +81,16 @@ export class WordPressWorker extends BaseWorker {
   }
 
   private getSimpleChapterNum (chapter: string): number {
-    const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || /Ch.([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
+    const matches = /\d+\b/gm.exec(chapter) || []
     let num = 0
 
     for (const match of matches) {
       const parsedMatch = parseFloat(match)
-      if (!isNaN(parsedMatch)) num = parsedMatch
+
+      if (!isNaN(parsedMatch)) {
+        num = parsedMatch
+        break
+      }
     }
 
     if (num === 0) {
