@@ -51,6 +51,7 @@ import {
 import { CatManga } from 'src/classes/sites/catmanga/catmanga'
 import constants from 'src/classes/constants'
 import { ManhwaClub } from 'src/classes/sites/manhwaclub/manhwaclub'
+import { BiliBiliComics } from 'src/classes/sites/bilibilicomics/bilibilicomics'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -79,7 +80,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
-  [SiteType.CatManga, new CatManga()]
+  [SiteType.CatManga, new CatManga()],
+  [SiteType.BiliBiliComics, new BiliBiliComics()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

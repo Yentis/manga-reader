@@ -23,7 +23,8 @@ export enum SiteType {
     Genkan = 'genkan.io',
     FlameScans = 'flamescans.org',
     ResetScans = 'reset-scans.com',
-    CatManga = 'catmanga.org'
+    CatManga = 'catmanga.org',
+    BiliBiliComics = 'bilibilicomics.com'
 }
 
 export enum SiteName {
@@ -52,7 +53,8 @@ export enum SiteName {
     'genkan.io' = 'Genkan',
     'flamescans.org' = 'Flame Scans',
     'reset-scans.com' = 'Reset Scans',
-    'catmanga.org' = 'CatManga'
+    'catmanga.org' = 'CatManga',
+    'bilibilicomics.com' = 'BiliBili Comics'
 }
 
 export enum SiteState {

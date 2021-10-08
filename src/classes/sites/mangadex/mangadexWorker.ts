@@ -46,7 +46,7 @@ interface LegacyIdResponse {
       legacyId: number,
       newId: string
     }
-  }
+  }[]
 }
 
 class MangaDexData extends BaseData {
@@ -181,11 +181,11 @@ export class MangaDexWorker extends BaseWorker {
       type: 'manga',
       ids
     })
-    const data = response.data as LegacyIdResponse[]
+    const legacyIdResponse = response.data as LegacyIdResponse
     const legacyIdMap: Record<number, string> = {}
 
-    data.forEach((item) => {
-      const attributes = item.data.attributes
+    legacyIdResponse.data.forEach((item) => {
+      const attributes = item.attributes
       legacyIdMap[attributes.legacyId] = attributes.newId
     })
 

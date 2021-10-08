@@ -78,6 +78,7 @@ import { useQuasar } from 'quasar'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { testResetScans } from 'src/services/test/resetscans'
 import { testCatManga } from 'src/services/test/catmanga'
+import { testBiliBiliComics } from 'src/services/test/bilibilicomics'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -136,6 +137,9 @@ export default defineComponent({
           break
         case SiteType.Batoto:
           await doTest(testBatoto)
+          break
+        case SiteType.BiliBiliComics:
+          await doTest(testBiliBiliComics)
           break
         case SiteType.CatManga:
           await doTest(testCatManga)

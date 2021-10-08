@@ -28,6 +28,7 @@ import { testResetScans } from './test/resetscans'
 import { testSleepingKnightScans } from './test/sleepingknightscans'
 import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
+import { testBiliBiliComics } from './test/bilibilicomics'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -43,6 +44,9 @@ export default async function testAll (
   }))
   promises.push(testBatoto().catch((error) => {
     errors.push({ site: SiteType.Batoto, error: error })
+  }))
+  promises.push(testBiliBiliComics().catch((error) => {
+    errors.push({ site: SiteType.BiliBiliComics, error: error })
   }))
   promises.push(testCatManga().catch((error) => {
     errors.push({ site: SiteType.CatManga, error: error })
