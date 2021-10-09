@@ -19,7 +19,7 @@ async function readUrl (): Promise<void> {
   desired.chapter = '598 Discussion(2)'
   desired.image = 'http://i0.hdslb.com/bfs/comic-static/58c0cc6a498b2d8c74e5ca1f283393cd26501e71.png@300w.webp'
   desired.title = 'Tales of Demons and Gods'
-  desired.chapterUrl = 'https://yentis.github.io/mangaviewer?type=bilibilicomics.com&data=%7B%22id%22%3A215%2C%22chapter%22%3A21115%7D'
+  desired.chapterUrl = '/mangaviewer?type=bilibilicomics.com&data=%7B%22id%22%3A215%2C%22chapter%22%3A21115%7D'
   desired.chapterNum = 598
 
   mangaEqual(manga, desired, false)

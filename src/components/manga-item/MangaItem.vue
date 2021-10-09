@@ -66,8 +66,14 @@
             </div>
 
             <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
-              Current: <a
-                v-if="mangaChapterUrl"
+              Current: <router-link
+                v-if="mangaChapterUrl?.startsWith('/')"
+                :to="mangaChapterUrl"
+              >
+                {{ mangaChapter }}
+              </router-link>
+              <a
+                v-else-if="mangaChapterUrl"
                 :href="mangaChapterUrl"
                 @click.prevent="navigate(mangaChapterUrl)"
               >{{ mangaChapter }}</a>

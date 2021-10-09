@@ -20,7 +20,7 @@ export default class BrowserRequest extends BaseRequest {
 
     return {
       headers: response.headers as Record<string, string>,
-      data: response.data as string
+      data: JSON.stringify(response.data)
     }
   }
 }

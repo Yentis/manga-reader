@@ -20,7 +20,7 @@ interface MangaData {
   'vertical_cover': string
 }
 
-interface ComicDetailResponse {
+export interface ComicDetailResponse {
   data: MangaData
 }
 
@@ -33,7 +33,7 @@ interface SearchResponse {
   }
 }
 
-interface BiliBiliComicsQueryData {
+export interface BiliBiliComicsQueryData {
   id?: number
   chapter?: number
 }
@@ -75,7 +75,7 @@ export class BiliBiliComicsWorker extends BaseWorker {
       data: JSON.stringify(viewerData)
     })
 
-    return `https://yentis.github.io/mangaviewer?${queryString}`
+    return `/mangaviewer?${queryString}`
   }
 
   getChapterNum (data: BiliBiliComicsData): number {
