@@ -1,21 +1,24 @@
 import { Manga } from 'src/classes/manga'
-import { WordPressWorker } from 'src/classes/sites/wordpress/wordpressWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.HiperDEX
-const TEST_URL = WordPressWorker.getTestUrl(SITE_TYPE)
 const QUERY = 'cabalist'
 
 export async function testHiperDEX (): Promise<void> {
-  await readUrl()
-  await search()
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  await readUrl(site)
+  await readUrl2()
+  await search(site)
 }
 
-async function readUrl (): Promise<void> {
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+async function readUrl (site: BaseSite): Promise<void> {
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = '35 [END]'
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Arata-Primal-193x278.jpg'
   desired.title = 'Arata Primal'
@@ -25,9 +28,21 @@ async function readUrl (): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function readUrl2 (): Promise<void> {
+  const manga = await getMangaInfo('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
+  const desired = new Manga('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
+  desired.chapter = '96'
+  desired.image = 'https://hiperdex.com/wp-content/uploads/2020/06/Touch-On-193x278.jpg'
+  desired.title = 'Touch On'
+  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-1808/96/'
+  desired.chapterNum = 96
+
+  mangaEqual(manga, desired)
+}
+
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg'
   desired.chapter = '44 [END]'
   desired.url = 'https://hiperdex.com/manga/cabalistin/'

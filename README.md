@@ -8,7 +8,7 @@ https://github.com/Yentis/manga-reader/blob/master/src/enums/siteEnum.ts
 Supported platforms:
 - Windows
 - Android
-- [Web](https://yentis.github.io/mangareader/) (Requires CORS extension)
+- [Web](https://yentis.github.io/mangareader/)
 
 Features:
 - Check all added manga for new chapters

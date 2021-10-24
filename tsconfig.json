@@ -10,7 +10,8 @@
     "esModuleInterop": true,
     "types": [
       "quasar"
-    ]
+    ],
+    "noUncheckedIndexedAccess": true
   },
   "exclude": [
     "node_modules",

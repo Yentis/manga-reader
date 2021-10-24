@@ -1,0 +1,28 @@
+{
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr2+7hJMMs7RJxXrrRgX+LM6O3/BfFdPGaiO3HnDQS7FpZX0y+zqE11yHYH8zG940bbgUxvLB+AtvMwhAnntoGpYfi9kygOAUOqNua8OxzldCD68ZrFoXvpx7e9cMuyVOQ0vlcXnIaRxAc54ybgnyL4D6PMrkUj3eiZMXOtoHYi2cjDs2JVeBdsPgAsjuor/JvmSetNAoXX/GTq3E6+v6KRmaMZgh24v2bRnQy1NWr/1rFSzc4LTiuo420rfbO0b/eoc6Kz+bOx589kicF6JVg/5P3g3jyJ3cle2UhZm77qtFK1RIf3VcjPsz9tkVuroFNT73mP0axIYdWZjqwlqk3QIDAQAB",
+  "manifest_version": 2,
+  "name": "Manga Reader",
+  "description": "Extension to support usage of the browser version of Yentis' Manga Reader",
+  "author": "Yentis#5218",
+  "version": "1.0",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "*://*/*",
+    "cookies"
+  ],
+  "externally_connectable": {
+    "matches": [
+      "https://yentis.github.io/*",
+      "http://localhost/*"
+    ]
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

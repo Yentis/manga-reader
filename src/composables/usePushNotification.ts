@@ -1,4 +1,3 @@
-import { useQuasar } from 'quasar'
 import { Manga } from '../classes/manga'
 import { UrlNavigation } from '../classes/urlNavigation'
 import useSettings from './useSettings'
@@ -25,11 +24,10 @@ interface CordovaNotification {
 }
 
 export default function usePushNotification () {
-  const $q = useQuasar()
   const { urlNavigation } = useUrlNavigation()
 
   const sendPushNotification = (manga: Manga) => {
-    if ($q.platform.is.cordova) {
+    if (getPlatform() === Platform.Cordova) {
       (cordova.plugins as CordovaNotification).notification.local.schedule({
         title: manga.title,
         text: manga.chapter,

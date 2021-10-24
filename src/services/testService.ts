@@ -7,7 +7,6 @@ import { testArangScans } from './test/arangscans'
 import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
 import { testCatManga } from './test/catmanga'
-import { testEdelgardeScans } from './test/edelgardescans'
 import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
 import { testGenkanio } from './test/genkanio'
@@ -29,6 +28,7 @@ import { testSleepingKnightScans } from './test/sleepingknightscans'
 import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 import { testBiliBiliComics } from './test/bilibilicomics'
+import { testKitsu } from './test/kitsu'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -51,9 +51,6 @@ export default async function testAll (
   promises.push(testCatManga().catch((error) => {
     errors.push({ site: SiteType.CatManga, error: error })
   }))
-  promises.push(testEdelgardeScans().catch((error) => {
-    errors.push({ site: SiteType.EdelgardeScans, error: error })
-  }))
   promises.push(testFirstKissManga().catch((error) => {
     errors.push({ site: SiteType.FirstKissManga, error: error })
   }))
@@ -68,6 +65,9 @@ export default async function testAll (
   }))
   promises.push(testHiperDEX().catch((error) => {
     errors.push({ site: SiteType.HiperDEX, error: error })
+  }))
+  promises.push(testKitsu($q).catch((error) => {
+    errors.push({ site: LinkingSiteType.Kitsu, error: error })
   }))
   promises.push(testLeviatanScans().catch((error) => {
     errors.push({ site: SiteType.LeviatanScans, error: error })
@@ -108,7 +108,7 @@ export default async function testAll (
   promises.push(testSleepingKnightScans().catch((error) => {
     errors.push({ site: SiteType.SleepingKnightScans, error: error })
   }))
-  promises.push(testWebtoons($q).catch((error) => {
+  promises.push(testWebtoons().catch((error) => {
     errors.push({ site: SiteType.Webtoons, error: error })
   }))
   promises.push(testZeroScans().catch((error) => {
@@ -153,9 +153,9 @@ export async function searchValid (
     return site && title && image && chapter && url
   })
 
-  if (matchingManga.length === 0) throw Error(`Failed ${desired.url}\nNo matching results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
-  else if (matchingManga.length > 1) throw Error(`Failed ${desired.url}\nToo many results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
   const resultManga = matchingManga[0]
+  if (!resultManga) throw Error(`Failed ${desired.url}\nNo matching results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
+  else if (matchingManga.length > 1) throw Error(`Failed ${desired.url}\nToo many results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
 
   const linkingSiteTypeUrls: string[] = Object.values(LinkingSiteType)
   if (linkingSiteTypeUrls.includes(resultManga.site)) return

@@ -2,56 +2,56 @@ import {
   Manga
 } from '../classes/manga'
 import {
-  SiteName,
   SiteType
 } from '../enums/siteEnum'
 import {
   Manganelo
-} from '../classes/sites/manganelo/manganelo'
+} from '../classes/sites/manganelo'
 import {
   Genkan
-} from '../classes/sites/genkan/genkan'
+} from '../classes/sites/genkan'
 import {
   Webtoons
-} from '../classes/sites/webtoons/webtoons'
+} from '../classes/sites/webtoons'
 import {
   Mangakakalot
-} from '../classes/sites/mangakakalot/mangakakalot'
+} from '../classes/sites/mangakakalot'
 import {
   MangaDex
-} from '../classes/sites/mangadex/mangadex'
+} from '../classes/sites/mangadex'
 import {
   WordPress
-} from '../classes/sites/wordpress/wordpress'
+} from '../classes/sites/wordpress'
 import {
   BaseSite
 } from '../classes/sites/baseSite'
 import {
   AsuraScans
-} from '../classes/sites/asura/asurascans'
+} from '../classes/sites/asurascans'
 import {
   Mangago
-} from '../classes/sites/mangago/mangago'
+} from '../classes/sites/mangago'
 import {
   Batoto
-} from '../classes/sites/batoto/batoto'
+} from '../classes/sites/batoto'
 import {
   Genkanio
-} from '../classes/sites/genkanio/genkanio'
+} from '../classes/sites/genkanio'
 import {
   Kitsu
-} from '../classes/sites/kitsu/kitsu'
+} from '../classes/sites/kitsu'
 import {
   LinkingSiteType
 } from '../enums/linkingSiteEnum'
 import PQueue from 'p-queue'
 import {
   ArangScans
-} from '../classes/sites/arang/arangscans'
-import { CatManga } from 'src/classes/sites/catmanga/catmanga'
+} from '../classes/sites/arangscans'
+import { CatManga } from 'src/classes/sites/catmanga'
 import constants from 'src/classes/constants'
-import { ManhwaClub } from 'src/classes/sites/manhwaclub/manhwaclub'
-import { BiliBiliComics } from 'src/classes/sites/bilibilicomics/bilibilicomics'
+import { ManhwaClub } from 'src/classes/sites/manhwaclub'
+import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
+import { getSiteByUrl } from 'src/utils/siteUtils'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -76,7 +76,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
   [SiteType.ArangScans, new ArangScans()],
-  [SiteType.EdelgardeScans, new Genkan(SiteType.EdelgardeScans)],
   [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
@@ -87,12 +86,6 @@ const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
   [LinkingSiteType.Kitsu, new Kitsu()]
 ])
-const siteAliases = [
-  { url: 'manganato.com', site: SiteType.Manganelo },
-  { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
-  { url: '1stkissmanga.com', site: SiteType.FirstKissManga }
-]
-
 function createRace (promise: Promise<Error | Manga[]>): Promise<Error | Manga[]> {
   const timeoutPromise: Promise<Error | Manga[]> = new Promise(resolve => setTimeout(() => resolve(Error('Timed out')), 10000))
   return Promise.race([
@@ -106,24 +99,6 @@ export function checkSites (): void {
     void site.checkLogin()
     void site.checkState()
   })
-}
-
-export function getSiteByUrl (url: string): SiteType | undefined {
-  const site = Object.values(SiteType).find((site) => url.includes(site))
-  if (site !== undefined) return site
-
-  const siteAlias = siteAliases.find((alias) => url.includes(alias.url))?.site
-  return siteAlias
-}
-
-export function getSiteNameByUrl (url: string): SiteName | undefined {
-  let siteType: LinkingSiteType | SiteType | undefined = getSiteByUrl(url)
-  if (siteType === undefined) {
-    siteType = Object.values(LinkingSiteType).find((site) => url.includes(site))
-    if (siteType === undefined) return undefined
-  }
-
-  return SiteName[siteType]
 }
 
 export async function getMangaInfoByUrl (url: string, altSources: Record<string, string> = {}, redirectCount = 0): Promise <Error | Manga> {
@@ -153,11 +128,11 @@ export async function getMangaInfo (
     error = result
   }
 
-  for (const urlSource of Object.keys(altSources)) {
+  for (const [urlSource, url] of Object.entries(altSources)) {
     const site = siteMap.get(urlSource)
     if (!site) continue
 
-    const result = await requestQueue.add(() => site.readUrl(altSources[urlSource]))
+    const result = await requestQueue.add(() => site.readUrl(url))
     if (!(result instanceof Error)) return result
   }
 

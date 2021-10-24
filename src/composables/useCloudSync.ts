@@ -6,13 +6,16 @@ import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
 import useMangaList from './useMangaList'
-import { Manga } from 'src/classes/manga'
+import { ReadListResponse } from '../services/dropboxService'
+import { setEditCode, setShareId } from 'src/services/rentryService'
+import { useStore } from 'src/store'
 
 export default function useCloudSync () {
   const $q = useQuasar()
+  const $store = useStore()
   const { urlNavigation } = useUrlNavigation()
   const { notification } = useNotification()
-  const { mangaList, storeManga } = useMangaList()
+  const { setMangaList, storeManga } = useMangaList()
 
   const openDropboxLogin = () => {
     getAuthUrl().then((authUrl) => {
@@ -28,33 +31,43 @@ export default function useCloudSync () {
       return
     }
 
-    let storedMangaList: Manga[]
+    let readListResponse: ReadListResponse
     try {
-      storedMangaList = await readList()
+      readListResponse = await readList()
     } catch (error) {
       if (error instanceof Error && error.message === 'Unauthorized') {
         openDropboxLogin()
         return
       }
 
-      notification.value = new NotifyOptions(error)
+      notification.value = new NotifyOptions(error as string)
       return
     }
 
     return new Promise<void>((resolve) => {
+      const { mangaList: storedMangaList, shareContents } = readListResponse
+
       $q.dialog({
         component: ConfirmationDialog,
         componentProps: {
           title: 'Import from Dropbox',
-          content: `Are you sure you want to import ${storedMangaList.length} titles from Dropbox?\nYou currently have ${mangaList.value.length} titles.`
+          content: `Are you sure you want to import ${storedMangaList.length} titles from Dropbox?\nYou currently have ${$store.state.reader.mangaMap.size} titles.`
         }
       }).onOk(() => {
         const notifyOptions = new NotifyOptions('Imported!')
         notifyOptions.type = 'positive'
         notification.value = notifyOptions
 
-        mangaList.value = storedMangaList
+        setMangaList(storedMangaList)
         storeManga()
+
+        if (!shareContents) {
+          resolve()
+          return
+        }
+
+        setShareId(shareContents.id)
+        setEditCode(shareContents.editCode)
 
         resolve()
       }).onCancel(() => {
@@ -70,15 +83,17 @@ export default function useCloudSync () {
     }
 
     return new Promise<void>((resolve) => {
+      const mangaMap = $store.state.reader.mangaMap
+
       $q.dialog({
         component: ConfirmationDialog,
         componentProps: {
           title: 'Export to Dropbox',
-          content: `Are you sure you want to export ${mangaList.value.length} titles to Dropbox?`
+          content: `Are you sure you want to export ${mangaMap.size} titles to Dropbox?`
         }
       }).onOk(async () => {
         try {
-          await saveList(mangaList.value)
+          await saveList(Array.from(mangaMap.values()))
         } catch (error) {
           if (error instanceof Error && error.message === 'Unauthorized') {
             openDropboxLogin()
@@ -86,7 +101,7 @@ export default function useCloudSync () {
             return
           }
 
-          notification.value = new NotifyOptions(error)
+          notification.value = new NotifyOptions(error as string)
           resolve()
           return
         }

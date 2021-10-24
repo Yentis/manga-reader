@@ -78,12 +78,12 @@
 import { useDialogPluginComponent, useQuasar } from 'quasar'
 import { defineComponent, ref, onMounted } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
-import { NotifyOptions } from 'src/classes/notifyOptions'
+import { SiteName, SiteType } from '../enums/siteEnum'
+import { NotifyOptions } from '../classes/notifyOptions'
 import SearchDialog from './SearchDialog.vue'
-import { useClearingSearchResults } from 'src/composables/useSearchResults'
-import useNotification from 'src/composables/useNotification'
-import { getSiteByUrl, getSiteNameByUrl } from 'src/services/siteService'
+import { useClearingSearchResults } from '../composables/useSearchResults'
+import useNotification from '../composables/useNotification'
+import { getSiteByUrl, getSiteNameByUrl } from '../utils/siteUtils'
 
 export default defineComponent({
   props: {
@@ -128,18 +128,17 @@ export default defineComponent({
 
     const getData = () => {
       const dataList: typeof data.value = []
-      Object.keys(sources.value).forEach((source) => {
+      Object.entries(sources.value).forEach(([source, url]) => {
         const siteType = getSiteByUrl(source)
         const siteName = getSiteNameByUrl(source)
-        if (siteType === undefined || siteName === undefined) return
 
+        if (!siteType || !siteName) return
         dataList.push({
           name: siteName,
           site: siteType,
-          url: sources.value[source]
+          url
         })
       })
-
       data.value = dataList
     }
     onMounted(getData)

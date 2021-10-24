@@ -1,25 +1,30 @@
-import { QVueGlobals } from 'quasar/dist/types'
 import { Manga } from 'src/classes/manga'
-import { WebtoonsWorker } from 'src/classes/sites/webtoons/webtoonsWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
+import { Platform } from 'src/enums/platformEnum'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getPlatform } from '../platformService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.Webtoons
-const TEST_URL = WebtoonsWorker.testUrl
 const QUERY = 'the wolf & red riding hood'
 
-export async function testWebtoons ($q: QVueGlobals): Promise<void> {
-  await readUrl($q)
-  await readUrlCordova($q)
-  await search()
+export async function testWebtoons (): Promise<void> {
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  const platform = getPlatform()
+
+  await readUrl(platform, site)
+  await readUrlCordova(platform)
+  await search(site)
 }
 
-async function readUrl ($q: QVueGlobals): Promise<void> {
-  if ($q.platform.is.cordova) return
+async function readUrl (platform: Platform, site: BaseSite): Promise<void> {
+  if (platform === Platform.Cordova) return
 
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Episode 16'
   desired.image = 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540'
   desired.title = 'The Wolf & Red Riding Hood'
@@ -29,8 +34,8 @@ async function readUrl ($q: QVueGlobals): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function readUrlCordova ($q: QVueGlobals): Promise<void> {
-  if (!$q.platform.is.cordva) return
+async function readUrlCordova (platform: Platform): Promise<void> {
+  if (platform !== Platform.Cordova) return
 
   const url = 'https://m.webtoons.com/en/super-hero/xinker/list?title_no=541'
   const manga = await getMangaInfo(url, SITE_TYPE)
@@ -44,9 +49,9 @@ async function readUrlCordova ($q: QVueGlobals): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://swebtoon-phinf.pstatic.net/20200723_56/15954724513992Eqto_JPEG/04_EC9E91ED9288EC8381EC84B8_mobile.jpg?type=crop540_540'
   desired.chapter = 'Episode 16'
   desired.url = 'https://www.webtoons.com/episodeList?titleNo=2142'

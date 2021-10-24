@@ -5,14 +5,20 @@ import HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest from './baseRequest'
 
 export default class ElectronRequest extends BaseRequest {
-  sendRequest (request: HttpRequest): Promise<HttpResponse> {
+  async sendRequest (request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     const mangaReader = (window as unknown as ElectronWindow).mangaReader
-    const headers = request.headers || {}
+    request.headers = request.headers || {}
 
-    if (headers['Content-Type'] === ContentType.URLENCODED) {
+    if (request.headers['Content-Type'] === ContentType.URLENCODED) {
       request.data = this.convertToUrlEncoded(request.data)
     }
 
-    return mangaReader.sendRequest(request)
+    const response = await mangaReader.sendRequest(request)
+
+    if (!ignoreErrorStatus && response.status >= 400) {
+      throw Error(`Status Code ${response.status} ${response.statusText}`.trim())
+    }
+
+    return response
   }
 }

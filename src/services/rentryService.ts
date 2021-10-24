@@ -5,6 +5,7 @@ import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { UrlNavigation } from '../classes/urlNavigation'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { ContentType } from 'src/enums/contentTypeEnum'
+import { getCookies } from 'src/classes/requests/baseRequest'
 
 const URL = 'https://rentry.co'
 
@@ -20,16 +21,16 @@ export function getShareId (): string {
 }
 
 export function setShareId (id?: string) {
-  if (id === undefined) return
+  if (!id) return
   LocalStorage.set(constants.SHARE_ID, id)
 }
 
-function getEditCode (): string {
+export function getEditCode (): string {
   return LocalStorage.getItem(constants.SHARE_EDIT_CODE) || ''
 }
 
-function setEditCode (code?: string) {
-  if (code === undefined) return
+export function setEditCode (code?: string) {
+  if (!code) return
   LocalStorage.set(constants.SHARE_EDIT_CODE, code)
 }
 
@@ -39,23 +40,7 @@ export async function getCsrfToken (): Promise<string> {
     url: URL
   })
 
-  const headers = response.headers
-  const cookies: Record<string, string | undefined> = {}
-  const setCookie = headers['set-cookie'] || ''
-
-  let cookieString: string
-  if (Array.isArray(setCookie)) {
-    cookieString = setCookie.join('')
-  } else cookieString = setCookie
-
-  cookieString.split(';').forEach((cookie) => {
-    const split = cookie.split('=')
-    const key = split[0].trim()
-    if (key === '') return
-
-    cookies[key] = split[1]
-  })
-
+  const cookies = getCookies(response)
   if (!cookies.csrftoken) {
     throw Error('CSRF token was not found')
   }
@@ -92,11 +77,11 @@ export async function createList (list: string, url?: string): Promise<string> {
   }
 
   const split = data.url.split('/')
-  if (split.length === 0) {
+  const id = split[split.length - 1]
+  if (!id) {
     throw Error(`Could not parse response url: ${data.url}`)
   }
 
-  const id = split[split.length - 1]
   setShareId(id)
   setEditCode(data.edit_code)
 

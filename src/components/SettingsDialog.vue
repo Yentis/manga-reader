@@ -18,12 +18,15 @@
       <q-form @submit="onOKClick">
         <q-card-actions vertical>
           <q-toggle
+            v-if="!isStatic"
             v-model="newSettings.openInBrowser"
-            :label="isStatic() ? 'Open in new tab' : 'Open in browser'"
+            label="Open in browser"
           />
           <q-toggle
-            v-model="newSettings.darkMode"
+            v-if="!isStatic"
             label="Dark mode"
+            :model-value="settings.darkMode"
+            @update:model-value="toggleDarkMode"
           />
           <q-toggle
             v-model="newSettings.refreshOptions.enabled"
@@ -101,16 +104,16 @@
 <script lang="ts">
 import { useDialogPluginComponent, copyToClipboard } from 'quasar'
 import { defineComponent, onMounted, ref } from 'vue'
-import { Settings } from 'src/classes/settings'
-import { NotifyOptions } from 'src/classes/notifyOptions'
-import useUrlNavigation from 'src/composables/useUrlNavigation'
-import useNotification from 'src/composables/useNotification'
-import useSettings from 'src/composables/useSettings'
-import TestComponent from 'src/components/TestComponent.vue'
-import useSharing from 'src/composables/useSharing'
-import { getPlatform } from 'src/services/platformService'
-import { Platform } from 'src/enums/platformEnum'
-import { getShareId } from 'src/services/rentryService'
+import { Settings } from '../classes/settings'
+import { NotifyOptions } from '../classes/notifyOptions'
+import useUrlNavigation from '../composables/useUrlNavigation'
+import useNotification from '../composables/useNotification'
+import useSettings from '../composables/useSettings'
+import TestComponent from '../components/TestComponent.vue'
+import useSharing from '../composables/useSharing'
+import { getPlatform } from '../services/platformService'
+import { Platform } from '../enums/platformEnum'
+import { getShareId } from '../services/rentryService'
 
 export default defineComponent({
   components: { TestComponent },
@@ -121,7 +124,7 @@ export default defineComponent({
     const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent()
     const { navigate } = useUrlNavigation()
     const { notification } = useNotification()
-    const { settings } = useSettings()
+    const { settings, toggleDarkMode } = useSettings()
     const { showShareDialog } = useSharing()
 
     const loading = ref(false)
@@ -159,10 +162,6 @@ export default defineComponent({
         })
     }
 
-    const isStatic = () => {
-      return getPlatform() === Platform.Static
-    }
-
     return {
       dialogRef,
       onDialogHide,
@@ -174,12 +173,14 @@ export default defineComponent({
       sitePrefix,
       dev: process.env.DEV?.toString() === 'true',
       loading,
+      settings,
       newSettings,
       shareId,
       navigate,
       onShareList,
       onCopyToClipboard,
-      isStatic
+      toggleDarkMode,
+      isStatic: getPlatform() === Platform.Static
     }
   }
 })

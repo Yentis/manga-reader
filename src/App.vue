@@ -10,24 +10,20 @@ import { useAppSettings } from './composables/useSettings'
 import { useAppNotification } from './composables/useNotification'
 import { useAppMangaList } from './composables/useMangaList'
 import { useAppWindowSize } from './composables/useWindowSize'
-import { useAppInitialized } from './composables/useInitialized'
 import { useAppPushNotification } from './composables/usePushNotification'
-import { useQuasar } from 'quasar'
 import { init as initRequestService } from './services/requestService'
 
 export default defineComponent({
   name: 'App',
 
   setup () {
-    const $q = useQuasar()
-    initRequestService($q)
+    initRequestService()
 
     useAppNotification()
     useAppSettings()
     useAppMangaList()
     useAppUrlNavigation()
     useAppWindowSize()
-    useAppInitialized()
     useAppPushNotification()
   }
 })

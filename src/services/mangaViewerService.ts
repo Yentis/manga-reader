@@ -1,10 +1,10 @@
 import { SiteType } from '../enums/siteEnum'
 import { requestHandler } from './requestService'
-import { BiliBiliComicsQueryData, BiliBiliComicsWorker, ComicDetailResponse } from '../classes/sites/bilibilicomics/bilibilicomicsWorker'
+import { BiliBiliComics, BiliBiliComicsQueryData, ComicDetailResponse } from '../classes/sites/bilibilicomics'
 import qs from 'qs'
 import { ContentType } from 'src/enums/contentTypeEnum'
 
-const BASE_BILIBILICOMICS_API_URL = `${BiliBiliComicsWorker.url}/twirp/comic.v1.Comic`
+const BASE_BILIBILICOMICS_API_URL = `${BiliBiliComics.getUrl()}/twirp/comic.v1.Comic`
 
 export interface ChapterData {
   id: number,

@@ -1,12 +1,12 @@
 import { NotifyOptions } from 'src/classes/notifyOptions'
-import ElectronWindow from 'src/interfaces/electronWindow'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import useNotification from './useNotification'
 import qs from 'qs'
 import { setAccessToken as setDropboxAccessToken } from '../services/dropboxService'
+import ElectronWindow from 'src/interfaces/electronWindow'
 
-function useAuth () {
+export function useAuth () {
   const { notification } = useNotification()
 
   const onDropboxRedirect = (accessToken?: string) => {
@@ -35,16 +35,13 @@ export function useElectronAuth () {
 }
 
 export function useCordovaAuth () {
-  const { onDropboxRedirect } = useAuth()
+  const onUrlLoadStart = (url: string): string | null => {
+    if (url.startsWith('http://localhost') && url.includes('access_token=')) {
+      const queryString = qs.parse(url.substring(url.indexOf('access_token=')))
+      return queryString.access_token as string
+    }
 
-  const onUrlLoadStart = (url: string): boolean => {
-    if (url.startsWith('http://localhost/redirect#access_token')) {
-      const queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
-      const token = queryString.access_token as string
-      onDropboxRedirect(token)
-    } else return false
-
-    return true
+    return null
   }
 
   return {
@@ -58,11 +55,10 @@ export function useStaticAuth () {
   onMounted(() => {
     const $route = useRoute()
     const fullPath = $route.fullPath
+    if (!fullPath.includes('access_token=')) return
 
-    if (fullPath.startsWith('/redirect#')) {
-      const queryString = qs.parse(fullPath.replace('/redirect#', ''))
-      const token = queryString.access_token as string
-      onDropboxRedirect(token)
-    }
+    const queryString = qs.parse(fullPath.substring(fullPath.indexOf('access_token=')))
+    const token = queryString.access_token as string
+    onDropboxRedirect(token)
   })
 }

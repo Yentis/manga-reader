@@ -1,5 +1,5 @@
 import { useStore } from '../store/index'
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { Manga } from '../classes/manga'
 import { tryMigrateMangaList } from '../services/migrationService'
 import { LocalStorage, useQuasar } from 'quasar'
@@ -19,13 +19,9 @@ export default function useMangaList () {
   const $store = useStore()
   const { notification } = useNotification()
 
-  const mangaList = computed({
-    get: () => $store.state.reader.mangaList,
-    set: (val) => $store.commit('reader/updateMangaList', val)
-  })
-  const sortMangaList = () => { $store.commit('reader/sortMangaList') }
+  const setMangaList = (val: Manga[]) => { $store.commit('reader/updateMangaList', val) }
   const addManga = (manga: Manga): boolean => {
-    const existingManga = mangaList.value.find((curManga) => curManga.url === manga.url)
+    const existingManga = $store.state.reader.mangaMap.get(manga.url)
     if (existingManga !== undefined) {
       notification.value = new NotifyOptions(Error('Manga already exists'))
       return false
@@ -41,9 +37,6 @@ export default function useMangaList () {
   }
   const updateMangaAltSources = (url: string, altSources: Record<string, string> | undefined) => {
     $store.commit('reader/updateMangaAltSources', { url, altSources })
-  }
-  const updateMangaChapter = (url: string, chapter: string) => {
-    $store.commit('reader/updateMangaChapter', { url, chapter })
   }
   const updateMangaChapterNum = (url: string, chapterNum: number) => {
     $store.commit('reader/updateMangaChapterNum', { url, chapterNum })
@@ -87,7 +80,7 @@ export default function useMangaList () {
 
   const storeManga = () => {
     setTimeout(() => {
-      LocalStorage.set(constants.MANGA_LIST_KEY, mangaList.value)
+      LocalStorage.set(constants.MANGA_LIST_KEY, Array.from($store.state.reader.mangaMap.values()))
     }, 0)
   }
 
@@ -126,7 +119,7 @@ export default function useMangaList () {
     try {
       manga = await getMangaInfoByUrl(url)
     } catch (error) {
-      notification.value = new NotifyOptions(error)
+      notification.value = new NotifyOptions(error as string | Error)
       return null
     }
 
@@ -187,7 +180,7 @@ export default function useMangaList () {
     try {
       result = await searchManga(query, siteType)
     } catch (error) {
-      notification.value = new NotifyOptions(error)
+      notification.value = new NotifyOptions(error as string | Error)
       $q.loading.hide()
       return false
     }
@@ -196,7 +189,7 @@ export default function useMangaList () {
     const processedResults: string[] = []
 
     const mangaResults = result.filter(resultManga => {
-      const alreadyAdded = !mangaList.value.find(manga => resultManga.url === manga.url) &&
+      const alreadyAdded = !$store.state.reader.mangaMap.get(resultManga.url) &&
                            !processedResults.includes(resultManga.url) &&
                            !excludedUrls.includes(resultManga.url)
       processedResults.push(resultManga.url)
@@ -217,13 +210,11 @@ export default function useMangaList () {
   }
 
   return {
-    mangaList,
-    sortMangaList,
+    setMangaList,
     addManga,
     removeManga,
     updateManga,
     updateMangaAltSources,
-    updateMangaChapter,
     updateMangaChapterNum,
     updateMangaChapterUrl,
     updateMangaChapterDate,
@@ -246,7 +237,7 @@ export default function useMangaList () {
 }
 
 export function useAppMangaList () {
-  const { mangaList } = useMangaList()
+  const { setMangaList } = useMangaList()
 
   onMounted(async () => {
     try {
@@ -256,7 +247,7 @@ export function useAppMangaList () {
     }
 
     const localMangaList: Manga[] = LocalStorage.getItem(constants.MANGA_LIST_KEY) || []
-    mangaList.value = localMangaList
+    setMangaList(localMangaList)
   })
 }
 

@@ -1,21 +1,23 @@
 import { Manga } from 'src/classes/manga'
-import { AsuraScansWorker } from 'src/classes/sites/asura/asurascansWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.FlameScans
-const TEST_URL = AsuraScansWorker.getTestUrl(SITE_TYPE)
 const QUERY = 'berserk of gluttony'
 
 export async function testFlameScans (): Promise<void> {
-  await readUrl()
-  await search()
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  await readUrl(site)
+  await search(site)
 }
 
-async function readUrl (): Promise<void> {
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+async function readUrl (site: BaseSite): Promise<void> {
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 9'
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/02/7-6.jpg'
   desired.title = 'You, the One and Only, and the Seven Billion Grim Reapers'
@@ -25,9 +27,9 @@ async function readUrl (): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/berserk-of-gluttony-cover-1-237x350.png'
   desired.chapter = '38'
   desired.url = 'https://flamescans.org/series/berserk-of-gluttony/'

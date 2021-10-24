@@ -79,10 +79,10 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import useMangaList from 'src/composables/useMangaList'
-import { useSearchResults } from 'src/composables/useSearchResults'
-import useMobileView from 'src/composables/useMobileView'
-import { getSiteNameByUrl } from 'src/services/siteService'
+import useMangaList from '../composables/useMangaList'
+import { useSearchResults } from '../composables/useSearchResults'
+import useMobileView from '../composables/useMobileView'
+import { getSiteNameByUrl } from '../utils/siteUtils'
 
 export default defineComponent({
   name: 'MangaSearch',

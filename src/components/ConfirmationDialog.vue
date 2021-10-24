@@ -26,6 +26,10 @@
           contain
           :src="imageUrl"
         />
+        <a
+          v-if="link"
+          :href="link"
+        >{{ linkText || link }}</a>
       </q-card-section>
 
       <q-card-actions>
@@ -60,6 +64,14 @@ export default {
       default: ''
     },
     imageUrl: {
+      type: String,
+      default: ''
+    },
+    link: {
+      type: String,
+      default: ''
+    },
+    linkText: {
       type: String,
       default: ''
     },

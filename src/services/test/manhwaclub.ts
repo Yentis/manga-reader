@@ -1,35 +1,37 @@
 import { Manga } from 'src/classes/manga'
-import { ManhwaClubWorker } from 'src/classes/sites/manhwaclub/manhwaclubWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.ManhwaClub
-const TEST_URL = ManhwaClubWorker.testUrl
 const QUERY = 'cram school scandal'
 
 export async function testManhwaClub (): Promise<void> {
-  await readUrl()
-  await search()
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  await readUrl(site)
+  await search(site)
 }
 
-async function readUrl (): Promise<void> {
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.chapter = 'Ch.023'
-  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/570.jpg'
-  desired.title = 'Real Man (Dogado)'
-  desired.chapterUrl = 'https://manhwa.club/comic/real-man-dogado/chapter-23/reader'
-  desired.chapterNum = 23
+async function readUrl (site: BaseSite): Promise<void> {
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
+  desired.chapter = 'Chapter 35'
+  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/1078.jpg'
+  desired.title = 'Movies Are Real'
+  desired.chapterUrl = 'https://manhwa.club/comic/movies-are-real/chapter-35/reader'
+  desired.chapterNum = 35
 
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
-  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/1096.jpg'
-  desired.chapter = 'Chapter 30 - The End'
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
+  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/253.jpg'
+  desired.chapter = 'Chapter 30'
   desired.url = 'https://manhwa.club/comic/cram-school-scandal'
 
   return searchValid(results, desired, QUERY)

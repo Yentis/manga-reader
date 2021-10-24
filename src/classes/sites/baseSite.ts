@@ -1,25 +1,31 @@
 import { Manga } from '../manga'
 import { UrlNavigation } from '../urlNavigation'
-import { SiteWorkerMessage } from 'src/classes/workerMessage/siteMessage'
-import { Worker } from '../worker'
 import { LinkingSiteType } from '../../enums/linkingSiteEnum'
 import { SiteState, SiteType } from '../../enums/siteEnum'
 import PQueue from 'p-queue'
-import { BaseWorker } from './baseWorker'
 import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
-import { RequestData, RequestType, SiteRequestType } from 'src/enums/workerEnum'
-import { BaseWorkerMessage } from '../workerMessage/baseMessage'
-import { getPlatform } from 'src/services/platformService'
-import { getSiteNameByUrl } from 'src/services/siteService'
+import { getDateFromNow, getSiteNameByUrl, parseNum } from 'src/utils/siteUtils'
+
+export class BaseData {
+  url: string
+  chapter?: Element | null
+  chapterNum?: Element | null
+  chapterDate?: Element | null
+  image?: Element
+  title?: Element
+
+  constructor (url: string) {
+    this.url = url
+  }
+}
 
 export abstract class BaseSite {
   abstract siteType: SiteType | LinkingSiteType
-  abstract WorkerClass: { new(): Worker }
 
-  requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
+  protected requestQueue = new PQueue({ interval: 1000, intervalCap: 10 })
   loggedIn = true
-  state = SiteState.REACHABLE
+  protected state = SiteState.REACHABLE
 
   statusOK (): boolean {
     return this.loggedIn && this.state === SiteState.REACHABLE
@@ -58,22 +64,40 @@ export abstract class BaseSite {
   }
 
   syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
-    return new Promise(resolve => {
-      const worker = new this.WorkerClass()
-      this.startWorkerListener(worker, (error) => {
-        resolve(error)
-      }, () => {
-        resolve()
-      })
-      const data = new Map()
-      data.set('mangaId', mangaId)
-      data.set('chapterNum', chapterNum)
-      worker.postMessage(new SiteWorkerMessage(SiteRequestType.SYNC_CHAPTER, data, this))
-    })
+    console.info(`Sync not implemented, ${mangaId}: ${chapterNum}`)
+    return Promise.resolve()
+  }
+
+  protected getChapter (data: BaseData): string {
+    return data.chapter?.textContent?.trim() || 'Unknown'
+  }
+
+  protected getChapterUrl (data: BaseData): string {
+    return data.chapter?.getAttribute('href') || ''
+  }
+
+  protected getChapterNum (data: BaseData): number {
+    return parseNum(data.chapterNum?.textContent?.trim())
+  }
+
+  protected getChapterDate (data: BaseData): string {
+    return getDateFromNow(data.chapterDate?.textContent)
+  }
+
+  protected getImage (data: BaseData): string {
+    return data.image?.getAttribute('src') || ''
+  }
+
+  protected getTitle (data: BaseData): string {
+    return data.title?.textContent?.trim() || ''
+  }
+
+  protected static getUrl (siteType: SiteType | LinkingSiteType): string {
+    return `https://${siteType}`
   }
 
   getUrl (): string {
-    return BaseWorker.getUrl(this.siteType)
+    return BaseSite.getUrl(this.siteType)
   }
 
   getLoginUrl (): string {
@@ -81,44 +105,18 @@ export abstract class BaseSite {
   }
 
   readUrl (url: string): Promise<Error | Manga> {
-    return this.addToQueue(() => {
-      return new Promise(resolve => {
-        const worker = new this.WorkerClass()
-        this.startWorkerListener(worker, (error) => {
-          resolve(error)
-        }, (data) => {
-          if (typeof data === 'object') {
-            resolve(Manga.clone(data as Manga))
-          } else {
-            resolve(Error('Unknown response received'))
-          }
-        })
-        const data = new Map()
-        data.set('url', url)
-        worker.postMessage(new SiteWorkerMessage(SiteRequestType.READ_URL, data, this))
-      })
-    })
+    return this.addToQueue(() => this.readUrlImpl(url))
   }
 
+  protected abstract readUrlImpl (url: string): Promise<Error | Manga>
+
   search (query: string): Promise<Error | Manga[]> {
-    return this.addToQueue(async () => {
-      return new Promise(resolve => {
-        const worker = new this.WorkerClass()
-        this.startWorkerListener(worker, (error) => {
-          resolve(error)
-        }, (data) => {
-          if (Array.isArray(data)) {
-            resolve(data.map((item) => Manga.clone(item)))
-          } else {
-            resolve(Error('Unknown response received'))
-          }
-        })
-        const data = new Map()
-        data.set('query', query)
-        worker.postMessage(new SiteWorkerMessage(SiteRequestType.SEARCH, data, this))
-      })
-    })
+    return this.addToQueue(() => this.searchImpl(query))
   }
+
+  protected abstract searchImpl (query: string): Promise<Error | Manga[]>
+
+  abstract getTestUrl(): string
 
   compare (b: BaseSite): number {
     if (this.state === SiteState.INVALID && b.state !== SiteState.INVALID) {
@@ -159,46 +157,18 @@ export abstract class BaseSite {
     })
   }
 
-  private startWorkerListener (
-    worker: Worker,
-    onError: (error: Error) => void,
-    onData: (data: unknown) => void
-  ) {
-    worker.onmessage = (event) => {
-      const message = event.data as BaseWorkerMessage
-      if (!(message.type.toUpperCase() in RequestType)) {
-        if (message.data.has(RequestData.ERROR)) {
-          onError(message.data.get(RequestData.ERROR) as Error)
-          return
-        }
+  protected buildManga (data: BaseData): Manga {
+    const manga = new Manga(data.url, this.siteType)
+    manga.chapter = this.getChapter(data)
+    manga.chapterUrl = this.getChapterUrl(data)
+    manga.image = this.getImage(data)
+    manga.title = this.getTitle(data)
+    manga.chapterDate = this.getChapterDate(data)
+    manga.chapterNum = this.getChapterNum(data)
 
-        if (message.data.has(RequestData.DATA)) {
-          onData(message.data.get(RequestData.DATA))
-        }
-        return
-      }
-
-      switch (message.type) {
-        case RequestType.PLATFORM: {
-          worker.postMessage(this.handlePlatformMessage())
-          break
-        }
-        default:
-          break
-      }
+    if (manga.title === '') {
+      throw Error('Could not parse site')
     }
+    return manga
   }
-
-  private handlePlatformMessage (): BaseWorkerMessage {
-    const data = new Map()
-    const platform = getPlatform()
-
-    data.set(RequestData.DATA, platform)
-    return new BaseWorkerMessage(
-      RequestType.PLATFORM,
-      data
-    )
-  }
-
-  abstract getTestUrl(): string
 }

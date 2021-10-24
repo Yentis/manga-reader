@@ -18,9 +18,16 @@ if (!matchingItem) {
   delete window.module
 }
 
+let dropboxTokenCallback: ((event: IpcRendererEvent, token?: string) => void) | undefined
+
+ipcRenderer.on('dropbox-token', (event: IpcRendererEvent, token?: string) => {
+  if (!dropboxTokenCallback) return
+  dropboxTokenCallback(event, token)
+})
+
 contextBridge.exposeInMainWorld('mangaReader', {
   onDropboxToken: (callback: (event: IpcRendererEvent, token?: string) => void) => {
-    ipcRenderer.on('dropbox-token', callback)
+    dropboxTokenCallback = callback
   },
 
   openURL: (url: string) => {
@@ -28,17 +35,6 @@ contextBridge.exposeInMainWorld('mangaReader', {
   },
 
   sendRequest: (options: HttpRequest) => {
-    return new Promise((resolve, reject) => {
-      const key = Math.random()
-      ipcRenderer.on('net-response', (_event, resultKey, response) => {
-        if (resultKey !== key) return
-        resolve(response)
-      })
-      ipcRenderer.on('net-error', (_event, resultKey, error) => {
-        if (resultKey !== key) return
-        reject(error)
-      })
-      ipcRenderer.send('net', key, options)
-    })
+    return ipcRenderer.invoke('net-request', options)
   }
 })

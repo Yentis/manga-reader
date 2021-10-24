@@ -1,6 +1,8 @@
 <template>
   <q-page class="q-ma-sm">
-    <MangaHeader />
+    <MangaHeader
+      v-model:refresh-progress="refreshProgress"
+    />
 
     <q-linear-progress
       v-if="refreshing"
@@ -13,31 +15,33 @@
 
     <div class="manga-container q-mt-sm full-width">
       <q-intersection
-        v-for="manga in filteredMangaList"
-        :key="manga.url"
+        v-for="url in mangaUrls"
+        :key="url"
         class="q-mb-xs full-width manga-item"
       >
-        <MangaItem :url="manga.url" />
+        <MangaItem
+          :url="url"
+          @image-load-failed="offerRefresh"
+        />
       </q-intersection>
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, onMounted } from 'vue'
-import moment from 'moment'
-import { SiteType } from 'src/enums/siteEnum'
-import MangaHeader from 'src/components/Header.vue'
-import MangaItem from 'src/components/manga-item/MangaItem.vue'
-import useMangaList from 'src/composables/useMangaList'
-import useSettings from 'src/composables/useSettings'
-import useSearchValue from 'src/composables/useSearchValue'
-import useRefreshing from 'src/composables/useRefreshing'
-import useRefreshProgress from 'src/composables/useRefreshProgress'
-import useInitialized from 'src/composables/useInitialized'
-import { useElectronAuth, useStaticAuth } from 'src/composables/useAuthCallback'
-import { useQuasar } from 'quasar'
-import { getSiteNameByUrl } from 'src/services/siteService'
+import { defineComponent, computed, ref } from 'vue'
+import MangaHeader from '../components/Header.vue'
+import MangaItem from '../components/manga-item/MangaItem.vue'
+import useSettings from '../composables/useSettings'
+import useSearchValue from '../composables/useSearchValue'
+import useRefreshing from '../composables/useRefreshing'
+import { getSiteNameByUrl } from '../utils/siteUtils'
+import { useAppInitialized, useCordovaInitialized, useElectronInitialized, useStaticInitialized } from '../composables/useInitialized'
+import { getPlatform } from '../services/platformService'
+import { Platform } from '../enums/platformEnum'
+import { useStore } from '../store'
+import { Manga } from '../classes/manga'
+import { mangaSort } from '../services/sortService'
 
 export default defineComponent({
   components: {
@@ -46,24 +50,27 @@ export default defineComponent({
   },
 
   setup () {
-    const $q = useQuasar()
-    const { mangaList } = useMangaList()
+    useAppInitialized()
+
+    const $store = useStore()
     const { settings } = useSettings()
     const { searchValue } = useSearchValue()
-    const { refreshing } = useRefreshing()
-    const { refreshProgress } = useRefreshProgress()
-    const { main: mainInitialized, clearInitialized } = useInitialized()
+    const refreshProgress = ref(0)
+    const { refreshing, offerRefresh } = useRefreshing(refreshProgress)
 
-    const filteredMangaList = computed(() => {
-      return mangaList.value.filter(manga => {
-        if (!settings.value.filters.includes(manga.status)) return false
+    const mangaMap = computed(() => $store.state.reader.mangaMap)
+    const mangaUrls = computed(() => {
+      const matchedManga: Manga[] = []
+
+      mangaMap.value.forEach((manga) => {
+        if (!settings.value.filters.includes(manga.status)) return
 
         const searchWords = searchValue.value.split(' ')
         let title = true
         let notes = true
         let site = true
 
-        return searchWords.every((word) => {
+        const containsWords = searchWords.every((word) => {
           const lowerCaseWord = word.toLowerCase()
 
           if (!manga.title.toLowerCase().includes(lowerCaseWord)) {
@@ -81,42 +88,33 @@ export default defineComponent({
 
           return title || notes || site
         })
+        if (!containsWords) return
+
+        matchedManga.push(manga)
       })
+
+      return matchedManga.sort((a, b) => {
+        return mangaSort(a, b, $store.state.reader.settings.sortedBy)
+      }).map((manga) => manga.url)
     })
 
-    if ($q.platform.is.cordova) {
-      onMounted(() => {
-        window.cookieMaster.setCookieValue(
-          `.${SiteType.Webtoons}`,
-          'pagGDPR',
-          'true',
-          () => undefined,
-          (error) => console.error(error)
-        )
-        window.cookieMaster.setCookieValue(
-          `.${SiteType.Webtoons}`,
-          'timezoneOffset',
-          (moment().utcOffset() / 60).toString(),
-          () => undefined,
-          (error) => console.error(error)
-        )
-
-        document.addEventListener('resume', () => {
-          if (!mainInitialized.value) return
-          clearInitialized()
-        })
-      })
-    } else if ($q.platform.is.electron) {
-      useElectronAuth()
-    } else {
-      useStaticAuth()
+    switch (getPlatform()) {
+      case Platform.Cordova:
+        useCordovaInitialized()
+        break
+      case Platform.Electron:
+        useElectronInitialized()
+        break
+      case Platform.Static:
+        useStaticInitialized()
+        break
     }
 
     return {
-      mangaList,
-      filteredMangaList,
+      mangaUrls,
       refreshing,
-      refreshProgress
+      refreshProgress,
+      offerRefresh
     }
   }
 })

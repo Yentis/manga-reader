@@ -1,8 +1,10 @@
 import { Manga } from 'src/classes/manga'
-import { SortType } from 'src/enums/sortingEnum'
+import { SimpleSortType, SortType } from 'src/enums/sortingEnum'
 import { Status } from 'src/enums/statusEnum'
 
-export function mangaSort (a: Manga, b: Manga, sortedBy: SortType): number {
+export function mangaSort (a: Manga | undefined, b: Manga, sortedBy: SortType | SimpleSortType): number {
+  if (!a) return 1
+
   if ((a.status !== Status.READING || undefined) && (b.status === Status.READING || undefined)) {
     return 1
   }
@@ -31,25 +33,32 @@ export function mangaSort (a: Manga, b: Manga, sortedBy: SortType): number {
     return -1
   }
 
-  const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
-  const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
+  if (a.status === Status.READING && b.status === Status.READING) {
+    const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
+    const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
 
-  if (!isARead && isBRead) {
-    return -1
-  }
-  if (!isBRead && isARead) {
-    return 1
+    if (!isARead && isBRead) {
+      return -1
+    }
+    if (!isBRead && isARead) {
+      return 1
+    }
   }
 
   switch (sortedBy) {
     case SortType.SITE:
+    case SimpleSortType.SITE:
       return sortSite(a, b)
     case SortType.CURRENT:
       return sortCurrent(a, b)
     case SortType.DATE:
       return sortDate(a, b)
     case SortType.READ:
+    case SimpleSortType.READ:
       return sortRead(a, b)
+    case SortType.RATING:
+    case SimpleSortType.RATING:
+      return sortRating(a, b)
     default:
       return sortTitle(a, b)
   }
@@ -110,10 +119,16 @@ function sortDate (a: Manga, b: Manga) {
     return bDirection
   }
 
-  let amountA = parseInt(aDate.split(' ')[0])
+  let amountA: number
+  const aDateNum = aDate.split(' ')[0]
+  if (aDateNum) amountA = parseInt(aDateNum)
+  else amountA = 0
   if (isNaN(amountA)) amountA = 0
 
-  let amountB = parseInt(bDate.split(' ')[0])
+  let amountB: number
+  const bDateNum = bDate.split(' ')[0]
+  if (bDateNum) amountB = parseInt(bDateNum)
+  else amountB = 0
   if (isNaN(amountB)) amountB = 0
 
   return amountA > amountB ? bDirection : amountB > amountA ? aDirection : sortTitle(a, b)
@@ -124,6 +139,14 @@ function sortRead (a: Manga, b: Manga) {
     return a.readNum > b.readNum ? 1 : b.readNum > a.readNum ? -1 : sortTitle(a, b)
   } else if (a.read && b.read) {
     return a.read.toLowerCase() > b.read.toLowerCase() ? 1 : b.read.toLowerCase() > a.read.toLowerCase() ? -1 : sortTitle(a, b)
+  } else {
+    return sortTitle(a, b)
+  }
+}
+
+function sortRating (a: Manga, b: Manga) {
+  if (a.rating && b.rating) {
+    return a.rating > b.rating ? -1 : b.rating > a.rating ? 1 : sortTitle(a, b)
   } else {
     return sortTitle(a, b)
   }

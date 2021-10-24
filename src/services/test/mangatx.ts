@@ -1,21 +1,23 @@
 import { Manga } from 'src/classes/manga'
-import { WordPressWorker } from 'src/classes/sites/wordpress/wordpressWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.MangaTx
-const TEST_URL = WordPressWorker.getTestUrl(SITE_TYPE)
 const QUERY = 'grandest wedding'
 
 export async function testMangaTx (): Promise<void> {
-  await readUrl()
-  await search()
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  await readUrl(site)
+  await search(site)
 }
 
-async function readUrl (): Promise<void> {
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+async function readUrl (site: BaseSite): Promise<void> {
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 169 [End]'
   desired.image = 'https://mangatx.com/wp-content/uploads/2019/10/85012-193x278.png'
   desired.title = 'Grandest Wedding'
@@ -25,9 +27,9 @@ async function readUrl (): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://mangatx.com/wp-content/uploads/2019/10/85012-193x278.png'
   desired.chapter = 'Chapter 169 [End]'
   desired.url = 'https://mangatx.com/manga/grandest-wedding/'

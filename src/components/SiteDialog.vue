@@ -76,12 +76,12 @@
 <script lang="ts">
 import { useDialogPluginComponent } from 'quasar'
 import { defineComponent } from 'vue'
-import { SiteState } from 'src/enums/siteEnum'
-import useSiteList from 'src/composables/useSiteList'
-import useSiteListVisible from 'src/composables/useSiteListVisible'
-import useUrlNavigation from 'src/composables/useUrlNavigation'
-import { useSearchResults } from 'src/composables/useSearchResults'
-import { getSiteNameByUrl } from 'src/services/siteService'
+import { SiteState } from '../enums/siteEnum'
+import useSiteList from '../composables/useSiteList'
+import useSiteListVisible from '../composables/useSiteListVisible'
+import useUrlNavigation from '../composables/useUrlNavigation'
+import { useSearchResults } from '../composables/useSearchResults'
+import { getSiteNameByUrl } from '../utils/siteUtils'
 
 export default defineComponent({
   props: {

@@ -1,12 +1,14 @@
 import { useStore } from '../store/index'
 import { computed, onMounted, watch } from 'vue'
+import useSharing from './useSharing'
 import { getChangelog } from '../services/updateService'
 import { LocalStorage, useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
-import { version } from '../../package.json'
-import useUpdate from './useUpdate'
-import useSharing from './useSharing'
 import constants from 'src/classes/constants'
+import { version } from '../../package.json'
+import { useElectronAuth, useStaticAuth } from './useAuthCallback'
+import { hasExtension } from 'src/classes/requests/browserRequest'
+import useUpdate from './useUpdate'
 
 export default function useInitialized () {
   const $store = useStore()
@@ -63,4 +65,46 @@ export function useAppInitialized () {
 
   onMounted(checkInitialize)
   watch(main, checkInitialize)
+}
+
+export function useCordovaInitialized () {
+  const { main, clearInitialized } = useInitialized()
+
+  onMounted(() => {
+    document.addEventListener('resume', () => {
+      if (!main.value) return
+      clearInitialized()
+    })
+  })
+}
+
+export function useElectronInitialized () {
+  useElectronAuth()
+}
+
+export function useStaticInitialized () {
+  const $q = useQuasar()
+
+  useStaticAuth()
+  hasExtension().then((hasExtension) => {
+    if (hasExtension) return
+
+    $q.dialog({
+      component: ConfirmationDialog,
+      componentProps: {
+        title: 'Extension required',
+        content: `To use this page it is required you download the Manga Reader chrome extension
+        
+        After downloading:
+        Open the extensions page
+        Enable developer mode
+        Extract the downloaded extension and select it with "Load unpacked"
+        
+        `,
+        link: 'https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FYentis%2Fmanga-reader%2Ftree%2Fmaster%2Fsrc-extension',
+        linkText: 'Download here',
+        hideCancel: true
+      }
+    })
+  }).catch((error) => console.error(error))
 }

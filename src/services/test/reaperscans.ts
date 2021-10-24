@@ -1,21 +1,23 @@
 import { Manga } from 'src/classes/manga'
-import { WordPressWorker } from 'src/classes/sites/wordpress/wordpressWorker'
+import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import { getMangaInfo, searchManga } from '../siteService'
+import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.ReaperScans
-const TEST_URL = WordPressWorker.getTestUrl(SITE_TYPE)
 const QUERY = 'aire'
 
 export async function testReaperScans (): Promise<void> {
-  await readUrl()
-  await search()
+  const site = getSite(SITE_TYPE)
+  if (!site) throw Error('Site not found')
+
+  await readUrl(site)
+  await search(site)
 }
 
-async function readUrl (): Promise<void> {
-  const manga = await getMangaInfo(TEST_URL, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+async function readUrl (site: BaseSite): Promise<void> {
+  const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 43'
   desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/AnyConv.com__AIRE.webp'
   desired.title = 'Aire'
@@ -25,9 +27,9 @@ async function readUrl (): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (): Promise<void> {
+async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
-  const desired = new Manga(TEST_URL, SITE_TYPE)
+  const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/AnyConv.com__AIRE-193x278.webp'
   desired.chapter = 'Chapter 43'
   desired.url = 'https://reaperscans.com/series/aire/'

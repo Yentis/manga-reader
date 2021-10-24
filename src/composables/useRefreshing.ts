@@ -2,29 +2,25 @@ import { useStore } from 'src/store/index'
 import { computed, ref } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { RefreshOptions } from 'src/classes/refreshOptions'
-import useRefreshProgress from './useRefreshProgress'
 import useMangaList from './useMangaList'
 import { Status } from 'src/enums/statusEnum'
-import { getMangaInfo, getSiteNameByUrl } from 'src/services/siteService'
+import { getMangaInfo } from 'src/services/siteService'
 import useNotification from 'src/composables/useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import useUrlNavigation from 'src/composables/useUrlNavigation'
 import { UrlNavigation } from 'src/classes/urlNavigation'
 import usePushNotification from 'src/composables/usePushNotification'
+import { getSiteNameByUrl } from 'src/utils/siteUtils'
+import { Manga } from 'src/classes/manga'
+import ChromeWindow from 'src/interfaces/chromeWindow'
 
-export default function useRefreshing () {
+const chromeWindow = (window as unknown) as ChromeWindow
+
+export default function useRefreshing (refreshProgress: Ref<number>) {
   const autoRefreshing = ref(false)
-  const { refreshProgress, incrementRefreshProgress } = useRefreshProgress()
   const {
-    mangaList,
     storeManga,
-    sortMangaList,
-    updateMangaChapter,
-    updateMangaChapterNum,
-    updateMangaChapterUrl,
-    updateMangaChapterDate,
-    updateMangaImage,
-    updateMangaTitle
+    updateManga
   } = useMangaList()
   const { notification } = useNotification()
   const { urlNavigation } = useUrlNavigation()
@@ -41,12 +37,21 @@ export default function useRefreshing () {
     refreshProgress.value = 0.01
     refreshing.value = true
 
-    const filteredMangaList = mangaList.value.filter(manga => {
+    const filteredMangaList: Manga[] = []
+
+    $store.state.reader.mangaMap.forEach((manga) => {
       // Force refresh will check all manga that don't get updated with a regular refresh
-      if (!forceRefresh) return manga.status === Status.READING || manga.shouldUpdate
-      else return manga.status !== Status.READING && !manga.shouldUpdate
+      if (!forceRefresh) {
+        if (manga.status !== Status.READING && !manga.shouldUpdate) return
+        filteredMangaList.push(manga)
+        return
+      }
+
+      if (manga.status === Status.READING || manga.shouldUpdate) return
+      filteredMangaList.push(manga)
     })
-    const promises = filteredMangaList.map(manga => {
+
+    const promises = filteredMangaList.map((manga) => {
       const promise = getMangaInfo(manga.url, manga.site, manga.altSources).then((result) => {
         if (result instanceof Error) {
           const notifyOptions = new NotifyOptions(`${getSiteNameByUrl(manga.site) || 'Unknown site'} | ${result.message}`, `Failed to refresh ${manga.title}`)
@@ -59,22 +64,31 @@ export default function useRefreshing () {
           }]
 
           notification.value = notifyOptions
-        } else {
-          if (autoRefreshing.value && manga.chapter !== result.chapter) {
-            sendPushNotification(result)
-          }
 
-          updateMangaTitle(manga.url, result.title)
-          updateMangaChapter(manga.url, result.chapter)
-          updateMangaChapterUrl(manga.url, result.chapterUrl)
-          updateMangaChapterNum(manga.url, result.chapterNum)
-          updateMangaChapterDate(manga.url, result.chapterDate)
-          updateMangaImage(manga.url, result.image)
-
-          sortMangaList()
+          refreshProgress.value += step
+          return Promise.resolve()
         }
 
-        incrementRefreshProgress(step)
+        if (autoRefreshing.value && manga.chapter !== result.chapter) {
+          sendPushNotification(result)
+        }
+
+        const newManga = Object.assign({}, manga, {
+          title: result.title,
+          chapter: result.chapter,
+          chapterUrl: result.chapterUrl,
+          chapterNum: result.chapterNum,
+          chapterDate: result.chapterDate,
+          image: result.image
+        })
+        refreshProgress.value += step
+
+        return new Promise<void>((resolve) => {
+          chromeWindow.requestIdleCallback(() => {
+            updateManga(manga.url, newManga)
+            resolve()
+          })
+        })
       })
 
       return promise

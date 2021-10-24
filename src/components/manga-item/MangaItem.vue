@@ -21,7 +21,7 @@
           class="manga-image q-my-sm q-ml-xs q-mr-sm"
           fit="scale-down"
           :src="mangaImage"
-          @error="offerRefresh"
+          @error="onImageLoadFailed"
         >
           <template #error>
             <q-icon
@@ -207,7 +207,7 @@
                     class="q-ma-none q-pa-none"
                     height="1rem"
                     width="1rem"
-                    :src="'https://' + site + '/favicon.ico'"
+                    :src="`https://icons.duckduckgo.com/ip2/${site}.ico`"
                   >
                     <template #error>
                       <q-icon
@@ -378,16 +378,15 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
-import { Status, StatusIcon } from 'src/enums/statusEnum'
-import useMobileView from 'src/composables/useMobileView'
-import useUrlNavigation from 'src/composables/useUrlNavigation'
-import { useMangaItem } from 'src/composables/useManga'
-import useProgressLinking from 'src/composables/useProgressLinking'
-import useAltSources from 'src/composables/useAltSources'
-import useMangaList from 'src/composables/useMangaList'
-import { isMangaRead } from 'src/services/sortService'
-import useRefreshing from 'src/composables/useRefreshing'
-import { getSiteNameByUrl } from 'src/services/siteService'
+import { Status, StatusIcon } from '../../enums/statusEnum'
+import useMobileView from '../../composables/useMobileView'
+import useUrlNavigation from '../../composables/useUrlNavigation'
+import { useMangaItem } from '../../composables/useManga'
+import useProgressLinking from '../../composables/useProgressLinking'
+import useAltSources from '../../composables/useAltSources'
+import useMangaList from '../../composables/useMangaList'
+import { isMangaRead } from '../../services/sortService'
+import { getSiteNameByUrl } from '../../utils/siteUtils'
 
 export default defineComponent({
   name: 'MangaItem',
@@ -399,13 +398,18 @@ export default defineComponent({
     }
   },
 
-  setup (props) {
+  emits: ['imageLoadFailed'],
+
+  setup (props, context) {
     const manga = useMangaItem(props.url)
     const { mobileView } = useMobileView()
-    const { openLinkingDialog } = useProgressLinking(props.url, manga.newLinkedSites)
-    const { openAltSourceDialog } = useAltSources(props.url, manga.newSources)
+    const { openLinkingDialog } = useProgressLinking(manga.title, manga.linkedSites, manga.newLinkedSites)
+    const { openAltSourceDialog } = useAltSources(manga.altSources, manga.title, manga.newSources)
     const { showUpdateMangaDialog } = useMangaList()
-    const { offerRefresh } = useRefreshing()
+
+    const onImageLoadFailed = () => {
+      context.emit('imageLoadFailed')
+    }
 
     const itemSize = computed(() => {
       return mobileView.value ? 'sm' : 'md'
@@ -463,7 +467,7 @@ export default defineComponent({
       mobileView,
       itemSize,
       navigate,
-      offerRefresh,
+      onImageLoadFailed,
       getSiteNameByUrl,
 
       hasLinkedSites,

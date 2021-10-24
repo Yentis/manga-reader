@@ -11,12 +11,13 @@ import useAltSources from './useAltSources'
 import { getMangaInfoByUrl } from 'src/services/siteService'
 import useNotification from './useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
+import { useStore } from 'src/store'
 
 export default function useManga (curUrl: string) {
+  const $store = useStore()
   const { notification } = useNotification()
 
   const {
-    mangaList,
     updateManga,
     updateMangaAltSources,
     updateMangaRead,
@@ -28,9 +29,8 @@ export default function useManga (curUrl: string) {
     updateMangaRating,
     updateMangaShouldUpdate
   } = useMangaList()
-
   const manga = computed(() => {
-    return mangaList.value.find(manga => manga.url === curUrl) || new Manga(curUrl, SiteType.ArangScans)
+    return $store.state.reader.mangaMap.get(curUrl) || new Manga(curUrl, SiteType.ArangScans)
   })
 
   const url = computed({
@@ -41,7 +41,7 @@ export default function useManga (curUrl: string) {
         notification.value = new NotifyOptions(result, 'Failed to update URL')
         return
       }
-      const curManga = Manga.clone(manga.value)
+      const curManga = Object.assign({}, manga.value)
       const newManga = Manga.inherit(curManga, result)
 
       updateManga(curUrl, newManga)
@@ -50,7 +50,7 @@ export default function useManga (curUrl: string) {
   })
 
   const altSources = computed({
-    get: () => manga.value.altSources,
+    get: () => manga.value.altSources || {},
     set: (val) => { updateMangaAltSources(curUrl, val) }
   })
 
@@ -141,10 +141,10 @@ export function useMangaItem (url: string) {
   const newLinkedSites: Ref<Record<string, number> | undefined> = ref()
   const newSources: Ref<Record<string, string> | undefined> = ref()
 
-  const { removeManga, storeManga } = useMangaList()
-  const { syncSites, saveLinkedSites } = useProgressLinking(url, newLinkedSites)
-  const { saveSources } = useAltSources(url, newSources)
   const manga = useManga(url)
+  const { removeManga, storeManga } = useMangaList()
+  const { syncSites, saveLinkedSites } = useProgressLinking(manga.title, manga.linkedSites, newLinkedSites)
+  const { saveSources } = useAltSources(manga.altSources, manga.title, newSources)
 
   const deleteManga = async () => {
     const confirmed = await manga.showDeleteMangaDialog()

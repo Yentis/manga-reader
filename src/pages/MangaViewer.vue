@@ -26,7 +26,7 @@
         <q-btn
           flat
           icon="close"
-          to="/"
+          :to="isStatic ? '/mangareader' : ''"
         />
       </q-card-actions>
     </q-card>
@@ -78,6 +78,8 @@ import useNotification from '../composables/useNotification'
 import { NotifyOptions } from '../classes/notifyOptions'
 import useWindowSize from '../composables/useWindowSize'
 import { useQuasar } from 'quasar'
+import { getPlatform } from '../services/platformService'
+import { Platform } from '../enums/platformEnum'
 
 export default defineComponent({
   name: 'PageMangaViewer',
@@ -115,10 +117,11 @@ export default defineComponent({
       }
 
       const targetChapter = chapters.findIndex((chapter) => chapter.id === imageData.id)
-      chapterIndex.value = Math.min(0, targetChapter)
+      chapterIndex.value = Math.max(0, targetChapter)
     }
 
-    const onChapterSelected = (chapter: ChapterData) => {
+    const onChapterSelected = (chapter: ChapterData | undefined) => {
+      if (!chapter) return
       window.scrollTo(0, 0)
 
       $q.loading.show({
@@ -147,14 +150,21 @@ export default defineComponent({
       return onChapterSelected(chapterList.value[chapterIndex.value - 1])
     }
 
-    onMounted(() => {
+    const startInit = () => {
       init().catch((error) => {
-        notification.value = new NotifyOptions(error)
-        console.error(error)
+        const notifyOptions = new NotifyOptions(error, 'Failed to load chapter')
+        notifyOptions.actions = [{
+          label: 'Retry',
+          handler: () => { startInit() },
+          color: 'white'
+        }]
+        notification.value = notifyOptions
       }).finally(() => {
         $q.loading.hide()
       })
-    })
+    }
+
+    onMounted(startInit)
 
     return {
       imageHeight,
@@ -163,7 +173,8 @@ export default defineComponent({
       chapterIndex,
       onChapterSelected,
       onPrevious,
-      onNext
+      onNext,
+      isStatic: getPlatform() === Platform.Static
     }
   }
 })

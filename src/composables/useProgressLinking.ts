@@ -2,17 +2,20 @@ import { useQuasar } from 'quasar'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { SiteType } from 'src/enums/siteEnum'
-import { getSite, getSiteNameByUrl } from 'src/services/siteService'
+import { getSite } from 'src/services/siteService'
 import { useStore } from 'src/store'
 import useNotification from './useNotification'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import LinkingDialog from '../components/LinkingDialog.vue'
-import useManga from './useManga'
 import { BaseSite } from 'src/classes/sites/baseSite'
+import { getSiteNameByUrl } from 'src/utils/siteUtils'
 
-export default function useProgressLinking (url: string, newLinkedSites: Ref<Record<string, number> | undefined>) {
+export default function useProgressLinking (
+  title: Ref<string>,
+  linkedSites: Ref<Record<string, number>>,
+  newLinkedSites: Ref<Record<string, number> | undefined>
+) {
   const { notification } = useNotification()
-  const { title, linkedSites } = useManga(url)
 
   const $q = useQuasar()
   const $store = useStore()
@@ -76,9 +79,10 @@ export default function useProgressLinking (url: string, newLinkedSites: Ref<Rec
     Object.keys(linkedSites.value).forEach(key => {
       const siteType = key as SiteType | LinkingSiteType
       const site = getSite(siteType)
+      const mangaId = linkedSites.value[siteType]
 
-      if (site) {
-        syncSite(site, linkedSites.value[siteType], chapterNum)
+      if (site && mangaId) {
+        syncSite(site, mangaId, chapterNum)
       }
     })
   }

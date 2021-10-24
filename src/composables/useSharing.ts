@@ -1,16 +1,16 @@
 import { createList, getNotifyOptions, updateList } from '../services/rentryService'
-import useMangaList from './useMangaList'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
 import { ref } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
+import { useStore } from 'src/store'
 
 export default function useSharing () {
   const $q = useQuasar()
+  const $store = useStore()
   const { urlNavigation } = useUrlNavigation()
-  const { mangaList } = useMangaList()
   const { notification } = useNotification()
 
   const getRentryNotifyOptions = (error: unknown) => {
@@ -18,7 +18,7 @@ export default function useSharing () {
   }
 
   const updateShareList = () => {
-    updateList(JSON.stringify(mangaList.value))
+    updateList(JSON.stringify(Array.from($store.state.reader.mangaMap.values())))
       .catch(error => {
         notification.value = getRentryNotifyOptions(error)
         console.error(error)
@@ -48,7 +48,7 @@ export default function useSharing () {
         }
       }).onOk(async () => {
         try {
-          const shareId = await createList(JSON.stringify(mangaList.value))
+          const shareId = await createList(JSON.stringify(Array.from($store.state.reader.mangaMap)))
           resolve(shareId)
 
           return

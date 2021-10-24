@@ -2,13 +2,13 @@ import { LocalStorage } from 'quasar'
 import constants from 'src/classes/constants'
 import { RefreshOptions } from 'src/classes/refreshOptions'
 import { Settings } from 'src/classes/settings'
-import { MangaDexWorker } from 'src/classes/sites/mangadex/mangadexWorker'
+import { MangaDex } from 'src/classes/sites/mangadex'
 import { SiteType } from 'src/enums/siteEnum'
 import { Status } from 'src/enums/statusEnum'
 import { version } from '../../package.json'
+import { requestHandler } from './requestService'
 
 const OPEN_BROWSER_KEY = 'open_browser'
-const DARK_MODE_KEY = 'dark_mode'
 const REFRESH_OPTIONS_KEY = 'refresh_options'
 
 interface MigrationManga {
@@ -38,17 +38,11 @@ export function tryMigrateSettings () {
   if (getMigrationVersion() === version) return
   const settings: Settings = LocalStorage.getItem(constants.SETTINGS) || new Settings()
   const openInBrowser: boolean | null = LocalStorage.getItem(OPEN_BROWSER_KEY)
-  const darkMode: boolean | null = LocalStorage.getItem(DARK_MODE_KEY)
   const refreshOptions: RefreshOptions | null = LocalStorage.getItem(REFRESH_OPTIONS_KEY)
 
   if (openInBrowser !== null) {
     settings.openInBrowser = openInBrowser
     LocalStorage.remove(OPEN_BROWSER_KEY)
-  }
-
-  if (darkMode !== null) {
-    settings.darkMode = darkMode
-    LocalStorage.remove(DARK_MODE_KEY)
   }
 
   if (refreshOptions !== null) {
@@ -89,9 +83,10 @@ async function doMigration (mangaList: MigrationManga[]) {
     }
 
     if (item.site === SiteType.MangaDex) {
-      const split = item.url.replace(`${MangaDexWorker.url}/title/`, '').split('/')
-      if (split.length !== 0 && split[0].length < 10) {
-        const id = split[0]
+      const split = item.url.replace(`${MangaDex.getUrl()}/title/`, '').split('/')
+      const id = split[0]
+
+      if (id && id.length < 10) {
         legacyMangaDexManga.push({ index, id: parseInt(id) })
       }
     }
@@ -100,12 +95,15 @@ async function doMigration (mangaList: MigrationManga[]) {
   if (legacyMangaDexManga.length === 0) return mangaList
 
   try {
-    const newMangaDexIdMap = await MangaDexWorker.convertLegacyIds(legacyMangaDexManga.map((item) => item.id))
+    const newMangaDexIdMap = await MangaDex.convertLegacyIds(legacyMangaDexManga.map((item) => item.id), requestHandler)
     legacyMangaDexManga.forEach((item) => {
       const newId = newMangaDexIdMap[item.id]
       if (!newId) return
 
-      mangaList[item.index].url = `${MangaDexWorker.url}/title/${newId}`
+      const manga = mangaList[item.index]
+      if (!manga) return
+
+      manga.url = `${MangaDex.getUrl()}/title/${newId}`
     })
   } catch (error) {
     console.error(error)

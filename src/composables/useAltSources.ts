@@ -1,11 +1,13 @@
 import { useQuasar } from 'quasar'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import AltSourceDialog from '../components/AltSourceDialog.vue'
-import useManga from './useManga'
 
-export default function useAltSources (url: string, newSources: Ref<Record<string, string> | undefined>) {
+export default function useAltSources (
+  altSources: Ref<Record<string, string>>,
+  title: Ref<string>,
+  newSources: Ref<Record<string, string> | undefined>
+) {
   const $q = useQuasar()
-  const { altSources, title } = useManga(url)
 
   const openAltSourceDialog = () => {
     $q.dialog({

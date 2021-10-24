@@ -6,6 +6,7 @@ import moment from 'moment'
 import path from 'path'
 import fs from 'fs'
 import HttpRequest from 'src/interfaces/httpRequest'
+import HttpResponse from 'src/interfaces/httpResponse'
 
 try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
@@ -154,12 +155,33 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('net', (_event, key: number, options: HttpRequest) => {
-  app.whenReady().then(() => {
-    const request = net.request({
-      method: options.method,
-      url: options.url
-    })
+ipcMain.handle('net-request', async (
+  _event,
+  options: HttpRequest
+): Promise<HttpResponse> => {
+  await app.whenReady()
+
+  const cookie = (await session.defaultSession.cookies.get({
+    url: options.url,
+    name: 'cf_clearance'
+  }))[0]
+
+  if (cookie) {
+    if (options.headers?.cookie) {
+      options.headers.cookie += `;${cookie.name}=${cookie.value}`
+    } else {
+      options.headers = options.headers || {}
+      options.headers.cookie = `${cookie.name}=${cookie.value}`
+    }
+  }
+
+  const request = net.request({
+    method: options.method,
+    url: options.url
+  })
+
+  return new Promise((resolve, reject) => {
+    let answered = false
 
     request.on('response', (response) => {
       let data = ''
@@ -169,20 +191,29 @@ ipcMain.on('net', (_event, key: number, options: HttpRequest) => {
       })
 
       response.on('end', () => {
-        mainWindow?.webContents.send('net-response', key, {
+        if (answered) return
+
+        const result: HttpResponse = {
           headers: response.headers,
-          data
-        })
+          data,
+          status: response.statusCode,
+          statusText: response.statusMessage
+        }
+
+        answered = true
+        resolve(result)
       })
     })
 
     request.on('error', (error) => {
-      mainWindow?.webContents.send('net-error', key, error)
+      if (answered) return
+      answered = true
+      reject(error)
     })
 
     const headers = options.headers || {}
-    Object.keys(headers).forEach((header) => {
-      request.setHeader(header, headers[header])
+    Object.entries(headers).forEach(([key, value]) => {
+      request.setHeader(key, value)
     })
 
     if (options.data) {
@@ -190,7 +221,5 @@ ipcMain.on('net', (_event, key: number, options: HttpRequest) => {
     }
 
     request.end()
-  }).catch((error) => {
-    mainWindow?.webContents.send('net-error', key, error)
   })
 })
