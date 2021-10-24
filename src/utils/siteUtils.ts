@@ -9,9 +9,9 @@ const siteAliases = [
   { url: '1stkissmanga.com', site: SiteType.FirstKissManga }
 ]
 
-const chromeWindow = (window as unknown) as ChromeWindow
-
 export function parseHtmlFromString (html: string, parser?: DOMParser): Promise<Document> {
+  const chromeWindow = (window as unknown) as ChromeWindow
+
   return new Promise((resolve) => {
     chromeWindow.requestIdleCallback(() => {
       resolve((parser || new DOMParser()).parseFromString(html, 'text/html'))

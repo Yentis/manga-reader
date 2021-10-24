@@ -14,8 +14,6 @@ import { getSiteNameByUrl } from 'src/utils/siteUtils'
 import { Manga } from 'src/classes/manga'
 import ChromeWindow from 'src/interfaces/chromeWindow'
 
-const chromeWindow = (window as unknown) as ChromeWindow
-
 export default function useRefreshing (refreshProgress: Ref<number>) {
   const autoRefreshing = ref(false)
   const {
@@ -84,6 +82,8 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
         refreshProgress.value += step
 
         return new Promise<void>((resolve) => {
+          const chromeWindow = (window as unknown) as ChromeWindow
+
           chromeWindow.requestIdleCallback(() => {
             updateManga(manga.url, newManga)
             resolve()
