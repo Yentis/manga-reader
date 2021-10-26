@@ -66,7 +66,7 @@ export class Manganelo extends BaseSite {
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/getstorysearchjson`,
-      data: `{"searchword": "${query}"}`,
+      data: JSON.stringify({ searchword: query }),
       headers: { 'Content-Type': ContentType.URLENCODED }
     }
     const response = await requestHandler.sendRequest(request)

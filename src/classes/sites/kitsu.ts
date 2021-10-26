@@ -181,10 +181,16 @@ export class Kitsu extends BaseSite {
   }
 
   async doLogin (data: { username: string, password: string }): Promise<Error | LoginResponse> {
+    const requestData = {
+      grant_type: 'password',
+      username: data.username,
+      password: data.password
+    }
+
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/api/oauth/token`,
-      data: `{"grant_type": "password", "username": "${data.username}", "password": "${data.password}"}`,
+      data: JSON.stringify(requestData),
       headers: { 'Content-Type': ContentType.JSON }
     }
     const response = await requestHandler.sendRequest(request)
@@ -205,18 +211,20 @@ export class Kitsu extends BaseSite {
       return
     }
 
+    const data = {
+      data: {
+        attributes: {
+          progress: chapterNum
+        },
+        id: mangaId.toString(),
+        type: 'library-entries'
+      }
+    }
+
     const request: HttpRequest = {
       method: 'PATCH',
       url: `${this.getUrl()}/api/edge/library-entries/${mangaId}`,
-      data: `{
-        "data": {
-          "attributes": {
-            "progress": ${chapterNum}
-          },
-          "id": "${mangaId.toString()}",
-          "type": "library-entries"
-        }
-      }`,
+      data: JSON.stringify(data),
       headers: {
         Authorization: `Bearer ${this.token}`,
         'Content-Type': ContentType.VND_API_JSON

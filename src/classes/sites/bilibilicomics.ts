@@ -108,7 +108,7 @@ export class BiliBiliComics extends BaseSite {
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/twirp/comic.v1.Comic/ComicDetail?${queryString}`,
-      data: `{"comic_id":${comicId}}`,
+      data: JSON.stringify({ comic_id: comicId }),
       headers: { 'Content-Type': ContentType.JSON }
     }
     const response = await requestHandler.sendRequest(request)
@@ -125,10 +125,19 @@ export class BiliBiliComics extends BaseSite {
       platform: 'web'
     })
 
+    const data = {
+      style_id: -1,
+      area_id: -1,
+      is_free: -1,
+      key_word: query,
+      page_num: 1,
+      page_size: 20
+    }
+
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/twirp/comic.v1.Comic/Search?${queryString}`,
-      data: `{"style_id": -1, "area_id": -1, "is_free": -1, "key_word": "${query}", "page_num": 1, "page_size": 20}`,
+      data: JSON.stringify(data),
       headers: { 'Content-Type': ContentType.JSON }
     }
     const response = await requestHandler.sendRequest(request)

@@ -87,7 +87,7 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
           chromeWindow.requestIdleCallback(() => {
             updateManga(manga.url, newManga)
             resolve()
-          })
+          }, { timeout: 2000 })
         })
       })
 

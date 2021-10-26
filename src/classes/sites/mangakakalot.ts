@@ -66,7 +66,7 @@ export class Mangakakalot extends BaseSite {
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/home_json_search`,
-      data: `{"searchword": "${query}"}`,
+      data: JSON.stringify({ searchword: query }),
       headers: { 'Content-Type': ContentType.URLENCODED }
     }
     const response = await requestHandler.sendRequest(request)

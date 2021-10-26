@@ -15,7 +15,7 @@ export function parseHtmlFromString (html: string, parser?: DOMParser): Promise<
   return new Promise((resolve) => {
     chromeWindow.requestIdleCallback(() => {
       resolve((parser || new DOMParser()).parseFromString(html, 'text/html'))
-    })
+    }, { timeout: 1000 })
   })
 }
 

@@ -193,11 +193,16 @@ export class WordPress extends BaseSite {
     const parser = new DOMParser()
     let doc: Document
 
+    const requestData = {
+      action: 'manga_get_chapters',
+      manga: mangaId
+    }
+
     try {
       const request: HttpRequest = {
         method: 'POST',
         url: chapterPath,
-        data: `{"action": "manga_get_chapters", "manga": "${mangaId}"}`,
+        data: JSON.stringify(requestData),
         headers: { 'Content-Type': ContentType.URLENCODED }
       }
       const response = await requestHandler.sendRequest(request)
