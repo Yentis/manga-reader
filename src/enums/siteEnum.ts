@@ -6,7 +6,6 @@ export enum SiteType {
     Mangakakalot = 'mangakakalot.com',
     MangaDex = 'mangadex.org',
     MangaKomi = 'mangakomi.com',
-    MethodScans = 'methodscans.com',
     LeviatanScans = 'leviatanscans.com',
     HiperDEX = 'hiperdex.com',
     ReaperScans = 'reaperscans.com',
@@ -23,7 +22,8 @@ export enum SiteType {
     FlameScans = 'flamescans.org',
     ResetScans = 'reset-scans.com',
     CatManga = 'catmanga.org',
-    BiliBiliComics = 'bilibilicomics.com'
+    BiliBiliComics = 'bilibilicomics.com',
+    AlphaScans = 'alpha-scans.org'
 }
 
 export enum SiteName {
@@ -34,7 +34,6 @@ export enum SiteName {
     'mangakakalot.com' = 'Mangakakalot',
     'mangadex.org' = 'MangaDex',
     'mangakomi.com' = 'Manga Komi',
-    'methodscans.com' = 'Method Scans',
     'leviatanscans.com' = 'Leviatan Scans',
     'hiperdex.com' = 'HiperDEX',
     'reaperscans.com' = 'Reaper Scans',
@@ -52,7 +51,8 @@ export enum SiteName {
     'flamescans.org' = 'Flame Scans',
     'reset-scans.com' = 'Reset Scans',
     'catmanga.org' = 'CatManga',
-    'bilibilicomics.com' = 'BiliBili Comics'
+    'bilibilicomics.com' = 'BiliBili Comics',
+    'alpha-scans.org' = 'Alpha Scans'
 }
 
 export enum SiteState {

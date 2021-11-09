@@ -67,7 +67,6 @@ import { testMangaKomi } from '../services/test/mangakomi'
 import { testManganelo } from '../services/test/manganelo'
 import { testMangaTx } from '../services/test/mangatx'
 import { testManhwaClub } from '../services/test/manhwaclub'
-import { testMethodScans } from '../services/test/methodscans'
 import { testReaperScans } from '../services/test/reaperscans'
 import { testSleepingKnightScans } from '../services/test/sleepingknightscans'
 import { testWebtoons } from '../services/test/webtoons'
@@ -79,6 +78,7 @@ import { testResetScans } from '../services/test/resetscans'
 import { testCatManga } from '../services/test/catmanga'
 import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
+import { testAlphaScans } from '../services/test/alphascans'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -129,6 +129,9 @@ export default defineComponent({
 
     const testSite = async () => {
       switch (selectedSite.value) {
+        case SiteType.AlphaScans:
+          await doTest(testAlphaScans)
+          break
         case SiteType.ArangScans:
           await doTest(testArangScans)
           break
@@ -188,9 +191,6 @@ export default defineComponent({
           break
         case SiteType.ManhwaClub:
           await doTest(testManhwaClub)
-          break
-        case SiteType.MethodScans:
-          await doTest(testMethodScans)
           break
         case SiteType.ReaperScans:
           await doTest(testReaperScans)

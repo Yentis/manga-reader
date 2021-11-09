@@ -58,14 +58,7 @@ export class AsuraScans extends BaseSite {
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
-    const response = await requestHandler.sendRequest(request, true)
-
-    if (response.headers['cf-edge-cache']?.includes('platform=wordpress') !== true) {
-      return Error('Found possible DDoS protection, visit the site manually and try again')
-    }
-    if (response.status >= 400) {
-      return Error(`Status Code ${response.status} ${response.statusText}`.trim())
-    }
+    const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
     const chapterItem = doc.querySelectorAll('#chapterlist li')[0]
@@ -95,14 +88,7 @@ export class AsuraScans extends BaseSite {
       headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
       data
     }
-    const response = await requestHandler.sendRequest(request, true)
-
-    if (response.headers['cf-edge-cache']?.includes('platform=wordpress') !== true) {
-      return Error('Found possible DDoS protection, visit the site manually and try again')
-    }
-    if (response.status >= 400) {
-      return Error(`Status Code ${response.status} ${response.statusText}`.trim())
-    }
+    const response = await requestHandler.sendRequest(request)
 
     const searchData = JSON.parse(response.data) as AsuraScansSearch
     if (!searchData.series) {
@@ -142,6 +128,8 @@ export class AsuraScans extends BaseSite {
         return `${this.getUrl()}/manga/tougen-anki/`
       case SiteType.FlameScans:
         return `${this.getUrl()}/series/you-the-one-and-only-and-the-seven-billion-grim-reapers/`
+      case SiteType.AlphaScans:
+        return `${this.getUrl()}/manga/lab-mice-game/`
     }
 
     return this.getUrl()

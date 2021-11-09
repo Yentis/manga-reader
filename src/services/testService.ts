@@ -21,7 +21,6 @@ import { testMangaKomi } from './test/mangakomi'
 import { testManganelo } from './test/manganelo'
 import { testMangaTx } from './test/mangatx'
 import { testManhwaClub } from './test/manhwaclub'
-import { testMethodScans } from './test/methodscans'
 import { testReaperScans } from './test/reaperscans'
 import { testResetScans } from './test/resetscans'
 import { testSleepingKnightScans } from './test/sleepingknightscans'
@@ -29,6 +28,7 @@ import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 import { testBiliBiliComics } from './test/bilibilicomics'
 import { testKitsu } from './test/kitsu'
+import { testAlphaScans } from './test/alphascans'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -36,6 +36,9 @@ export default async function testAll (
   const promises: Promise<void>[] = []
   const errors: { site: SiteType | LinkingSiteType, error: unknown }[] = []
 
+  promises.push(testAlphaScans().catch((error) => {
+    errors.push({ site: SiteType.AlphaScans, error: error })
+  }))
   promises.push(testArangScans().catch((error) => {
     errors.push({ site: SiteType.ArangScans, error: error })
   }))
@@ -95,9 +98,6 @@ export default async function testAll (
   }))
   promises.push(testManhwaClub().catch((error) => {
     errors.push({ site: SiteType.ManhwaClub, error: error })
-  }))
-  promises.push(testMethodScans().catch((error) => {
-    errors.push({ site: SiteType.MethodScans, error: error })
   }))
   promises.push(testReaperScans().catch((error) => {
     errors.push({ site: SiteType.ReaperScans, error: error })

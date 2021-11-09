@@ -92,8 +92,8 @@ export function useStaticInitialized () {
     $q.dialog({
       component: ConfirmationDialog,
       componentProps: {
-        title: 'Extension required',
-        content: `To use this page it is required you download the Manga Reader chrome extension
+        title: 'Extension missing or outdated',
+        content: `To use this page it is required you download the latest Manga Reader chrome extension version
         
         After downloading:
         Open the extensions page

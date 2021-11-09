@@ -155,25 +155,25 @@ app.on('activate', () => {
   }
 })
 
+const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
+
 ipcMain.handle('net-request', async (
   _event,
   options: HttpRequest
 ): Promise<HttpResponse> => {
   await app.whenReady()
+  const headers = options.headers || {}
 
-  const cookie = (await session.defaultSession.cookies.get({
-    url: options.url,
-    name: 'cf_clearance'
-  }))[0]
-
-  if (cookie) {
-    if (options.headers?.cookie) {
-      options.headers.cookie += `;${cookie.name}=${cookie.value}`
-    } else {
-      options.headers = options.headers || {}
-      options.headers.cookie = `${cookie.name}=${cookie.value}`
+  const cookies = await session.defaultSession.cookies.get({ url: options.url })
+  cookies.filter((cookie) => COOKIE_NAMES.includes(cookie.name)).forEach((cookie) => {
+    if (!cookie) return
+    if (!headers.cookie) {
+      headers.cookie = `${cookie.name}=${cookie.value}`
+      return
     }
-  }
+
+    headers.cookie += `;${cookie.name}=${cookie.value}`
+  })
 
   const request = net.request({
     method: options.method,
@@ -211,7 +211,6 @@ ipcMain.handle('net-request', async (
       reject(error)
     })
 
-    const headers = options.headers || {}
     Object.entries(headers).forEach(([key, value]) => {
       request.setHeader(key, value)
     })

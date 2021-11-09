@@ -39,6 +39,8 @@ interface CordovaHttp {
   }
 }
 
+const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
+
 export default class CordovaRequest extends BaseRequest {
   constructor () {
     super()
@@ -48,25 +50,30 @@ export default class CordovaRequest extends BaseRequest {
 
   async sendRequest (request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     const localCordova = (cordova as unknown) as CordovaHttp
-    request.headers = request.headers || {}
+    const headers = request.headers || {}
 
-    if (request.headers['Content-Type'] === ContentType.URLENCODED) {
+    if (headers['Content-Type'] === ContentType.URLENCODED) {
       request.data = this.convertToUrlEncoded(request.data)
     }
 
     const cookieString = await new Promise<string | null>((resolve, reject) => {
       localCordova.plugins.CookiesPlugin.getCookie(request.url, resolve, reject)
     })
-    const cookie = getCookies(cookieString || '').cf_clearance
+    const cookies = getCookies(cookieString || '')
 
-    if (cookie) {
-      if (request.headers.cookie) {
-        request.headers.cookie += `;cf_clearance=${cookie}`
-      } else {
-        request.headers.cookie = `cf_clearance=${cookie}`
+    COOKIE_NAMES.map((name) => {
+      return { name, value: cookies[name] }
+    }).forEach((cookie) => {
+      if (!cookie.value) return
+      if (!headers.cookie) {
+        headers.cookie = `${cookie.name}=${cookie.value}`
+        return
       }
-    }
 
+      headers.cookie += `;${cookie.name}=${cookie.value}`
+    })
+
+    request.headers = headers
     const response = await new Promise<HttpResponse>((resolve) => {
       const onResponse = (response: CordovaHttpResponse) => {
         resolve({

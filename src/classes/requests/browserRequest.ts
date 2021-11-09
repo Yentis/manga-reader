@@ -9,7 +9,7 @@ interface Runtime {
   sendMessage: (
     extensionId: string,
     message: HttpRequest | string,
-    responseCallback: (response?: HttpResponse | Error) => void
+    responseCallback: (response?: HttpResponse | Error | string) => void
   ) => void,
   lastError?: { message: string }
 }
@@ -34,7 +34,7 @@ export async function hasExtension (): Promise<boolean> {
         return
       }
 
-      resolve(response !== undefined)
+      resolve(response === '1.1')
     })
   })
 }
@@ -65,6 +65,11 @@ export default class BrowserRequest extends BaseRequest {
 
           if (response instanceof Error) {
             reject(response)
+            return
+          }
+
+          if (typeof response === 'string') {
+            reject(Error(`Invalid response received: ${response}`))
             return
           }
 

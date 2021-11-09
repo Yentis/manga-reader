@@ -80,31 +80,21 @@ export class Genkan extends BaseSite {
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
     const queryString = qs.stringify({ query })
-    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/comics?${queryString}` }
+    const url = this.siteType === SiteType.LynxScans ? '/web/comics' : '/comics'
+    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}${url}?${queryString}` }
+
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
     const promises: Promise<Error | Manga>[] = []
 
-    if (this.siteType === SiteType.MethodScans) {
-      doc.querySelectorAll('.list-item.rounded').forEach((elem) => {
-        const titleElem = elem.querySelectorAll('.list-body a')[0]
-        const title = titleElem?.innerHTML || ''
-        const url = titleElem?.getAttribute('href') || ''
+    doc.querySelectorAll('.list-item.rounded').forEach((elem) => {
+      const url = elem.querySelectorAll('.media-content')[0]?.getAttribute('href') || ''
+      const title = elem.querySelectorAll('.list-body a')[0]?.innerHTML || ''
 
-        if (titleContainsQuery(query, title) && url) {
-          promises.push(this.readUrl(url))
-        }
-      })
-    } else {
-      doc.querySelectorAll('.list-item.rounded').forEach((elem) => {
-        const url = elem.querySelectorAll('.media-content')[0]?.getAttribute('href') || ''
-        const title = elem.querySelectorAll('.list-body a')[0]?.innerHTML || ''
-
-        if (titleContainsQuery(query, title) && url) {
-          promises.push(this.readUrl(url))
-        }
-      })
-    }
+      if (titleContainsQuery(query, title) && url) {
+        promises.push(this.readUrl(url))
+      }
+    })
 
     const mangaList = await Promise.all(promises)
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]
@@ -114,12 +104,10 @@ export class Genkan extends BaseSite {
     switch (this.siteType) {
       case SiteType.HatigarmScans:
         return `${this.getUrl()}/comics/848996-ichizu-de-bitch-na-kouhai`
-      case SiteType.MethodScans:
-        return `${this.getUrl()}/comics/773532-meng-shi-zai-shang`
       case SiteType.ZeroScans:
         return `${this.getUrl()}/comics/136750-all-heavenly-days`
       case SiteType.LynxScans:
-        return `${this.getUrl()}/comics/698439-dawn-of-the-eastland`
+        return `${this.getUrl()}/web/comics/698439-dawn-of-the-eastland`
     }
 
     return this.getUrl()

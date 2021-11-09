@@ -139,17 +139,20 @@ function sortRead (a: Manga, b: Manga) {
     return a.readNum > b.readNum ? 1 : b.readNum > a.readNum ? -1 : sortTitle(a, b)
   } else if (a.read && b.read) {
     return a.read.toLowerCase() > b.read.toLowerCase() ? 1 : b.read.toLowerCase() > a.read.toLowerCase() ? -1 : sortTitle(a, b)
+  } else if (a.read) {
+    return -1
+  } else if (b.read) {
+    return 1
   } else {
     return sortTitle(a, b)
   }
 }
 
 function sortRating (a: Manga, b: Manga) {
-  if (a.rating && b.rating) {
-    return a.rating > b.rating ? -1 : b.rating > a.rating ? 1 : sortTitle(a, b)
-  } else {
-    return sortTitle(a, b)
-  }
+  const aRating = a.rating || 0
+  const bRating = b.rating || 0
+
+  return aRating > bRating ? -1 : bRating > aRating ? 1 : sortTitle(a, b)
 }
 
 function sortTitle (a: Manga, b: Manga) {

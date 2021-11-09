@@ -1,8 +1,6 @@
 import { createList, getNotifyOptions, updateList } from '../services/rentryService'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
-import { ref } from 'vue'
-import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { useQuasar } from 'quasar'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
 import { useStore } from 'src/store'
@@ -25,15 +23,15 @@ export default function useSharing () {
       })
   }
 
-  const shareSyncInterval: Ref<ReturnType<typeof setInterval> | undefined> = ref()
+  let shareSyncInterval: ReturnType<typeof setInterval> | undefined
   const startShareSyncInterval = () => {
-    if (shareSyncInterval.value !== undefined) {
-      clearInterval(shareSyncInterval.value)
-      shareSyncInterval.value = undefined
+    if (shareSyncInterval !== undefined) {
+      clearInterval(shareSyncInterval)
+      shareSyncInterval = undefined
     }
 
     updateShareList()
-    shareSyncInterval.value = setInterval(() => {
+    shareSyncInterval = setInterval(() => {
       updateShareList()
     }, 5 * 60 * 1000)
   }

@@ -26,7 +26,7 @@
             v-if="!isStatic"
             label="Dark mode"
             :model-value="settings.darkMode"
-            @update:model-value="toggleDarkMode"
+            @update:model-value="onToggleDarkMode"
           />
           <q-toggle
             v-model="newSettings.refreshOptions.enabled"
@@ -162,6 +162,11 @@ export default defineComponent({
         })
     }
 
+    const onToggleDarkMode = () => {
+      toggleDarkMode()
+      newSettings.value.darkMode = settings.value.darkMode
+    }
+
     return {
       dialogRef,
       onDialogHide,
@@ -179,7 +184,7 @@ export default defineComponent({
       navigate,
       onShareList,
       onCopyToClipboard,
-      toggleDarkMode,
+      onToggleDarkMode,
       isStatic: getPlatform() === Platform.Static
     }
   }

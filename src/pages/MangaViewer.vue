@@ -26,7 +26,7 @@
         <q-btn
           flat
           icon="close"
-          :to="isStatic ? '/mangareader' : ''"
+          :to="isStatic ? '/mangareader' : '/'"
         />
       </q-card-actions>
     </q-card>
