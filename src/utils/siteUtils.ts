@@ -1,13 +1,18 @@
 import moment from 'moment'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
-import { SiteName, SiteType } from 'src/enums/siteEnum'
+import { Guya, SiteName, SiteType } from 'src/enums/siteEnum'
 import ChromeWindow from 'src/interfaces/chromeWindow'
 
-const siteAliases = [
+export const siteAliases = [
   { url: 'manganato.com', site: SiteType.Manganelo },
   { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
-  { url: '1stkissmanga.com', site: SiteType.FirstKissManga }
+  { url: '1stkissmanga.com', site: SiteType.FirstKissManga },
+  { url: Guya, site: SiteType.Cubari }
 ]
+
+export function getUrl (url: string) {
+  return `https://${url}`
+}
 
 export function parseHtmlFromString (html: string, parser?: DOMParser): Promise<Document> {
   const chromeWindow = (window as unknown) as ChromeWindow

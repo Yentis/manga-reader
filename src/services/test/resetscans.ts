@@ -18,8 +18,8 @@ export async function testResetScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 04'
-  desired.image = 'https://reset-scans.com/wp-content/uploads/2021/04/truth-weaver-cover-193x278.png'
+  desired.chapter = 'Chapter 4'
+  desired.image = 'https://reset-scans.com/wp-content/uploads/2021/04/truth-weaver-cover.png'
   desired.title = 'Madou no Keifu'
   desired.chapterUrl = 'https://reset-scans.com/manga/madou-no-keifu/chapter-04/'
   desired.chapterNum = 4

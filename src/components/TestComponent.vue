@@ -75,10 +75,10 @@ import { testFlameScans } from '../services/test/flamescans'
 import { useQuasar } from 'quasar'
 import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
-import { testCatManga } from '../services/test/catmanga'
 import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
 import { testAlphaScans } from '../services/test/alphascans'
+import { testCubari } from '../services/test/cubari'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -144,8 +144,8 @@ export default defineComponent({
         case SiteType.BiliBiliComics:
           await doTest(testBiliBiliComics)
           break
-        case SiteType.CatManga:
-          await doTest(testCatManga)
+        case SiteType.Cubari:
+          await doTest(testCubari)
           break
         case SiteType.FirstKissManga:
           await doTest(testFirstKissManga)

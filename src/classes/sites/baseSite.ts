@@ -5,7 +5,7 @@ import { SiteState, SiteType } from '../../enums/siteEnum'
 import PQueue from 'p-queue'
 import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
-import { getDateFromNow, getSiteNameByUrl, parseNum } from 'src/utils/siteUtils'
+import * as SiteUtils from 'src/utils/siteUtils'
 
 export class BaseData {
   url: string
@@ -77,11 +77,11 @@ export abstract class BaseSite {
   }
 
   protected getChapterNum (data: BaseData): number {
-    return parseNum(data.chapterNum?.textContent?.trim())
+    return SiteUtils.parseNum(data.chapterNum?.textContent?.trim())
   }
 
   protected getChapterDate (data: BaseData): string {
-    return getDateFromNow(data.chapterDate?.textContent)
+    return SiteUtils.getDateFromNow(data.chapterDate?.textContent)
   }
 
   protected getImage (data: BaseData): string {
@@ -93,7 +93,7 @@ export abstract class BaseSite {
   }
 
   protected static getUrl (siteType: SiteType | LinkingSiteType): string {
-    return `https://${siteType}`
+    return SiteUtils.getUrl(siteType)
   }
 
   getUrl (): string {
@@ -132,8 +132,8 @@ export abstract class BaseSite {
     } else if (b.state === SiteState.OFFLINE && this.state !== SiteState.OFFLINE) {
       return 1
     } else {
-      const siteName = getSiteNameByUrl(this.siteType)
-      const siteNameB = getSiteNameByUrl(b.siteType)
+      const siteName = SiteUtils.getSiteNameByUrl(this.siteType)
+      const siteNameB = SiteUtils.getSiteNameByUrl(b.siteType)
 
       if (siteName === undefined && siteNameB === undefined) return 0
       if (siteNameB === undefined) return -1

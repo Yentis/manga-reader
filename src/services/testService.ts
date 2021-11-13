@@ -6,7 +6,6 @@ import { getMangaInfoByUrl } from './siteService'
 import { testArangScans } from './test/arangscans'
 import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
-import { testCatManga } from './test/catmanga'
 import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
 import { testGenkanio } from './test/genkanio'
@@ -29,6 +28,7 @@ import { testZeroScans } from './test/zeroscans'
 import { testBiliBiliComics } from './test/bilibilicomics'
 import { testKitsu } from './test/kitsu'
 import { testAlphaScans } from './test/alphascans'
+import { testCubari } from './test/cubari'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -51,8 +51,8 @@ export default async function testAll (
   promises.push(testBiliBiliComics().catch((error) => {
     errors.push({ site: SiteType.BiliBiliComics, error: error })
   }))
-  promises.push(testCatManga().catch((error) => {
-    errors.push({ site: SiteType.CatManga, error: error })
+  promises.push(testCubari().catch((error) => {
+    errors.push({ site: SiteType.Cubari, error: error })
   }))
   promises.push(testFirstKissManga().catch((error) => {
     errors.push({ site: SiteType.FirstKissManga, error: error })

@@ -1,3 +1,5 @@
+export const Guya = 'guya.moe'
+
 export enum SiteType {
     Manganelo = 'manganelo.com',
     Webtoons = 'webtoons.com',
@@ -21,9 +23,9 @@ export enum SiteType {
     Genkan = 'genkan.io',
     FlameScans = 'flamescans.org',
     ResetScans = 'reset-scans.com',
-    CatManga = 'catmanga.org',
     BiliBiliComics = 'bilibilicomics.com',
-    AlphaScans = 'alpha-scans.org'
+    AlphaScans = 'alpha-scans.org',
+    Cubari = 'cubari.moe'
 }
 
 export enum SiteName {
@@ -50,9 +52,9 @@ export enum SiteName {
     'genkan.io' = 'Genkan',
     'flamescans.org' = 'Flame Scans',
     'reset-scans.com' = 'Reset Scans',
-    'catmanga.org' = 'CatManga',
     'bilibilicomics.com' = 'BiliBili Comics',
-    'alpha-scans.org' = 'Alpha Scans'
+    'alpha-scans.org' = 'Alpha Scans',
+    'cubari.moe' = 'Cubari / Guya'
 }
 
 export enum SiteState {

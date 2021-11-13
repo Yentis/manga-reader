@@ -47,11 +47,11 @@ import PQueue from 'p-queue'
 import {
   ArangScans
 } from '../classes/sites/arangscans'
-import { CatManga } from 'src/classes/sites/catmanga'
 import constants from 'src/classes/constants'
 import { ManhwaClub } from 'src/classes/sites/manhwaclub'
 import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
 import { getSiteByUrl } from 'src/utils/siteUtils'
+import { Cubari } from 'src/classes/sites/cubari'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -78,9 +78,9 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
-  [SiteType.CatManga, new CatManga()],
   [SiteType.BiliBiliComics, new BiliBiliComics()],
-  [SiteType.AlphaScans, new AsuraScans(SiteType.AlphaScans)]
+  [SiteType.AlphaScans, new AsuraScans(SiteType.AlphaScans)],
+  [SiteType.Cubari, new Cubari()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

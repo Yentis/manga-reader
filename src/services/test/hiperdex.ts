@@ -31,11 +31,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrl2 (): Promise<void> {
   const manga = await getMangaInfo('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   const desired = new Manga('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
-  desired.chapter = '96'
+  desired.chapter = '98'
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/06/Touch-On-193x278.jpg'
   desired.title = 'Touch On'
-  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-1808/96/'
-  desired.chapterNum = 96
+  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/98/'
+  desired.chapterNum = 98
 
   mangaEqual(manga, desired)
 }

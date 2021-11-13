@@ -21,7 +21,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Volume 2 Chapter 5'
   desired.image = 'https://lynxscans.com/storage/comics/8D05F5079B603C1A9CC73689B5EC57670EA64A56782F1850/haF3HtsXzE4ZebquDIeTvGvLZ82sUKOBmKMLWVUf.png'
   desired.title = 'Dawn of the Eastland'
-  desired.chapterUrl = 'https://lynxscans.com/Web/comics/698439-dawn-of-the-eastland/2/5'
+  desired.chapterUrl = 'https://lynxscans.com/web/comics/698439-dawn-of-the-eastland/2/5'
   desired.chapterNum = 70
 
   mangaEqual(manga, desired)
