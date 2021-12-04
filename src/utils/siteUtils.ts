@@ -25,7 +25,7 @@ export function parseHtmlFromString (html: string, parser?: DOMParser): Promise<
 }
 
 export function titleContainsQuery (query: string, title?: string): boolean {
-  if (!title) return false
+  if (title === undefined) return false
 
   query = query.replace('’', '\'')
   title = title.replace('’', '\'')
@@ -35,7 +35,9 @@ export function titleContainsQuery (query: string, title?: string): boolean {
 }
 
 export function parseNum (elem?: string | null): number {
-  const parsedInt = parseFloat(elem || '0')
+  if (typeof elem !== 'string') return 0
+  const parsedInt = parseFloat(elem)
+
   if (isNaN(parsedInt)) {
     return 0
   } else {
@@ -48,11 +50,11 @@ export function getDateFromNow (input?: string | null): string {
   const chapterDate = input?.trim().split(' ') || []
   let amount = -1
 
-  if (chapterDate[0]) {
+  if (chapterDate[0] !== undefined) {
     amount = parseInt(chapterDate[0]) || -1
   }
 
-  if (amount !== -1 && chapterDate[1]) {
+  if (amount !== -1 && chapterDate[1] !== undefined) {
     const durationUnit = chapterDate[1]
     if (durationUnit.startsWith('sec')) {
       date.subtract(amount, 'second')

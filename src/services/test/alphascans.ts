@@ -30,7 +30,7 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://content.alpha-scans.org//2021/06/1623391710-9847-i336634.png'
+  desired.image = 'https://i3.wp.com/alpha-scans.org/wp-content/uploads/2021/06/1623391710-9847-i336634.png?h=80'
   desired.chapter = '4'
   desired.url = 'https://alpha-scans.org/manga/how-to-disguise-as-a-failure/'
 

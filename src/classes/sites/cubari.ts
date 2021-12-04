@@ -26,8 +26,10 @@ export class Cubari extends BaseSite {
   }
 
   protected getChapterDate (data: BaseData): string {
-    const chapterDateText = data.chapterDate?.textContent
-    const chapterDate = moment(chapterDateText, 'YYYY-MM-DD')
+    const chapterDateText = data.chapterDate?.textContent?.replace('[', '').replace(']', '')
+    const chapterDate = moment(chapterDateText, 'YYYY, M, D, H, m, s')
+    // month is 0-based for cubari
+    chapterDate.add(1, 'month')
 
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()

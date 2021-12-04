@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { Manga } from '../classes/manga'
 import { tryMigrateMangaList } from '../services/migrationService'
 import { LocalStorage, useQuasar } from 'quasar'
+import { DialogChainObject } from 'quasar/dist/types'
 import { Status } from 'src/enums/statusEnum'
 import SearchDialog from '../components/SearchDialog.vue'
 import SiteDialog from '../components/SiteDialog.vue'
@@ -105,7 +106,7 @@ export default function useMangaList () {
         resolve(null)
       })
 
-      const siteDialog = $q.dialog({
+      const siteDialog: DialogChainObject | undefined = $q.dialog({
         component: SiteDialog
       })
     })

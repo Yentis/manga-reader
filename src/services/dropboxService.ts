@@ -22,16 +22,14 @@ export interface ReadListResponse {
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024
 const CLIENT_ID = 'uoywjq0b8q2208f'
 
-let accessToken: string = LocalStorage.getItem(constants.DROPBOX_TOKEN) || ''
-
 export function getAccessToken (): string {
+  const accessToken = LocalStorage.getItem(constants.DROPBOX_TOKEN)
+  if (typeof accessToken !== 'string') return ''
   return accessToken
 }
 
 export function setAccessToken (token: string | undefined) {
-  if (!token) return
-
-  accessToken = token
+  if (token === undefined) return
   LocalStorage.set(constants.DROPBOX_TOKEN, token)
 }
 
@@ -47,6 +45,7 @@ export async function getAuthUrl (): Promise<string> {
 }
 
 export function saveList (mangaList: Manga[]): Promise<void> {
+  const accessToken = getAccessToken()
   if (!accessToken) return Promise.reject(Error('No access token'))
 
   return new Promise((resolve, reject) => {
@@ -100,6 +99,7 @@ export function saveList (mangaList: Manga[]): Promise<void> {
 }
 
 export async function readList (): Promise<ReadListResponse> {
+  const accessToken = getAccessToken()
   if (!accessToken) throw Error('No access token')
   const downloadPromises: Promise<DropboxResponse<files.FileMetadata>>[] = []
 

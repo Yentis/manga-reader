@@ -81,7 +81,7 @@ export default function useProgressLinking (
       const site = getSite(siteType)
       const mangaId = linkedSites.value[siteType]
 
-      if (site && mangaId) {
+      if (site && mangaId !== undefined) {
         syncSite(site, mangaId, chapterNum)
       }
     })

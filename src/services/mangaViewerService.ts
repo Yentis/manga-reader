@@ -36,7 +36,7 @@ export async function getImagesFromData (type: string, data: string): Promise<Im
   if (!data) return null
 
   const bilibiliComicsData = JSON.parse(data) as BiliBiliComicsQueryData
-  if (!bilibiliComicsData.chapter) return { id: -1, images: [] }
+  if (bilibiliComicsData.chapter === undefined) return { id: -1, images: [] }
 
   const queryString = qs.stringify({
     device: 'pc',
@@ -74,7 +74,7 @@ export async function getChaptersFromData (type: string, data: string): Promise<
   if (!data) return []
 
   const bilibiliComicsData = JSON.parse(data) as BiliBiliComicsQueryData
-  if (!bilibiliComicsData.id) return []
+  if (bilibiliComicsData.id === undefined) return []
 
   const queryString = qs.stringify({
     device: 'pc',

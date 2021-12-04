@@ -58,7 +58,6 @@ const mangaDex = new MangaDex()
 const siteMap = new Map<string, BaseSite>([
   [SiteType.Manganelo, new Manganelo()],
   [SiteType.Webtoons, new Webtoons()],
-  [SiteType.HatigarmScans, new Genkan(SiteType.HatigarmScans)],
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
   [SiteType.Mangakakalot, new Mangakakalot()],
   [SiteType.MangaDex, mangaDex],
@@ -80,7 +79,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
   [SiteType.BiliBiliComics, new BiliBiliComics()],
   [SiteType.AlphaScans, new AsuraScans(SiteType.AlphaScans)],
-  [SiteType.Cubari, new Cubari()]
+  [SiteType.Cubari, new Cubari()],
+  [SiteType.LuminousScans, new AsuraScans(SiteType.LuminousScans)]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

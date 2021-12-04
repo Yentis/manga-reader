@@ -77,12 +77,12 @@ export default defineComponent({
             title = false
           }
 
-          if (!manga.notes?.toLowerCase().includes(lowerCaseWord)) {
+          if (manga.notes?.toLowerCase().includes(lowerCaseWord) !== true) {
             notes = false
           }
 
           const siteName = getSiteNameByUrl(manga.site)
-          if (!siteName?.toLowerCase().includes(lowerCaseWord)) {
+          if (siteName?.toLowerCase().includes(lowerCaseWord) !== true) {
             site = false
           }
 

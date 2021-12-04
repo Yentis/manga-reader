@@ -56,7 +56,6 @@ import { testAsuraScans } from '../services/test/asurascans'
 import { testBatoto } from '../services/test/batoto'
 import { testFirstKissManga } from '../services/test/firstkissmanga'
 import { testGenkanio } from '../services/test/genkanio'
-import { testHatigarmScans } from '../services/test/hatigarmscans'
 import { testHiperDEX } from '../services/test/hiperdex'
 import { testLeviatanScans } from '../services/test/leviatanscans'
 import { testLynxScans } from '../services/test/lynxscans'
@@ -79,6 +78,7 @@ import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
 import { testAlphaScans } from '../services/test/alphascans'
 import { testCubari } from '../services/test/cubari'
+import { testLuminousScans } from 'src/services/test/luminousscans'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -156,9 +156,6 @@ export default defineComponent({
         case SiteType.Genkan:
           await doTest(testGenkanio)
           break
-        case SiteType.HatigarmScans:
-          await doTest(testHatigarmScans)
-          break
         case SiteType.HiperDEX:
           await doTest(testHiperDEX)
           break
@@ -167,6 +164,9 @@ export default defineComponent({
           break
         case SiteType.LeviatanScans:
           await doTest(testLeviatanScans)
+          break
+        case SiteType.LuminousScans:
+          await doTest(testLuminousScans)
           break
         case SiteType.LynxScans:
           await doTest(testLynxScans)

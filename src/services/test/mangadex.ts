@@ -46,8 +46,13 @@ async function convertLegacyIds (): Promise<void> {
   const convertedIds = await MangaDex.convertLegacyIds(ids, requestHandler)
 
   ids.forEach((id, index) => {
-    if (convertedIds[id] !== mappingIds[index]) {
-      throw Error(`ID ${id} did not match required mapping ${mappingIds[index] || ''}, was: ${convertedIds[id] || ''}`)
-    }
+    const convertedId = convertedIds[id]
+    const mappingId = mappingIds[index]
+    if (convertedId === mappingId) return
+
+    throw Error(
+      `ID ${id} did not match required mapping ${mappingId !== undefined ? mappingId : ''}
+      was: ${convertedId !== undefined ? convertedId : ''}`
+    )
   })
 }

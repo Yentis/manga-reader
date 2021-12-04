@@ -9,7 +9,6 @@ import { testBatoto } from './test/batoto'
 import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
 import { testGenkanio } from './test/genkanio'
-import { testHatigarmScans } from './test/hatigarmscans'
 import { testHiperDEX } from './test/hiperdex'
 import { testLeviatanScans } from './test/leviatanscans'
 import { testLynxScans } from './test/lynxscans'
@@ -29,6 +28,7 @@ import { testBiliBiliComics } from './test/bilibilicomics'
 import { testKitsu } from './test/kitsu'
 import { testAlphaScans } from './test/alphascans'
 import { testCubari } from './test/cubari'
+import { testLuminousScans } from './test/luminousscans'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -63,9 +63,6 @@ export default async function testAll (
   promises.push(testGenkanio().catch((error) => {
     errors.push({ site: SiteType.Genkan, error: error })
   }))
-  promises.push(testHatigarmScans().catch((error) => {
-    errors.push({ site: SiteType.HatigarmScans, error: error })
-  }))
   promises.push(testHiperDEX().catch((error) => {
     errors.push({ site: SiteType.HiperDEX, error: error })
   }))
@@ -74,6 +71,9 @@ export default async function testAll (
   }))
   promises.push(testLeviatanScans().catch((error) => {
     errors.push({ site: SiteType.LeviatanScans, error: error })
+  }))
+  promises.push(testLuminousScans().catch((error) => {
+    errors.push({ site: SiteType.LuminousScans, error: error })
   }))
   promises.push(testLynxScans().catch((error) => {
     errors.push({ site: SiteType.LynxScans, error: error })

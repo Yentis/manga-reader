@@ -130,6 +130,8 @@ export class AsuraScans extends BaseSite {
         return `${this.getUrl()}/series/you-the-one-and-only-and-the-seven-billion-grim-reapers/`
       case SiteType.AlphaScans:
         return `${this.getUrl()}/manga/lab-mice-game/`
+      case SiteType.LuminousScans:
+        return `${this.getUrl()}/series/black-kanojo/`
     }
 
     return this.getUrl()

@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.HatigarmScans
-const QUERY = 'x epoch of dragon'
+const SITE_TYPE = SiteType.LuminousScans
+const QUERY = 'jubunnoichi no hanayome'
 
-export async function testHatigarmScans (): Promise<void> {
+export async function testLuminousScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,11 +18,11 @@ export async function testHatigarmScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 5'
-  desired.image = 'https://hatigarmscanz.net/storage/comics/0136EED9F0042F701F86C0B47B925F5255FC39FB87F336DB/bhK9esSCI5sZgJOO9dw5gcLNfwne47H69XOxQHs1.jpeg'
-  desired.title = 'Ichizu de Bitch na Kouhai'
-  desired.chapterUrl = 'https://hatigarmscanz.net/comics/848996-ichizu-de-bitch-na-kouhai/1/5'
-  desired.chapterNum = 5
+  desired.chapter = 'Chapter 20 : Hoshino\'s Answer'
+  desired.image = 'https://luminousscans.com/fypadsuh/2021/08/Black-Kanojo.jpg'
+  desired.title = 'Black Kanojo'
+  desired.chapterUrl = 'https://luminousscans.com/black-kanojo-chapter-20/'
+  desired.chapterNum = 20
 
   mangaEqual(manga, desired)
 }
@@ -30,9 +30,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://hatigarmscanz.net/storage/comics/E8D061825E549CFD9F2C762C6E15A4B393428101A8925D08/XIP9e5jwQQQo3IGjeDj0lbiIRE2t6HNRvRyikUTL.jpeg'
-  desired.chapter = 'The 1% Effort Punch'
-  desired.url = 'https://hatigarmscanz.net/comics/469569-x-epoch-of-dragon'
+  desired.image = 'https://luminousscans.com/fypadsuh/2021/09/001-16-212x300.jpg'
+  desired.chapter = '59.5'
+  desired.url = 'https://luminousscans.com/series/jubunnoichi-no-hanayome/'
 
   return searchValid(results, desired, QUERY)
 }

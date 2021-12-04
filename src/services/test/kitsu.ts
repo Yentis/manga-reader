@@ -32,9 +32,9 @@ async function testLogin (site: Kitsu) {
   if (loggedIn) throw Error('Check login should return false')
 
   const username = process.env.KITSU_TEST_USERNAME
-  if (!username) throw Error('Username environment variable not set')
+  if (username === undefined) throw Error('Username environment variable not set')
   const password = process.env.KITSU_TEST_PASSWORD
-  if (!password) throw Error('Password environment variable not set')
+  if (password === undefined) throw Error('Password environment variable not set')
 
   const loginResponse = await site.doLogin({
     username,
@@ -55,7 +55,7 @@ async function testUserId (site: Kitsu) {
   if (userId instanceof Error) throw userId
 
   const targetUserId = process.env.KITSU_TEST_USER_ID
-  if (!targetUserId) throw Error('User ID environment variable not set')
+  if (targetUserId === undefined) throw Error('User ID environment variable not set')
 
   if (userId !== targetUserId) throw Error(`User ID should be ${targetUserId} but was ${userId}`)
 }

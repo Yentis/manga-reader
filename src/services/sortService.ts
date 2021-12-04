@@ -5,10 +5,10 @@ import { Status } from 'src/enums/statusEnum'
 export function mangaSort (a: Manga | undefined, b: Manga, sortedBy: SortType | SimpleSortType): number {
   if (!a) return 1
 
-  if ((a.status !== Status.READING || undefined) && (b.status === Status.READING || undefined)) {
+  if ((a.status !== Status.READING) && (b.status === Status.READING)) {
     return 1
   }
-  if ((b.status !== Status.READING || undefined) && (a.status === Status.READING || undefined)) {
+  if ((b.status !== Status.READING) && (a.status === Status.READING)) {
     return -1
   }
 
@@ -121,13 +121,13 @@ function sortDate (a: Manga, b: Manga) {
 
   let amountA: number
   const aDateNum = aDate.split(' ')[0]
-  if (aDateNum) amountA = parseInt(aDateNum)
+  if (aDateNum !== undefined) amountA = parseInt(aDateNum)
   else amountA = 0
   if (isNaN(amountA)) amountA = 0
 
   let amountB: number
   const bDateNum = bDate.split(' ')[0]
-  if (bDateNum) amountB = parseInt(bDateNum)
+  if (bDateNum !== undefined) amountB = parseInt(bDateNum)
   else amountB = 0
   if (isNaN(amountB)) amountB = 0
 
@@ -135,13 +135,13 @@ function sortDate (a: Manga, b: Manga) {
 }
 
 function sortRead (a: Manga, b: Manga) {
-  if (a.readNum && b.readNum) {
+  if (a.readNum !== undefined && b.readNum !== undefined) {
     return a.readNum > b.readNum ? 1 : b.readNum > a.readNum ? -1 : sortTitle(a, b)
-  } else if (a.read && b.read) {
+  } else if (a.read !== undefined && b.read !== undefined) {
     return a.read.toLowerCase() > b.read.toLowerCase() ? 1 : b.read.toLowerCase() > a.read.toLowerCase() ? -1 : sortTitle(a, b)
-  } else if (a.read) {
+  } else if (a.read !== undefined) {
     return -1
-  } else if (b.read) {
+  } else if (b.read !== undefined) {
     return 1
   } else {
     return sortTitle(a, b)

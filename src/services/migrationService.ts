@@ -21,7 +21,9 @@ interface MigrationManga {
 }
 
 export function getMigrationVersion () {
-  return LocalStorage.getItem(constants.MIGRATION_VERSION) || ''
+  const migrationVersion = LocalStorage.getItem(constants.MIGRATION_VERSION)
+  if (typeof migrationVersion !== 'string') return ''
+  return migrationVersion
 }
 
 export async function tryMigrateMangaList () {
@@ -86,7 +88,7 @@ async function doMigration (mangaList: MigrationManga[]) {
       const split = item.url.replace(`${MangaDex.getUrl()}/title/`, '').split('/')
       const id = split[0]
 
-      if (id && id.length < 10) {
+      if (id !== undefined && id.length < 10) {
         legacyMangaDexManga.push({ index, id: parseInt(id) })
       }
     }
@@ -98,7 +100,7 @@ async function doMigration (mangaList: MigrationManga[]) {
     const newMangaDexIdMap = await MangaDex.convertLegacyIds(legacyMangaDexManga.map((item) => item.id), requestHandler)
     legacyMangaDexManga.forEach((item) => {
       const newId = newMangaDexIdMap[item.id]
-      if (!newId) return
+      if (newId === undefined) return
 
       const manga = mangaList[item.index]
       if (!manga) return

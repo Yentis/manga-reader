@@ -47,7 +47,7 @@ export function useAppUrlNavigation () {
 
     browser.addEventListener('loadstart', (event) => {
       const token = onUrlLoadStart(event.url)
-      if (!token) return
+      if (token === null) return
 
       browser.close()
       onDropboxRedirect(token)

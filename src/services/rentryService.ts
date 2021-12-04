@@ -17,20 +17,26 @@ interface RentryResponse {
 }
 
 export function getShareId (): string {
-  return LocalStorage.getItem(constants.SHARE_ID) || ''
+  const shareId = LocalStorage.getItem(constants.SHARE_ID)
+  if (typeof shareId !== 'string') return ''
+
+  return shareId
 }
 
 export function setShareId (id?: string) {
-  if (!id) return
+  if (id === undefined) return
   LocalStorage.set(constants.SHARE_ID, id)
 }
 
 export function getEditCode (): string {
-  return LocalStorage.getItem(constants.SHARE_EDIT_CODE) || ''
+  const shareEditCode = LocalStorage.getItem(constants.SHARE_EDIT_CODE)
+  if (typeof shareEditCode !== 'string') return ''
+
+  return shareEditCode
 }
 
 export function setEditCode (code?: string) {
-  if (!code) return
+  if (code === undefined) return
   LocalStorage.set(constants.SHARE_EDIT_CODE, code)
 }
 
@@ -41,7 +47,7 @@ export async function getCsrfToken (): Promise<string> {
   })
 
   const cookies = getCookies(response)
-  if (!cookies.csrftoken) {
+  if (cookies.csrftoken === undefined) {
     throw Error('CSRF token was not found')
   }
 
@@ -78,7 +84,7 @@ export async function createList (list: string, url?: string): Promise<string> {
 
   const split = data.url.split('/')
   const id = split[split.length - 1]
-  if (!id) {
+  if (id === undefined) {
     throw Error(`Could not parse response url: ${data.url}`)
   }
 

@@ -40,12 +40,12 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
     $store.state.reader.mangaMap.forEach((manga) => {
       // Force refresh will check all manga that don't get updated with a regular refresh
       if (!forceRefresh) {
-        if (manga.status !== Status.READING && !manga.shouldUpdate) return
+        if (manga.status !== Status.READING && manga.shouldUpdate !== true) return
         filteredMangaList.push(manga)
         return
       }
 
-      if (manga.status === Status.READING || manga.shouldUpdate) return
+      if (manga.status === Status.READING || manga.shouldUpdate === true) return
       filteredMangaList.push(manga)
     })
 

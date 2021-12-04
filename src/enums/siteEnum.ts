@@ -3,7 +3,6 @@ export const Guya = 'guya.moe'
 export enum SiteType {
     Manganelo = 'manganelo.com',
     Webtoons = 'webtoons.com',
-    HatigarmScans = 'hatigarmscanz.net',
     FirstKissManga = '1stkissmanga.io',
     Mangakakalot = 'mangakakalot.com',
     MangaDex = 'mangadex.org',
@@ -25,13 +24,13 @@ export enum SiteType {
     ResetScans = 'reset-scans.com',
     BiliBiliComics = 'bilibilicomics.com',
     AlphaScans = 'alpha-scans.org',
-    Cubari = 'cubari.moe'
+    Cubari = 'cubari.moe',
+    LuminousScans = 'luminousscans.com'
 }
 
 export enum SiteName {
     'manganelo.com' = 'Manganato',
     'webtoons.com' = 'Webtoons',
-    'hatigarmscanz.net' = 'Hatigarm Scans',
     '1stkissmanga.io' = '1st Kiss Manga',
     'mangakakalot.com' = 'Mangakakalot',
     'mangadex.org' = 'MangaDex',
@@ -54,7 +53,8 @@ export enum SiteName {
     'reset-scans.com' = 'Reset Scans',
     'bilibilicomics.com' = 'BiliBili Comics',
     'alpha-scans.org' = 'Alpha Scans',
-    'cubari.moe' = 'Cubari / Guya'
+    'cubari.moe' = 'Cubari / Guya',
+    'luminousscans.com' = 'Luminous Scans'
 }
 
 export enum SiteState {
