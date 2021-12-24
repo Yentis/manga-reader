@@ -3,7 +3,7 @@ import { createRouter, createMemoryHistory, createWebHistory, createWebHashHisto
 import routes from './routes'
 
 export default route(function () {
-  const createHistory = process.env.SERVER !== undefined
+  const createHistory = process.env.SERVER
     ? createMemoryHistory
     : process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory
 

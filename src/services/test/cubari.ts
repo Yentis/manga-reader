@@ -20,11 +20,11 @@ export async function testCubari (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 154: Ultimate Hellfire Burst Wave'
+  desired.chapter = 'Chapter 155: Results'
   desired.image = 'https://cdn.discordapp.com/attachments/754390245860048900/814308196620697640/23_-_p000_-_aKraa.jpg'
   desired.title = 'One Punch Man'
-  desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/154/1/'
-  desired.chapterNum = 154
+  desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/155/1/'
+  desired.chapterNum = 155
 
   mangaEqual(manga, desired)
 }
@@ -32,11 +32,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlGuya (): Promise<void> {
   const manga = await getMangaInfo('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   const desired = new Manga('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
-  desired.chapter = 'Thus, Yu Ishigami Closed His Eyes, Part 5'
+  desired.chapter = 'Kaguya-sama Wants to Break Up'
   desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.jpg'
   desired.title = 'Kaguya-sama: Love is War'
-  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/246/1/'
-  desired.chapterNum = 246
+  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/248/1/'
+  desired.chapterNum = 248
 
   mangaEqual(manga, desired)
 }
@@ -55,7 +55,7 @@ async function searchGuya (site: BaseSite): Promise<void> {
   const results = await searchManga('kaguya-sama love is war', SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.jpg'
-  desired.chapter = 'Thus, Yu Ishigami Closed His Eyes, Part 5'
+  desired.chapter = 'Kaguya-sama Wants to Break Up'
   desired.url = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/'
 
   return searchValid(results, desired, 'kaguya-sama: love is war')

@@ -19,7 +19,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 20 : Hoshino\'s Answer'
-  desired.image = 'https://luminousscans.com/fypadsuh/2021/08/Black-Kanojo.jpg'
+  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/08/Black-Kanojo.jpg'
   desired.title = 'Black Kanojo'
   desired.chapterUrl = 'https://luminousscans.com/black-kanojo-chapter-20/'
   desired.chapterNum = 20
@@ -30,7 +30,7 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://luminousscans.com/fypadsuh/2021/09/001-16-212x300.jpg'
+  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/09/001-16-212x300.jpg'
   desired.chapter = '59.5'
   desired.url = 'https://luminousscans.com/series/jubunnoichi-no-hanayome/'
 

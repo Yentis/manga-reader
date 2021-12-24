@@ -20,7 +20,8 @@ interface MangaData {
   id: number,
   title: string,
   'ep_list': ChapterData[],
-  'vertical_cover': string
+  'vertical_cover': string,
+  'only_app_amount': number
 }
 
 export interface ComicDetailResponse {
@@ -55,28 +56,28 @@ export class BiliBiliComics extends BaseSite {
   siteType = BiliBiliComics.siteType
 
   getChapter (data: BiliBiliComicsData): string {
-    const chapter = data.mangaData.ep_list[0]
+    const chapter = this.getLatestWebChapter(data)
     if (!chapter) return ''
 
     return `${chapter.ord} ${chapter.title}`
   }
 
   getChapterUrl (data: BiliBiliComicsData): string {
-    const viewerData: BiliBiliComicsQueryData = {
-      id: data.mangaData.id,
-      chapter: data.mangaData.ep_list[0]?.id
-    }
+    const chapterId = this.getLatestWebChapter(data)?.id
+    if (!chapterId) return ''
 
-    const queryString = qs.stringify({
-      type: this.siteType,
-      data: JSON.stringify(viewerData)
-    })
+    return `${this.getUrl()}/mc${data.mangaData.id}/${chapterId}`
+  }
 
-    return `/mangaviewer?${queryString}`
+  private getLatestWebChapter (data: BiliBiliComicsData): ChapterData | undefined {
+    const chapters = data.mangaData.ep_list
+    const appOnlyAmount = data.mangaData.only_app_amount
+    return chapters[appOnlyAmount]
   }
 
   getChapterNum (data: BiliBiliComicsData): number {
-    return data.mangaData.ep_list[0]?.ord || 0
+    const chapter = this.getLatestWebChapter(data)
+    return chapter?.ord || 0
   }
 
   getChapterDate (data: BiliBiliComicsData): string {

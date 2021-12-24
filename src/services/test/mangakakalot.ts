@@ -40,7 +40,7 @@ async function search (site: BaseSite): Promise<void> {
   const results2 = await searchManga(query2, SITE_TYPE)
   const desired2 = new Manga('https://readmanganato.com/manga-hv985178', SITE_TYPE)
   desired2.image = 'https://avt.mkklcdnv6temp.com/4/p/21-1587119305.jpg'
-  desired2.chapter = 'Chapter 54'
+  desired2.chapter = 'Chapter 74'
   desired2.url = 'https://readmanganato.com/manga-hv985178'
 
   return searchValid(results2, desired2, query2)

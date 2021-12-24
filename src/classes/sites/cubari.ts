@@ -11,7 +11,10 @@ export class Cubari extends BaseSite {
   siteType = SiteType.Cubari
 
   protected getChapter (data: BaseData): string {
-    return data.chapter?.textContent?.split('-')[1]?.trim() || 'Unknown'
+    const textContent = data.chapter?.textContent
+    const dashIndex = textContent?.indexOf('-') || 0
+
+    return textContent?.substring(dashIndex + 1)?.trim() || 'Unknown'
   }
 
   protected getChapterUrl (data: BaseData): string {

@@ -48,6 +48,7 @@ async function testLogin (site: Kitsu) {
 
   const tokenStored = LocalStorage.getItem(constants.KITSU_TOKEN)
   if (tokenStored === null || tokenStored === '') throw Error('Token should be set in local storage')
+  LocalStorage.remove(constants.KITSU_TOKEN)
 }
 
 async function testUserId (site: Kitsu) {
