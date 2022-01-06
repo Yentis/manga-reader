@@ -57,7 +57,7 @@ export class BiliBiliComics extends BaseSite {
 
   getChapter (data: BiliBiliComicsData): string {
     const chapter = this.getLatestWebChapter(data)
-    if (!chapter) return ''
+    if (!chapter) return 'Unknown'
 
     return `${chapter.ord} ${chapter.title}`
   }

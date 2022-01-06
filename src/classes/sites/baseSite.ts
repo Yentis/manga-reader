@@ -69,11 +69,14 @@ export abstract class BaseSite {
   }
 
   protected getChapter (data: BaseData): string {
-    return data.chapter?.textContent?.trim() || 'Unknown'
+    return data.chapter?.textContent?.replace(/\n/gm, ' ').trim() || 'Unknown'
   }
 
   protected getChapterUrl (data: BaseData): string {
-    return data.chapter?.getAttribute('href') || ''
+    const url = data.chapter?.getAttribute('href') || ''
+    if (url.startsWith('/')) return `${this.getUrl()}${url}`
+
+    return url
   }
 
   protected getChapterNum (data: BaseData): number {
@@ -85,7 +88,10 @@ export abstract class BaseSite {
   }
 
   protected getImage (data: BaseData): string {
-    return data.image?.getAttribute('src') || ''
+    const url = data.image?.getAttribute('src') || ''
+    if (url.startsWith('/')) return `${this.getUrl()}${url}`
+
+    return url
   }
 
   protected getTitle (data: BaseData): string {

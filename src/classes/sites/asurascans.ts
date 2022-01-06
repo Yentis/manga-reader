@@ -127,7 +127,7 @@ export class AsuraScans extends BaseSite {
       case SiteType.AsuraScans:
         return `${this.getUrl()}/manga/tougen-anki/`
       case SiteType.FlameScans:
-        return `${this.getUrl()}/series/you-the-one-and-only-and-the-seven-billion-grim-reapers/`
+        return `${this.getUrl()}/series/solo-leveling/`
       case SiteType.AlphaScans:
         return `${this.getUrl()}/manga/lab-mice-game/`
       case SiteType.LuminousScans:

@@ -1,13 +1,14 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.ReaperScans
-const QUERY = 'aire'
+const SITE_TYPE = SiteType.CopinComics
+const QUERY = 'return survival'
 
-export async function testReaperScans (): Promise<void> {
+export async function testCopinComics (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,11 +19,12 @@ export async function testReaperScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 57 - Season 1 End'
-  desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/aire-cover.jpg.webp'
-  desired.title = 'Aire'
-  desired.chapterUrl = 'https://reaperscans.com/series/aire/chapter-57/'
-  desired.chapterNum = 57
+  desired.chapter = 'Episode 35'
+  desired.image = 'https://s3.us-west-1.amazonaws.com/t.copincomics.com/img/title/301/WNJKdqRdvG_3x4.png'
+  desired.title = 'Return Survival'
+  desired.chapterUrl = ''
+  desired.chapterNum = 35
+  desired.chapterDate = moment('01.06.2022', 'MM.DD.YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -30,9 +32,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/aire-cover-193x278.jpg'
-  desired.chapter = 'Chapter 57'
-  desired.url = 'https://reaperscans.com/series/aire/'
+  desired.image = 'https://s3.us-west-1.amazonaws.com/t.copincomics.com/img/title/301/WNJKdqRdvG_3x4.png'
+  desired.chapter = 'Episode 35'
+  desired.url = 'https://copincomics.com/?c=toon&k=301'
 
   return searchValid(results, desired, QUERY)
 }

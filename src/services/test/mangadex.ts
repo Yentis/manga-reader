@@ -14,6 +14,7 @@ export async function testMangaDex (): Promise<void> {
   if (!site) throw Error('Site not found')
 
   await readUrl(site)
+  await readUrlMultiVolumes()
   await search(site)
   await convertLegacyIds()
 }
@@ -21,11 +22,23 @@ export async function testMangaDex (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 95 - World of Stars and Stripes - Outro'
+  desired.chapter = 'Volume 24 - Chapter 95 - World of Stars and Stripes - Outro'
   desired.image = 'https://uploads.mangadex.org/covers/1044287a-73df-48d0-b0b2-5327f32dd651/b625ddac-757c-44a4-a392-b315ccdf4fb2.jpg'
   desired.title = 'JoJo\'s Bizarre Adventure Part 7 - Steel Ball Run (Official Colored)'
   desired.chapterUrl = 'https://mangadex.org/chapter/8a984365-fd9d-4f6e-85f9-0d58e0a592a3'
   desired.chapterNum = 95
+
+  mangaEqual(manga, desired)
+}
+
+async function readUrlMultiVolumes (): Promise<void> {
+  const manga = await getMangaInfo('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
+  const desired = new Manga('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
+  desired.chapter = 'Volume 2 - Chapter 57'
+  desired.image = 'https://uploads.mangadex.org/covers/3e873799-6f86-4f17-bc50-8b6ba07b9978/3205ab00-84e2-4df5-bd80-48d89450fbce.jpg'
+  desired.title = 'Revival Man'
+  desired.chapterUrl = 'https://mangadex.org/chapter/78a5f71a-12ff-4e99-89f9-2a5ff52a164f'
+  desired.chapterNum = 57
 
   mangaEqual(manga, desired)
 }

@@ -8,13 +8,6 @@ import { BaseData, BaseSite } from './baseSite'
 export class Batoto extends BaseSite {
   siteType = SiteType.Batoto
 
-  getChapterUrl (data: BaseData): string {
-    const url = data.chapter?.getAttribute('href')
-    if (!url) return ''
-
-    return `${this.getUrl()}${url}`
-  }
-
   getChapterNum (data: BaseData): number {
     return parseNum(data.chapterNum?.textContent?.trim().split(' ')[1])
   }

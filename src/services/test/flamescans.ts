@@ -18,11 +18,11 @@ export async function testFlameScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 9'
-  desired.image = 'https://flamescans.org/wp-content/uploads/2021/02/7-6.jpg'
-  desired.title = 'You, the One and Only, and the Seven Billion Grim Reapers'
-  desired.chapterUrl = 'https://flamescans.org/you-the-one-and-only-and-the-seven-billion-grim-reapers-chapter-9-epilogue/'
-  desired.chapterNum = 9
+  desired.chapter = 'Chapter 179.5 [END]'
+  desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/SL_V3_ANIMATED-2.webp'
+  desired.title = 'Solo Leveling'
+  desired.chapterUrl = 'https://flamescans.org/1641484861-solo-leveling-chapter-179-5/'
+  desired.chapterNum = 179.5
 
   mangaEqual(manga, desired)
 }

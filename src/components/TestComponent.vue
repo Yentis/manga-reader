@@ -79,6 +79,8 @@ import { testKitsu } from '../services/test/kitsu'
 import { testAlphaScans } from '../services/test/alphascans'
 import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
+import { testTapas } from 'src/services/test/tapas'
+import { testCopinComics } from 'src/services/test/copincomics'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -144,6 +146,9 @@ export default defineComponent({
         case SiteType.BiliBiliComics:
           await doTest(testBiliBiliComics)
           break
+        case SiteType.CopinComics:
+          await doTest(testCopinComics)
+          break
         case SiteType.Cubari:
           await doTest(testCubari)
           break
@@ -200,6 +205,9 @@ export default defineComponent({
           break
         case SiteType.SleepingKnightScans:
           await doTest(testSleepingKnightScans)
+          break
+        case SiteType.Tapas:
+          await doTest(testTapas)
           break
         case SiteType.Webtoons:
           await doTest(testWebtoons)

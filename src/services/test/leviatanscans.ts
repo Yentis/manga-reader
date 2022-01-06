@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = '30'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT.png'
   desired.title = 'The Throne'
-  desired.chapterUrl = 'https://leviatanscans.com/mk/manga/the-throne/30/'
+  desired.chapterUrl = 'https://leviatanscans.com/bu/manga/the-throne/30/'
   desired.chapterNum = 30
 
   mangaEqual(manga, desired)
@@ -33,11 +33,11 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   const url = 'https://leviatanscans.com/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = 'Season 3 | 111'
+  desired.chapter = 'Season 3 | 113'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-SK.png'
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
-  desired.chapterUrl = 'https://leviatanscans.com/mk/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-3/111/'
-  desired.chapterNum = 111
+  desired.chapterUrl = 'https://leviatanscans.com/bu/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-3/113/'
+  desired.chapterNum = 113
 
   mangaEqual(manga, desired)
 }
@@ -46,11 +46,11 @@ async function readUrlCorrectSeasonOrder (): Promise<void> {
   const url = 'https://leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = '82 - Season 2 - Ch 19'
+  desired.chapter = '84 - Season 2 - Ch 21'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TSRC.png'
   desired.title = 'Tale of a Scribe Who Retires to the Countryside'
-  desired.chapterUrl = 'https://leviatanscans.com/mk/manga/tale-of-a-scribe-who-retires-to-the-countryside/82/'
-  desired.chapterNum = 82
+  desired.chapterUrl = 'https://leviatanscans.com/bu/manga/tale-of-a-scribe-who-retires-to-the-countryside/84/'
+  desired.chapterNum = 84
 
   mangaEqual(manga, desired)
 }
@@ -60,7 +60,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover_BE-193x278.png'
   desired.chapter = '188'
-  desired.url = 'https://leviatanscans.com/mk/manga/burning-effect/'
+  desired.url = 'https://leviatanscans.com/bu/manga/burning-effect/'
 
   return searchValid(results, desired, QUERY)
 }

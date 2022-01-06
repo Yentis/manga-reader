@@ -29,6 +29,8 @@ import { testKitsu } from './test/kitsu'
 import { testAlphaScans } from './test/alphascans'
 import { testCubari } from './test/cubari'
 import { testLuminousScans } from './test/luminousscans'
+import { testTapas } from './test/tapas'
+import { testCopinComics } from './test/copincomics'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -50,6 +52,9 @@ export default async function testAll (
   }))
   promises.push(testBiliBiliComics().catch((error) => {
     errors.push({ site: SiteType.BiliBiliComics, error: error })
+  }))
+  promises.push(testCopinComics().catch((error) => {
+    errors.push({ site: SiteType.CopinComics, error: error })
   }))
   promises.push(testCubari().catch((error) => {
     errors.push({ site: SiteType.Cubari, error: error })
@@ -108,6 +113,9 @@ export default async function testAll (
   promises.push(testSleepingKnightScans().catch((error) => {
     errors.push({ site: SiteType.SleepingKnightScans, error: error })
   }))
+  promises.push(testTapas().catch((error) => {
+    errors.push({ site: SiteType.Tapas, error: error })
+  }))
   promises.push(testWebtoons().catch((error) => {
     errors.push({ site: SiteType.Webtoons, error: error })
   }))
@@ -134,7 +142,9 @@ export function mangaEqual (
   else if (actual.chapterUrl !== desired.chapterUrl) throw Error(`Failed ${desired.url}\nExpected chapter url: ${desired.chapterUrl}\nActual: ${actual.chapterUrl}`)
   else if (actual.read !== desired.read) throw Error(`Failed ${desired.url}\nExpected read: ${desired.read || 'undefined'}\nActual: ${actual.read || 'undefined'}`)
   else if (actual.readUrl !== desired.read) throw Error(`Failed ${desired.url}\nExpected read url: ${desired.readUrl || 'undefined'}\nActual: ${actual.readUrl || 'undefined'}`)
-  else if (checkDate && !actual.chapterDate.includes('ago')) throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
+  else if (desired.chapterDate && actual.chapterDate !== desired.chapterDate) {
+    throw Error(`Failed ${desired.chapterDate}\nExpected chapter date: ${desired.chapterDate || 'undefined'}\nActual: ${actual.chapterDate || 'undefined'}`)
+  } else if (checkDate && !actual.chapterDate.includes('ago')) throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
   else if (actual.chapterNum !== desired.chapterNum) throw Error(`Failed ${desired.url}\nExpected chapter num: ${desired.chapterNum}\nActual: ${actual.chapterNum}`)
 }
 

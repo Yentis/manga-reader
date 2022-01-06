@@ -65,7 +65,7 @@ export class WordPress extends BaseSite {
   private getSimpleChapterNum (chapter: string | undefined): number {
     if (!chapter) return 0
 
-    const pattern = /\d+\b/gm
+    const pattern = /[\d\\.,]+\b/gm
     let num = 0
     let match: RegExpExecArray | null
 
@@ -92,18 +92,17 @@ export class WordPress extends BaseSite {
   }
 
   getChapterDate (data: BaseData): string {
-    let format
+    const chapterDateText = data.chapterDate?.textContent?.trim()
 
-    switch (this.siteType) {
-      case SiteType.FirstKissManga:
-        format = 'Do MMMM YYYY'
-        break
-      default:
-        format = 'MMMM DD, YYYY'
-        break
+    let format
+    if (chapterDateText?.includes('/')) {
+      format = 'DD/MM/YYYY'
+    } else if (chapterDateText?.includes(',')) {
+      format = 'MMMM DD, YYYY'
+    } else {
+      format = 'Do MMMM YYYY'
     }
 
-    const chapterDateText = data.chapterDate?.textContent?.trim()
     const chapterDate = moment(chapterDateText, format)
     if (!chapterDateText?.endsWith('ago') && chapterDate.isValid()) {
       return chapterDate.fromNow()

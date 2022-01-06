@@ -17,6 +17,7 @@ interface ChapterResult {
   id: string,
   attributes: {
     title: string,
+    volume: string,
     chapter: string,
     updatedAt: string
   }
@@ -88,9 +89,15 @@ export class MangaDex extends BaseSite {
 
     const chapter = attributes.chapter
     let chapterText = `Chapter ${chapter}`
+
     if (attributes.title) {
       chapterText += ` - ${attributes.title}`
     }
+
+    if (attributes.volume) {
+      chapterText = `Volume ${attributes.volume} - ${chapterText}`
+    }
+
     return chapterText
   }
 
@@ -147,6 +154,7 @@ export class MangaDex extends BaseSite {
 
     const chapterQueryString = qs.stringify({
       manga: mangaId,
+      'order[volume]': 'desc',
       'order[chapter]': 'desc',
       limit: 1,
       'translatedLanguage[]': 'en'

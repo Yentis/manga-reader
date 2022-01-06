@@ -18,14 +18,16 @@ export enum SiteType {
     ZeroScans = 'zeroscans.com',
     LynxScans = 'lynxscans.com',
     Batoto = 'bato.to',
-    ArangScans = 'arangscans.com',
+    ArangScans = 'arangscans.org',
     Genkan = 'genkan.io',
     FlameScans = 'flamescans.org',
     ResetScans = 'reset-scans.com',
     BiliBiliComics = 'bilibilicomics.com',
     AlphaScans = 'alpha-scans.org',
     Cubari = 'cubari.moe',
-    LuminousScans = 'luminousscans.com'
+    LuminousScans = 'luminousscans.com',
+    Tapas = 'tapas.io',
+    CopinComics = 'copincomics.com'
 }
 
 export enum SiteName {
@@ -47,14 +49,16 @@ export enum SiteName {
     'zeroscans.com' = 'Zero Scans',
     'lynxscans.com' = 'Lynx Scans',
     'bato.to' = 'Batoto',
-    'arangscans.com' = 'Arang Scans',
+    'arangscans.org' = 'Arang Scans',
     'genkan.io' = 'Genkan',
     'flamescans.org' = 'Flame Scans',
     'reset-scans.com' = 'Reset Scans',
     'bilibilicomics.com' = 'BiliBili Comics',
     'alpha-scans.org' = 'Alpha Scans',
     'cubari.moe' = 'Cubari / Guya',
-    'luminousscans.com' = 'Luminous Scans'
+    'luminousscans.com' = 'Luminous Scans',
+    'tapas.io' = 'Tapas',
+    'copincomics.com' = 'Copin Comics'
 }
 
 export enum SiteState {

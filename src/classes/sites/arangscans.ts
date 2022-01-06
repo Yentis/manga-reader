@@ -9,13 +9,6 @@ import { BaseData, BaseSite } from './baseSite'
 export class ArangScans extends BaseSite {
   siteType = SiteType.ArangScans
 
-  getChapterUrl (data: BaseData): string {
-    const chapterUrl = data.chapter?.getAttribute('href')
-    if (!chapterUrl) return ''
-
-    return `${this.getUrl()}${chapterUrl}`
-  }
-
   getChapterNum (data: BaseData): number {
     const chapterNum = data.chapterNum?.textContent?.trim().replace('Chapter ', '')
     return parseNum(chapterNum)
@@ -28,13 +21,6 @@ export class ArangScans extends BaseSite {
     } else {
       return ''
     }
-  }
-
-  getImage (data: BaseData): string {
-    const image = data.image?.getAttribute('src')
-    if (!image) return ''
-
-    return `${this.getUrl()}${image}`
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {

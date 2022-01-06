@@ -31,7 +31,7 @@ async function search (): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga('https://www.bilibilicomics.com/detail/mc245', SITE_TYPE)
   desired.image = 'http://i0.hdslb.com/bfs/comic-static/798919b4975940465d33396b4a8a874517caafdd.png@300w.webp'
-  desired.chapter = '41 Where Are You Taking Me?!'
+  desired.chapter = '47 Is He Possessed?'
 
   return searchValid(results, desired, 'My Beloved Liu Yu\'an')
 }

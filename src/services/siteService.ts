@@ -52,6 +52,8 @@ import { ManhwaClub } from 'src/classes/sites/manhwaclub'
 import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
 import { getSiteByUrl } from 'src/utils/siteUtils'
 import { Cubari } from 'src/classes/sites/cubari'
+import { Tapas } from 'src/classes/sites/tapas'
+import { CopinComics } from 'src/classes/sites/copincomics'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -80,7 +82,9 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.BiliBiliComics, new BiliBiliComics()],
   [SiteType.AlphaScans, new AsuraScans(SiteType.AlphaScans)],
   [SiteType.Cubari, new Cubari()],
-  [SiteType.LuminousScans, new AsuraScans(SiteType.LuminousScans)]
+  [SiteType.LuminousScans, new AsuraScans(SiteType.LuminousScans)],
+  [SiteType.Tapas, new Tapas()],
+  [SiteType.CopinComics, new CopinComics()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
