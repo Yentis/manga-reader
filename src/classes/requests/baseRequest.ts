@@ -1,6 +1,9 @@
 import HttpRequest from 'src/interfaces/httpRequest'
 import HttpResponse from 'src/interfaces/httpResponse'
 
+export const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36'
+export const HEADER_USER_AGENT = 'User-Agent'
+
 export function getCookies (data: HttpResponse | string): Record<string, string | undefined> {
   const cookies: Record<string, string | undefined> = {}
   let cookieData: string | string[]

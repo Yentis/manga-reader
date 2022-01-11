@@ -1,8 +1,10 @@
 import { Manga } from 'src/classes/manga'
-import { getCookies } from 'src/classes/requests/baseRequest'
+import { getCookies, HEADER_USER_AGENT, MOBILE_USER_AGENT } from 'src/classes/requests/baseRequest'
 import { ContentType } from 'src/enums/contentTypeEnum'
+import { Platform } from 'src/enums/platformEnum'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
+import { getPlatform } from 'src/services/platformService'
 import { requestHandler } from 'src/services/requestService'
 import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
@@ -63,6 +65,8 @@ export class Genkanio extends BaseSite {
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
+    this.trySetUserAgent(request)
+
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
     const columns = doc.querySelectorAll('tbody tr')[0]?.children
@@ -80,6 +84,8 @@ export class Genkanio extends BaseSite {
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/manga` }
+    this.trySetUserAgent(request)
+
     const response = await requestHandler.sendRequest(request)
     const parser = new DOMParser()
     let doc = await parseHtmlFromString(response.data, parser)
@@ -120,6 +126,8 @@ export class Genkanio extends BaseSite {
         cookie: `XSRF-TOKEN=${responseXsrfToken};genkan_session=${responseGenkanSession}`
       }
     }
+    this.trySetUserAgent(loadRequest)
+
     const loadResponse = await requestHandler.sendRequest(loadRequest)
     const loadLivewireResponse = JSON.parse(loadResponse.data) as LivewireResponse
 
@@ -154,6 +162,8 @@ export class Genkanio extends BaseSite {
         cookie: `XSRF-TOKEN=${loadResponseXsrfToken};genkan_session=${loadResponseGenkanSession}`
       }
     }
+    this.trySetUserAgent(searchRequest)
+
     const searchResponse = await requestHandler.sendRequest(searchRequest)
     const searchLivewireResponse = JSON.parse(searchResponse.data) as LivewireResponse
     doc = await parseHtmlFromString(searchLivewireResponse.effects.html, parser)
@@ -171,6 +181,14 @@ export class Genkanio extends BaseSite {
 
     const mangaList = await Promise.all(promises)
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]
+  }
+
+  private trySetUserAgent (request: HttpRequest) {
+    if (getPlatform() !== Platform.Cordova) return
+
+    const headers = request.headers || {}
+    headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+    request.headers = headers
   }
 
   getTestUrl (): string {

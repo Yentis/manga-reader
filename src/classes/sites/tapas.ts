@@ -53,7 +53,7 @@ export class Tapas extends BaseSite {
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
-    const idElement = doc.querySelectorAll('meta[name="twitter:app:url:googleplay"]')[0]
+    const idElement = doc.querySelectorAll('meta[content*="tapastic://series"]')[0]
     const id = idElement?.getAttribute('content')?.split('/')[3]
     if (id === undefined) return Error('Failed to get ID')
 
@@ -72,7 +72,14 @@ export class Tapas extends BaseSite {
     const chaptersDoc = await parseHtmlFromString(chaptersData.data.body)
 
     const data = new TapasData(url)
-    const chapterElem = chaptersDoc.querySelectorAll('.episode-item')[1]
+    let chapterElem: Element | undefined
+    for (const elem of chaptersDoc.querySelectorAll('.episode-item')) {
+      if (elem.querySelectorAll('.additional span').length > 0) {
+        chapterElem = elem
+        break
+      }
+    }
+
     data.chapter = chapterElem?.querySelectorAll('.title')[0]
     data.chapterUrl = chapterElem
     data.chapterNum = chapterElem

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="org.cordova.manga.reader" version="2.17.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="org.cordova.manga.reader" version="2.17.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Manga Reader</name>
     <description>Manga reader that scrapes manga sites for updates</description>
     <author email="dev@cordova.apache.org" href="http://cordova.io">
@@ -82,5 +82,5 @@
     <allow-navigation href="about:*" />
     <preference name="Fullscreen" value="true" />
     <preference name="SplashMaintainAspectRatio" value="true" />
-    <preference name="OverrideUserAgent" value="Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36" />
+    <preference name="OverrideUserAgent" value="Mozilla/5.0 (Linux; Android 11) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36" />
 </widget>

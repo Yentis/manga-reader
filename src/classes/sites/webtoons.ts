@@ -8,8 +8,7 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
 import qs from 'qs'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
-
-const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 7.1.2; LEX820) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Mobile Safari/537.36'
+import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
 
 interface WebtoonsSearch {
   query: string[]
@@ -50,9 +49,12 @@ export class Webtoons extends BaseSite {
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
     const mobile = url.includes('//m.' + this.siteType)
     const platform = getPlatform()
-    const headers = mobile && platform !== Platform.Cordova
-      ? { 'User-Agent': MOBILE_USER_AGENT }
-      : null
+    const headers: Record<string, string> = {}
+
+    if (mobile && platform !== Platform.Cordova) {
+      headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+    }
+
     const request: HttpRequest = {
       method: 'GET',
       url,

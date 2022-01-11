@@ -31,11 +31,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlReverseOrder (): Promise<void> {
   const manga = await getMangaInfo('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
   const desired = new Manga('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
-  desired.chapter = 'Episode 39'
+  desired.chapter = 'Episode 40'
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/81/e9eb4a65-59fd-46c2-a26e-076d4fed209c_z.jpg'
   desired.title = 'Mystic Musketeer'
-  desired.chapterUrl = 'https://tapas.io/episode/2395774'
-  desired.chapterNum = 39
+  desired.chapterUrl = 'https://tapas.io/episode/2395783'
+  desired.chapterNum = 40
 
   mangaEqual(manga, desired)
 }
@@ -44,7 +44,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/81/e9eb4a65-59fd-46c2-a26e-076d4fed209c_z.jpg'
-  desired.chapter = 'Episode 39'
+  desired.chapter = 'Episode 40'
   desired.url = 'https://tapas.io/series/mystic-musketeer/info'
 
   return searchValid(results, desired, QUERY)

@@ -2,7 +2,7 @@ import moment from 'moment'
 import { Guya, SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
-import { getDateFromNow, getUrl, parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
+import { getUrl, parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
 import qs from 'querystring'
@@ -29,20 +29,32 @@ export class Cubari extends BaseSite {
   }
 
   protected getChapterDate (data: BaseData): string {
-    const chapterDateText = data.chapterDate?.textContent?.replace('[', '').replace(']', '')
-    const chapterDate = moment(chapterDateText, 'YYYY, M, D, H, m, s')
-    // month is 0-based for cubari
-    chapterDate.add(1, 'month')
+    const dateText = data.chapterDate?.textContent
+    if (!dateText?.startsWith('[')) return ''
+
+    const [year, month, day, hour, minute, second] = JSON.parse(dateText) as number[]
+    const chapterDate = moment({
+      year,
+      month,
+      day,
+      hour,
+      minute,
+      second
+    })
 
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return getDateFromNow(chapterDateText)
+      return ''
     }
   }
 
   protected getImage (data: BaseData): string {
-    const imageUrl = data.image?.getAttribute('src')
+    const source = data.image?.querySelectorAll('source')[0]?.getAttribute('srcset')
+    if (source?.startsWith('http')) return source
+    if (source) return `${this.getDomainFromUrl(data.url)}${source}`
+
+    const imageUrl = data.image?.querySelectorAll('img')[0]?.getAttribute('src')
     if (!imageUrl) return ''
     if (imageUrl.startsWith('http')) return imageUrl
 
@@ -60,7 +72,7 @@ export class Cubari extends BaseSite {
     data.chapter = chapterRow?.querySelectorAll('.chapter-title a')[0]
     data.chapterNum = chapterRow
     data.chapterDate = chapterRow?.querySelectorAll('.detailed-chapter-upload-date')[0]
-    data.image = doc.querySelectorAll('picture img')[0]
+    data.image = doc.querySelectorAll('picture')[0]
     data.title = doc.querySelectorAll('h1')[0]
 
     return this.buildManga(data)

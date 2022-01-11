@@ -32,11 +32,12 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlGuya (): Promise<void> {
   const manga = await getMangaInfo('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   const desired = new Manga('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
-  desired.chapter = 'Kaguya-sama Wants to Break Up'
-  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.jpg'
+  desired.chapter = 'Kaguya-sama Wants to Break Up (Part 2)'
+  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.webp'
   desired.title = 'Kaguya-sama: Love is War'
-  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/248/1/'
-  desired.chapterNum = 248
+  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/249/1/'
+  desired.chapterNum = 249
+  desired.chapterDate = '15 hours ago'
 
   mangaEqual(manga, desired)
 }
@@ -54,8 +55,8 @@ async function search (site: BaseSite): Promise<void> {
 async function searchGuya (site: BaseSite): Promise<void> {
   const results = await searchManga('kaguya-sama love is war', SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.jpg'
-  desired.chapter = 'Kaguya-sama Wants to Break Up'
+  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/24/11124.webp'
+  desired.chapter = 'Kaguya-sama Wants to Break Up (Part 2)'
   desired.url = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/'
 
   return searchValid(results, desired, 'kaguya-sama: love is war')

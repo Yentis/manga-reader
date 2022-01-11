@@ -8,6 +8,9 @@ import { Manga } from 'src/classes/manga'
 import qs from 'qs'
 import moment from 'moment'
 import { getDateFromNow, parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
+import { getPlatform } from 'src/services/platformService'
+import { Platform } from 'src/enums/platformEnum'
+import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
 
 class WordPressData extends BaseData {
   volume?: Element
@@ -122,6 +125,8 @@ export class WordPress extends BaseSite {
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
+    this.trySetUserAgent(request)
+
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
 
@@ -167,6 +172,8 @@ export class WordPress extends BaseSite {
       post_type: 'wp-manga'
     })
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/?${queryString}` }
+    this.trySetUserAgent(request)
+
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
 
@@ -204,6 +211,8 @@ export class WordPress extends BaseSite {
         data: JSON.stringify(requestData),
         headers: { 'Content-Type': ContentType.URLENCODED }
       }
+      this.trySetUserAgent(request)
+
       const response = await requestHandler.sendRequest(request)
       if (response.data === '0') throw Error('Invalid chapter data')
 
@@ -216,6 +225,14 @@ export class WordPress extends BaseSite {
     newData = this.setChapter(doc, newData)
 
     return newData
+  }
+
+  private trySetUserAgent (request: HttpRequest) {
+    if (getPlatform() !== Platform.Cordova) return
+
+    const headers = request.headers || {}
+    headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+    request.headers = headers
   }
 
   private setVolume (doc: Document, data: WordPressData): WordPressData {
