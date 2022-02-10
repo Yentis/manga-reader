@@ -5,7 +5,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.AlphaScans
-const QUERY = 'how to disguise as a failure'
+const QUERY = 'medical return'
 
 export async function testAlphaScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -18,11 +18,11 @@ export async function testAlphaScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 3'
-  desired.image = 'https://content.alpha-scans.org//2021/06/1624684704-9305-i349634.png'
-  desired.title = 'Lab Mice Game'
-  desired.chapterUrl = 'https://alpha-scans.org/lab-mice-game-chapter-3/'
-  desired.chapterNum = 3
+  desired.chapter = 'Chapter 148 (END)'
+  desired.image = 'https://i2.wp.com/alpha-scans.org/wp-content/uploads/2021/07/Medical-Return-Cover.gif'
+  desired.title = 'Medical Return'
+  desired.chapterUrl = 'https://alpha-scans.org/medical-return-chapter-148-end/'
+  desired.chapterNum = 148
 
   mangaEqual(manga, desired)
 }
@@ -30,9 +30,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://i3.wp.com/alpha-scans.org/wp-content/uploads/2021/06/1623391710-9847-i336634.png?h=80'
-  desired.chapter = '4'
-  desired.url = 'https://alpha-scans.org/manga/how-to-disguise-as-a-failure/'
+  desired.image = 'https://i2.wp.com/alpha-scans.org/wp-content/uploads/2021/07/Medical-Return-Cover.gif?h=80'
+  desired.chapter = '148 (END)'
+  desired.url = 'https://alpha-scans.org/manga/medical-return/'
 
   return searchValid(results, desired, QUERY)
 }

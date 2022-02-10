@@ -19,11 +19,11 @@ export async function testTapas (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = '75. A Hunting Goddess With Pink Hair'
+  desired.chapter = '79. The Assassin\'s Token'
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/ba/bd321b26-680a-4911-b675-94a41efce1bf_z.jpg'
   desired.title = 'Villains Are Destined to Die'
-  desired.chapterUrl = 'https://tapas.io/episode/2364043'
-  desired.chapterNum = 86
+  desired.chapterUrl = 'https://tapas.io/episode/2407859'
+  desired.chapterNum = 90
 
   mangaEqual(manga, desired)
 }
@@ -31,11 +31,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlReverseOrder (): Promise<void> {
   const manga = await getMangaInfo('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
   const desired = new Manga('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
-  desired.chapter = 'Episode 40'
+  desired.chapter = 'Episode 44'
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/81/e9eb4a65-59fd-46c2-a26e-076d4fed209c_z.jpg'
   desired.title = 'Mystic Musketeer'
-  desired.chapterUrl = 'https://tapas.io/episode/2395783'
-  desired.chapterNum = 40
+  desired.chapterUrl = 'https://tapas.io/episode/2431272'
+  desired.chapterNum = 44
 
   mangaEqual(manga, desired)
 }
@@ -44,7 +44,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/81/e9eb4a65-59fd-46c2-a26e-076d4fed209c_z.jpg'
-  desired.chapter = 'Episode 40'
+  desired.chapter = 'Episode 44'
   desired.url = 'https://tapas.io/series/mystic-musketeer/info'
 
   return searchValid(results, desired, QUERY)

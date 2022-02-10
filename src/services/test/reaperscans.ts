@@ -19,7 +19,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 57 - Season 1 End'
-  desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/aire-cover.jpg.webp'
+  desired.image = 'https://reaperscans.com/wp-content/uploads/2021/07/aire-cover.jpg'
   desired.title = 'Aire'
   desired.chapterUrl = 'https://reaperscans.com/series/aire/chapter-57/'
   desired.chapterNum = 57

@@ -4,22 +4,28 @@ import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
-import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
+import { titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
 interface MangaData {
-  episode: {
-    episodetitle: string,
-    episodepubdate: string
-  }[],
-  thumbs: {
-    thumb1x1: string
-    thumb2x1: string
-    thumb3x4: string
-    thumb4x3: string
-    thumb5x3: string
-  },
-  titlename: string
+  body: {
+    episodelist: {
+      episodetitle: string,
+      episodetitle2: string,
+      episodepubdate: string
+    }[],
+
+    item: {
+      titlename: string,
+      thumbs: {
+        thumb1x1: string
+        thumb2x1: string
+        thumb3x4: string
+        thumb4x3: string
+        thumb5x3: string
+      }
+    }
+  }
 }
 
 interface SearchData {
@@ -44,7 +50,7 @@ export class CopinComics extends BaseSite {
   siteType = SiteType.CopinComics
 
   protected getChapter (data: CopinComicsData): string {
-    const episodes = data.mangaData.episode
+    const episodes = data.mangaData.body.episodelist
     return episodes[episodes.length - 1]?.episodetitle || 'Unknown'
   }
 
@@ -71,7 +77,7 @@ export class CopinComics extends BaseSite {
   }
 
   protected getChapterDate (data: CopinComicsData): string {
-    const episodes = data.mangaData.episode
+    const episodes = data.mangaData.body.episodelist
     const date = episodes[episodes.length - 1]?.episodepubdate.substring(0, 8)
     if (date === undefined) return ''
 
@@ -84,24 +90,26 @@ export class CopinComics extends BaseSite {
   }
 
   protected getImage (data: CopinComicsData): string {
-    const thumbnails = data.mangaData.thumbs
+    const thumbnails = data.mangaData.body.item.thumbs
     return thumbnails.thumb3x4 || thumbnails.thumb4x3 || thumbnails.thumb1x1 || thumbnails.thumb5x3 || thumbnails.thumb2x1
   }
 
   protected getTitle (data: CopinComicsData): string {
-    return data.mangaData.titlename
+    return data.mangaData.body.item.titlename
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
-    const request: HttpRequest = { method: 'GET', url }
+    const split = url.split('/')
+    const comicId = split[split.length - 1]
+    if (comicId === undefined) return Error('Could not parse data')
+
+    const request: HttpRequest = {
+      method: 'GET',
+      url: `https://api.${SiteType.CopinComics}/s/v2/toon.json?titlepkey=${comicId}`
+    }
     const response = await requestHandler.sendRequest(request)
 
-    const doc = await parseHtmlFromString(response.data)
-    const lines = doc.querySelectorAll('.wrap script')[0]?.innerHTML.trim().split('\n').map((line) => line.trim())
-    const dataTitle = lines?.find((line) => line.startsWith('var data_title'))?.replace('var data_title = ', '')
-    if (dataTitle === undefined) return Error('Could not parse data')
-
-    const mangaData = JSON.parse(dataTitle.substring(0, dataTitle.length - 1)) as MangaData
+    const mangaData = JSON.parse(response.data) as MangaData
     const data = new CopinComicsData(url, mangaData)
 
     return this.buildManga(data)
@@ -109,7 +117,7 @@ export class CopinComics extends BaseSite {
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
     const queryString = qs.stringify({ q: query })
-    const request: HttpRequest = { method: 'GET', url: `https://api.copincomics.com/q/a.json?${queryString}` }
+    const request: HttpRequest = { method: 'GET', url: `https://api.${SiteType.CopinComics}/q/a.json?${queryString}` }
     const response = await requestHandler.sendRequest(request)
     const responseData = JSON.parse(response.data) as SearchData
 
@@ -118,7 +126,7 @@ export class CopinComics extends BaseSite {
 
     results.forEach((entry) => {
       const title = entry.titlename
-      const url = `${this.getUrl()}/?c=toon&k=${entry.titlepkey}`
+      const url = `${this.getUrl()}/toon/${entry.titlepkey}`
       if (!url) return
 
       if (titleContainsQuery(query, title)) {
@@ -131,6 +139,6 @@ export class CopinComics extends BaseSite {
   }
 
   getTestUrl (): string {
-    return `${this.getUrl()}/?c=toon&k=301`
+    return `${this.getUrl()}/toon/301`
   }
 }

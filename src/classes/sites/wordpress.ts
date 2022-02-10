@@ -228,10 +228,14 @@ export class WordPress extends BaseSite {
   }
 
   private trySetUserAgent (request: HttpRequest) {
-    if (getPlatform() !== Platform.Cordova) return
-
     const headers = request.headers || {}
-    headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+
+    if (getPlatform() === Platform.Cordova) {
+      headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+    } else {
+      headers[HEADER_USER_AGENT] = navigator.userAgent
+    }
+
     request.headers = headers
   }
 

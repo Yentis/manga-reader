@@ -1,9 +1,12 @@
 import qs from 'qs'
+import { Platform } from 'src/enums/platformEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
+import { getPlatform } from 'src/services/platformService'
 import { requestHandler } from 'src/services/requestService'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
 import { SiteType } from '../../enums/siteEnum'
 import { Manga } from '../manga'
+import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
 import { BaseData, BaseSite } from './baseSite'
 
 class GenkanData extends BaseData {
@@ -62,6 +65,8 @@ export class Genkan extends BaseSite {
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
+    this.trySetUserAgent(request)
+
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
 
@@ -82,6 +87,7 @@ export class Genkan extends BaseSite {
     const queryString = qs.stringify({ query })
     const url = this.siteType === SiteType.LynxScans ? '/web/comics' : '/comics'
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}${url}?${queryString}` }
+    this.trySetUserAgent(request)
 
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
@@ -98,6 +104,14 @@ export class Genkan extends BaseSite {
 
     const mangaList = await Promise.all(promises)
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]
+  }
+
+  private trySetUserAgent (request: HttpRequest) {
+    if (getPlatform() !== Platform.Cordova) return
+
+    const headers = request.headers || {}
+    headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+    request.headers = headers
   }
 
   getTestUrl () : string {

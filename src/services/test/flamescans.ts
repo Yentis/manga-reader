@@ -21,7 +21,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 179.5 [END]'
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/SL_V3_ANIMATED-2.webp'
   desired.title = 'Solo Leveling'
-  desired.chapterUrl = 'https://flamescans.org/1641484861-solo-leveling-chapter-179-5/'
+  desired.chapterUrl = 'https://flamescans.org/1644508861-solo-leveling-chapter-179-5/'
   desired.chapterNum = 179.5
 
   mangaEqual(manga, desired)

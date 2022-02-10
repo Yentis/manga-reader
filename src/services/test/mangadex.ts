@@ -34,11 +34,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlMultiVolumes (): Promise<void> {
   const manga = await getMangaInfo('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
   const desired = new Manga('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
-  desired.chapter = 'Volume 2 - Chapter 57'
-  desired.image = 'https://uploads.mangadex.org/covers/3e873799-6f86-4f17-bc50-8b6ba07b9978/3205ab00-84e2-4df5-bd80-48d89450fbce.jpg'
+  desired.chapter = 'Volume 2 - Chapter 62'
+  desired.image = 'https://uploads.mangadex.org/covers/3e873799-6f86-4f17-bc50-8b6ba07b9978/0bd8ccaa-a1b7-4750-9018-5f2fd43d788b.jpg'
   desired.title = 'Revival Man'
-  desired.chapterUrl = 'https://mangadex.org/chapter/78a5f71a-12ff-4e99-89f9-2a5ff52a164f'
-  desired.chapterNum = 57
+  desired.chapterUrl = 'https://mangadex.org/chapter/6c0da2d5-66d9-4957-a14e-2f22f002401a'
+  desired.chapterNum = 62
 
   mangaEqual(manga, desired)
 }
