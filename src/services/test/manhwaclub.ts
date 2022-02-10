@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Movies Are Real'
   desired.chapterUrl = 'https://manhwa.club/comic/movies-are-real/chapter-35/reader'
   desired.chapterNum = 35
+  desired.chapterDate = moment('2021-10-15', 'YYYY-MM-DD').fromNow()
 
   mangaEqual(manga, desired)
 }

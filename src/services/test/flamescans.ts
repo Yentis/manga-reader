@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Solo Leveling'
   desired.chapterUrl = 'https://flamescans.org/1644508861-solo-leveling-chapter-179-5/'
   desired.chapterNum = 179.5
+  desired.chapterDate = moment('January 3, 2022', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

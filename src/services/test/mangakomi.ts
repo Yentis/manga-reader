@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Good Night'
   desired.chapterUrl = 'https://mangakomi.com/manga/good-night/chapter-34/'
   desired.chapterNum = 34
+  desired.chapterDate = moment('August 14, 2020', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

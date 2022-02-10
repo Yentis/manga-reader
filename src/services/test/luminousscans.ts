@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Black Kanojo'
   desired.chapterUrl = 'https://luminousscans.com/black-kanojo-chapter-20/'
   desired.chapterNum = 20
+  desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

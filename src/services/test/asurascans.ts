@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -24,6 +25,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Tougen Anki'
   desired.chapterUrl = 'https://www.asurascans.com/tougen-anki-chapter-19/'
   desired.chapterNum = 19
+  desired.chapterDate = moment('November 1, 2020', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -37,6 +39,7 @@ async function readUrlAdvanced (): Promise<void> {
   desired.title = 'Solo Bug Player'
   desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-80/'
   desired.chapterNum = 80
+  desired.chapterDate = moment('October 3, 2021', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

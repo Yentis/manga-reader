@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { MangaDex } from 'src/classes/sites/mangadex'
@@ -27,6 +28,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'JoJo\'s Bizarre Adventure Part 7 - Steel Ball Run (Official Colored)'
   desired.chapterUrl = 'https://mangadex.org/chapter/8a984365-fd9d-4f6e-85f9-0d58e0a592a3'
   desired.chapterNum = 95
+  desired.chapterDate = moment('31/01/2018, 00:08:19', 'DD/MM/YYYY, hh:mm:ss').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -39,6 +41,7 @@ async function readUrlMultiVolumes (): Promise<void> {
   desired.title = 'Revival Man'
   desired.chapterUrl = 'https://mangadex.org/chapter/6c0da2d5-66d9-4957-a14e-2f22f002401a'
   desired.chapterNum = 62
+  desired.chapterDate = moment('08/02/2022, 17:36:35', 'DD/MM/YYYY, hh:mm:ss').fromNow()
 
   mangaEqual(manga, desired)
 }

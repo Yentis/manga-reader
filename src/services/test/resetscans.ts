@@ -25,6 +25,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Madou no Keifu'
   desired.chapterUrl = 'https://reset-scans.com/manga/madou-no-keifu/chapter-04/'
   desired.chapterNum = 4
+  desired.chapterDate = moment('09/04/2021', 'DD/MM/YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

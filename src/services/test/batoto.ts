@@ -3,6 +3,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.Batoto
 const QUERY = 'I found somebody to love'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Doctor Elise: The Royal Lady with the Lamp'
   desired.chapterUrl = 'https://bato.to/chapter/1629009'
   desired.chapterNum = 143
+  desired.chapterDate = SiteUtils.getDateFromNow('326 days ago')
 
   mangaEqual(manga, desired)
 }

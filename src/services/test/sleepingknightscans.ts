@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Chronicles of Heavenly Demon'
   desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-heavenly-demon/151/'
   desired.chapterNum = 151
+  desired.chapterDate = moment('June 25, 2021', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

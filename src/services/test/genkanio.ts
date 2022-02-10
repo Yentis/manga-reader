@@ -23,6 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Castle'
   desired.chapterUrl = 'https://genkan.io/manga/8383424626-castle/chapters/22272'
   desired.chapterNum = 78
+  desired.chapterDate = '5 months ago'
 
   mangaEqual(manga, desired)
 }

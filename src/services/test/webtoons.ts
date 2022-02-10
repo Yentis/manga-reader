@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { Platform } from 'src/enums/platformEnum'
@@ -30,6 +31,7 @@ async function readUrl (platform: Platform, site: BaseSite): Promise<void> {
   desired.title = 'The Wolf & Red Riding Hood'
   desired.chapterUrl = 'https://www.webtoons.com/en/comedy/wolf-and-red-riding-hood/episode-16/viewer?title_no=2142&episode_no=16'
   desired.chapterNum = 16
+  desired.chapterDate = moment('Jul 24, 2020', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -45,6 +47,7 @@ async function readUrlCordova (platform: Platform): Promise<void> {
   desired.title = 'XINK3R'
   desired.chapterUrl = 'https://m.webtoons.com/en/super-hero/xinker/epilogue/viewer?title_no=541&episode_no=223'
   desired.chapterNum = 223
+  desired.chapterDate = moment('Jul 1, 2020', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

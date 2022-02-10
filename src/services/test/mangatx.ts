@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Grandest Wedding'
   desired.chapterUrl = 'https://mangatx.com/manga/grandest-wedding/chapter-169-end/'
   desired.chapterNum = 169
+  desired.chapterDate = moment('October 19, 2019', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

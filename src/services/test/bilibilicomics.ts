@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Tales of Demons and Gods'
   desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/30056'
   desired.chapterNum = 618
+  desired.chapterDate = moment('2021-12-02', 'YYYY-MM-DD').fromNow()
 
   mangaEqual(manga, desired, false)
 }

@@ -1,8 +1,10 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.HiperDEX
 const QUERY = 'cabalist'
@@ -24,6 +26,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Arata Primal'
   desired.chapterUrl = 'https://hiperdex.com/manga/arata-primal-the-new-primitive/35-end/'
   desired.chapterNum = 35
+  desired.chapterDate = moment('June 7, 2020', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -36,6 +39,7 @@ async function readUrl2 (): Promise<void> {
   desired.title = 'Touch On'
   desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/108-3/'
   desired.chapterNum = 108.3
+  desired.chapterDate = SiteUtils.getDateFromNow('21 hours ago')
 
   mangaEqual(manga, desired)
 }

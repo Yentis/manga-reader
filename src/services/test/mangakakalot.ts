@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Tomo-chan wa Onnanoko!'
   desired.chapterUrl = 'https://mangakakalot.com/chapter/tomochan_wa_onnanoko/chapter_953.6'
   desired.chapterNum = 953.6
+  desired.chapterDate = moment('Oct-16-19', 'MMM-DD-YY').fromNow()
 
   mangaEqual(manga, desired)
 }

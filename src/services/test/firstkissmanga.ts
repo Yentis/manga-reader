@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Ripples Of Love'
   desired.chapterUrl = 'https://1stkissmanga.io/manga/ripples-of-love/chapter-99/'
   desired.chapterNum = 99
+  desired.chapterDate = moment('September 30, 2020', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

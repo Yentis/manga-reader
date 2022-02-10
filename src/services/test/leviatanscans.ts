@@ -1,8 +1,10 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.LeviatanScans
 const QUERY = 'burning effect'
@@ -25,6 +27,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'The Throne'
   desired.chapterUrl = 'https://leviatanscans.com/vf/manga/the-throne/30/'
   desired.chapterNum = 30
+  desired.chapterDate = moment('March 16, 2021', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -38,6 +41,7 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
   desired.chapterUrl = 'https://leviatanscans.com/vf/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-3/118/'
   desired.chapterNum = 118
+  desired.chapterDate = SiteUtils.getDateFromNow('2 days ago')
 
   mangaEqual(manga, desired)
 }
@@ -51,6 +55,7 @@ async function readUrlCorrectSeasonOrder (): Promise<void> {
   desired.title = 'Tale of a Scribe Who Retires to the Countryside'
   desired.chapterUrl = 'https://leviatanscans.com/vf/manga/tale-of-a-scribe-who-retires-to-the-countryside/89/'
   desired.chapterNum = 89
+  desired.chapterDate = SiteUtils.getDateFromNow('3 days ago')
 
   mangaEqual(manga, desired)
 }

@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Kudan No Gotoshi'
   desired.chapterUrl = 'https://readmanganato.com/manga-dt981276/chapter-57'
   desired.chapterNum = 57
+  desired.chapterDate = moment('May 21,20', 'MMM DD,YY').fromNow()
 
   mangaEqual(manga, desired)
 }

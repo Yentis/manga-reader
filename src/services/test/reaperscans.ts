@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Aire'
   desired.chapterUrl = 'https://reaperscans.com/series/aire/chapter-57/'
   desired.chapterNum = 57
+  desired.chapterDate = moment('Jan 03, 2022', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }

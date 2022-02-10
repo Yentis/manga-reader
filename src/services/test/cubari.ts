@@ -1,8 +1,10 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.Cubari
 const QUERY = 'bleach'
@@ -25,6 +27,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'One Punch Man'
   desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/157/1/'
   desired.chapterNum = 157
+  desired.chapterDate = moment('2022-01-27, 20:00:19', 'YYYY-MM-DD, hh:mm:ss').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -37,7 +40,7 @@ async function readUrlGuya (): Promise<void> {
   desired.title = 'Kaguya-sama: Love is War'
   desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/253/1/'
   desired.chapterNum = 253
-  desired.chapterDate = '4 hours ago'
+  desired.chapterDate = SiteUtils.getDateFromNow('6 hours ago')
 
   mangaEqual(manga, desired)
 }

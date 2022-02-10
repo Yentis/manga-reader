@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -23,6 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Leveling Up, by Only Eating!'
   desired.chapterUrl = 'https://arangscans.org/chapters/08d9399b-000f-4e68-8849-a20fdb0c183a/read'
   desired.chapterNum = 32
+  desired.chapterDate = moment('2021-06-27', 'YYYY/MM/DD').fromNow()
 
   mangaEqual(manga, desired)
 }

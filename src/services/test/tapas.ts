@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -24,6 +25,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Villains Are Destined to Die'
   desired.chapterUrl = 'https://tapas.io/episode/2407859'
   desired.chapterNum = 90
+  desired.chapterDate = moment('Feb 09, 2022', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -36,6 +38,7 @@ async function readUrlReverseOrder (): Promise<void> {
   desired.title = 'Mystic Musketeer'
   desired.chapterUrl = 'https://tapas.io/episode/2431272'
   desired.chapterNum = 44
+  desired.chapterDate = moment('Feb 06, 2022', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
