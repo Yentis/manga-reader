@@ -4,7 +4,6 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
-import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.HiperDEX
 const QUERY = 'cabalist'
@@ -34,12 +33,12 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrl2 (): Promise<void> {
   const manga = await getMangaInfo('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   const desired = new Manga('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
-  desired.chapter = '108.3'
+  desired.chapter = '109.1'
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/06/Touch-On-193x278.jpg'
   desired.title = 'Touch On'
-  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/108-3/'
-  desired.chapterNum = 108.3
-  desired.chapterDate = SiteUtils.getDateFromNow('21 hours ago')
+  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/109-1/'
+  desired.chapterNum = 109.1
+  desired.chapterDate = moment('February 13, 2022', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
