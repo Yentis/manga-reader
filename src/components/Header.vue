@@ -129,6 +129,7 @@ export default defineComponent({
       addManga,
       storeManga,
       showAddMangaDialog,
+      showEditMangaDialog,
       fetchManga
     } = useMangaList()
 
@@ -162,9 +163,9 @@ export default defineComponent({
       if (manga === null) return
 
       const added = addManga(manga)
-      if (added) {
-        storeManga()
-      }
+      if (added) storeManga()
+
+      await showEditMangaDialog(url)
       refreshing.value = false
     }
 

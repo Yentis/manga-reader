@@ -395,10 +395,14 @@ export default defineComponent({
     url: {
       type: String,
       required: true
+    },
+    initialEditing: {
+      type: Boolean,
+      default: false
     }
   },
 
-  emits: ['imageLoadFailed'],
+  emits: ['imageLoadFailed', 'mangaSaved', 'mangaRemoved'],
 
   setup (props, context) {
     const manga = useMangaItem(props.url)
@@ -435,6 +439,10 @@ export default defineComponent({
       if (url === null) return
 
       manga.newUrl.value = url
+    }
+
+    if (props.initialEditing) {
+      manga.toggleEditing()
     }
 
     return {
@@ -476,10 +484,16 @@ export default defineComponent({
       openSearchDialog,
 
       isUnread,
-      deleteManga: manga.deleteManga,
+      deleteManga: () => {
+        context.emit('mangaRemoved')
+        manga.deleteManga().catch(console.error)
+      },
       readManga: manga.readManga,
       toggleEditing: manga.toggleEditing,
-      saveManga: manga.saveManga
+      saveManga: () => {
+        context.emit('mangaSaved')
+        manga.saveManga().catch(console.error)
+      }
     }
   }
 })

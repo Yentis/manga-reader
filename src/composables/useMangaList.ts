@@ -7,6 +7,7 @@ import { DialogChainObject } from 'quasar/dist/types'
 import { Status } from 'src/enums/statusEnum'
 import SearchDialog from '../components/SearchDialog.vue'
 import SiteDialog from '../components/SiteDialog.vue'
+import EditMangaItemDialog from '../components/EditMangaItemDialog.vue'
 import useNotification from './useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { getMangaInfoByUrl, getSite, searchManga } from 'src/services/siteService'
@@ -114,6 +115,21 @@ export default function useMangaList () {
 
   const showAddMangaDialog = () => showMangaDialog('Add')
   const showUpdateMangaDialog = (query: string) => showMangaDialog('Update', query)
+
+  const showEditMangaDialog = (url: string): Promise<void> => {
+    return new Promise((resolve) => {
+      $q.dialog({
+        component: EditMangaItemDialog,
+        componentProps: {
+          url
+        }
+      }).onOk(() => {
+        resolve()
+      }).onDismiss(() => {
+        resolve()
+      })
+    })
+  }
 
   const fetchManga = async (url: string): Promise<Manga | null> => {
     let manga: Manga | Error
@@ -232,6 +248,7 @@ export default function useMangaList () {
     storeManga,
     showAddMangaDialog,
     showUpdateMangaDialog,
+    showEditMangaDialog,
     fetchManga,
     findManga
   }
