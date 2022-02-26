@@ -1,5 +1,5 @@
 import useMangaList from './useMangaList'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { Manga } from '../classes/manga'
 import { SiteType } from '../enums/siteEnum'
@@ -33,21 +33,20 @@ export default function useManga (curUrl: string) {
     return $store.state.reader.mangaMap.get(curUrl) || new Manga(curUrl, SiteType.ArangScans)
   })
 
-  const url = computed({
-    get: () => manga.value.url,
-    set: async (val) => {
-      const result = await getMangaInfoByUrl(val)
-      if (result instanceof Error) {
-        notification.value = new NotifyOptions(result, 'Failed to update URL')
-        return
-      }
-      const curManga = Object.assign({}, manga.value)
-      const newManga = Manga.inherit(curManga, result)
-
-      updateManga(curUrl, newManga)
-      curUrl = val
+  const url = computed(() => manga.value.url)
+  const setUrl = async (newUrl: string): Promise<void> => {
+    const result = await getMangaInfoByUrl(newUrl)
+    if (result instanceof Error) {
+      notification.value = new NotifyOptions(result, 'Failed to update URL')
+      return
     }
-  })
+
+    const curManga = Object.assign({}, manga.value)
+    const newManga = Manga.inherit(curManga, result)
+
+    updateManga(curUrl, newManga)
+    curUrl = newUrl
+  }
 
   const altSources = computed({
     get: () => manga.value.altSources || {},
@@ -118,6 +117,7 @@ export default function useManga (curUrl: string) {
   return {
     altSources,
     url,
+    setUrl,
     site: computed(() => manga.value.site),
     chapter: computed(() => manga.value.chapter),
     chapterNum: computed(() => manga.value.chapterNum),
@@ -217,18 +217,12 @@ export function useMangaItem (url: string) {
     newSources.value = undefined
   }
 
-  const saveUrl = (): Promise<boolean> => {
+  const saveUrl = async (): Promise<boolean> => {
     const currentUrl = manga.url.value || ''
-    if (newUrl.value === currentUrl) return Promise.resolve(false)
+    if (newUrl.value === currentUrl) return false
 
-    return new Promise((resolve) => {
-      const stopWatching = watch(manga.url, () => {
-        resolve(true)
-        stopWatching()
-      })
-
-      manga.url.value = newUrl.value
-    })
+    await manga.setUrl(newUrl.value)
+    return true
   }
 
   const saveReadNum = (): boolean => {
