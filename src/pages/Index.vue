@@ -21,7 +21,6 @@
       >
         <MangaItem
           :url="url"
-          @image-load-failed="offerRefresh"
         />
       </q-intersection>
     </div>
@@ -56,7 +55,7 @@ export default defineComponent({
     const { settings } = useSettings()
     const { searchValue } = useSearchValue()
     const refreshProgress = ref(0)
-    const { refreshing, offerRefresh } = useRefreshing(refreshProgress)
+    const { refreshing } = useRefreshing(refreshProgress)
 
     const mangaMap = computed(() => $store.state.reader.mangaMap)
     const mangaUrls = computed(() => {
@@ -113,8 +112,7 @@ export default defineComponent({
     return {
       mangaUrls,
       refreshing,
-      refreshProgress,
-      offerRefresh
+      refreshProgress
     }
   }
 })
