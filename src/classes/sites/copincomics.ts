@@ -7,13 +7,16 @@ import { requestHandler } from 'src/services/requestService'
 import { titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
+interface MangaEpisode {
+  dailyUnlock: string,
+  episodetitle: string,
+  episodetitle2: string,
+  episodepubdate: string
+}
+
 interface MangaData {
   body: {
-    episodelist: {
-      episodetitle: string,
-      episodetitle2: string,
-      episodepubdate: string
-    }[],
+    episodelist: MangaEpisode[],
 
     item: {
       titlename: string,
@@ -44,14 +47,18 @@ class CopinComicsData extends BaseData {
     super(url)
     this.mangaData = mangaData
   }
+
+  getLatestEpisode (): MangaEpisode | undefined {
+    const episodes = this.mangaData.body.episodelist
+    return episodes.reverse().find((episode) => episode.dailyUnlock === 'Y')
+  }
 }
 
 export class CopinComics extends BaseSite {
   siteType = SiteType.CopinComics
 
   protected getChapter (data: CopinComicsData): string {
-    const episodes = data.mangaData.body.episodelist
-    return episodes[episodes.length - 1]?.episodetitle || 'Unknown'
+    return data.getLatestEpisode()?.episodetitle || 'Unknown'
   }
 
   protected getChapterNum (data: CopinComicsData): number {
@@ -77,8 +84,7 @@ export class CopinComics extends BaseSite {
   }
 
   protected getChapterDate (data: CopinComicsData): string {
-    const episodes = data.mangaData.body.episodelist
-    const date = episodes[episodes.length - 1]?.episodepubdate.substring(0, 8)
+    const date = data.getLatestEpisode()?.episodepubdate.substring(0, 8)
     if (date === undefined) return ''
 
     const chapterDate = moment(date, 'YYYYMMDD')
