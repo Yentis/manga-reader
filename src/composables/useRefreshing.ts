@@ -30,7 +30,7 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
     set: (val) => $store.commit('reader/updateRefreshing', val)
   })
 
-  const refreshAllManga = (forceRefresh = false) => {
+  const refreshAllManga = async (forceRefresh = false): Promise<void> => {
     if (refreshing.value) return
     refreshProgress.value = 0.01
     refreshing.value = true
@@ -95,22 +95,33 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
     })
     const step = promises.length > 0 ? (1 / promises.length) : 0
 
-    Promise.all(promises)
-      .catch((error) => console.error(error))
-      .finally(() => {
-        storeManga()
-        autoRefreshing.value = false
-        refreshing.value = false
-        refreshProgress.value = 0
-      })
+    try {
+      await Promise.all(promises)
+    } finally {
+      storeManga()
+      autoRefreshing.value = false
+      refreshing.value = false
+      refreshProgress.value = 0
+    }
   }
 
-  const refreshInterval: Ref<ReturnType<typeof setInterval> | undefined> = ref()
-  const createRefreshInterval = (refreshOptions: RefreshOptions) => {
-    refreshInterval.value = setInterval(() => {
-      if (!refreshOptions.enabled || refreshing.value) return
+  const refreshTimer: Ref<ReturnType<typeof setTimeout> | undefined> = ref()
+  const startRefreshTimer = (refreshOptions: RefreshOptions) => {
+    if (refreshTimer.value) clearTimeout(refreshTimer.value)
+    refreshTimer.value = setTimeout(() => {
+      refreshTimer.value = undefined
+      if (!refreshOptions.enabled || refreshing.value) {
+        startRefreshTimer(refreshOptions)
+        return
+      }
+
       autoRefreshing.value = true
       refreshAllManga()
+        .finally(() => {
+          if (refreshTimer.value) return
+          startRefreshTimer(refreshOptions)
+        })
+        .catch(console.error)
     }, refreshOptions.period * 60 * 1000)
   }
 
@@ -119,7 +130,7 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
     notifyOptions.type = 'warning'
     notifyOptions.actions = [{
       label: 'Refresh',
-      handler: () => refreshAllManga(true),
+      handler: () => refreshAllManga(true).catch(console.error),
       color: 'black'
     }]
 
@@ -128,8 +139,8 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
 
   return {
     refreshing,
-    refreshInterval,
-    createRefreshInterval,
+    refreshTimer,
+    startRefreshTimer,
     refreshAllManga,
     offerRefresh
   }
