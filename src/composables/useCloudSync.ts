@@ -9,6 +9,7 @@ import useMangaList from './useMangaList'
 import { ReadListResponse } from '../services/dropboxService'
 import { setEditCode, setShareId } from 'src/services/rentryService'
 import { useStore } from 'src/store'
+import { DropboxResponseError } from 'dropbox'
 
 export default function useCloudSync () {
   const $q = useQuasar()
@@ -34,14 +35,19 @@ export default function useCloudSync () {
     let readListResponse: ReadListResponse
     try {
       readListResponse = await readList()
-    } catch (error) {
-      if (error instanceof Error && error.message === 'Unauthorized') {
-        openDropboxLogin()
-        return
-      }
+    } catch (error: unknown) {
+      if (error instanceof DropboxResponseError) {
+        if (error.status === 401) {
+          openDropboxLogin()
+          return
+        }
 
-      notification.value = new NotifyOptions(error as string)
-      return
+        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error.error)}`)
+      } else if (error instanceof Error) {
+        notification.value = new NotifyOptions(error)
+      } else {
+        notification.value = new NotifyOptions(error as string)
+      }
     }
 
     return new Promise<void>((resolve) => {

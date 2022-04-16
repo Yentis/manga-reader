@@ -85,7 +85,7 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
     const filteredMangaUrlList: string[] = []
 
     $store.state.reader.mangaMap.forEach((manga, url) => {
-      if (manga.status === Status.READING || manga.shouldUpdate === true) return
+      if (manga.status !== Status.READING && manga.shouldUpdate !== true) return
       filteredMangaUrlList.push(url)
     })
 

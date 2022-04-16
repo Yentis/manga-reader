@@ -1,4 +1,4 @@
-import { Dropbox, DropboxAuth, DropboxResponse } from 'dropbox'
+import { Dropbox, DropboxAuth, DropboxResponse, DropboxResponseError } from 'dropbox'
 import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import fetch from 'isomorphic-fetch'
@@ -10,12 +10,12 @@ import { Platform } from 'src/enums/platformEnum'
 import { files } from 'dropbox/types/dropbox_types'
 
 interface ShareContents {
-  id: string,
+  id: string
   editCode: string
 }
 
 export interface ReadListResponse {
-  mangaList: Manga[],
+  mangaList: Manga[]
   shareContents?: ShareContents
 }
 
@@ -101,68 +101,51 @@ export function saveList (mangaList: Manga[]): Promise<void> {
 export async function readList (): Promise<ReadListResponse> {
   const accessToken = getAccessToken()
   if (!accessToken) throw Error('No access token')
-  const downloadPromises: Promise<DropboxResponse<files.FileMetadata>>[] = []
 
-  downloadPromises.push(
-    new Dropbox({
-      accessToken,
-      fetch
-    }).filesDownload({
-      path: `/${constants.SHARE_FILENAME}`
-    })
-  )
+  const shareText = await readFile(`/${constants.SHARE_FILENAME}`, accessToken)
+  const shareContents = shareText ? (JSON.parse(shareText) as ShareContents) : undefined
 
-  downloadPromises.push(
-    new Dropbox({
-      accessToken,
-      fetch
-    }).filesDownload({
-      path: `/${constants.MANGA_LIST_FILENAME}`
-    })
-  )
-
-  const [shareResponse, mangaListResponse] = await Promise.all(downloadPromises)
-  if (!shareResponse || !mangaListResponse) throw Error('Failed to get response')
-
-  const shareFile = shareResponse.result as unknown as { fileBlob: Blob }
-  const mangaListFile = mangaListResponse.result as unknown as { fileBlob: Blob }
-
-  const shareReader = new FileReader()
-  const mangaListReader = new FileReader()
-
-  const readPromises: Promise<unknown>[] = []
-  readPromises.push(new Promise<ShareContents | undefined>((resolve) => {
-    shareReader.onload = function () {
-      if (typeof this.result !== 'string') {
-        resolve(undefined)
-        return
-      }
-
-      resolve(JSON.parse(this.result) as ShareContents)
-    }
-  }))
-
-  readPromises.push(new Promise<Manga[]>((resolve, reject) => {
-    mangaListReader.onload = async function () {
-      if (typeof this.result !== 'string') {
-        reject(Error('Failed to read file'))
-        return
-      }
-
-      const migratedManga = await migrateInput(this.result)
-      resolve(JSON.parse(migratedManga) as Manga[])
-    }
-  }))
-
-  shareReader.readAsText(shareFile.fileBlob)
-  mangaListReader.readAsText(mangaListFile.fileBlob)
-
-  const readResponses = await Promise.all(readPromises)
-  const shareContents = readResponses[0] as ShareContents | undefined
-  const mangaList = readResponses[1] as Manga[]
+  const mangaListText = await readFile(`/${constants.MANGA_LIST_FILENAME}`, accessToken)
+  const migratedManga = mangaListText ? (await migrateInput(mangaListText)) : undefined
+  const mangaList = migratedManga ? (JSON.parse(migratedManga) as Manga[]) : []
 
   return {
     mangaList,
     shareContents
   }
+}
+
+async function readFile (path: string, accessToken: string): Promise<string | undefined> {
+  let response: DropboxResponse<files.FileMetadata> | undefined
+  try {
+    response = await new Dropbox({
+      accessToken,
+      fetch
+    }).filesDownload({
+      path
+    })
+  } catch (error) {
+    if (error instanceof DropboxResponseError) {
+      // File not found
+      if (error.status !== 409) throw error
+    }
+  }
+
+  if (!response) return undefined
+  const file = response.result as unknown as { fileBlob: Blob }
+  const reader = new FileReader()
+
+  const readPromise = new Promise<string | undefined>((resolve) => {
+    reader.onload = function () {
+      if (typeof this.result !== 'string') {
+        resolve(undefined)
+        return
+      }
+
+      resolve(this.result)
+    }
+  })
+
+  reader.readAsText(file.fileBlob)
+  return readPromise
 }
