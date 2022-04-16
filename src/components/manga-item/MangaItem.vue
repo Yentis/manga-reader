@@ -137,6 +137,10 @@
               class="q-mb-sm"
             />
 
+            <div :class="{ 'text-caption': mobileView, 'text-body2': !mobileView, 'manga-subtitle': true }">
+              Current: <span>{{ mangaChapter }}</span>
+            </div>
+
             <q-input
               v-model="newNotes"
               stack-label
