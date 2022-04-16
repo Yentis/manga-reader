@@ -16,9 +16,9 @@ import { parseNum, titleContainsQuery } from 'src/utils/siteUtils'
 interface ChapterResult {
   id: string,
   attributes: {
-    title: string,
-    volume: string,
-    chapter: string,
+    title?: string,
+    volume?: string,
+    chapter?: string,
     updatedAt: string
   }
 }
@@ -88,14 +88,22 @@ export class MangaDex extends BaseSite {
     if (!attributes) return 'Unknown'
 
     const chapter = attributes.chapter
-    let chapterText = `Chapter ${chapter}`
+    let chapterText = chapter ? `Chapter ${chapter}` : ''
 
     if (attributes.title) {
-      chapterText += ` - ${attributes.title}`
+      if (chapterText.length === 0) {
+        chapterText = attributes.title
+      } else {
+        chapterText += ` - ${attributes.title}`
+      }
     }
 
     if (attributes.volume) {
-      chapterText = `Volume ${attributes.volume} - ${chapterText}`
+      if (chapterText.length === 0) {
+        chapterText = `Volume ${attributes.volume}`
+      } else {
+        chapterText = `Volume ${attributes.volume} - ${chapterText}`
+      }
     }
 
     return chapterText
