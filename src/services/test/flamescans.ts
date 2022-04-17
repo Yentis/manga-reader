@@ -22,7 +22,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 179.5 [END]'
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/solo-cover-1.png'
   desired.title = 'Solo Leveling'
-  desired.chapterUrl = 'https://flamescans.org/1645891261-solo-leveling-chapter-179-5/'
+  desired.chapterUrl = 'https://flamescans.org/1650124861-solo-leveling-chapter-179-5/'
   desired.chapterNum = 179.5
   desired.chapterDate = moment('January 3, 2022', 'MMMM DD, YYYY').fromNow()
 

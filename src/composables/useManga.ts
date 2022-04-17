@@ -30,7 +30,7 @@ export default function useManga (curUrl: string) {
     updateMangaShouldUpdate
   } = useMangaList()
   const manga = computed(() => {
-    return $store.state.reader.mangaMap.get(curUrl) || new Manga(curUrl, SiteType.ArangScans)
+    return $store.state.reader.mangaMap.get(curUrl) || new Manga(curUrl, SiteType.AlphaScans)
   })
 
   const url = computed(() => manga.value.url)

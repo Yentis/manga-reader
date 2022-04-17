@@ -3,7 +3,6 @@ import { Manga } from 'src/classes/manga'
 import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfoByUrl } from './siteService'
-import { testArangScans } from './test/arangscans'
 import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
 import { testFirstKissManga } from './test/firstkissmanga'
@@ -40,9 +39,6 @@ export default async function testAll (
 
   promises.push(testAlphaScans().catch((error) => {
     errors.push({ site: SiteType.AlphaScans, error: error })
-  }))
-  promises.push(testArangScans().catch((error) => {
-    errors.push({ site: SiteType.ArangScans, error: error })
   }))
   promises.push(testAsuraScans().catch((error) => {
     errors.push({ site: SiteType.AsuraScans, error: error })

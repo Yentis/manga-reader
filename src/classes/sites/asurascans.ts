@@ -35,15 +35,15 @@ export class AsuraScans extends BaseSite {
     }
   }
 
-  getChapterUrl (data: AsuraScansData): string {
+  protected getChapterUrl (data: AsuraScansData): string {
     return data.chapterUrl?.getAttribute('href') || ''
   }
 
-  getChapterNum (data: BaseData): number {
+  protected getChapterNum (data: BaseData): number {
     return parseNum(data.chapterNum?.getAttribute('data-num'))
   }
 
-  getChapterDate (data: BaseData): string {
+  protected getChapterDate (data: BaseData): string {
     const chapterDate = moment(data.chapterDate?.textContent, 'MMMM DD, YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
@@ -52,7 +52,7 @@ export class AsuraScans extends BaseSite {
     }
   }
 
-  getImage (data: BaseData): string {
+  protected getImage (data: BaseData): string {
     return data.image?.getAttribute('content') || ''
   }
 
@@ -125,7 +125,7 @@ export class AsuraScans extends BaseSite {
   getTestUrl () : string {
     switch (this.siteType) {
       case SiteType.AsuraScans:
-        return `${this.getUrl()}/manga/tougen-anki/`
+        return `${this.getUrl()}/comics/mookhyang-the-origin/`
       case SiteType.FlameScans:
         return `${this.getUrl()}/series/solo-leveling/`
       case SiteType.AlphaScans:

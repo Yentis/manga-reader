@@ -6,7 +6,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.AsuraScans
-const QUERY = 'tougen anki'
+const QUERY = 'mookhyang the origin'
 
 export async function testAsuraScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -20,12 +20,12 @@ export async function testAsuraScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 19'
-  desired.image = 'https://www.asurascans.com/wp-content/uploads/2020/09/49754.jpg'
-  desired.title = 'Tougen Anki'
-  desired.chapterUrl = 'https://www.asurascans.com/tougen-anki-chapter-19/'
-  desired.chapterNum = 19
-  desired.chapterDate = moment('November 1, 2020', 'MMMM DD, YYYY').fromNow()
+  desired.chapter = 'Chapter 47'
+  desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ponytail_boy_.png'
+  desired.title = 'Mookhyang The Origin'
+  desired.chapterUrl = 'https://www.asurascans.com/1649969469-mookhyang-the-origin-chapter-47/'
+  desired.chapterNum = 47
+  desired.chapterDate = '8 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -37,7 +37,7 @@ async function readUrlAdvanced (): Promise<void> {
   desired.chapter = 'Chapter 80'
   desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/cover4.gif'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-80/'
+  desired.chapterUrl = 'https://www.asurascans.com/1649969469-solo-bug-player-chapter-80/'
   desired.chapterNum = 80
   desired.chapterDate = moment('October 3, 2021', 'MMMM DD, YYYY').fromNow()
 
@@ -47,9 +47,9 @@ async function readUrlAdvanced (): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://www.asurascans.com/wp-content/uploads/2020/09/49754-194x300.jpg'
-  desired.chapter = '19'
-  desired.url = 'https://www.asurascans.com/comics/tougen-anki/'
+  desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ponytail_boy_-222x300.png'
+  desired.chapter = '47'
+  desired.url = 'https://www.asurascans.com/comics/1649969363-mookhyang-the-origin/'
 
   return searchValid(results, desired, QUERY)
 }

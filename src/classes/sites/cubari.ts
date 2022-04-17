@@ -5,7 +5,6 @@ import { requestHandler } from 'src/services/requestService'
 import { getUrl, parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
-import qs from 'querystring'
 
 export class Cubari extends BaseSite {
   siteType = SiteType.Cubari
@@ -79,44 +78,10 @@ export class Cubari extends BaseSite {
   }
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
-    const cubariManga = await this.searchCubari(query)
-    if (cubariManga instanceof Error) return cubariManga
-
     const guyaManga = await this.searchGuya(query)
     if (guyaManga instanceof Error) return guyaManga
 
-    return [...cubariManga, ...guyaManga]
-  }
-
-  private async searchCubari (query: string): Promise<Error | Manga[]> {
-    const queryString = qs.stringify({
-      q: `site:${this.getUrl()} ${query}`
-    })
-
-    const request: HttpRequest = {
-      method: 'GET',
-      url: `https://www.google.com/search?${queryString}`,
-      headers: {
-        cookie: 'CONSENT=YES+cb.20211109-06-p0.en+F+325'
-      }
-    }
-
-    const response = await requestHandler.sendRequest(request)
-    const doc = await parseHtmlFromString(response.data)
-    const promises: Promise<Error | Manga>[] = []
-
-    doc.querySelectorAll('a').forEach((element) => {
-      const url = element.href
-      if (!url.startsWith(this.getUrl())) return
-
-      const title = element.textContent?.split(this.getUrl())[0]
-      if (!titleContainsQuery(query, title)) return
-
-      promises.push(this.readUrl(url))
-    })
-
-    const mangaList = await Promise.all(promises)
-    return mangaList.filter(manga => manga instanceof Manga) as Manga[]
+    return guyaManga
   }
 
   private async searchGuya (query: string): Promise<Error | Manga[]> {

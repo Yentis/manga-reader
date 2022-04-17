@@ -51,7 +51,6 @@ import { defineComponent, ref } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import testAll from '../services/testService'
 import { SiteType } from '../enums/siteEnum'
-import { testArangScans } from '../services/test/arangscans'
 import { testAsuraScans } from '../services/test/asurascans'
 import { testBatoto } from '../services/test/batoto'
 import { testFirstKissManga } from '../services/test/firstkissmanga'
@@ -133,9 +132,6 @@ export default defineComponent({
       switch (selectedSite.value) {
         case SiteType.AlphaScans:
           await doTest(testAlphaScans)
-          break
-        case SiteType.ArangScans:
-          await doTest(testArangScans)
           break
         case SiteType.AsuraScans:
           await doTest(testAsuraScans)

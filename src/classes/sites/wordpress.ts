@@ -185,7 +185,7 @@ export class WordPress extends BaseSite {
 
       manga.image = this.getImageSrc(imageElem?.querySelectorAll('img')[0])
       manga.title = elem.querySelectorAll('.post-title')[0]?.textContent?.trim() || ''
-      manga.chapter = elem.querySelectorAll('.font-meta.chapter')[0]?.textContent || 'Unknown'
+      manga.chapter = elem.querySelectorAll('.font-meta.chapter')[0]?.textContent?.trim() || 'Unknown'
 
       if (titleContainsQuery(query, manga.title)) {
         mangaList.push(manga)

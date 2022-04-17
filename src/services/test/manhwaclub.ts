@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -20,11 +19,11 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 35'
-  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/1078.jpg'
+  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/814.jpg'
   desired.title = 'Movies Are Real'
   desired.chapterUrl = 'https://manhwa.club/comic/movies-are-real/chapter-35/reader'
   desired.chapterNum = 35
-  desired.chapterDate = moment('2021-10-15', 'YYYY-MM-DD').fromNow()
+  desired.chapterDate = '16 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,7 +31,7 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/253.jpg'
+  desired.image = 'https://cdn.manhwa.club/mhc/storage/comics/thumbs/41.jpg'
   desired.chapter = 'Chapter 30'
   desired.url = 'https://manhwa.club/comic/cram-school-scandal'
 

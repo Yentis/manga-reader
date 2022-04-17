@@ -3,7 +3,6 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
-import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.ZeroScans
 const QUERY = 'all heavenly days'
@@ -20,11 +19,11 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 48'
-  desired.image = 'https://zeroscans.com/storage/comics/8DCFC50774FFFF3D13215FE6857AB0811143AF014679A2AC/7GSIDO6mfZXWN1WbKS6MR8QbXXZHsALjDv8tgRy4.jpeg'
+  desired.image = 'https://api.zeroscans.com/storage/76097/conversions/07e0721be5f0d441a13507975adaabf9-full.webp'
   desired.title = 'All Heavenly Days'
-  desired.chapterUrl = 'https://zeroscans.com/comics/136750-all-heavenly-days/1/48'
+  desired.chapterUrl = 'https://zeroscans.com/comics/all-heavenly-days/384'
   desired.chapterNum = 48
-  desired.chapterDate = SiteUtils.getDateFromNow('2 years ago')
+  desired.chapterDate = '21 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,9 +31,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://zeroscans.com/storage/comics/8DCFC50774FFFF3D13215FE6857AB0811143AF014679A2AC/7GSIDO6mfZXWN1WbKS6MR8QbXXZHsALjDv8tgRy4.jpeg'
+  desired.image = 'https://api.zeroscans.com/storage/76097/conversions/07e0721be5f0d441a13507975adaabf9-full.webp'
   desired.chapter = 'Chapter 48'
-  desired.url = 'https://zeroscans.com/comics/136750-all-heavenly-days'
+  desired.url = 'https://zeroscans.com/comics/all-heavenly-days'
 
   return searchValid(results, desired, QUERY)
 }

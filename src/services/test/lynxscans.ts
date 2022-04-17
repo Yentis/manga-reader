@@ -31,7 +31,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://lynxscans.com/storage/comics/4431EFC0673555AAB70C6C5D434A0B2BDB3C92B0AB3CF800/VRidS9sTtJR7cOVMZy7DzeYaEwQLbcQ3BXRKhUEN.png'
-  desired.chapter = 'Chapter 28'
+  desired.chapter = 'Chapter 29'
   desired.url = 'https://lynxscans.com/comics/269405-another-happy-day-for-the-villainess'
 
   return searchValid(results, desired, QUERY)

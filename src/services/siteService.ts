@@ -44,9 +44,6 @@ import {
   LinkingSiteType
 } from '../enums/linkingSiteEnum'
 import PQueue from 'p-queue'
-import {
-  ArangScans
-} from '../classes/sites/arangscans'
 import constants from 'src/classes/constants'
 import { ManhwaClub } from 'src/classes/sites/manhwaclub'
 import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
@@ -54,6 +51,7 @@ import { getSiteByUrl } from 'src/utils/siteUtils'
 import { Cubari } from 'src/classes/sites/cubari'
 import { Tapas } from 'src/classes/sites/tapas'
 import { CopinComics } from 'src/classes/sites/copincomics'
+import { ZeroScans } from 'src/classes/sites/zeroscans'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -72,10 +70,9 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],
-  [SiteType.ZeroScans, new Genkan(SiteType.ZeroScans)],
+  [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
-  [SiteType.ArangScans, new ArangScans()],
   [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],

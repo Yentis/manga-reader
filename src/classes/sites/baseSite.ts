@@ -167,10 +167,10 @@ export abstract class BaseSite {
     const manga = new Manga(data.url, this.siteType)
     manga.chapter = this.getChapter(data)
     manga.chapterUrl = this.getChapterUrl(data)
+    manga.chapterNum = this.getChapterNum(data)
+    manga.chapterDate = this.getChapterDate(data)
     manga.image = this.getImage(data)
     manga.title = this.getTitle(data)
-    manga.chapterDate = this.getChapterDate(data)
-    manga.chapterNum = this.getChapterNum(data)
 
     if (manga.title === '') {
       throw Error('Could not parse site')

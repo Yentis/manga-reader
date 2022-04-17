@@ -116,8 +116,6 @@ export class Genkan extends BaseSite {
 
   getTestUrl () : string {
     switch (this.siteType) {
-      case SiteType.ZeroScans:
-        return `${this.getUrl()}/comics/136750-all-heavenly-days`
       case SiteType.LynxScans:
         return `${this.getUrl()}/comics/698439-dawn-of-the-eastland`
     }

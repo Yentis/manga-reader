@@ -97,6 +97,6 @@ export class Mangakakalot extends BaseSite {
   }
 
   getTestUrl (): string {
-    return `${this.getUrl()}/read-qu4wd158504821675`
+    return `${this.getUrl()}/read-mm1rb158504859793`
   }
 }
