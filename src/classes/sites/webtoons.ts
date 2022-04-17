@@ -2,39 +2,70 @@ import { BaseData, BaseSite } from './baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import moment from 'moment'
 import { Manga } from 'src/classes/manga'
-import { getPlatform } from 'src/services/platformService'
-import { Platform } from 'src/enums/platformEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
 import qs from 'qs'
-import { parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
-import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
+import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
+import { HEADER_USER_AGENT } from '../requests/baseRequest'
 
 interface WebtoonsSearch {
   query: string[]
   items: string[][][][]
 }
 
-class WebtoonsData extends BaseData {
-  chapterUrl?: Element
-}
-
 export class Webtoons extends BaseSite {
   siteType = SiteType.Webtoons
 
-  getChapterNum (data: BaseData): number {
-    return parseNum(data.chapterNum?.getAttribute('data-episode-no'))
+  protected getChapter (data: BaseData): string {
+    const chapterTitle = data.chapter?.querySelectorAll('title')[0]
+    const chapterText = chapterTitle?.textContent
+    if (!chapterText) return 'Unknown'
+
+    return this.removeCdata(chapterText)
   }
 
-  getChapterUrl (data: WebtoonsData): string {
-    return data.chapterUrl?.getAttribute('href') || ''
+  protected getChapterUrl (data: BaseData): string {
+    const chapterLink = data.chapter?.querySelectorAll('link')[0]
+    return chapterLink?.textContent || ''
   }
 
-  getChapterDate (data: BaseData): string {
+  protected getChapterNum (data: BaseData): number {
+    const chapterText = data.chapterNum?.textContent
+    if (!chapterText) return 0
+
+    const chapter = this.removeCdata(chapterText)
+    const pattern = /[\d\\.,]+\b/gm
+
+    let num = 0
+    let match: RegExpExecArray | null
+
+    while ((match = pattern.exec(chapter)) !== null) {
+      const matchedValue = match[0]
+      if (!matchedValue) continue
+
+      const parsedMatch = parseFloat(matchedValue)
+      if (!isNaN(parsedMatch)) {
+        num = parsedMatch
+        break
+      }
+    }
+
+    if (num === 0) {
+      const chapterNum = chapter.split(' ')[0]
+      if (!chapterNum) return num
+
+      const candidateNum = parseFloat(chapterNum)
+      if (!isNaN(candidateNum)) num = candidateNum
+    }
+
+    return num
+  }
+
+  protected getChapterDate (data: BaseData): string {
     const chapterDateText = data.chapterDate?.textContent?.trim()
     if (!chapterDateText) return ''
 
-    const chapterDate = moment(chapterDateText, 'MMM DD, YYYY')
+    const chapterDate = moment(chapterDateText, 'dddd, DD MMM YYYY HH:mm:ss')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -42,45 +73,64 @@ export class Webtoons extends BaseSite {
     }
   }
 
-  getImage (data: BaseData): string {
-    return data.image?.getAttribute('content') || ''
+  protected getImage (data: BaseData): string {
+    return data.image?.textContent || ''
+  }
+
+  protected getTitle (data: BaseData): string {
+    const titleText = data.title?.textContent
+    if (!titleText) return ''
+
+    return this.removeCdata(titleText)
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
-    const mobile = url.includes('//m.' + this.siteType)
-    const platform = getPlatform()
-    const headers: Record<string, string> = {}
+    let baseUrl: string
+    if (url.includes('episodeList?')) {
+      const baseRequest: HttpRequest = {
+        method: 'GET',
+        url,
+        headers: {
+          cookie: `pagGDPR=true;timezoneOffset=${(moment().utcOffset() / 60).toString()}`
+        }
+      }
 
-    if (mobile && platform !== Platform.Cordova) {
-      headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
+      const baseResponse = await requestHandler.sendRequest(baseRequest)
+      const baseDoc = await parseHtmlFromString(baseResponse.data)
+
+      const urlElement = baseDoc.querySelectorAll('meta[property="og:url"]')[0]
+      const urlContent = urlElement?.getAttribute('content')
+      if (!urlContent) return Error(`Failed to find feed for ${url}`)
+
+      baseUrl = urlContent
+    } else {
+      baseUrl = url
     }
+
+    const desktopUrl = baseUrl.replace('m.webtoons.com', 'www.webtoons.com')
+    const rssUrl = desktopUrl.replace('list?title_no', 'rss?title_no')
+
+    const headers: Record<string, string> = {}
+    headers[HEADER_USER_AGENT] = ''
 
     const request: HttpRequest = {
       method: 'GET',
-      url,
-      headers: {
-        ...headers,
-        cookie: `pagGDPR=true;timezoneOffset=${(moment().utcOffset() / 60).toString()}`
-      }
+      url: rssUrl,
+      headers
     }
     const response = await requestHandler.sendRequest(request)
-    const doc = await parseHtmlFromString(response.data)
+    const doc = await parseHtmlFromString(response.data, undefined, 'text/xml')
 
-    const data = new WebtoonsData(url)
-    data.image = doc.querySelectorAll('meta[property="og:image"]')[0]
-    data.chapterDate = doc.querySelectorAll('.date')[0]
+    const channel = doc.querySelectorAll('channel')[0]
+    const data = new BaseData(url)
 
-    if (mobile || platform === Platform.Cordova) {
-      data.chapter = doc.querySelectorAll('.sub_title span')[0]
-      data.chapterUrl = doc.querySelectorAll('li[data-episode-no] a')[0]
-      data.chapterNum = doc.querySelectorAll('#_episodeList li[data-episode-no]')[0]
-      data.title = doc.querySelectorAll('._btnInfo .subj')[0]
-    } else {
-      data.chapter = doc.querySelectorAll('#_listUl .subj span')[0]
-      data.chapterUrl = doc.querySelectorAll('#_listUl a')[0]
-      data.chapterNum = doc.querySelectorAll('#_listUl li')[0]
-      data.title = doc.querySelectorAll('.info .subj')[0]
-    }
+    data.image = channel?.querySelectorAll('image url')[0]
+    data.title = channel?.querySelectorAll('title')[0]
+
+    const chapter = channel?.querySelectorAll('item')[0]
+    data.chapter = chapter
+    data.chapterNum = chapter?.querySelectorAll('title')[0]
+    data.chapterDate = chapter?.querySelectorAll('pubDate')[0]
 
     return this.buildManga(data)
   }
@@ -123,5 +173,9 @@ export class Webtoons extends BaseSite {
 
   getTestUrl (): string {
     return `${this.getUrl()}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
+  }
+
+  private removeCdata (content: string): string {
+    return content.replace('<![CDATA[', '').replace(']]>', '').trim()
   }
 }

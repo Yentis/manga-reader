@@ -1,3 +1,4 @@
+import PQueue from 'p-queue'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
@@ -46,6 +47,11 @@ class ZeroScansData extends BaseData {
 
 export class ZeroScans extends BaseSite {
   siteType = SiteType.ZeroScans
+
+  constructor () {
+    super()
+    this.requestQueue = new PQueue({ interval: 1000, intervalCap: 1 })
+  }
 
   protected getChapter (data: ZeroScansData): string {
     const chapterNum = data.chapterData?.name

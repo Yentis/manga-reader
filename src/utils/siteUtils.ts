@@ -3,6 +3,8 @@ import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 import { Guya, SiteName, SiteType } from 'src/enums/siteEnum'
 import ChromeWindow from 'src/interfaces/chromeWindow'
 
+type DOMParserSupportedType = 'text/html' | 'text/xml'
+
 export const siteAliases = [
   { url: 'manganato.com', site: SiteType.Manganelo },
   { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
@@ -14,12 +16,16 @@ export function getUrl (url: string) {
   return `https://${url}`
 }
 
-export function parseHtmlFromString (html: string, parser?: DOMParser): Promise<Document> {
+export function parseHtmlFromString (
+  html: string,
+  parser?: DOMParser,
+  type: DOMParserSupportedType = 'text/html'
+): Promise<Document> {
   const chromeWindow = (window as unknown) as ChromeWindow
 
   return new Promise((resolve) => {
     chromeWindow.requestIdleCallback(() => {
-      resolve((parser || new DOMParser()).parseFromString(html, 'text/html'))
+      resolve((parser || new DOMParser()).parseFromString(html, type))
     }, { timeout: 1000 })
   })
 }
