@@ -2,7 +2,12 @@ import { Manga } from 'src/classes/manga'
 import { SimpleSortType, SortType } from 'src/enums/sortingEnum'
 import { Status } from 'src/enums/statusEnum'
 
-export function mangaSort (a: Manga | undefined, b: Manga, sortedBy: SortType | SimpleSortType): number {
+export function mangaSort (
+  a: Manga | undefined,
+  b: Manga,
+  sortedBy: SortType | SimpleSortType,
+  ignoreProgress = false
+): number {
   if (!a) return 1
 
   if ((a.status !== Status.READING) && (b.status === Status.READING)) {
@@ -33,15 +38,17 @@ export function mangaSort (a: Manga | undefined, b: Manga, sortedBy: SortType | 
     return -1
   }
 
-  if (a.status === Status.READING && b.status === Status.READING) {
-    const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
-    const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
+  if (!ignoreProgress) {
+    if (a.status === Status.READING && b.status === Status.READING) {
+      const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
+      const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
 
-    if (!isARead && isBRead) {
-      return -1
-    }
-    if (!isBRead && isARead) {
-      return 1
+      if (!isARead && isBRead) {
+        return -1
+      }
+      if (!isBRead && isARead) {
+        return 1
+      }
     }
   }
 

@@ -82,44 +82,50 @@ export default function useCloudSync () {
     })
   }
 
-  const exportList = () => {
+  const exportList = async () => {
     if (!getAccessToken()) {
       openDropboxLogin()
-      return Promise.resolve()
+      return
     }
 
-    return new Promise<void>((resolve) => {
-      const mangaMap = $store.state.reader.mangaMap
+    const mangaMap = $store.state.reader.mangaMap
 
+    const confirmed = await new Promise<boolean>((resolve) => {
       $q.dialog({
         component: ConfirmationDialog,
         componentProps: {
           title: 'Export to Dropbox',
           content: `Are you sure you want to export ${mangaMap.size} titles to Dropbox?`
         }
-      }).onOk(async () => {
-        try {
-          await saveList(Array.from(mangaMap.values()))
-        } catch (error) {
-          if (error instanceof Error && error.message === 'Unauthorized') {
-            openDropboxLogin()
-            resolve()
-            return
-          }
+      }).onOk(() => {
+        resolve(true)
+      }).onCancel(() => {
+        resolve(false)
+      })
+    })
 
-          notification.value = new NotifyOptions(error as string)
-          resolve()
+    if (!confirmed) return
+
+    try {
+      await saveList(Array.from(mangaMap.values()))
+
+      const notifyOptions = new NotifyOptions('Exported!')
+      notifyOptions.type = 'positive'
+      notification.value = notifyOptions
+    } catch (error: unknown) {
+      if (error instanceof DropboxResponseError) {
+        if (error.status === 401) {
+          openDropboxLogin()
           return
         }
 
-        const notifyOptions = new NotifyOptions('Exported!')
-        notifyOptions.type = 'positive'
-        notification.value = notifyOptions
-        resolve()
-      }).onCancel(() => {
-        resolve()
-      })
-    })
+        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error.error)}`)
+      } else if (error instanceof Error) {
+        notification.value = new NotifyOptions(error)
+      } else {
+        notification.value = new NotifyOptions(error as string)
+      }
+    }
   }
 
   return { importList, exportList }

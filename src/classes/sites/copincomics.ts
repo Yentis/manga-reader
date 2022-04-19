@@ -8,10 +8,11 @@ import { titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
 interface MangaEpisode {
-  dailyUnlock: string,
-  episodetitle: string,
-  episodetitle2: string,
+  dailyUnlock: string
+  episodetitle: string
+  episodetitle2: string
   episodepubdate: string
+  episodepkey: string
 }
 
 interface MangaData {
@@ -50,7 +51,10 @@ class CopinComicsData extends BaseData {
 
   getLatestEpisode (): MangaEpisode | undefined {
     const episodes = this.mangaData.body.episodelist
-    return episodes.reverse().find((episode) => episode.dailyUnlock === 'Y')
+
+    return episodes.sort((a, b) => {
+      return parseInt(b.episodepkey) - parseInt(a.episodepkey)
+    }).find((episode) => episode.dailyUnlock === 'Y')
   }
 }
 

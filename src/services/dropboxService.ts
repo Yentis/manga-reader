@@ -44,58 +44,55 @@ export async function getAuthUrl (): Promise<string> {
   return authUrl.toString()
 }
 
-export function saveList (mangaList: Manga[]): Promise<void> {
+export async function saveList (mangaList: Manga[]): Promise<void> {
   const accessToken = getAccessToken()
-  if (!accessToken) return Promise.reject(Error('No access token'))
+  if (!accessToken) throw Error('No access token')
 
-  return new Promise((resolve, reject) => {
-    const contents = JSON.stringify(mangaList)
+  const contents = JSON.stringify(mangaList)
+  if (contents.length >= UPLOAD_FILE_SIZE_LIMIT) throw Error('File too large')
 
-    if (contents.length >= UPLOAD_FILE_SIZE_LIMIT) return reject(Error('File too large'))
+  const promises: Promise<unknown>[] = []
 
-    const promises = []
+  promises.push(
+    new Dropbox({
+      accessToken,
+      fetch
+    }).filesUpload({
+      path: `/${constants.MANGA_LIST_FILENAME}`,
+      contents,
+      mode: {
+        '.tag': 'overwrite'
+      }
+    })
+  )
 
-    promises.push(
-      new Dropbox({
-        accessToken,
-        fetch
-      }).filesUpload({
-        path: `/${constants.MANGA_LIST_FILENAME}`,
-        contents,
-        mode: {
-          '.tag': 'overwrite'
-        }
-      })
-    )
+  const shareId = getShareId()
+  const editCode = getEditCode()
 
-    const shareId = getShareId()
-    const editCode = getEditCode()
+  if (!shareId && !editCode) {
+    await Promise.all(promises)
+    return
+  }
 
-    if (!shareId && !editCode) {
-      Promise.all(promises).then(() => resolve()).catch((error) => reject(error))
-      return
-    }
+  const shareContents: ShareContents = {
+    id: shareId,
+    editCode
+  }
 
-    const shareContents: ShareContents = {
-      id: shareId,
-      editCode
-    }
+  promises.push(
+    new Dropbox({
+      accessToken,
+      fetch
+    }).filesUpload({
+      path: `/${constants.SHARE_FILENAME}`,
+      contents: JSON.stringify(shareContents),
+      mode: {
+        '.tag': 'overwrite'
+      }
+    })
+  )
 
-    promises.push(
-      new Dropbox({
-        accessToken,
-        fetch
-      }).filesUpload({
-        path: `/${constants.SHARE_FILENAME}`,
-        contents: JSON.stringify(shareContents),
-        mode: {
-          '.tag': 'overwrite'
-        }
-      })
-    )
-
-    Promise.all(promises).then(() => resolve()).catch((error) => reject(error))
-  })
+  await Promise.all(promises)
 }
 
 export async function readList (): Promise<ReadListResponse> {

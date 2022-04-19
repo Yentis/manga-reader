@@ -30,35 +30,20 @@ export class Webtoons extends BaseSite {
   }
 
   protected getChapterNum (data: BaseData): number {
-    const chapterText = data.chapterNum?.textContent
-    if (!chapterText) return 0
+    const chapterLink = data.chapter?.querySelectorAll('link')[0]
+    const chapterUrl = chapterLink?.textContent
+    if (!chapterUrl) return 0
 
-    const chapter = this.removeCdata(chapterText)
-    const pattern = /[\d\\.,]+\b/gm
+    const queryString = chapterUrl.substring(chapterUrl.indexOf('?'))
+    const query = qs.parse(queryString)
 
-    let num = 0
-    let match: RegExpExecArray | null
+    const episodeText = query.episode_no?.toString()
+    if (!episodeText) return 0
 
-    while ((match = pattern.exec(chapter)) !== null) {
-      const matchedValue = match[0]
-      if (!matchedValue) continue
+    const episode = parseFloat(episodeText)
+    if (isNaN(episode)) return 0
 
-      const parsedMatch = parseFloat(matchedValue)
-      if (!isNaN(parsedMatch)) {
-        num = parsedMatch
-        break
-      }
-    }
-
-    if (num === 0) {
-      const chapterNum = chapter.split(' ')[0]
-      if (!chapterNum) return num
-
-      const candidateNum = parseFloat(chapterNum)
-      if (!isNaN(candidateNum)) num = candidateNum
-    }
-
-    return num
+    return episode
   }
 
   protected getChapterDate (data: BaseData): string {

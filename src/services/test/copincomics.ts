@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Return Survival'
   desired.chapterUrl = ''
   desired.chapterNum = 34
-  desired.chapterDate = '7 months ago'
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }
