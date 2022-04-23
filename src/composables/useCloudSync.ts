@@ -1,7 +1,7 @@
 import { useQuasar } from 'quasar'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from 'src/classes/urlNavigation'
-import { getAccessToken, getAuthUrl, readList, saveList } from 'src/services/dropboxService'
+import { getAuth, getAuthUrl, readList, saveList } from 'src/services/dropboxService'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
@@ -27,7 +27,7 @@ export default function useCloudSync () {
   }
 
   const importList = async () => {
-    if (!getAccessToken()) {
+    if (!getAuth()) {
       openDropboxLogin()
       return
     }
@@ -83,7 +83,7 @@ export default function useCloudSync () {
   }
 
   const exportList = async () => {
-    if (!getAccessToken()) {
+    if (!getAuth()) {
       openDropboxLogin()
       return
     }

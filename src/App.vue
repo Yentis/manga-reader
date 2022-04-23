@@ -11,6 +11,7 @@ import { useAppNotification } from './composables/useNotification'
 import { useAppMangaList } from './composables/useMangaList'
 import { useAppWindowSize } from './composables/useWindowSize'
 import { useAppPushNotification } from './composables/usePushNotification'
+import { useAppAuth } from './composables/useAuthCallback'
 import { init as initRequestService } from './services/requestService'
 
 export default defineComponent({
@@ -20,6 +21,7 @@ export default defineComponent({
     initRequestService()
 
     useAppNotification()
+    useAppAuth()
     useAppSettings()
     useAppMangaList()
     useAppUrlNavigation()

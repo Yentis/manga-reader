@@ -10,6 +10,7 @@ import { requestHandler } from './requestService'
 
 const OPEN_BROWSER_KEY = 'open_browser'
 const REFRESH_OPTIONS_KEY = 'refresh_options'
+const DROPBOX_TOKEN = 'dropbox_token'
 
 interface MigrationManga {
   mangaDexId: number | undefined
@@ -53,6 +54,18 @@ export function tryMigrateSettings () {
   }
 
   LocalStorage.set(constants.SETTINGS, settings)
+}
+
+export function tryMigrateDropbox () {
+  if (getMigrationVersion() === version) return
+  const dropboxAuth = LocalStorage.getItem(constants.DROPBOX_AUTH)
+  if (dropboxAuth) return
+
+  const dropboxToken = LocalStorage.getItem(DROPBOX_TOKEN)
+  if (typeof dropboxToken !== 'string') return
+
+  LocalStorage.set(constants.DROPBOX_AUTH, { access_token: dropboxToken })
+  LocalStorage.remove(DROPBOX_TOKEN)
 }
 
 export async function migrateInput (input: string): Promise<string> {

@@ -7,6 +7,6 @@ export default {
   SHARE_EDIT_CODE: 'share_edit_code',
   MANGA_LIST_FILENAME: 'manga-reader.json',
   SHARE_FILENAME: 'share.json',
-  DROPBOX_TOKEN: 'dropbox_token',
+  DROPBOX_AUTH: 'dropbox_auth',
   REDIRECT_PREFIX: 'REDIRECT:'
 }

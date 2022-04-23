@@ -192,7 +192,7 @@ export default defineComponent({
 
       importList().finally(() => {
         importing.value = false
-      })
+      }).catch(console.error)
     }
 
     const exporting = ref(false)
@@ -201,7 +201,7 @@ export default defineComponent({
 
       exportList().finally(() => {
         exporting.value = false
-      })
+      }).catch(console.error)
     }
 
     const { mobileView } = useMobileView()

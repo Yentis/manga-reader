@@ -119,13 +119,13 @@ function loadAppUrl () {
 }
 
 function onNavigation (event: Event, url: string) {
-  if (!url.startsWith('http://localhost/redirect#')) return
+  if (!url.startsWith('http://localhost/redirect?')) return
   handleDropboxOAuth(event, url)
 }
 
 function handleDropboxOAuth (event: Event, url: string) {
   event.preventDefault()
-  queryString = qs.parse(url.replace('http://localhost/redirect#', ''))
+  queryString = qs.parse(url.replace('http://localhost/redirect?', ''))
   oauthType = 'dropbox'
 
   loadAppUrl()
@@ -135,7 +135,7 @@ function handleDropboxOAuth (event: Event, url: string) {
 function onFinishLoad () {
   if (!queryString || !oauthType) return
 
-  mainWindow?.webContents.send(`${oauthType}-token`, queryString.access_token)
+  mainWindow?.webContents.send(`${oauthType}-token`, queryString)
   mainWindow?.webContents.removeListener('did-finish-load', onFinishLoad)
 }
 

@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from 'electron'
 import HttpRequest from 'src/interfaces/httpRequest'
+import qs from 'qs'
 
 const whitelist = [
   'http://localhost',
@@ -18,15 +19,15 @@ if (!matchingItem) {
   delete window.module
 }
 
-let dropboxTokenCallback: ((event: IpcRendererEvent, token?: string) => void) | undefined
+let dropboxTokenCallback: ((event: IpcRendererEvent, queryString?: qs.ParsedQs) => void) | undefined
 
-ipcRenderer.on('dropbox-token', (event: IpcRendererEvent, token?: string) => {
+ipcRenderer.on('dropbox-token', (event: IpcRendererEvent, queryString?: qs.ParsedQs) => {
   if (!dropboxTokenCallback) return
-  dropboxTokenCallback(event, token)
+  dropboxTokenCallback(event, queryString)
 })
 
 contextBridge.exposeInMainWorld('mangaReader', {
-  onDropboxToken: (callback: (event: IpcRendererEvent, token?: string) => void) => {
+  onDropboxToken: (callback: (event: IpcRendererEvent, queryString?: qs.ParsedQs) => void) => {
     dropboxTokenCallback = callback
   },
 

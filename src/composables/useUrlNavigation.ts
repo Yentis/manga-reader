@@ -46,11 +46,11 @@ export function useAppUrlNavigation () {
     })
 
     browser.addEventListener('loadstart', (event) => {
-      const token = onUrlLoadStart(event.url)
-      if (token === null) return
+      const queryString = onUrlLoadStart(event.url)
+      if (queryString === null) return
 
       browser.close()
-      onDropboxRedirect(token)
+      onDropboxRedirect(queryString)
     })
   }
 

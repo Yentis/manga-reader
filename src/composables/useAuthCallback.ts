@@ -3,23 +3,30 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import useNotification from './useNotification'
 import qs from 'qs'
-import { setAccessToken as setDropboxAccessToken } from '../services/dropboxService'
+import { setAuth as setDropboxAuth } from '../services/dropboxService'
 import ElectronWindow from 'src/interfaces/electronWindow'
+import { tryMigrateDropbox } from 'src/services/migrationService'
 
 export function useAuth () {
   const { notification } = useNotification()
 
-  const onDropboxRedirect = (accessToken?: string) => {
+  const onDropboxRedirect = (queryString?: qs.ParsedQs) => {
     const notifyOptions = new NotifyOptions('Logged in successfully! Please import / export again')
     notifyOptions.type = 'positive'
     notification.value = notifyOptions
 
-    setDropboxAccessToken(accessToken)
+    setDropboxAuth(queryString)
   }
 
   return {
     onDropboxRedirect
   }
+}
+
+export function useAppAuth () {
+  onMounted(() => {
+    tryMigrateDropbox()
+  })
 }
 
 export function useElectronAuth () {
@@ -28,17 +35,17 @@ export function useElectronAuth () {
   onMounted(() => {
     const electronWindow = window as unknown as ElectronWindow
 
-    electronWindow.mangaReader.onDropboxToken((_event: unknown, token?: string) => {
-      onDropboxRedirect(token)
+    electronWindow.mangaReader.onDropboxToken((_event: unknown, queryString?: qs.ParsedQs) => {
+      onDropboxRedirect(queryString)
     })
   })
 }
 
 export function useCordovaAuth () {
-  const onUrlLoadStart = (url: string): string | null => {
-    if (url.startsWith('http://localhost') && url.includes('access_token=')) {
-      const queryString = qs.parse(url.substring(url.indexOf('access_token=')))
-      return queryString.access_token as string
+  const onUrlLoadStart = (url: string): qs.ParsedQs | null => {
+    if (url.startsWith('http://localhost') && url.includes('code=')) {
+      const queryString = qs.parse(url.substring(url.indexOf('code=')))
+      return queryString
     }
 
     return null
@@ -55,10 +62,9 @@ export function useStaticAuth () {
   onMounted(() => {
     const $route = useRoute()
     const fullPath = $route.fullPath
-    if (!fullPath.includes('access_token=')) return
+    if (!fullPath.includes('code=')) return
 
-    const queryString = qs.parse(fullPath.substring(fullPath.indexOf('access_token=')))
-    const token = queryString.access_token as string
-    onDropboxRedirect(token)
+    const queryString = qs.parse(fullPath.substring(fullPath.indexOf('code=')))
+    onDropboxRedirect(queryString)
   })
 }
