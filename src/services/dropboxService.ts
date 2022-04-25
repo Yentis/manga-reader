@@ -49,12 +49,12 @@ export function getAuth (): qs.ParsedQs | undefined {
   return queryString
 }
 
-export function setAuth (queryString: qs.ParsedQs | undefined) {
+export function setAuth (queryString: Record<string, unknown> | undefined) {
   if (!queryString) return
 
   const auth = getAuth() || {}
   LocalStorage.set(constants.DROPBOX_AUTH, {
-    ...auth,
+    code_verifier: auth.code_verifier,
     ...queryString
   })
 }
@@ -73,26 +73,52 @@ async function initAuth (): Promise<Dropbox | undefined> {
     const response = await dropboxAuth.getAccessTokenFromCode(getRedirectUrl(), code)
 
     auth = response.result as Record<string, unknown>
+
+    const expiresInSeconds = auth.expires_in
+    if (typeof expiresInSeconds === 'number') {
+      const accessTokenExpiresAt = new Date(Date.now() + (expiresInSeconds * 1000))
+      auth.expires_at = accessTokenExpiresAt.toJSON()
+      delete auth.expires_in
+    }
+
     LocalStorage.set(constants.DROPBOX_AUTH, auth)
   }
 
   const accessToken = auth.access_token
   if (typeof accessToken !== 'string') return undefined
 
-  const expiresInSeconds = auth.expires_in
-  if (typeof expiresInSeconds !== 'number') return undefined
-  const accessTokenExpiresAt = new Date(Date.now() + (expiresInSeconds * 1000))
+  const expiresAt = auth.expires_at
+  if (typeof expiresAt !== 'string') return undefined
+  const accessTokenExpiresAt = new Date(expiresAt)
 
   const refreshToken = auth.refresh_token
   if (typeof refreshToken !== 'string') return undefined
 
+  dropboxAuth.setAccessToken(accessToken)
+  dropboxAuth.setAccessTokenExpiresAt(accessTokenExpiresAt)
+  dropboxAuth.setRefreshToken(refreshToken)
+
   dropboxSession = new Dropbox({
-    accessToken,
-    accessTokenExpiresAt,
-    refreshToken
+    auth: dropboxAuth
   })
 
   return dropboxSession
+}
+
+async function tryRefreshAccessToken (): Promise<void> {
+  const refreshPromise = (dropboxAuth.checkAndRefreshAccessToken() as unknown)
+  await refreshPromise as Promise<unknown>
+
+  const accessToken = dropboxAuth.getAccessToken()
+  const accessTokenExpiresAt = dropboxAuth.getAccessTokenExpiresAt()
+
+  const auth = getAuth()
+
+  setAuth({
+    ...auth,
+    access_token: accessToken,
+    expires_at: accessTokenExpiresAt
+  })
 }
 
 function getRedirectUrl (): string {
@@ -103,6 +129,7 @@ function getRedirectUrl (): string {
 export async function saveList (mangaList: Manga[]): Promise<void> {
   const dropbox = dropboxSession || await initAuth()
   if (!dropbox) throw new DropboxResponseError(401, {}, Error('Failed to init auth'))
+  await tryRefreshAccessToken()
 
   const contents = JSON.stringify(mangaList)
   if (contents.length >= UPLOAD_FILE_SIZE_LIMIT) throw Error('File too large')
@@ -148,6 +175,7 @@ export async function saveList (mangaList: Manga[]): Promise<void> {
 export async function readList (): Promise<ReadListResponse> {
   const dropbox = dropboxSession || await initAuth()
   if (!dropbox) throw new DropboxResponseError(401, {}, Error('Failed to init auth'))
+  await tryRefreshAccessToken()
 
   const shareText = await readFile(`/${constants.SHARE_FILENAME}`, dropbox)
   const shareContents = shareText ? (JSON.parse(shareText) as ShareContents) : undefined

@@ -37,7 +37,7 @@ export default function useCloudSync () {
       readListResponse = await readList()
     } catch (error: unknown) {
       if (error instanceof DropboxResponseError) {
-        if (error.status === 401) {
+        if (error.status === 401 || error.status === 400) {
           openDropboxLogin()
           return
         }
@@ -114,7 +114,7 @@ export default function useCloudSync () {
       notification.value = notifyOptions
     } catch (error: unknown) {
       if (error instanceof DropboxResponseError) {
-        if (error.status === 401) {
+        if (error.status === 401 || error.status === 400) {
           openDropboxLogin()
           return
         }
