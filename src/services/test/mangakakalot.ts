@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Osananajimi ni najimitai'
   desired.chapterUrl = 'https://mangakakalot.com/chapter/osananajimi_ni_najimitai/chapter_24'
   desired.chapterNum = 24
-  desired.chapterDate = '2 years ago'
+  desired.chapterDate = '3 years ago'
 
   mangaEqual(manga, desired)
 }
@@ -41,7 +41,7 @@ async function search (site: BaseSite): Promise<void> {
   const results2 = await searchManga(query2, SITE_TYPE)
   const desired2 = new Manga('https://readmanganato.com/manga-hv985178', SITE_TYPE)
   desired2.image = 'https://avt.mkklcdnv6temp.com/4/p/21-1587119305.jpg'
-  desired2.chapter = 'Chapter 145'
+  desired2.chapter = 'Chapter 149.2'
   desired2.url = 'https://readmanganato.com/manga-hv985178'
 
   return searchValid(results2, desired2, query2)

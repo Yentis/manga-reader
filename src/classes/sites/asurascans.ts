@@ -21,6 +21,7 @@ interface AsuraScansSearch {
 
 class AsuraScansData extends BaseData {
   chapterUrl?: Element
+  chapterList?: Element
 }
 
 export class AsuraScans extends BaseSite {
@@ -39,8 +40,22 @@ export class AsuraScans extends BaseSite {
     return data.chapterUrl?.getAttribute('href') || ''
   }
 
-  protected getChapterNum (data: BaseData): number {
-    return parseNum(data.chapterNum?.getAttribute('data-num'))
+  protected getChapterNum (data: AsuraScansData): number {
+    const chapterNum = parseNum(data.chapterNum?.getAttribute('data-num'))
+    if (chapterNum !== 0) return chapterNum
+
+    const chapters = data.chapterList?.querySelectorAll('li')
+    if (!chapters) return 0
+
+    // Derive current chapter number based on last valid chapter number
+    for (const [index, chapter] of chapters.entries()) {
+      const curChapterNum = parseNum(chapter.getAttribute('data-num'))
+      if (curChapterNum === 0) continue
+
+      return curChapterNum + index
+    }
+
+    return 0
   }
 
   protected getChapterDate (data: BaseData): string {
@@ -61,13 +76,15 @@ export class AsuraScans extends BaseSite {
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
-    const chapterItem = doc.querySelectorAll('#chapterlist li')[0]
+    const chapterList = doc.querySelectorAll('#chapterlist')[0]
+    const chapterItem = chapterList?.querySelectorAll('li')[0]
 
     const data = new AsuraScansData(url)
     data.chapter = chapterItem?.querySelectorAll('.chapternum')[0]
     data.chapterUrl = chapterItem?.querySelectorAll('a')[0]
     data.chapterNum = chapterItem
     data.chapterDate = chapterItem?.querySelectorAll('.chapterdate')[0]
+    data.chapterList = chapterList
     data.title = doc.querySelectorAll('.entry-title')[0]
 
     const imageElements = doc.querySelectorAll('meta[property="og:image"]')
@@ -127,11 +144,11 @@ export class AsuraScans extends BaseSite {
       case SiteType.AsuraScans:
         return `${this.getUrl()}/comics/mookhyang-the-origin/`
       case SiteType.FlameScans:
-        return `${this.getUrl()}/series/solo-leveling/`
+        return `${this.getUrl()}/series/the-way-of-the-househusband/`
       case SiteType.AlphaScans:
         return `${this.getUrl()}/manga/medical-return/`
       case SiteType.LuminousScans:
-        return `${this.getUrl()}/series/black-kanojo/`
+        return `${this.getUrl()}/series/my-office-noonas-story/`
     }
 
     return this.getUrl()

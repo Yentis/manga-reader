@@ -303,7 +303,7 @@ export class WordPress extends BaseSite {
       case SiteType.LeviatanScans:
         return `${this.getUrl()}/manga/the-throne/`
       case SiteType.SleepingKnightScans:
-        return `${this.getUrl()}/manga/chronicles-of-heavenly-demon/`
+        return `${this.getUrl()}/manga/chronicles-of-the-martial-gods-return/`
       case SiteType.ReaperScans:
         return `${this.getUrl()}/series/aire/`
       case SiteType.ResetScans:

@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -21,11 +20,11 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 47'
-  desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ponytail_boy_.png'
+  desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/ponytail_boy_.png?v=1652281235'
   desired.title = 'Mookhyang The Origin'
-  desired.chapterUrl = 'https://www.asurascans.com/1649969469-mookhyang-the-origin-chapter-47/'
+  desired.chapterUrl = 'https://www.asurascans.com/mookhyang-the-origin-chapter-47/'
   desired.chapterNum = 47
-  desired.chapterDate = '8 months ago'
+  desired.chapterDate = 'a year ago'
 
   mangaEqual(manga, desired)
 }
@@ -34,12 +33,12 @@ async function readUrlAdvanced (): Promise<void> {
   const testUrl = 'https://www.asurascans.com/comics/solo-bug-player/'
   const manga = await getMangaInfo(testUrl, SITE_TYPE)
   const desired = new Manga(testUrl, SITE_TYPE)
-  desired.chapter = 'Chapter 80'
+  desired.chapter = 'Chapter 88'
   desired.image = 'https://www.asurascans.com/wp-content/uploads/2021/02/cover4.gif'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://www.asurascans.com/1649969469-solo-bug-player-chapter-80/'
-  desired.chapterNum = 80
-  desired.chapterDate = moment('October 3, 2021', 'MMMM DD, YYYY').fromNow()
+  desired.chapterUrl = 'https://www.asurascans.com/solo-bug-player-chapter-88/'
+  desired.chapterNum = 88
+  desired.chapterDate = '3 months ago'
 
   mangaEqual(manga, desired)
 }

@@ -15,7 +15,7 @@ import { testMangaDex } from './test/mangadex'
 import { testMangago } from './test/mangago'
 import { testMangakakalot } from './test/mangakakalot'
 import { testMangaKomi } from './test/mangakomi'
-import { testManganelo } from './test/manganelo'
+import { testManganato } from './test/manganato'
 import { testMangaTx } from './test/mangatx'
 import { testManhwaClub } from './test/manhwaclub'
 import { testReaperScans } from './test/reaperscans'
@@ -91,8 +91,8 @@ export default async function testAll (
   promises.push(testMangaKomi().catch((error) => {
     errors.push({ site: SiteType.MangaKomi, error: error })
   }))
-  promises.push(testManganelo().catch((error) => {
-    errors.push({ site: SiteType.Manganelo, error: error })
+  promises.push(testManganato().catch((error) => {
+    errors.push({ site: SiteType.Manganato, error: error })
   }))
   promises.push(testMangaTx().catch((error) => {
     errors.push({ site: SiteType.MangaTx, error: error })

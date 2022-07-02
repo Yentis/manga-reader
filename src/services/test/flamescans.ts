@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
@@ -19,12 +18,12 @@ export async function testFlameScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 179.5 [END]'
-  desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/solo-cover-1.png'
-  desired.title = 'Solo Leveling'
-  desired.chapterUrl = 'https://flamescans.org/1650124861-solo-leveling-chapter-179-5/'
-  desired.chapterNum = 179.5
-  desired.chapterDate = moment('January 3, 2022', 'MMMM DD, YYYY').fromNow()
+  desired.chapter = 'Chapter 89'
+  desired.image = 'https://flamescans.org/wp-content/uploads/2021/11/whhvol9cover.png'
+  desired.title = 'The Way of the Househusband'
+  desired.chapterUrl = 'https://flamescans.org/1656734462-the-way-of-the-househusband-chapter-89/'
+  desired.chapterNum = 89
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }

@@ -5,10 +5,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.Manganelo
+const SITE_TYPE = SiteType.Manganato
 const QUERY = 'together with the rain'
 
-export async function testManganelo (): Promise<void> {
+export async function testManganato (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -34,7 +34,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://avt.mkklcdnv6temp.com/48/l/21-1597329685.jpg'
   desired.chapter = 'Chapter 2: That’s what\'s unfair about you! [END]'
-  desired.url = 'https://manganelo.com/manga/pg923760'
+  desired.url = 'https://manganato.com/manga-iu986229'
 
   return searchValid(results, desired, QUERY)
 }

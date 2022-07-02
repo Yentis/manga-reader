@@ -6,10 +6,11 @@ import ChromeWindow from 'src/interfaces/chromeWindow'
 type DOMParserSupportedType = 'text/html' | 'text/xml'
 
 export const siteAliases = [
-  { url: 'manganato.com', site: SiteType.Manganelo },
+  { url: 'manganelo.com', site: SiteType.Manganato },
   { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
   { url: '1stkissmanga.com', site: SiteType.FirstKissManga },
-  { url: Guya, site: SiteType.Cubari }
+  { url: Guya, site: SiteType.Cubari },
+  { url: 'mangakomi.com', site: SiteType.MangaKomi }
 ]
 
 export function getUrl (url: string) {

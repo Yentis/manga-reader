@@ -129,6 +129,7 @@ export class BiliBiliComics extends BaseSite {
     const data = {
       style_id: -1,
       area_id: -1,
+      is_finish: -1,
       is_free: -1,
       key_word: query,
       page_num: 1,

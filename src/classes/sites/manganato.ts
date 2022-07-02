@@ -7,22 +7,22 @@ import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
 
-interface ManganeloSearch {
+interface ManganatoSearch {
   name: string
   image: string
   lastchapter: string
-  'id_encode': string
+  'link_story': string
 }
 
-class ManganeloData extends BaseData {
+class ManganatoData extends BaseData {
   currentTime?: Element
 }
 
-export class Manganelo extends BaseSite {
-  static siteType = SiteType.Manganelo
-  siteType = Manganelo.siteType
+export class Manganato extends BaseSite {
+  static siteType = SiteType.Manganato
+  siteType = Manganato.siteType
 
-  getChapterDate (data: ManganeloData): string {
+  getChapterDate (data: ManganatoData): string {
     const curTime = moment(data.currentTime?.textContent, '[Current Time is] MMM DD,YYYY - hh:mm:ss A')
     const chapterDate = moment(data.chapterDate?.getAttribute('title'), 'MMM DD,YYYY hh:mm')
     if (chapterDate.isValid()) {
@@ -50,7 +50,7 @@ export class Manganelo extends BaseSite {
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
 
-    const data = new ManganeloData(url)
+    const data = new ManganatoData(url)
     data.chapter = doc.querySelectorAll('.chapter-name')[0]
     data.image = doc.querySelectorAll('.info-image img')[0]
     data.title = doc.querySelectorAll('.story-info-right h1')[0]
@@ -71,7 +71,7 @@ export class Manganelo extends BaseSite {
     }
     const response = await requestHandler.sendRequest(request)
 
-    const searchData = JSON.parse(response.data) as ManganeloSearch[]
+    const searchData = JSON.parse(response.data) as ManganatoSearch[]
     const mangaList = []
     const parser = new DOMParser()
 
@@ -84,7 +84,7 @@ export class Manganelo extends BaseSite {
 
       manga.image = entry.image
       manga.chapter = entry.lastchapter
-      manga.url = `${this.getUrl()}/manga/${entry.id_encode}`
+      manga.url = entry.link_story
 
       mangaList.push(manga)
     }
@@ -93,10 +93,10 @@ export class Manganelo extends BaseSite {
   }
 
   getLoginUrl (): string {
-    return `https://user.${this.siteType}/login?l=manganelo`
+    return 'https://user.manganelo.com/login?l=manganato'
   }
 
   getTestUrl (): string {
-    return `${this.getUrl()}/manga/pu918807`
+    return `${this.getUrl()}/manga-dt981276`
   }
 }

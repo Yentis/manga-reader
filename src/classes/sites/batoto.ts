@@ -13,15 +13,7 @@ export class Batoto extends BaseSite {
   }
 
   getImage (data: BaseData): string {
-    const image = data.image?.getAttribute('content')
-    if (!image) return ''
-
-    return this.cleanImageUrl(image)
-  }
-
-  private cleanImageUrl (url: string) {
-    // Get rid of the query string
-    return url.substring(0, url.lastIndexOf('?'))
+    return data.image?.getAttribute('content') || ''
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
@@ -56,7 +48,7 @@ export class Batoto extends BaseSite {
 
       const image = elem.querySelectorAll('img')[0]
       const imageUrl = image?.getAttribute('data-cfsrc') || image?.getAttribute('src') || ''
-      manga.image = this.cleanImageUrl(imageUrl)
+      manga.image = imageUrl
 
       manga.chapter = elem.querySelectorAll('.item-volch a')[0]?.textContent?.trim() || 'Unknown'
       manga.url = url ? `${this.getUrl()}${url}` : ''

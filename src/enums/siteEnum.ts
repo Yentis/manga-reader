@@ -1,12 +1,12 @@
 export const Guya = 'guya.moe'
 
 export enum SiteType {
-    Manganelo = 'manganelo.com',
+    Manganato = 'manganato.com',
     Webtoons = 'webtoons.com',
     FirstKissManga = '1stkissmanga.io',
     Mangakakalot = 'mangakakalot.com',
     MangaDex = 'mangadex.org',
-    MangaKomi = 'mangakomi.com',
+    MangaKomi = 'mangakomi.io',
     LeviatanScans = 'leviatanscans.com',
     HiperDEX = 'hiperdex.com',
     ReaperScans = 'reaperscans.com',
@@ -30,12 +30,12 @@ export enum SiteType {
 }
 
 export enum SiteName {
-    'manganelo.com' = 'Manganato',
+    'manganato.com' = 'Manganato',
     'webtoons.com' = 'Webtoons',
     '1stkissmanga.io' = '1st Kiss Manga',
     'mangakakalot.com' = 'Mangakakalot',
     'mangadex.org' = 'MangaDex',
-    'mangakomi.com' = 'Manga Komi',
+    'mangakomi.io' = 'Manga Komi',
     'leviatanscans.com' = 'Leviatan Scans',
     'hiperdex.com' = 'HiperDEX',
     'reaperscans.com' = 'Reaper Scans',

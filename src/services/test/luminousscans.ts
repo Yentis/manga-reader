@@ -6,7 +6,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.LuminousScans
-const QUERY = 'jubunnoichi no hanayome'
+const QUERY = 'legend of the northern blade'
 
 export async function testLuminousScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -19,11 +19,11 @@ export async function testLuminousScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 20 : Hoshino\'s Answer'
-  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/08/Black-Kanojo.jpg'
-  desired.title = 'Black Kanojo'
-  desired.chapterUrl = 'https://luminousscans.com/black-kanojo-chapter-20/'
-  desired.chapterNum = 20
+  desired.chapter = 'Chapter Epilogue Ch 03 [End]'
+  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg'
+  desired.title = 'My Office Noona’s Story'
+  desired.chapterUrl = 'https://luminousscans.com/1653732334-my-office-noonas-story-epilogue-chapter-03/'
+  desired.chapterNum = 64
   desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
@@ -32,9 +32,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/09/001-16-212x300.jpg'
-  desired.chapter = '59.5'
-  desired.url = 'https://luminousscans.com/series/jubunnoichi-no-hanayome/'
+  desired.image = 'https://luminousscans.com/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif'
+  desired.chapter = '130'
+  desired.url = 'https://luminousscans.com/series/1653732347-legend-of-the-northern-blade/'
 
   return searchValid(results, desired, QUERY)
 }

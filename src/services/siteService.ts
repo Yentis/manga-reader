@@ -5,8 +5,8 @@ import {
   SiteType
 } from '../enums/siteEnum'
 import {
-  Manganelo
-} from '../classes/sites/manganelo'
+  Manganato
+} from '../classes/sites/manganato'
 import {
   Genkan
 } from '../classes/sites/genkan'
@@ -56,7 +56,7 @@ import { ZeroScans } from 'src/classes/sites/zeroscans'
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
 const siteMap = new Map<string, BaseSite>([
-  [SiteType.Manganelo, new Manganelo()],
+  [SiteType.Manganato, new Manganato()],
   [SiteType.Webtoons, new Webtoons()],
   [SiteType.FirstKissManga, new WordPress(SiteType.FirstKissManga)],
   [SiteType.Mangakakalot, new Mangakakalot()],

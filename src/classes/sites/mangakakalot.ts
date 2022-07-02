@@ -7,7 +7,6 @@ import { getDateFromNow, parseHtmlFromString, titleContainsQuery } from 'src/uti
 import constants from '../constants'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
-import { Manganelo } from './manganelo'
 
 interface MangakakalotSearch {
   name: string
@@ -93,7 +92,7 @@ export class Mangakakalot extends BaseSite {
   }
 
   getLoginUrl (): string {
-    return `https://user.${Manganelo.siteType}/login?l=mangakakalot`
+    return 'https://user.manganelo.com/login?l=mangakakalot'
   }
 
   getTestUrl (): string {

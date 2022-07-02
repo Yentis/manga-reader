@@ -18,7 +18,7 @@
       >
         <q-img
           contain
-          class="manga-image q-my-sm q-ml-xs q-mr-sm"
+          class="manga-image q-ma-sm"
           fit="scale-down"
           :src="mangaImage"
         >
