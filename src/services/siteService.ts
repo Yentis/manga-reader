@@ -119,9 +119,16 @@ export async function getMangaInfo (
 ): Promise <Error | Manga> {
   let error: Error | undefined
 
-  const site = siteMap.get(siteType)
+  let site = siteMap.get(siteType)
+  if (!site) {
+    const urlSiteType = getSiteByUrl(url)
+    if (urlSiteType) site = siteMap.get(urlSiteType)
+  }
+
   if (site) {
-    const result = await requestQueue.add(() => site.readUrl(url))
+    const finalSite = site
+    const result = await requestQueue.add(() => finalSite.readUrl(url))
+
     if (result instanceof Manga) return result
     if (result.message.startsWith(constants.REDIRECT_PREFIX) && redirectCount < 5) {
       return getMangaInfoByUrl(result.message.replace(constants.REDIRECT_PREFIX, ''), altSources, redirectCount + 1)
