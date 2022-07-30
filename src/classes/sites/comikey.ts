@@ -23,13 +23,14 @@ export class Comikey extends BaseSite {
     const chapterUrl = chapterLink?.textContent
     if (!chapterUrl) return 0
 
-    const episodeText = (/episode-([^\\/]*)/.exec(chapterUrl))?.[1]
-    if (!episodeText) return 0
+    const chapterRegex = (/episode-([^\\/]*)/.exec(chapterUrl)) ?? (/chapter-([^\\/]*)/.exec(chapterUrl))
+    const chapterText = chapterRegex?.[1]
+    if (!chapterText) return 0
 
-    const episode = parseFloat(episodeText)
-    if (isNaN(episode)) return 0
+    const chapterNum = parseFloat(chapterText)
+    if (isNaN(chapterNum)) return 0
 
-    return episode
+    return chapterNum
   }
 
   protected getChapterDate (data: BaseData): string {
