@@ -13,7 +13,7 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "cordova-android": "^9.0.0",
+    "cordova-android": "^9.1.0",
     "cordova-plugin-advanced-http": "github:Yentis/cordova-plugin-advanced-http",
     "cordova-plugin-badge": "^0.8.8",
     "cordova-plugin-cookies": "^0.0.2",

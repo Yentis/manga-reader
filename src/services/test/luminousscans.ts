@@ -22,7 +22,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter Epilogue Ch 03 [End]'
   desired.image = 'https://luminousscans.com/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg'
   desired.title = 'My Office Noona’s Story'
-  desired.chapterUrl = 'https://luminousscans.com/1653732334-my-office-noonas-story-epilogue-chapter-03/'
+  desired.chapterUrl = 'https://luminousscans.com/1658218624-my-office-noonas-story-epilogue-chapter-03/'
   desired.chapterNum = 64
   desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 

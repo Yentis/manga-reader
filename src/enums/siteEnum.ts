@@ -26,7 +26,8 @@ export enum SiteType {
     Cubari = 'cubari.moe',
     LuminousScans = 'luminousscans.com',
     Tapas = 'tapas.io',
-    CopinComics = 'copincomics.com'
+    CopinComics = 'copincomics.com',
+    Comikey = 'comikey.com'
 }
 
 export enum SiteName {
@@ -56,7 +57,8 @@ export enum SiteName {
     'cubari.moe' = 'Cubari / Guya',
     'luminousscans.com' = 'Luminous Scans',
     'tapas.io' = 'Tapas',
-    'copincomics.com' = 'Copin Comics'
+    'copincomics.com' = 'Copin Comics',
+    'comikey.com' = 'Comikey'
 }
 
 export enum SiteState {

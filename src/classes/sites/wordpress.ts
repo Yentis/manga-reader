@@ -119,8 +119,7 @@ export class WordPress extends BaseSite {
   }
 
   getTitle (data: BaseData): string {
-    const spanText = data.title?.querySelectorAll('span')[0]?.textContent || ''
-    return data.title?.textContent?.replace(spanText, '').trim() || ''
+    return data.title?.getAttribute('content') || ''
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
@@ -136,7 +135,6 @@ export class WordPress extends BaseSite {
 
     if (!data.chapter?.innerHTML || !data.chapterDate?.innerHTML) {
       const mangaId = doc.querySelectorAll('#manga-chapters-holder')[0]?.getAttribute('data-id') || ''
-
       let result = await this.readChapters(mangaId, data, `${this.getUrl()}/wp-admin/admin-ajax.php`)
 
       if (result instanceof Error) {
@@ -155,7 +153,9 @@ export class WordPress extends BaseSite {
     } else {
       data.image = doc.querySelectorAll('meta[property="og:image"]')[0]
     }
-    data.title = doc.querySelectorAll('.post-title')[0]
+
+    const metaTitles = doc.querySelectorAll('meta[property="og:title"]')
+    data.title = metaTitles.length > 0 ? metaTitles[metaTitles.length - 1] : undefined
 
     return this.buildManga(data)
   }

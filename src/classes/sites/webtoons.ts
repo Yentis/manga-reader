@@ -7,6 +7,7 @@ import { requestHandler } from 'src/services/requestService'
 import qs from 'qs'
 import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import { HEADER_USER_AGENT } from '../requests/baseRequest'
+import { getRssChapter, getRssChapterDate, getRssChapterUrl, getRssData, getRssImage, getRssTitle } from 'src/utils/rssUtils'
 
 interface WebtoonsSearch {
   query: string[]
@@ -17,16 +18,11 @@ export class Webtoons extends BaseSite {
   siteType = SiteType.Webtoons
 
   protected getChapter (data: BaseData): string {
-    const chapterTitle = data.chapter?.querySelectorAll('title')[0]
-    const chapterText = chapterTitle?.textContent
-    if (!chapterText) return 'Unknown'
-
-    return this.removeCdata(chapterText)
+    return getRssChapter(data)
   }
 
   protected getChapterUrl (data: BaseData): string {
-    const chapterLink = data.chapter?.querySelectorAll('link')[0]
-    return chapterLink?.textContent || ''
+    return getRssChapterUrl(data)
   }
 
   protected getChapterNum (data: BaseData): number {
@@ -47,26 +43,15 @@ export class Webtoons extends BaseSite {
   }
 
   protected getChapterDate (data: BaseData): string {
-    const chapterDateText = data.chapterDate?.textContent?.trim()
-    if (!chapterDateText) return ''
-
-    const chapterDate = moment(chapterDateText, 'dddd, DD MMM YYYY HH:mm:ss')
-    if (chapterDate.isValid()) {
-      return chapterDate.fromNow()
-    } else {
-      return ''
-    }
+    return getRssChapterDate(data)
   }
 
   protected getImage (data: BaseData): string {
-    return data.image?.textContent || ''
+    return getRssImage(data)
   }
 
   protected getTitle (data: BaseData): string {
-    const titleText = data.title?.textContent
-    if (!titleText) return ''
-
-    return this.removeCdata(titleText)
+    return getRssTitle(data)
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
@@ -103,20 +88,8 @@ export class Webtoons extends BaseSite {
       url: rssUrl,
       headers
     }
-    const response = await requestHandler.sendRequest(request)
-    const doc = await parseHtmlFromString(response.data, undefined, 'text/xml')
 
-    const channel = doc.querySelectorAll('channel')[0]
-    const data = new BaseData(url)
-
-    data.image = channel?.querySelectorAll('image url')[0]
-    data.title = channel?.querySelectorAll('title')[0]
-
-    const chapter = channel?.querySelectorAll('item')[0]
-    data.chapter = chapter
-    data.chapterNum = chapter?.querySelectorAll('title')[0]
-    data.chapterDate = chapter?.querySelectorAll('pubDate')[0]
-
+    const data = await getRssData(url, request)
     return this.buildManga(data)
   }
 
@@ -158,9 +131,5 @@ export class Webtoons extends BaseSite {
 
   getTestUrl (): string {
     return `${this.getUrl()}/en/comedy/wolf-and-red-riding-hood/list?title_no=2142`
-  }
-
-  private removeCdata (content: string): string {
-    return content.replace('<![CDATA[', '').replace(']]>', '').trim()
   }
 }

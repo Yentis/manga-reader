@@ -52,6 +52,7 @@ import { Cubari } from 'src/classes/sites/cubari'
 import { Tapas } from 'src/classes/sites/tapas'
 import { CopinComics } from 'src/classes/sites/copincomics'
 import { ZeroScans } from 'src/classes/sites/zeroscans'
+import { Comikey } from 'src/classes/sites/comikey'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -81,7 +82,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Cubari, new Cubari()],
   [SiteType.LuminousScans, new AsuraScans(SiteType.LuminousScans)],
   [SiteType.Tapas, new Tapas()],
-  [SiteType.CopinComics, new CopinComics()]
+  [SiteType.CopinComics, new CopinComics()],
+  [SiteType.Comikey, new Comikey()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

@@ -38,7 +38,7 @@ async function readUrl2 (): Promise<void> {
   desired.title = 'Touch On'
   desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/109-3/'
   desired.chapterNum = 109.3
-  desired.chapterDate = 'a month ago'
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }

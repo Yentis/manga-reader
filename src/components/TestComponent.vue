@@ -80,6 +80,7 @@ import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
 import { testTapas } from 'src/services/test/tapas'
 import { testCopinComics } from 'src/services/test/copincomics'
+import { testComikey } from 'src/services/test/comikey'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -141,6 +142,9 @@ export default defineComponent({
           break
         case SiteType.BiliBiliComics:
           await doTest(testBiliBiliComics)
+          break
+        case SiteType.Comikey:
+          await doTest(testComikey)
           break
         case SiteType.CopinComics:
           await doTest(testCopinComics)

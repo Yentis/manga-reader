@@ -23,9 +23,9 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = '30'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TT.png'
   desired.title = 'The Throne'
-  desired.chapterUrl = 'https://leviatanscans.com/hym/manga/the-throne/30/'
+  desired.chapterUrl = 'https://leviatanscans.com/hy/manga/the-throne/30/'
   desired.chapterNum = 30
-  desired.chapterDate = '3 months ago'
+  desired.chapterDate = 'a year ago'
 
   mangaEqual(manga, desired)
 }
@@ -34,11 +34,11 @@ async function readUrlWrongSeasonOrder (): Promise<void> {
   const url = 'https://leviatanscans.com/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = 'Season 3 | Chapter 135'
+  desired.chapter = 'Season 3 | Chapter 140'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-SK.png'
   desired.title = 'Survival Story of a Sword King in a Fantasy World'
-  desired.chapterUrl = 'https://leviatanscans.com/hym/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-3/chapter-135/'
-  desired.chapterNum = 135
+  desired.chapterUrl = 'https://leviatanscans.com/hy/manga/survivor-story-of-a-sword-king-in-a-fantasy-world/season-3/chapter-140/'
+  desired.chapterNum = 140
 
   mangaEqual(manga, desired)
 }
@@ -47,11 +47,11 @@ async function readUrlCorrectSeasonOrder (): Promise<void> {
   const url = 'https://leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = 'Chapter 110 - Season 2 - Ch 47'
+  desired.chapter = 'Chapter 114 - Season 2 - Ch 51'
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover-_TSRC.png'
   desired.title = 'Tale of a Scribe Who Retires to the Countryside'
-  desired.chapterUrl = 'https://leviatanscans.com/hym/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-110/'
-  desired.chapterNum = 110
+  desired.chapterUrl = 'https://leviatanscans.com/hy/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-114/'
+  desired.chapterNum = 114
 
   mangaEqual(manga, desired)
 }
@@ -61,7 +61,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://leviatanscans.com/wp-content/uploads/2021/03/cover_BE-193x278.png'
   desired.chapter = 'Chapter 212'
-  desired.url = 'https://leviatanscans.com/hym/manga/burning-effect/'
+  desired.url = 'https://leviatanscans.com/hy/manga/burning-effect/'
 
   return searchValid(results, desired, QUERY)
 }

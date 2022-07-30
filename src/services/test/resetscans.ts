@@ -24,7 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Madou no Keifu'
   desired.chapterUrl = 'https://reset-scans.com/devmax/madou-no-keifu/chapter-04/'
   desired.chapterNum = 4
-  desired.chapterDate = '3 months ago'
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,12 +32,12 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlDotChapter (): Promise<void> {
   const manga = await getMangaInfo('https://reset-scans.com/manga/the-unwanted-undead-adventurer/', SITE_TYPE)
   const desired = new Manga('https://reset-scans.com/manga/the-unwanted-undead-adventurer/', SITE_TYPE)
-  desired.chapter = 'Chapter 44.2'
+  desired.chapter = 'Chapter 45.2'
   desired.image = 'https://reset-scans.com/wp-content/uploads/2021/06/Undead-Cover-Page.jpg'
   desired.title = 'The Unwanted Undead Adventurer'
-  desired.chapterUrl = 'https://reset-scans.com/devmax/the-unwanted-undead-adventurer/chapter-44-2/'
-  desired.chapterNum = 44.2
-  desired.chapterDate = '10 days ago'
+  desired.chapterUrl = 'https://reset-scans.com/devmax/the-unwanted-undead-adventurer/chapter-45-2/'
+  desired.chapterNum = 45.2
+  desired.chapterDate = '11 days ago'
 
   mangaEqual(manga, desired)
 }

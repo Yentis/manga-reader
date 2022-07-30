@@ -24,7 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Villains Are Destined to Die'
   desired.chapterUrl = 'https://tapas.io/episode/2449631'
   desired.chapterNum = 96
-  desired.chapterDate = '3 months ago'
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,11 +32,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlReverseOrder (): Promise<void> {
   const manga = await getMangaInfo('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
   const desired = new Manga('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
-  desired.chapter = 'Episode 63'
+  desired.chapter = 'Episode 67'
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/7e/923721d0-86a3-4679-a929-4efe5945c10f_z.jpg'
   desired.title = 'Mystic Musketeer'
-  desired.chapterUrl = 'https://tapas.io/episode/2527217'
-  desired.chapterNum = 63
+  desired.chapterUrl = 'https://tapas.io/episode/2562229'
+  desired.chapterNum = 67
 
   mangaEqual(manga, desired)
 }
@@ -45,7 +45,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/7e/923721d0-86a3-4679-a929-4efe5945c10f_z.jpg'
-  desired.chapter = 'Episode 63'
+  desired.chapter = 'Episode 67'
   desired.url = 'https://tapas.io/series/mystic-musketeer/info'
 
   return searchValid(results, desired, QUERY)

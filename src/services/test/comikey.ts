@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.ZeroScans
-const QUERY = 'all heavenly days'
+const SITE_TYPE = SiteType.Comikey
+const QUERY = 'to be winner'
 
-export async function testZeroScans (): Promise<void> {
+export async function testComikey (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,12 +18,12 @@ export async function testZeroScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 48'
-  desired.image = 'https://api.zeroscans.com/storage/76097/conversions/07e0721be5f0d441a13507975adaabf9-full.webp'
-  desired.title = 'All Heavenly Days'
-  desired.chapterUrl = 'https://zeroscans.com/comics/all-heavenly-days/384'
-  desired.chapterNum = 48
-  desired.chapterDate = '4 months ago'
+  desired.chapter = 'Episode 114'
+  desired.image = 'https://i2.wp.com/comikey.com/media/comics/4orPDQ/621d00480ac3.jpg?fit=500%2C500&quality=95&strip=all'
+  desired.title = 'To Be Winner'
+  desired.chapterUrl = 'https://comikey.com/read/to-be-winner-webtoon/Po6VBo/episode-114/'
+  desired.chapterNum = 114
+  desired.chapterDate = '9 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -31,9 +31,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://api.zeroscans.com/storage/76097/conversions/07e0721be5f0d441a13507975adaabf9-full.webp'
-  desired.chapter = 'Chapter 48'
-  desired.url = 'https://zeroscans.com/comics/all-heavenly-days'
+  desired.image = 'https://i2.wp.com/comikey.com/media/comics/4orPDQ/621d00480ac3.jpg?fit=500%2C500&quality=95&strip=all'
+  desired.chapter = 'Episode 114'
+  desired.url = 'https://comikey.com/comics/to-be-winner-webtoon/23/'
 
   return searchValid(results, desired, QUERY)
 }

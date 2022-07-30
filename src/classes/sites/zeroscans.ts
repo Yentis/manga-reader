@@ -87,8 +87,14 @@ export class ZeroScans extends BaseSite {
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
-    const script = doc.querySelectorAll('script:not([src]):not([data-hid])')[0]
-    const scriptContent = script?.textContent
+    const scripts = doc.querySelectorAll('script:not([src]):not([data-hid])')
+
+    let scriptContent: string | null = null
+    for (const script of scripts) {
+      if (!script.textContent?.trim().startsWith('window.__ZEROSCANS__')) continue
+      scriptContent = script.textContent
+      break
+    }
     if (!scriptContent) return Error(`Failed to parse script for ${url}`)
 
     const idIndex = scriptContent.indexOf('id') || 0

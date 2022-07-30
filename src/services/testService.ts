@@ -30,6 +30,7 @@ import { testCubari } from './test/cubari'
 import { testLuminousScans } from './test/luminousscans'
 import { testTapas } from './test/tapas'
 import { testCopinComics } from './test/copincomics'
+import { testComikey } from './test/comikey'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -48,6 +49,9 @@ export default async function testAll (
   }))
   promises.push(testBiliBiliComics().catch((error) => {
     errors.push({ site: SiteType.BiliBiliComics, error: error })
+  }))
+  promises.push(testComikey().catch((error) => {
+    errors.push({ site: SiteType.Comikey, error: error })
   }))
   promises.push(testCopinComics().catch((error) => {
     errors.push({ site: SiteType.CopinComics, error: error })
