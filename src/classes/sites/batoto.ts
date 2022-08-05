@@ -5,11 +5,29 @@ import { requestHandler } from 'src/services/requestService'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
+class BatotoData extends BaseData {
+  chapterList?: Element
+}
+
 export class Batoto extends BaseSite {
   siteType = SiteType.Batoto
 
-  getChapterNum (data: BaseData): number {
-    return parseNum(data.chapterNum?.textContent?.trim().split(' ')[1])
+  getChapterNum (data: BatotoData): number {
+    const chapterNum = parseNum(data.chapterNum?.textContent?.trim().split(' ')[1])
+    if (chapterNum !== 0) return chapterNum
+
+    const chapters = data.chapterList?.querySelectorAll('.chapt')
+    if (!chapters) return 0
+
+    // Derive current chapter number based on last valid chapter number
+    for (const [index, chapter] of chapters.entries()) {
+      const curChapterNum = parseNum(chapter.textContent?.trim().split(' ')[1])
+      if (curChapterNum === 0) continue
+
+      return curChapterNum + index
+    }
+
+    return 0
   }
 
   getImage (data: BaseData): string {
@@ -22,7 +40,8 @@ export class Batoto extends BaseSite {
 
     const doc = await parseHtmlFromString(response.data)
 
-    const data = new BaseData(url)
+    const data = new BatotoData(url)
+    data.chapterList = doc.querySelectorAll('.episode-list')[0]
     data.chapter = doc.querySelectorAll('.chapt')[0]
     const episodeListChildren = doc.querySelectorAll('.episode-list .extra')[0]?.children
     data.chapterDate = episodeListChildren?.item(episodeListChildren.length - 1)
