@@ -4,7 +4,10 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
 import { parseHtmlFromString } from 'src/utils/siteUtils'
 
-export async function getRssData (url: string, request: HttpRequest): Promise<BaseData> {
+export async function getRssData (props: { url: string, request: HttpRequest, index?: number }): Promise<BaseData> {
+  const { url, request } = props
+  const index = props.index ?? 0
+
   const response = await requestHandler.sendRequest(request)
   const doc = await parseHtmlFromString(response.data, undefined, 'text/xml')
 
@@ -14,7 +17,8 @@ export async function getRssData (url: string, request: HttpRequest): Promise<Ba
   data.image = channel?.querySelectorAll('image url')[0]
   data.title = channel?.querySelectorAll('title')[0]
 
-  const chapter = channel?.querySelectorAll('item')[0]
+  const chapters = channel?.querySelectorAll('item')
+  const chapter = chapters?.[index] ?? chapters?.[0]
   data.chapter = chapter
   data.chapterNum = chapter?.querySelectorAll('title')[0]
   data.chapterDate = chapter?.querySelectorAll('pubDate')[0]

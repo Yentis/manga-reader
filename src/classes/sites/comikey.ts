@@ -51,7 +51,8 @@ export class Comikey extends BaseSite {
     if (!rssUrl) return Error('Could not find RSS url')
 
     const rssRequest: HttpRequest = { method: 'GET', url: `${this.getUrl()}${rssUrl}` }
-    const data = await getRssData(url, rssRequest)
+    // Latest chapter can't be read for free
+    const data = await getRssData({ url, request: rssRequest, index: 1 })
     data.image = doc.querySelectorAll('.item-preview img')[0]
 
     return this.buildManga(data)

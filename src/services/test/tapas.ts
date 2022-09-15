@@ -19,12 +19,12 @@ export async function testTapas (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = '85. Proper Judgment'
-  desired.image = 'https://d30womf5coomej.cloudfront.net/sa/ba/bd321b26-680a-4911-b675-94a41efce1bf_z.jpg'
+  desired.chapter = '88. Waking Up'
+  desired.image = 'https://d30womf5coomej.cloudfront.net/sa/53/035d7813-b234-45d6-b880-5563a759a95b_z.jpg'
   desired.title = 'Villains Are Destined to Die'
-  desired.chapterUrl = 'https://tapas.io/episode/2449631'
-  desired.chapterNum = 96
-  desired.chapterDate = '4 months ago'
+  desired.chapterUrl = 'https://tapas.io/episode/2640590'
+  desired.chapterNum = 99
+  desired.chapterDate = '2 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,11 +32,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlReverseOrder (): Promise<void> {
   const manga = await getMangaInfo('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
   const desired = new Manga('https://tapas.io/series/mystic-musketeer/info', SITE_TYPE)
-  desired.chapter = 'Episode 67'
+  desired.chapter = 'Episode 74'
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/7e/923721d0-86a3-4679-a929-4efe5945c10f_z.jpg'
   desired.title = 'Mystic Musketeer'
-  desired.chapterUrl = 'https://tapas.io/episode/2562229'
-  desired.chapterNum = 67
+  desired.chapterUrl = 'https://tapas.io/episode/2625500'
+  desired.chapterNum = 74
 
   mangaEqual(manga, desired)
 }
@@ -45,7 +45,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://d30womf5coomej.cloudfront.net/sa/7e/923721d0-86a3-4679-a929-4efe5945c10f_z.jpg'
-  desired.chapter = 'Episode 67'
+  desired.chapter = 'Episode 74'
   desired.url = 'https://tapas.io/series/mystic-musketeer/info'
 
   return searchValid(results, desired, QUERY)

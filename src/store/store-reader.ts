@@ -13,6 +13,7 @@ export class ReaderState {
   mobileView = false
   settings = new Settings()
   searchValue = ''
+  errors: NotifyOptions[] = []
 }
 
 const state = new ReaderState()
@@ -126,6 +127,12 @@ const mutations = {
   },
   updateSearchValue (state: ReaderState, searchValue: string) {
     state.searchValue = searchValue
+  },
+  addError (state: ReaderState, error: NotifyOptions) {
+    state.errors.push(error)
+  },
+  updateErrors (state: ReaderState, errors: NotifyOptions[]) {
+    state.errors = errors
   }
 }
 
@@ -153,6 +160,9 @@ const getters = {
   },
   searchValue: (state: ReaderState) => {
     return state.searchValue
+  },
+  errors: (state: ReaderState) => {
+    return state.errors
   }
 }
 

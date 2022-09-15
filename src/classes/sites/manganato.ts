@@ -7,11 +7,15 @@ import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
 
-interface ManganatoSearch {
+interface ManganatoSearchItem {
   name: string
   image: string
   lastchapter: string
-  'link_story': string
+  'url_story': string
+}
+
+interface ManganatoSearch {
+  searchlist: ManganatoSearchItem[]
 }
 
 class ManganatoData extends BaseData {
@@ -71,11 +75,11 @@ export class Manganato extends BaseSite {
     }
     const response = await requestHandler.sendRequest(request)
 
-    const searchData = JSON.parse(response.data) as ManganatoSearch[]
+    const searchData = JSON.parse(response.data) as ManganatoSearch
     const mangaList = []
     const parser = new DOMParser()
 
-    for (const entry of searchData) {
+    for (const entry of searchData.searchlist) {
       const manga = new Manga('', this.siteType)
       const docElement = (await parseHtmlFromString(entry.name, parser)).documentElement
 
@@ -84,7 +88,7 @@ export class Manganato extends BaseSite {
 
       manga.image = entry.image
       manga.chapter = entry.lastchapter
-      manga.url = entry.link_story
+      manga.url = entry.url_story
 
       mangaList.push(manga)
     }

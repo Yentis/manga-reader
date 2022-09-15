@@ -89,7 +89,7 @@ export class Webtoons extends BaseSite {
       headers
     }
 
-    const data = await getRssData(url, request)
+    const data = await getRssData({ url, request })
     return this.buildManga(data)
   }
 

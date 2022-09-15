@@ -18,12 +18,12 @@ export async function testBiliBiliComics (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = '631 Opportunist(1)'
+  desired.chapter = '654 Shopping at the Heavenly Treasures Pavilion (2)'
   desired.image = 'https://i0.hdslb.com/bfs/comic-static/58c0cc6a498b2d8c74e5ca1f283393cd26501e71.png@300w.webp'
   desired.title = 'Tales of Demons and Gods'
-  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/186795'
-  desired.chapterNum = 631
-  desired.chapterDate = '3 days ago'
+  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/271808'
+  desired.chapterNum = 654
+  desired.chapterDate = '16 hours ago'
 
   mangaEqual(manga, desired, false)
 }

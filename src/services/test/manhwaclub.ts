@@ -23,7 +23,8 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Movies Are Real'
   desired.chapterUrl = 'https://manhwa.club/comic/movies-are-real/chapter-35/reader'
   desired.chapterNum = 35
-  desired.chapterDate = 'a year ago'
+  // Yes really
+  desired.chapterDate = '2021 years ago'
 
   mangaEqual(manga, desired)
 }

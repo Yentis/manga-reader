@@ -35,9 +35,6 @@ import {
   Batoto
 } from '../classes/sites/batoto'
 import {
-  Genkanio
-} from '../classes/sites/genkanio'
-import {
   Kitsu
 } from '../classes/sites/kitsu'
 import {
@@ -74,7 +71,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
-  [SiteType.Genkan, new Genkanio()],
   [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
   [SiteType.BiliBiliComics, new BiliBiliComics()],

@@ -142,7 +142,7 @@ export class AsuraScans extends BaseSite {
   getTestUrl () : string {
     switch (this.siteType) {
       case SiteType.AsuraScans:
-        return `${this.getUrl()}/comics/mookhyang-the-origin/`
+        return `${this.getUrl()}/manga/mookhyang-the-origin/`
       case SiteType.FlameScans:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
       case SiteType.AlphaScans:

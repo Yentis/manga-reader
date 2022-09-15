@@ -21,9 +21,9 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 89'
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/11/whhvol9cover.png'
   desired.title = 'The Way of the Househusband'
-  desired.chapterUrl = 'https://flamescans.org/1659196861-the-way-of-the-househusband-chapter-89/'
+  desired.chapterUrl = 'https://flamescans.org/1662523261-the-way-of-the-househusband-chapter-89/'
   desired.chapterNum = 89
-  desired.chapterDate = '5 months ago'
+  desired.chapterDate = '6 months ago'
 
   mangaEqual(manga, desired)
 }

@@ -54,7 +54,6 @@ import { SiteType } from '../enums/siteEnum'
 import { testAsuraScans } from '../services/test/asurascans'
 import { testBatoto } from '../services/test/batoto'
 import { testFirstKissManga } from '../services/test/firstkissmanga'
-import { testGenkanio } from '../services/test/genkanio'
 import { testHiperDEX } from '../services/test/hiperdex'
 import { testLeviatanScans } from '../services/test/leviatanscans'
 import { testLynxScans } from '../services/test/lynxscans'
@@ -157,9 +156,6 @@ export default defineComponent({
           break
         case SiteType.FlameScans:
           await doTest(testFlameScans)
-          break
-        case SiteType.Genkan:
-          await doTest(testGenkanio)
           break
         case SiteType.HiperDEX:
           await doTest(testHiperDEX)

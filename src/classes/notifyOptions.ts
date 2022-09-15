@@ -1,6 +1,6 @@
 export class NotifyOptions {
     message: Error | string
-    type = 'negative'
+    type: 'positive' | 'negative' | 'warning' | 'info' | 'ongoing' = 'negative'
     timeout: number | undefined = undefined
     position: 'bottom' | 'top' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'left' | 'right' | 'center' | undefined = undefined
     closeBtn: boolean | string = false

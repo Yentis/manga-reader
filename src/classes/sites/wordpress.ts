@@ -15,6 +15,7 @@ import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
 class WordPressData extends BaseData {
   volume?: Element
   volumeList?: Element[]
+  chapterText?: string | null
 }
 
 export class WordPress extends BaseSite {
@@ -32,7 +33,7 @@ export class WordPress extends BaseSite {
   getChapter (data: WordPressData): string {
     const volume = data.volume?.textContent?.trim() || 'Vol.01'
     const chapterDate = data.chapterDate?.textContent?.trim() || ''
-    const chapter = data.chapter?.textContent?.replace(chapterDate, '').trim()
+    const chapter = data.chapterText?.replace(chapterDate, '').trim()
 
     if (!volume.endsWith('.01') && !volume.endsWith(' 1') && chapter) {
       return `${volume} | ${chapter}`
@@ -51,7 +52,7 @@ export class WordPress extends BaseSite {
 
     data.volumeList?.forEach((element, index) => {
       const chapterElement = element.querySelectorAll('.wp-manga-chapter a')[0]
-      const chapterText = chapterElement?.textContent?.trim()
+      const chapterText = this.getChapterText(chapterElement)
       const chapterOfVolume = this.getSimpleChapterNum(chapterText)
 
       // We only want decimal places if this is the current chapter, otherwise just add the floored volume number
@@ -266,6 +267,7 @@ export class WordPress extends BaseSite {
     if (data.volume) {
       const volumeParent = data.volume.parentElement
       data.chapter = volumeParent?.querySelectorAll(chapterSelector)[0]
+      data.chapterText = this.getChapterText(data.chapter)
       data.chapterDate = volumeParent?.querySelectorAll(chapterDateSelector)[0]
       if (volumeParent) data.volumeList = [volumeParent]
 
@@ -273,6 +275,7 @@ export class WordPress extends BaseSite {
     }
 
     data.chapter = doc.querySelectorAll(chapterSelector)[0]
+    data.chapterText = this.getChapterText(data.chapter)
     data.chapterDate = doc.querySelectorAll(chapterDateSelector)[0]
     data.volumeList = Array.from(doc.querySelectorAll('.parent.has-child'))
 
@@ -286,6 +289,14 @@ export class WordPress extends BaseSite {
     return url
   }
 
+  private getChapterText (elem: Element | undefined): string | undefined {
+    if (elem?.childNodes[0]?.textContent?.trim()) {
+      return elem?.childNodes[0]?.textContent?.trim()
+    } else {
+      return elem?.textContent?.trim()
+    }
+  }
+
   getLoginUrl (): string {
     return this.getUrl()
   }
@@ -297,11 +308,11 @@ export class WordPress extends BaseSite {
       case SiteType.MangaKomi:
         return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
-        return `${this.getUrl()}/manga/arata-primal-the-new-primitive/`
+        return `${this.getUrl()}/manga/10-years-in-the-friend-zone/`
       case SiteType.MangaTx:
         return `${this.getUrl()}/manga/grandest-wedding/`
       case SiteType.LeviatanScans:
-        return `${this.getUrl()}/manga/the-throne/`
+        return `${this.getUrl()}/manga/i-am-the-sorcerer-king/`
       case SiteType.SleepingKnightScans:
         return `${this.getUrl()}/manga/chronicles-of-the-martial-gods-return/`
       case SiteType.ReaperScans:

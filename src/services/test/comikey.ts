@@ -19,12 +19,12 @@ export async function testComikey (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Episode 114'
+  desired.chapter = 'Episode 113'
   desired.image = 'https://i2.wp.com/comikey.com/media/comics/4orPDQ/621d00480ac3.jpg?fit=500%2C500&quality=95&strip=all'
   desired.title = 'To Be Winner'
-  desired.chapterUrl = 'https://comikey.com/read/to-be-winner-webtoon/Po6VBo/episode-114/'
-  desired.chapterNum = 114
-  desired.chapterDate = '9 months ago'
+  desired.chapterUrl = 'https://comikey.com/read/to-be-winner-webtoon/dowAND/episode-113/'
+  desired.chapterNum = 113
+  desired.chapterDate = 'a year ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,12 +32,12 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlChapter (): Promise<void> {
   const manga = await getMangaInfo('https://comikey.com/comics/demon-lord-got-remarried-manga/37/', SITE_TYPE)
   const desired = new Manga('https://comikey.com/comics/demon-lord-got-remarried-manga/37/', SITE_TYPE)
-  desired.chapter = 'Chapter 53: (End)'
+  desired.chapter = 'Chapter 52'
   desired.image = 'https://i0.wp.com/comikey.com/media/comics/2oLlo8/4b07b0a862bb.jpg?fit=500%2C500&quality=95&strip=all'
   desired.title = 'I\'m a Demon Lord. I Got Remarried to the Mother of a Hero, So She Became My Step-Daughter'
-  desired.chapterUrl = 'https://comikey.com/read/demon-lord-got-remarried-manga/eZBJ0e/chapter-53/'
-  desired.chapterNum = 53
-  desired.chapterDate = '9 months ago'
+  desired.chapterUrl = 'https://comikey.com/read/demon-lord-got-remarried-manga/kEZzXD/chapter-52/'
+  desired.chapterNum = 52
+  desired.chapterDate = 'a year ago'
 
   mangaEqual(manga, desired)
 }
@@ -46,7 +46,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://i2.wp.com/comikey.com/media/comics/4orPDQ/621d00480ac3.jpg?fit=500%2C500&quality=95&strip=all'
-  desired.chapter = 'Episode 114'
+  desired.chapter = 'Episode 113'
   desired.url = 'https://comikey.com/comics/to-be-winner-webtoon/23/'
 
   return searchValid(results, desired, QUERY)

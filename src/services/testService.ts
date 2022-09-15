@@ -7,7 +7,6 @@ import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
 import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
-import { testGenkanio } from './test/genkanio'
 import { testHiperDEX } from './test/hiperdex'
 import { testLeviatanScans } from './test/leviatanscans'
 import { testLynxScans } from './test/lynxscans'
@@ -64,9 +63,6 @@ export default async function testAll (
   }))
   promises.push(testFlameScans().catch((error) => {
     errors.push({ site: SiteType.FlameScans, error: error })
-  }))
-  promises.push(testGenkanio().catch((error) => {
-    errors.push({ site: SiteType.Genkan, error: error })
   }))
   promises.push(testHiperDEX().catch((error) => {
     errors.push({ site: SiteType.HiperDEX, error: error })
