@@ -315,8 +315,6 @@ export class WordPress extends BaseSite {
         return `${this.getUrl()}/manga/i-am-the-sorcerer-king/`
       case SiteType.SleepingKnightScans:
         return `${this.getUrl()}/manga/chronicles-of-the-martial-gods-return/`
-      case SiteType.ReaperScans:
-        return `${this.getUrl()}/series/aire/`
       case SiteType.ResetScans:
         return `${this.getUrl()}/manga/madou-no-keifu/`
     }

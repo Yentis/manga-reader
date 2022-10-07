@@ -50,6 +50,7 @@ import { Tapas } from 'src/classes/sites/tapas'
 import { CopinComics } from 'src/classes/sites/copincomics'
 import { ZeroScans } from 'src/classes/sites/zeroscans'
 import { Comikey } from 'src/classes/sites/comikey'
+import { ReaperScans } from 'src/classes/sites/reaperscans'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -62,7 +63,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
-  [SiteType.ReaperScans, new WordPress(SiteType.ReaperScans)],
+  [SiteType.ReaperScans, new ReaperScans()],
   [SiteType.AsuraScans, new AsuraScans(SiteType.AsuraScans)],
   [SiteType.ManhwaClub, new ManhwaClub()],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],

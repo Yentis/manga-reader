@@ -133,7 +133,7 @@ export function mangaEqual (
   if (actual.url !== desired.url) throw Error(`Failed ${desired.url}\nExpected url: ${desired.url}\nActual: ${actual.url}`)
   else if (actual.site !== desired.site) throw Error(`Failed ${desired.url}\nExpected site: ${desired.site}\nActual: ${actual.site}`)
   else if (actual.chapter !== desired.chapter) throw Error(`Failed ${desired.url}\nExpected chapter: ${desired.chapter}\nActual: ${actual.chapter}`)
-  else if (actual.image !== desired.image) throw Error(`Failed ${desired.url}\nExpected image: ${desired.image}\nActual: ${actual.image}`)
+  else if (!actual.image.includes(desired.image)) throw Error(`Failed ${desired.url}\nExpected image: ${desired.image}\nActual: ${actual.image}`)
   else if (actual.title !== desired.title) throw Error(`Failed ${desired.url}\nExpected title: ${desired.title}\nActual: ${actual.title}`)
   else if (actual.chapterUrl !== desired.chapterUrl) throw Error(`Failed ${desired.url}\nExpected chapter url: ${desired.chapterUrl}\nActual: ${actual.chapterUrl}`)
   else if (actual.read !== desired.read) throw Error(`Failed ${desired.url}\nExpected read: ${desired.read || 'undefined'}\nActual: ${actual.read || 'undefined'}`)
@@ -152,7 +152,7 @@ export async function searchValid (
   const matchingManga = results.filter((manga) => {
     const site = manga.site === desired.site
     const title = manga.title.toLowerCase() === query.toLowerCase()
-    const image = manga.image === desired.image
+    const image = manga.image.includes(desired.image)
     const chapter = desired.chapter === 'Unknown' || manga.chapter === desired.chapter
     const url = manga.url === desired.url
 

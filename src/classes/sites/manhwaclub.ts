@@ -1,4 +1,5 @@
 import moment from 'moment'
+import PQueue from 'p-queue'
 import qs from 'qs'
 import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
@@ -41,6 +42,11 @@ class ManhwaClubData extends BaseData {
 export class ManhwaClub extends BaseSite {
   private comicPrefix = '/comic/'
   siteType = SiteType.ManhwaClub
+
+  constructor () {
+    super()
+    this.requestQueue = new PQueue({ interval: 500, intervalCap: 1 })
+  }
 
   getChapter (data: ManhwaClubData): string {
     return data.latestChapter?.name || 'Unknown'

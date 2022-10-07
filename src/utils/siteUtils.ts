@@ -10,7 +10,9 @@ export const siteAliases = [
   { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
   { url: '1stkissmanga.com', site: SiteType.FirstKissManga },
   { url: Guya, site: SiteType.Cubari },
-  { url: 'mangakomi.com', site: SiteType.MangaKomi }
+  { url: 'mangakomi.com', site: SiteType.MangaKomi },
+  { url: 'www.asurascans.com', site: SiteType.AsuraScans },
+  { url: 'asurascans.com', site: SiteType.AsuraScans }
 ]
 
 export function getUrl (url: string) {

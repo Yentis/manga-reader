@@ -130,15 +130,6 @@ export class AsuraScans extends BaseSite {
     return mangaList
   }
 
-  getUrl (): string {
-    switch (this.siteType) {
-      case SiteType.AsuraScans:
-        return `https://www.${this.siteType}`
-    }
-
-    return super.getUrl()
-  }
-
   getTestUrl () : string {
     switch (this.siteType) {
       case SiteType.AsuraScans:

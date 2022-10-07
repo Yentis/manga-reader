@@ -19,12 +19,12 @@ export async function testCubari (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 170: What was Gained'
+  desired.chapter = 'Chapter 171: The Last Guy I Wanna Run Into'
   desired.image = 'https://cdn.discordapp.com/attachments/754390245860048900/814308196620697640/23_-_p000_-_aKraa.jpg'
   desired.title = 'One Punch Man'
-  desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/170/1/'
-  desired.chapterNum = 170
-  desired.chapterDate = 'a month ago'
+  desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/171/1/'
+  desired.chapterNum = 171
+  desired.chapterDate = '16 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,11 +32,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlGuya (): Promise<void> {
   const manga = await getMangaInfo('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   const desired = new Manga('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
-  desired.chapter = 'Kobachi Osaragi’s Final Chapter'
+  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 1'
   desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/26/73174.webp'
   desired.title = 'Kaguya-sama: Love is War'
-  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/275/1/'
-  desired.chapterNum = 275
+  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/277/1/'
+  desired.chapterNum = 277
   desired.chapterDate = SiteUtils.getDateFromNow('a day ago')
 
   mangaEqual(manga, desired)
@@ -46,7 +46,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga('kaguya-sama love is war', SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/26/73174.webp'
-  desired.chapter = 'Kobachi Osaragi’s Final Chapter'
+  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 1'
   desired.url = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/'
 
   return searchValid(results, desired, 'kaguya-sama: love is war')

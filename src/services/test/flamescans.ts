@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'The Way of the Househusband'
   desired.chapterUrl = 'https://flamescans.org/1662523261-the-way-of-the-househusband-chapter-89/'
   desired.chapterNum = 89
-  desired.chapterDate = '6 months ago'
+  desired.chapterDate = '7 months ago'
 
   mangaEqual(manga, desired)
 }

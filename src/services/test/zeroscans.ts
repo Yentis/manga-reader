@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'All Heavenly Days'
   desired.chapterUrl = 'https://zeroscans.com/comics/all-heavenly-days/384'
   desired.chapterNum = 48
-  desired.chapterDate = '5 months ago'
+  desired.chapterDate = '6 months ago'
 
   mangaEqual(manga, desired)
 }
