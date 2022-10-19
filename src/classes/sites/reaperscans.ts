@@ -1,3 +1,4 @@
+import PQueue from 'p-queue'
 import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
@@ -11,6 +12,11 @@ class ReaperScansData extends BaseData {
 
 export class ReaperScans extends BaseSite {
   siteType = SiteType.ReaperScans
+
+  constructor () {
+    super()
+    this.requestQueue = new PQueue({ interval: 1500, intervalCap: 1 })
+  }
 
   protected getChapterUrl (data: ReaperScansData): string {
     const url = data.chapterUrl?.getAttribute('href') || ''

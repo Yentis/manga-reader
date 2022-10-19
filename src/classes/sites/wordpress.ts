@@ -39,8 +39,6 @@ export class WordPress extends BaseSite {
       return `${volume} | ${chapter}`
     } else if (chapter) {
       return chapter
-    } else if (volume) {
-      return volume
     } else {
       return 'Unknown'
     }

@@ -24,7 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'One Punch Man'
   desired.chapterUrl = 'https://cubari.moe/read/gist/OPM/171/1/'
   desired.chapterNum = 171
-  desired.chapterDate = '16 days ago'
+  desired.chapterDate = 'a month ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,11 +32,11 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlGuya (): Promise<void> {
   const manga = await getMangaInfo('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   const desired = new Manga('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
-  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 1'
-  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/26/73174.webp'
+  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 2'
+  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/27/22149.webp'
   desired.title = 'Kaguya-sama: Love is War'
-  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/277/1/'
-  desired.chapterNum = 277
+  desired.chapterUrl = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/278/1/'
+  desired.chapterNum = 278
   desired.chapterDate = SiteUtils.getDateFromNow('a day ago')
 
   mangaEqual(manga, desired)
@@ -45,8 +45,8 @@ async function readUrlGuya (): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga('kaguya-sama love is war', SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/26/73174.webp'
-  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 1'
+  desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/27/22149.webp'
+  desired.chapter = 'Miko Iino and Yu Ishigami’s Final Chapter, Part 2'
   desired.url = 'https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/'
 
   return searchValid(results, desired, 'kaguya-sama: love is war')
