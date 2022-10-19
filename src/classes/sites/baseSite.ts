@@ -172,7 +172,7 @@ export abstract class BaseSite {
     manga.image = this.getImage(data)
     manga.title = this.getTitle(data)
 
-    if (manga.title === '') {
+    if (manga.title === '' || manga.chapter === 'Unknown') {
       throw Error('Could not parse site')
     }
     return manga

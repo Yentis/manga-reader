@@ -12,7 +12,8 @@ export const siteAliases = [
   { url: Guya, site: SiteType.Cubari },
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
-  { url: 'asurascans.com', site: SiteType.AsuraScans }
+  { url: 'asurascans.com', site: SiteType.AsuraScans },
+  { url: 'leviatanscans.com', site: SiteType.LeviatanScans }
 ]
 
 export function getUrl (url: string) {
