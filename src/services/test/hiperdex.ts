@@ -24,7 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = '10 Years in the Friend Zone'
   desired.chapterUrl = 'https://hiperdex.com/manga/10-years-in-the-friend-zone/chapter-84/'
   desired.chapterNum = 84
-  desired.chapterDate = '9 months ago'
+  desired.chapterDate = '10 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -37,7 +37,7 @@ async function readUrl2 (): Promise<void> {
   desired.title = 'Touch On'
   desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-0411/109-3/'
   desired.chapterNum = 109.3
-  desired.chapterDate = '7 months ago'
+  desired.chapterDate = '8 months ago'
 
   mangaEqual(manga, desired)
 }

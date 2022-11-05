@@ -18,12 +18,12 @@ export async function testBiliBiliComics (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = '662 Dress Lightly for Battle (2)'
+  desired.chapter = '665 I\'m Done Fighting (1)'
   desired.image = 'https://i0.hdslb.com/bfs/comic-static/58c0cc6a498b2d8c74e5ca1f283393cd26501e71.png@300w.webp'
   desired.title = 'Tales of Demons and Gods'
-  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/308331'
-  desired.chapterNum = 662
-  desired.chapterDate = '4 days ago'
+  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/316424'
+  desired.chapterNum = 665
+  desired.chapterDate = '20 hours ago'
 
   mangaEqual(manga, desired, false)
 }

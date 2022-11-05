@@ -18,12 +18,12 @@ export async function testSleepingKnightScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 38'
+  desired.chapter = 'Chapter 42'
   desired.image = 'https://skscans.com/wp-content/uploads/2022/09/COVER.jpg'
   desired.title = 'Chronicles of the Martial God’s Return'
-  desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-the-martial-gods-return/chapter-38/'
-  desired.chapterNum = 38
-  desired.chapterDate = 'an hour ago'
+  desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-the-martial-gods-return/chapter-42/'
+  desired.chapterNum = 42
+  desired.chapterDate = '4 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,7 +32,7 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://skscans.com/wp-content/uploads/2022/09/COVER-193x278.jpg'
-  desired.chapter = 'Chapter 38'
+  desired.chapter = 'Chapter 42'
   desired.url = 'https://skscans.com/manga/chronicles-of-the-martial-gods-return/'
 
   return searchValid(results, desired, 'Chronicles of the Martial God’s Return')

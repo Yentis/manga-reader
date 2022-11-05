@@ -22,7 +22,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 143'
   desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2022/08/cover-iatsk.png'
   desired.title = 'I Am the Sorcerer King'
-  desired.chapterUrl = 'https://en.leviatanscans.com/hcd/manga/i-am-the-sorcerer-king/chapter-143/'
+  desired.chapterUrl = 'https://en.leviatanscans.com/tkl/manga/i-am-the-sorcerer-king/chapter-143/'
   desired.chapterNum = 143
   desired.chapterDate = '2 months ago'
 
@@ -33,11 +33,11 @@ async function readUrlCorrectSeasonOrder (): Promise<void> {
   const url = 'https://en.leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  desired.chapter = 'Chapter 125'
+  desired.chapter = 'Chapter 128'
   desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2022/08/cover-TSWRC.png'
   desired.title = 'Tale of a Scribe Who Retires to the Countryside'
-  desired.chapterUrl = 'https://en.leviatanscans.com/hcd/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-125/'
-  desired.chapterNum = 125
+  desired.chapterUrl = 'https://en.leviatanscans.com/tkl/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-128/'
+  desired.chapterNum = 128
 
   mangaEqual(manga, desired)
 }
@@ -47,7 +47,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2022/08/cover-BE-193x278.png'
   desired.chapter = 'Chapter 212'
-  desired.url = 'https://en.leviatanscans.com/hcd/manga/burning-effect/'
+  desired.url = 'https://en.leviatanscans.com/tkl/manga/burning-effect/'
 
   return searchValid(results, desired, QUERY)
 }

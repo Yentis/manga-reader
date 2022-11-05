@@ -49,8 +49,11 @@ export class WordPress extends BaseSite {
     let chapterNum = 0
 
     data.volumeList?.forEach((element, index) => {
-      const chapterElement = element.querySelectorAll('.wp-manga-chapter a')[0]
-      const chapterText = this.getChapterText(chapterElement)
+      const matchingChapter = this.getMatchingChapter(
+        Array.from(element.querySelectorAll('.wp-manga-chapter a') ?? [])
+      )
+
+      const chapterText = matchingChapter?.text
       const chapterOfVolume = this.getSimpleChapterNum(chapterText)
 
       // We only want decimal places if this is the current chapter, otherwise just add the floored volume number
@@ -101,6 +104,8 @@ export class WordPress extends BaseSite {
       format = 'DD/MM/YYYY'
     } else if (chapterDateText?.includes(',')) {
       format = 'MMMM DD, YYYY'
+    } else if (chapterDateText?.includes('-')) {
+      format = 'DD-MM-YYYY'
     } else {
       format = 'Do MMMM YYYY'
     }
@@ -264,16 +269,24 @@ export class WordPress extends BaseSite {
 
     if (data.volume) {
       const volumeParent = data.volume.parentElement
-      data.chapter = volumeParent?.querySelectorAll(chapterSelector)[0]
-      data.chapterText = this.getChapterText(data.chapter)
+      const matchingChapter = this.getMatchingChapter(
+        Array.from(volumeParent?.querySelectorAll(chapterSelector) ?? [])
+      )
+
+      data.chapter = matchingChapter?.element
+      data.chapterText = matchingChapter?.text
       data.chapterDate = volumeParent?.querySelectorAll(chapterDateSelector)[0]
       if (volumeParent) data.volumeList = [volumeParent]
 
       return data
     }
 
-    data.chapter = doc.querySelectorAll(chapterSelector)[0]
-    data.chapterText = this.getChapterText(data.chapter)
+    const matchingChapter = this.getMatchingChapter(
+      Array.from(doc.querySelectorAll(chapterSelector) ?? [])
+    )
+
+    data.chapter = matchingChapter?.element
+    data.chapterText = matchingChapter?.text
     data.chapterDate = doc.querySelectorAll(chapterDateSelector)[0]
     data.volumeList = Array.from(doc.querySelectorAll('.parent.has-child'))
 
@@ -287,12 +300,15 @@ export class WordPress extends BaseSite {
     return url
   }
 
-  private getChapterText (elem: Element | undefined): string | undefined {
-    if (elem?.childNodes[0]?.textContent?.trim()) {
-      return elem?.childNodes[0]?.textContent?.trim()
-    } else {
-      return elem?.textContent?.trim()
+  private getMatchingChapter (elements: Element[] | undefined): ({ element: Element, text: string }) | undefined {
+    if (!elements) return undefined
+
+    for (const element of elements) {
+      const text = element?.childNodes[0]?.textContent?.trim() || element?.textContent?.trim()
+      if (text) return { element, text }
     }
+
+    return undefined
   }
 
   getLoginUrl (): string {

@@ -38,7 +38,7 @@ async function readUrlAdvanced (): Promise<void> {
   desired.title = 'Solo Bug Player'
   desired.chapterUrl = 'https://asura.gg/solo-bug-player-chapter-88/'
   desired.chapterNum = 88
-  desired.chapterDate = '6 months ago'
+  desired.chapterDate = '7 months ago'
 
   mangaEqual(manga, desired)
 }

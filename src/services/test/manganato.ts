@@ -22,7 +22,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Vol.6 Chapter 57: The Final Chapter'
   desired.image = 'https://avt.mkklcdnv6temp.com/8/x/18-1583497426.jpg'
   desired.title = 'Kudan No Gotoshi'
-  desired.chapterUrl = 'https://readmanganato.com/manga-dt981276/chapter-57'
+  desired.chapterUrl = 'https://chapmanganato.com/manga-dt981276/chapter-57'
   desired.chapterNum = 57
   desired.chapterDate = moment('May 21,20', 'MMM DD,YY').fromNow()
 

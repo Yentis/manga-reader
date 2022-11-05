@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Aire'
   desired.chapterUrl = 'https://reaperscans.com/comics/7946-aire/chapters/28705678-chapter-57'
   desired.chapterNum = 57
-  desired.chapterDate = '3 days ago'
+  desired.chapterDate = 'a month ago'
 
   mangaEqual(manga, desired)
 }

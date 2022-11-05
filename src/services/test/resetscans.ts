@@ -19,12 +19,12 @@ export async function testResetScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 4'
+  desired.chapter = 'Chapter 04'
   desired.image = 'https://reset-scans.com/wp-content/uploads/2021/04/Madou-no-Keifu.jpg'
   desired.title = 'Madou no Keifu'
-  desired.chapterUrl = 'https://reset-scans.com/dev/madou-no-keifu/chapter-04/'
+  desired.chapterUrl = 'https://reset-scans.com/manga/madou-no-keifu/chapter-04/'
   desired.chapterNum = 4
-  desired.chapterDate = '6 months ago'
+  desired.chapterDate = '2 years ago'
 
   mangaEqual(manga, desired)
 }
@@ -32,12 +32,12 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function readUrlDotChapter (): Promise<void> {
   const manga = await getMangaInfo('https://reset-scans.com/manga/the-unwanted-undead-adventurer/', SITE_TYPE)
   const desired = new Manga('https://reset-scans.com/manga/the-unwanted-undead-adventurer/', SITE_TYPE)
-  desired.chapter = 'Chapter 46.3'
+  desired.chapter = 'Chapter 47'
   desired.image = 'https://reset-scans.com/wp-content/uploads/2021/06/Undead-Cover-Page.jpg'
   desired.title = 'The Unwanted Undead Adventurer'
-  desired.chapterUrl = 'https://reset-scans.com/dev/the-unwanted-undead-adventurer/chapter-46-3/'
-  desired.chapterNum = 46.3
-  desired.chapterDate = '15 days ago'
+  desired.chapterUrl = 'https://reset-scans.com/manga/the-unwanted-undead-adventurer/chapter-47/'
+  desired.chapterNum = 47
+  desired.chapterDate = '14 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -47,7 +47,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://reset-scans.com/wp-content/uploads/2021/05/Zoo-Dorm-193x278.png'
   desired.chapter = 'Chapter 18'
-  desired.url = 'https://reset-scans.com/dev/zoo-in-the-dormitory/'
+  desired.url = 'https://reset-scans.com/manga/zoo-in-the-dormitory/'
 
   return searchValid(results, desired, QUERY)
 }
