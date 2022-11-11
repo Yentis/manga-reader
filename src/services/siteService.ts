@@ -26,8 +26,8 @@ import {
   BaseSite
 } from '../classes/sites/baseSite'
 import {
-  AsuraScans
-} from '../classes/sites/asurascans'
+  Madara
+} from '../classes/sites/madara'
 import {
   Mangago
 } from '../classes/sites/mangago'
@@ -64,7 +64,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LeviatanScans, new WordPress(SiteType.LeviatanScans)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new ReaperScans()],
-  [SiteType.AsuraScans, new AsuraScans(SiteType.AsuraScans)],
+  [SiteType.AsuraScans, new Madara(SiteType.AsuraScans)],
   [SiteType.ManhwaClub, new ManhwaClub()],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
@@ -72,12 +72,12 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
-  [SiteType.FlameScans, new AsuraScans(SiteType.FlameScans)],
+  [SiteType.FlameScans, new Madara(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
   [SiteType.BiliBiliComics, new BiliBiliComics()],
-  [SiteType.AlphaScans, new AsuraScans(SiteType.AlphaScans)],
+  [SiteType.CosmicScans, new Madara(SiteType.CosmicScans)],
   [SiteType.Cubari, new Cubari()],
-  [SiteType.LuminousScans, new AsuraScans(SiteType.LuminousScans)],
+  [SiteType.LuminousScans, new Madara(SiteType.LuminousScans)],
   [SiteType.Tapas, new Tapas()],
   [SiteType.CopinComics, new CopinComics()],
   [SiteType.Comikey, new Comikey()]

@@ -24,7 +24,7 @@ import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 import { testBiliBiliComics } from './test/bilibilicomics'
 import { testKitsu } from './test/kitsu'
-import { testAlphaScans } from './test/alphascans'
+import { testCosmicScans } from './test/cosmicscans'
 import { testCubari } from './test/cubari'
 import { testLuminousScans } from './test/luminousscans'
 import { testTapas } from './test/tapas'
@@ -37,8 +37,8 @@ export default async function testAll (
   const promises: Promise<void>[] = []
   const errors: { site: SiteType | LinkingSiteType, error: unknown }[] = []
 
-  promises.push(testAlphaScans().catch((error) => {
-    errors.push({ site: SiteType.AlphaScans, error: error })
+  promises.push(testCosmicScans().catch((error) => {
+    errors.push({ site: SiteType.CosmicScans, error: error })
   }))
   promises.push(testAsuraScans().catch((error) => {
     errors.push({ site: SiteType.AsuraScans, error: error })

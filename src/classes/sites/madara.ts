@@ -8,7 +8,7 @@ import { requestHandler } from 'src/services/requestService'
 import { ContentType } from 'src/enums/contentTypeEnum'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from '../../utils/siteUtils'
 
-interface AsuraScansSearch {
+interface MadaraSearch {
   series: {
     all: {
       'post_title': string,
@@ -19,12 +19,12 @@ interface AsuraScansSearch {
   }[]
 }
 
-class AsuraScansData extends BaseData {
+class MadaraData extends BaseData {
   chapterUrl?: Element
   chapterList?: Element
 }
 
-export class AsuraScans extends BaseSite {
+export class Madara extends BaseSite {
   siteType: SiteType
 
   constructor (siteType: SiteType) {
@@ -36,11 +36,11 @@ export class AsuraScans extends BaseSite {
     }
   }
 
-  protected getChapterUrl (data: AsuraScansData): string {
+  protected getChapterUrl (data: MadaraData): string {
     return data.chapterUrl?.getAttribute('href') || ''
   }
 
-  protected getChapterNum (data: AsuraScansData): number {
+  protected getChapterNum (data: MadaraData): number {
     const chapterNum = parseNum(data.chapterNum?.getAttribute('data-num'))
     if (chapterNum !== 0) return chapterNum
 
@@ -79,7 +79,7 @@ export class AsuraScans extends BaseSite {
     const chapterList = doc.querySelectorAll('#chapterlist')[0]
     const chapterItem = chapterList?.querySelectorAll('li')[0]
 
-    const data = new AsuraScansData(url)
+    const data = new MadaraData(url)
     data.chapter = chapterItem?.querySelectorAll('.chapternum')[0]
     data.chapterUrl = chapterItem?.querySelectorAll('a')[0]
     data.chapterNum = chapterItem
@@ -107,7 +107,7 @@ export class AsuraScans extends BaseSite {
     }
     const response = await requestHandler.sendRequest(request)
 
-    const searchData = JSON.parse(response.data) as AsuraScansSearch
+    const searchData = JSON.parse(response.data) as MadaraSearch
     if (!searchData.series) {
       return []
     }
@@ -136,8 +136,8 @@ export class AsuraScans extends BaseSite {
         return `${this.getUrl()}/manga/mookhyang-the-origin/`
       case SiteType.FlameScans:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
-      case SiteType.AlphaScans:
-        return `${this.getUrl()}/manga/medical-return/`
+      case SiteType.CosmicScans:
+        return `${this.getUrl()}/manga/i-have-max-level-luck/`
       case SiteType.LuminousScans:
         return `${this.getUrl()}/series/my-office-noonas-story/`
     }

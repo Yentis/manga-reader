@@ -74,7 +74,7 @@ import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
 import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
-import { testAlphaScans } from '../services/test/alphascans'
+import { testCosmicScans } from '../services/test/cosmicscans'
 import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
 import { testTapas } from 'src/services/test/tapas'
@@ -130,9 +130,6 @@ export default defineComponent({
 
     const testSite = async () => {
       switch (selectedSite.value) {
-        case SiteType.AlphaScans:
-          await doTest(testAlphaScans)
-          break
         case SiteType.AsuraScans:
           await doTest(testAsuraScans)
           break
@@ -147,6 +144,9 @@ export default defineComponent({
           break
         case SiteType.CopinComics:
           await doTest(testCopinComics)
+          break
+        case SiteType.CosmicScans:
+          await doTest(testCosmicScans)
           break
         case SiteType.Cubari:
           await doTest(testCubari)

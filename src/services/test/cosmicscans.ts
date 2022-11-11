@@ -5,10 +5,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.AlphaScans
-const QUERY = 'medical return'
+const SITE_TYPE = SiteType.CosmicScans
+const QUERY = 'i have max level luck'
 
-export async function testAlphaScans (): Promise<void> {
+export async function testCosmicScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -19,12 +19,12 @@ export async function testAlphaScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 148 (END)'
-  desired.image = 'https://i2.wp.com/alpha-scans.org/wp-content/uploads/2021/07/Medical-Return-Cover.gif'
-  desired.title = 'Medical Return'
-  desired.chapterUrl = 'https://alpha-scans.org/medical-return-chapter-148-end/'
-  desired.chapterNum = 148
-  desired.chapterDate = moment('28/01/2022', 'DD/MM/YYYY').fromNow()
+  desired.chapter = 'Chapter 9'
+  desired.image = 'https://cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg'
+  desired.title = 'I Have Max Level Luck'
+  desired.chapterUrl = 'https://cosmicscans.com/i-have-max-level-luck-chapter-9/'
+  desired.chapterNum = 9
+  desired.chapterDate = moment('25/06/2022', 'DD/MM/YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -32,9 +32,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://i2.wp.com/alpha-scans.org/wp-content/uploads/2021/07/Medical-Return-Cover.gif?h=80'
-  desired.chapter = '148 (END)'
-  desired.url = 'https://alpha-scans.org/manga/medical-return/'
+  desired.image = 'https://i3.wp.com/cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg?resize=65,85'
+  desired.chapter = '9'
+  desired.url = 'https://cosmicscans.com/manga/i-have-max-level-luck/'
 
   return searchValid(results, desired, QUERY)
 }
