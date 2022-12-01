@@ -27,24 +27,7 @@ export class ReaperScans extends BaseSite {
 
   protected getChapterNum (data: ReaperScansData): number {
     const chapter = this.getChapter(data)
-    if (!chapter) return 0
-
-    const pattern = /[\d\\.,]+\b/gm
-    let num = 0
-    let match: RegExpExecArray | null
-
-    while ((match = pattern.exec(chapter)) !== null) {
-      const matchedValue = match[0]
-      if (!matchedValue) continue
-
-      const parsedMatch = parseFloat(matchedValue)
-      if (!isNaN(parsedMatch)) {
-        num = parsedMatch
-        break
-      }
-    }
-
-    return num
+    return SiteUtils.matchNum(chapter)
   }
 
   protected getChapterDate (data: BaseData): string {

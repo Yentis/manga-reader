@@ -5,7 +5,7 @@ import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
-import { getDateFromNow, parseNum, titleContainsQuery } from 'src/utils/siteUtils'
+import { getDateFromNow, matchNum, titleContainsQuery } from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
 interface ChaptersResponse {
@@ -58,7 +58,7 @@ export class ManhwaClub extends BaseSite {
   }
 
   getChapterNum (data: ManhwaClubData): number {
-    return parseNum(data.latestChapter?.name.replace(/\D/g, ''))
+    return matchNum(data.latestChapter?.name)
   }
 
   getChapterDate (data: ManhwaClubData): string {

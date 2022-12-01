@@ -7,7 +7,7 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import { Manga } from 'src/classes/manga'
 import qs from 'qs'
 import moment from 'moment'
-import { getDateFromNow, parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
+import { getDateFromNow, matchNum, parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import { getPlatform } from 'src/services/platformService'
 import { Platform } from 'src/enums/platformEnum'
 import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
@@ -68,32 +68,7 @@ export class WordPress extends BaseSite {
   }
 
   private getSimpleChapterNum (chapter: string | undefined): number {
-    if (!chapter) return 0
-
-    const pattern = /[\d\\.,]+\b/gm
-    let num = 0
-    let match: RegExpExecArray | null
-
-    while ((match = pattern.exec(chapter)) !== null) {
-      const matchedValue = match[0]
-      if (!matchedValue) continue
-
-      const parsedMatch = parseFloat(matchedValue)
-      if (!isNaN(parsedMatch)) {
-        num = parsedMatch
-        break
-      }
-    }
-
-    if (num === 0) {
-      const chapterNum = chapter.split(' ')[0]
-      if (!chapterNum) return num
-
-      const candidateNum = parseFloat(chapterNum)
-      if (!isNaN(candidateNum)) num = candidateNum
-    }
-
-    return num
+    return matchNum(chapter)
   }
 
   getChapterDate (data: BaseData): string {

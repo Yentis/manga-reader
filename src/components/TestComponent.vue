@@ -78,8 +78,8 @@ import { testCosmicScans } from '../services/test/cosmicscans'
 import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
 import { testTapas } from 'src/services/test/tapas'
-import { testCopinComics } from 'src/services/test/copincomics'
 import { testComikey } from 'src/services/test/comikey'
+import { testTappytoon } from 'src/services/test/tappytoon'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -142,9 +142,6 @@ export default defineComponent({
         case SiteType.Comikey:
           await doTest(testComikey)
           break
-        case SiteType.CopinComics:
-          await doTest(testCopinComics)
-          break
         case SiteType.CosmicScans:
           await doTest(testCosmicScans)
           break
@@ -204,6 +201,9 @@ export default defineComponent({
           break
         case SiteType.Tapas:
           await doTest(testTapas)
+          break
+        case SiteType.Tappytoon:
+          await doTest(testTappytoon)
           break
         case SiteType.Webtoons:
           await doTest(testWebtoons)

@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.CopinComics
+const SITE_TYPE = SiteType.Tappytoon
 const QUERY = 'return survival'
 
-export async function testCopinComics (): Promise<void> {
+export async function testTappytoon (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,12 +18,12 @@ export async function testCopinComics (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Episode 60'
-  desired.image = 'https://s3.us-west-1.amazonaws.com/t.copincomics.com/img/title/301/PDMAu2zYHz_3x4.png'
+  desired.chapter = 'Episode 75'
+  desired.image = 'https://d1ed0vta5mrb00.cloudfront.net/comics/482/thumbnails/b9e789c4-d9c7-4273-bdfd-2c01ec69aedc.jpg'
   desired.title = 'Return Survival'
-  desired.chapterUrl = ''
-  desired.chapterNum = 60
-  desired.chapterDate = '4 months ago'
+  desired.chapterUrl = 'https://www.tappytoon.com/en/chapters/925932591'
+  desired.chapterNum = 75
+  desired.chapterDate = '3 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -31,9 +31,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://s3.us-west-1.amazonaws.com/t.copincomics.com/img/title/301/PDMAu2zYHz_3x4.png'
-  desired.chapter = 'Episode 60'
-  desired.url = 'https://copincomics.com/toon/301'
+  desired.image = 'https://d1ed0vta5mrb00.cloudfront.net/comics/482/thumbnails/b9e789c4-d9c7-4273-bdfd-2c01ec69aedc.jpg'
+  desired.chapter = 'Episode 75'
+  desired.url = 'https://www.tappytoon.com/en/book/return-survival'
 
   return searchValid(results, desired, QUERY)
 }

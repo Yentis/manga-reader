@@ -40,8 +40,8 @@ export function mangaSort (
 
   if (!ignoreProgress) {
     if (a.status === Status.READING && b.status === Status.READING) {
-      const isARead = isMangaRead(a.chapter, a.chapterNum, a.read, a.readNum)
-      const isBRead = isMangaRead(b.chapter, b.chapterNum, b.read, b.readNum)
+      const isARead = isMangaRead(a.chapter, a.read)
+      const isBRead = isMangaRead(b.chapter, b.read)
 
       if (!isARead && isBRead) {
         return -1
@@ -71,8 +71,8 @@ export function mangaSort (
   }
 }
 
-export function isMangaRead (chapter: string, chapterNum: number, read?: string, readNum?: number): boolean {
-  return chapter === read || (readNum !== undefined && chapterNum <= readNum)
+export function isMangaRead (chapter: string, read?: string): boolean {
+  return chapter === read
 }
 
 function sortSite (a: Manga, b: Manga) {

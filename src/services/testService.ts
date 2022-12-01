@@ -28,8 +28,8 @@ import { testCosmicScans } from './test/cosmicscans'
 import { testCubari } from './test/cubari'
 import { testLuminousScans } from './test/luminousscans'
 import { testTapas } from './test/tapas'
-import { testCopinComics } from './test/copincomics'
 import { testComikey } from './test/comikey'
+import { testTappytoon } from './test/tappytoon'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -51,9 +51,6 @@ export default async function testAll (
   }))
   promises.push(testComikey().catch((error) => {
     errors.push({ site: SiteType.Comikey, error: error })
-  }))
-  promises.push(testCopinComics().catch((error) => {
-    errors.push({ site: SiteType.CopinComics, error: error })
   }))
   promises.push(testCubari().catch((error) => {
     errors.push({ site: SiteType.Cubari, error: error })
@@ -111,6 +108,9 @@ export default async function testAll (
   }))
   promises.push(testTapas().catch((error) => {
     errors.push({ site: SiteType.Tapas, error: error })
+  }))
+  promises.push(testTappytoon().catch((error) => {
+    errors.push({ site: SiteType.Tappytoon, error: error })
   }))
   promises.push(testWebtoons().catch((error) => {
     errors.push({ site: SiteType.Webtoons, error: error })

@@ -1,4 +1,4 @@
-type Method =
+export type Method =
   | 'GET'
   | 'DELETE'
   | 'HEAD'

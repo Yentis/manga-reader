@@ -441,12 +441,7 @@ export default defineComponent({
     })
     const isUnread = computed(() => {
       return manga.status.value === Status.READING &&
-      !isMangaRead(
-        manga.chapter.value,
-        manga.chapterNum.value,
-        manga.read.value,
-        manga.readNum.value
-      )
+      !isMangaRead(manga.chapter.value, manga.read.value)
     })
 
     const { navigate } = useUrlNavigation()

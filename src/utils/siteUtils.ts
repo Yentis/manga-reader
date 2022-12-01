@@ -55,6 +55,27 @@ export function parseNum (elem?: string | null): number {
   }
 }
 
+export function matchNum (text: string | undefined) {
+  if (!text) return 0
+
+  const pattern = /[\d]+[.,]*\b/gm
+  let num = 0
+  let match: RegExpExecArray | null
+
+  while ((match = pattern.exec(text)) !== null) {
+    const matchedValue = match[0]
+    if (!matchedValue) continue
+
+    const parsedMatch = parseFloat(matchedValue)
+    if (!isNaN(parsedMatch)) {
+      num = parsedMatch
+      break
+    }
+  }
+
+  return num
+}
+
 export function getDateFromNow (input?: string | null): string {
   const date = moment()
   const chapterDate = input?.trim().split(' ') || []
