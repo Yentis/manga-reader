@@ -6,10 +6,6 @@ import { requestHandler } from 'src/services/requestService'
 import * as SiteUtils from 'src/utils/siteUtils'
 import { BaseData, BaseSite } from './baseSite'
 
-class ReaperScansData extends BaseData {
-  chapterUrl?: Element | null
-}
-
 export class ReaperScans extends BaseSite {
   siteType = SiteType.ReaperScans
 
@@ -18,14 +14,7 @@ export class ReaperScans extends BaseSite {
     this.requestQueue = new PQueue({ interval: 1500, intervalCap: 1 })
   }
 
-  protected getChapterUrl (data: ReaperScansData): string {
-    const url = data.chapterUrl?.getAttribute('href') || ''
-    if (url.startsWith('/')) return `${this.getUrl()}${url}`
-
-    return url
-  }
-
-  protected getChapterNum (data: ReaperScansData): number {
+  protected getChapterNum (data: BaseData): number {
     const chapter = this.getChapter(data)
     return SiteUtils.matchNum(chapter)
   }
@@ -41,7 +30,7 @@ export class ReaperScans extends BaseSite {
     const response = await requestHandler.sendRequest(request)
 
     const doc = await SiteUtils.parseHtmlFromString(response.data)
-    const data = new ReaperScansData(url)
+    const data = new BaseData(url)
 
     const titleContainer = doc.querySelectorAll('main>div:nth-child(2)>div>div')[0]
     const chapterContainer = doc.querySelectorAll('div>div>div>ul li')[0]

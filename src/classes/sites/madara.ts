@@ -20,7 +20,6 @@ interface MadaraSearch {
 }
 
 class MadaraData extends BaseData {
-  chapterUrl?: Element
   chapterList?: Element
 }
 
@@ -34,10 +33,6 @@ export class Madara extends BaseSite {
     if (siteType === SiteType.AsuraScans) {
       this.requestQueue = new PQueue({ interval: 2000, intervalCap: 1 })
     }
-  }
-
-  protected getChapterUrl (data: MadaraData): string {
-    return data.chapterUrl?.getAttribute('href') || ''
   }
 
   protected getChapterNum (data: MadaraData): number {

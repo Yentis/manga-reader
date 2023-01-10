@@ -26,7 +26,8 @@ export enum SiteType {
     LuminousScans = 'luminousscans.com',
     Tapas = 'tapas.io',
     Comikey = 'comikey.com',
-    Tappytoon = 'tappytoon.com'
+    Tappytoon = 'tappytoon.com',
+    ScyllaScans = 'scyllascans.org'
 }
 
 export enum SiteName {
@@ -56,7 +57,8 @@ export enum SiteName {
     'luminousscans.com' = 'Luminous Scans',
     'tapas.io' = 'Tapas',
     'comikey.com' = 'Comikey',
-    'tappytoon.com' = 'Tappytoon'
+    'tappytoon.com' = 'Tappytoon',
+    'scyllascans.org' = 'Scylla Scans'
 }
 
 export enum SiteState {

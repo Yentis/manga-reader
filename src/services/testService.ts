@@ -30,6 +30,7 @@ import { testLuminousScans } from './test/luminousscans'
 import { testTapas } from './test/tapas'
 import { testComikey } from './test/comikey'
 import { testTappytoon } from './test/tappytoon'
+import { testScyllaScans } from './test/scyllascans'
 
 export default async function testAll (
   $q: QVueGlobals
@@ -102,6 +103,9 @@ export default async function testAll (
   }))
   promises.push(testResetScans().catch((error) => {
     errors.push({ site: SiteType.ResetScans, error: error })
+  }))
+  promises.push(testScyllaScans().catch((error) => {
+    errors.push({ site: SiteType.ScyllaScans, error: error })
   }))
   promises.push(testSleepingKnightScans().catch((error) => {
     errors.push({ site: SiteType.SleepingKnightScans, error: error })

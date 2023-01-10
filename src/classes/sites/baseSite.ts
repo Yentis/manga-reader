@@ -10,6 +10,7 @@ import * as SiteUtils from 'src/utils/siteUtils'
 export class BaseData {
   url: string
   chapter?: Element | null
+  chapterUrl?: Element | null
   chapterNum?: Element | null
   chapterDate?: Element | null
   image?: Element
@@ -73,7 +74,7 @@ export abstract class BaseSite {
   }
 
   protected getChapterUrl (data: BaseData): string {
-    const url = data.chapter?.getAttribute('href') || ''
+    const url = (data.chapterUrl ?? data.chapter)?.getAttribute('href') || ''
     if (url.startsWith('/')) return `${this.getUrl()}${url}`
 
     return url

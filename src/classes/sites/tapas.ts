@@ -20,19 +20,8 @@ interface SearchData {
   }
 }
 
-class TapasData extends BaseData {
-  chapterUrl?: Element
-}
-
 export class Tapas extends BaseSite {
   siteType = SiteType.Tapas
-
-  protected getChapterUrl (data: TapasData): string {
-    const url = data.chapterUrl?.getAttribute('href')
-    if (!url) return ''
-
-    return `${this.getUrl()}${url}`
-  }
 
   protected getChapterNum (data: BaseData): number {
     const chapterNum = data.chapterNum?.getAttribute('data-scene-number')
@@ -71,7 +60,7 @@ export class Tapas extends BaseSite {
     const chaptersData = JSON.parse(chaptersResponse.data) as ChaptersData
     const chaptersDoc = await parseHtmlFromString(chaptersData.data.body)
 
-    const data = new TapasData(url)
+    const data = new BaseData(url)
     let chapterElem: Element | undefined
     for (const elem of chaptersDoc.querySelectorAll('.episode-item')) {
       if (elem.querySelectorAll('.additional span').length > 0) {

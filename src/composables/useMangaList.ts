@@ -1,5 +1,5 @@
 import { useStore } from '../store/index'
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { Manga } from '../classes/manga'
 import { tryMigrateMangaList } from '../services/migrationService'
 import { LocalStorage, useQuasar } from 'quasar'
@@ -21,6 +21,7 @@ export default function useMangaList () {
   const $store = useStore()
   const { notification } = useNotification()
 
+  const mangaMap = computed(() => $store.state.reader.mangaMap)
   const setMangaList = (val: Manga[]) => { $store.commit('reader/updateMangaList', val) }
   const addManga = (manga: Manga): boolean => {
     const existingManga = $store.state.reader.mangaMap.get(manga.url)
@@ -227,6 +228,7 @@ export default function useMangaList () {
   }
 
   return {
+    mangaMap,
     setMangaList,
     addManga,
     removeManga,

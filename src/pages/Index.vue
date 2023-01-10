@@ -41,6 +41,7 @@ import { Platform } from '../enums/platformEnum'
 import { useStore } from '../store'
 import { Manga } from '../classes/manga'
 import { mangaSort } from '../services/sortService'
+import useMangaList from 'src/composables/useMangaList'
 
 export default defineComponent({
   components: {
@@ -56,8 +57,8 @@ export default defineComponent({
     const { searchValue } = useSearchValue()
     const refreshProgress = ref(0)
     const { refreshing } = useRefreshing(refreshProgress)
+    const { mangaMap } = useMangaList()
 
-    const mangaMap = computed(() => $store.state.reader.mangaMap)
     const mangaUrls = computed(() => {
       const matchedManga: Manga[] = []
 

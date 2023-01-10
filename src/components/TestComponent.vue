@@ -80,6 +80,7 @@ import { testLuminousScans } from 'src/services/test/luminousscans'
 import { testTapas } from 'src/services/test/tapas'
 import { testComikey } from 'src/services/test/comikey'
 import { testTappytoon } from 'src/services/test/tappytoon'
+import { testScyllaScans } from 'src/services/test/scyllascans'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -204,6 +205,9 @@ export default defineComponent({
           break
         case SiteType.Tappytoon:
           await doTest(testTappytoon)
+          break
+        case SiteType.ScyllaScans:
+          await doTest(testScyllaScans)
           break
         case SiteType.Webtoons:
           await doTest(testWebtoons)

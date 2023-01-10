@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.Tappytoon
-const QUERY = 'return survival'
+const SITE_TYPE = SiteType.ScyllaScans
+const QUERY = 'one in a hundred'
 
-export async function testTappytoon (): Promise<void> {
+export async function testScyllaScans (): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,12 +18,12 @@ export async function testTappytoon (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Episode 75'
-  desired.image = 'https://d1ed0vta5mrb00.cloudfront.net/comics/482/thumbnails/b9e789c4-d9c7-4273-bdfd-2c01ec69aedc.jpg'
-  desired.title = 'Return Survival'
-  desired.chapterUrl = 'https://www.tappytoon.com/en/chapters/925932591'
-  desired.chapterNum = 75
-  desired.chapterDate = '5 months ago'
+  desired.chapter = 'Chapter 6'
+  desired.image = 'https://i0.wp.com/api.scyllascans.org/works/db6b48e0-5b2d-11ec-a302-c7bd018ebdbc/420cunetnoiselevel3ttaresult.jpg?strip=all&quality=100'
+  desired.title = 'One in a Hundred'
+  desired.chapterUrl = 'https://scyllascans.org/read/one_in_a_hundred_/en/0/6.0'
+  desired.chapterNum = 6
+  desired.chapterDate = '9 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -31,9 +31,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://d1ed0vta5mrb00.cloudfront.net/comics/482/thumbnails/b9e789c4-d9c7-4273-bdfd-2c01ec69aedc.jpg'
-  desired.chapter = 'Episode 75'
-  desired.url = 'https://www.tappytoon.com/en/book/return-survival'
+  desired.image = 'https://i0.wp.com/api.scyllascans.org/works/db6b48e0-5b2d-11ec-a302-c7bd018ebdbc/420cunetnoiselevel3ttaresult.jpg?strip=all&quality=100'
+  desired.chapter = 'Chapter 6'
+  desired.url = 'https://scyllascans.org/work/en/one_in_a_hundred_'
 
   return searchValid(results, desired, QUERY)
 }

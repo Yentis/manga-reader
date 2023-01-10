@@ -51,6 +51,7 @@ import { ZeroScans } from 'src/classes/sites/zeroscans'
 import { Comikey } from 'src/classes/sites/comikey'
 import { ReaperScans } from 'src/classes/sites/reaperscans'
 import { TappyToon } from 'src/classes/sites/tappytoon'
+import { ScyllaScans } from 'src/classes/sites/scyllascans'
 
 const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
 const mangaDex = new MangaDex()
@@ -80,7 +81,8 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LuminousScans, new Madara(SiteType.LuminousScans)],
   [SiteType.Tapas, new Tapas()],
   [SiteType.Comikey, new Comikey()],
-  [SiteType.Tappytoon, new TappyToon()]
+  [SiteType.Tappytoon, new TappyToon()],
+  [SiteType.ScyllaScans, new ScyllaScans()]
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],

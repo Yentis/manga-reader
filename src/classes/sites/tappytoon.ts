@@ -39,7 +39,8 @@ interface ChapterData {
   id: number,
   title: string,
   order: number,
-  createdAt: string
+  createdAt: string,
+  isAccessible: boolean
 }
 
 class TappyToonData extends BaseData {
@@ -51,6 +52,10 @@ class TappyToonData extends BaseData {
     this.comicData = comicData
     this.chapterDataList = chapterDataList
   }
+
+  getChapterData (): ChapterData | undefined {
+    return this.chapterDataList.find((chapter) => chapter.isAccessible)
+  }
 }
 
 export class TappyToon extends BaseSite {
@@ -58,22 +63,22 @@ export class TappyToon extends BaseSite {
   apiUrl = `https://api-global.${this.siteType}`
 
   protected getChapter (data: TappyToonData): string {
-    return data.chapterDataList[0]?.title ?? 'Unknown'
+    return data.getChapterData()?.title ?? 'Unknown'
   }
 
   protected getChapterUrl (data: TappyToonData): string {
-    const chapter = data.chapterDataList[0]
+    const chapter = data.getChapterData()
     if (!chapter) return ''
 
     return `${this.getUrl()}/en/chapters/${chapter.id}`
   }
 
   protected getChapterNum (data: TappyToonData): number {
-    return data.chapterDataList[0]?.order ?? 0
+    return data.getChapterData()?.order ?? 0
   }
 
   protected getChapterDate (data: TappyToonData): string {
-    const chapterDate = moment(data.chapterDataList[0]?.createdAt)
+    const chapterDate = moment(data.getChapterData()?.createdAt)
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
@@ -152,7 +157,7 @@ export class TappyToon extends BaseSite {
   private getChapterDataListQueryString (): string {
     return qs.stringify({
       sort: 'desc',
-      limit: 1,
+      limit: 10,
       locale: 'en'
     })
   }
