@@ -22,7 +22,7 @@ export default function useCloudSync () {
     getAuthUrl().then((authUrl) => {
       urlNavigation.value = new UrlNavigation(authUrl, true)
     }).catch((error) => {
-      notification.value = new NotifyOptions(error)
+      notification.value = new NotifyOptions(error, 'Failed to get auth url')
     })
   }
 

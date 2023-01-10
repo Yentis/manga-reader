@@ -14,6 +14,7 @@ export class ReaderState {
   settings = new Settings()
   searchValue = ''
   errors: NotifyOptions[] = []
+  pushNotifications: Map<string, number> = new Map()
 }
 
 const state = new ReaderState()
@@ -133,6 +134,13 @@ const mutations = {
   },
   updateErrors (state: ReaderState, errors: NotifyOptions[]) {
     state.errors = errors
+  },
+  addPushNotification (state: ReaderState, data: { url: string, id: number }) {
+    const { url, id } = data
+    state.pushNotifications.set(url, id)
+  },
+  removePushNotification (state: ReaderState, url: string) {
+    state.pushNotifications.delete(url)
   }
 }
 
@@ -163,6 +171,9 @@ const getters = {
   },
   errors: (state: ReaderState) => {
     return state.errors
+  },
+  pushNotifications: (state: ReaderState) => {
+    return state.pushNotifications
   }
 }
 

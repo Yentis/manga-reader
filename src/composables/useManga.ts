@@ -12,10 +12,13 @@ import { getMangaInfoByUrl } from 'src/services/siteService'
 import useNotification from './useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { useStore } from 'src/store'
+import usePushNotification from './usePushNotification'
+import { isMangaRead } from 'src/services/sortService'
 
 export default function useManga (curUrl: string) {
   const $store = useStore()
   const { notification } = useNotification()
+  const { clearPushNotification } = usePushNotification()
 
   const {
     updateManga,
@@ -48,6 +51,8 @@ export default function useManga (curUrl: string) {
     curUrl = newUrl
   }
 
+  const chapter = computed(() => manga.value.chapter)
+
   const altSources = computed({
     get: () => manga.value.altSources || {},
     set: (val) => { updateMangaAltSources(curUrl, val) }
@@ -55,7 +60,13 @@ export default function useManga (curUrl: string) {
 
   const read = computed({
     get: () => manga.value.read,
-    set: (val) => { updateMangaRead(curUrl, val) }
+    set: (val) => {
+      updateMangaRead(curUrl, val)
+
+      if (isMangaRead(chapter.value, read.value)) {
+        clearPushNotification(curUrl)
+      }
+    }
   })
 
   const readNum = computed({
@@ -119,7 +130,7 @@ export default function useManga (curUrl: string) {
     url,
     setUrl,
     site: computed(() => manga.value.site),
-    chapter: computed(() => manga.value.chapter),
+    chapter,
     chapterNum: computed(() => manga.value.chapterNum),
     chapterUrl: computed(() => manga.value.chapterUrl),
     chapterDate: computed(() => manga.value.chapterDate),
