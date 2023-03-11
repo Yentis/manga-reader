@@ -52,9 +52,7 @@ import { ScyllaScans } from 'src/classes/sites/scyllascans'
 
 const globalRequestQueue = new PQueue({
   interval: 1000,
-  intervalCap: 20,
-  timeout: 30000,
-  throwOnTimeout: true
+  intervalCap: 20
 })
 
 const mangaDex = new MangaDex()
