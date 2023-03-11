@@ -9,7 +9,6 @@ import { testFirstKissManga } from './test/firstkissmanga'
 import { testFlameScans } from './test/flamescans'
 import { testHiperDEX } from './test/hiperdex'
 import { testLeviatanScans } from './test/leviatanscans'
-import { testLynxScans } from './test/lynxscans'
 import { testMangaDex } from './test/mangadex'
 import { testMangago } from './test/mangago'
 import { testMangakakalot } from './test/mangakakalot'
@@ -73,9 +72,6 @@ export default async function testAll (
   }))
   promises.push(testLuminousScans().catch((error) => {
     errors.push({ site: SiteType.LuminousScans, error: error })
-  }))
-  promises.push(testLynxScans().catch((error) => {
-    errors.push({ site: SiteType.LynxScans, error: error })
   }))
   promises.push(testMangaDex().catch((error) => {
     errors.push({ site: SiteType.MangaDex, error: error })
@@ -154,13 +150,32 @@ export async function searchValid (
   query: string
 ): Promise<void> {
   const matchingManga = results.filter((manga) => {
-    const site = manga.site === desired.site
-    const title = manga.title.toLowerCase() === query.toLowerCase()
-    const image = manga.image.includes(desired.image)
-    const chapter = desired.chapter === 'Unknown' || manga.chapter === desired.chapter
-    const url = manga.url === desired.url
+    if (manga.site !== desired.site) {
+      console.log(`Site did not match: ${manga.site} | ${desired.site}`)
+      return false
+    }
 
-    return site && title && image && chapter && url
+    if (manga.title.toLowerCase() !== query.toLowerCase()) {
+      console.log(`Title did not match: ${manga.title.toLowerCase()} | ${query.toLowerCase()}`)
+      return false
+    }
+
+    if (!manga.image.includes(desired.image)) {
+      console.log(`Image did not match: ${manga.image} | ${desired.image}`)
+      return false
+    }
+
+    if (desired.chapter !== 'Unknown' && manga.chapter !== desired.chapter) {
+      console.log(`Chapter did not match: ${manga.chapter} | ${desired.chapter}`)
+      return false
+    }
+
+    if (manga.url !== desired.url) {
+      console.log(`URL did not match: ${manga.url} | ${desired.url}`)
+      return false
+    }
+
+    return true
   })
 
   const resultManga = matchingManga[0]

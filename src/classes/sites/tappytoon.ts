@@ -39,7 +39,7 @@ interface ChapterData {
   id: number,
   title: string,
   order: number,
-  createdAt: string,
+  willAccessibleAt: string,
   isAccessible: boolean
 }
 
@@ -78,7 +78,7 @@ export class TappyToon extends BaseSite {
   }
 
   protected getChapterDate (data: TappyToonData): string {
-    const chapterDate = moment(data.getChapterData()?.createdAt)
+    const chapterDate = moment(data.getChapterData()?.willAccessibleAt)
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {

@@ -91,6 +91,6 @@ export class ReaperScans extends BaseSite {
   }
 
   getTestUrl (): string {
-    return `${this.getUrl()}/comics/7946-aire`
+    return `${this.getUrl()}/comics/7346-fff-class-trashero`
   }
 }

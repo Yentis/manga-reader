@@ -37,7 +37,7 @@ async function search (site: BaseSite): Promise<void> {
 
   await searchValid(results, desired, QUERY)
 
-  const query2 = 'this song only for you'
+  const query2 = 'this song is only for you'
   const results2 = await searchManga(query2, SITE_TYPE)
   const desired2 = new Manga('https://readmanganato.com/manga-hv985178', SITE_TYPE)
   desired2.image = 'https://avt.mkklcdnv6temp.com/4/p/21-1587119305.jpg'

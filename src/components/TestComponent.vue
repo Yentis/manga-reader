@@ -56,7 +56,6 @@ import { testBatoto } from '../services/test/batoto'
 import { testFirstKissManga } from '../services/test/firstkissmanga'
 import { testHiperDEX } from '../services/test/hiperdex'
 import { testLeviatanScans } from '../services/test/leviatanscans'
-import { testLynxScans } from '../services/test/lynxscans'
 import { testMangaDex } from '../services/test/mangadex'
 import { testMangago } from '../services/test/mangago'
 import { testMangakakalot } from '../services/test/mangakakalot'
@@ -166,9 +165,6 @@ export default defineComponent({
           break
         case SiteType.LuminousScans:
           await doTest(testLuminousScans)
-          break
-        case SiteType.LynxScans:
-          await doTest(testLynxScans)
           break
         case SiteType.MangaDex:
           await doTest(testMangaDex)

@@ -7,6 +7,7 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
 import { ContentType } from 'src/enums/contentTypeEnum'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from '../../utils/siteUtils'
+import qs from 'qs'
 
 interface MadaraSearch {
   series: {
@@ -100,7 +101,11 @@ export class Madara extends BaseSite {
       headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
       data
     }
-    const response = await requestHandler.sendRequest(request)
+    const response = await requestHandler.sendRequest(request, true)
+
+    if (response.status >= 400) {
+      return await this.searchFallback(query)
+    }
 
     const searchData = JSON.parse(response.data) as MadaraSearch
     if (!searchData.series) {
@@ -125,6 +130,40 @@ export class Madara extends BaseSite {
     return mangaList
   }
 
+  private async searchFallback (query: string): Promise<Error | Manga[]> {
+    const queryString = qs.stringify({ s: query })
+    const request: HttpRequest = {
+      method: 'GET',
+      url: `${this.getUrl()}/?${queryString}`,
+      headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` }
+    }
+
+    const response = await requestHandler.sendRequest(request)
+    const doc = await parseHtmlFromString(response.data)
+    const mangaList: Manga[] = []
+
+    doc.querySelectorAll('.listupd').forEach((elem) => {
+      const titleElem = elem.querySelectorAll('a')[0]
+      const url = titleElem?.getAttribute('href')
+
+      const manga = new Manga('', this.siteType)
+      manga.title = titleElem?.getAttribute('title')?.trim() || ''
+
+      const image = elem.querySelectorAll('img')[0]
+      const imageUrl = image?.getAttribute('src') || ''
+      manga.image = imageUrl
+
+      manga.chapter = elem.querySelectorAll('.epxs')[0]?.textContent?.trim() || 'Unknown'
+      manga.url = url ?? ''
+
+      if (titleContainsQuery(query, manga.title)) {
+        mangaList.push(manga)
+      }
+    })
+
+    return mangaList
+  }
+
   getTestUrl () : string {
     switch (this.siteType) {
       case SiteType.AsuraScans:
@@ -134,7 +173,7 @@ export class Madara extends BaseSite {
       case SiteType.CosmicScans:
         return `${this.getUrl()}/manga/i-have-max-level-luck/`
       case SiteType.LuminousScans:
-        return `${this.getUrl()}/series/my-office-noonas-story/`
+        return `${this.getUrl()}/series/1677679234-my-office-noonas-story/`
     }
 
     return this.getUrl()

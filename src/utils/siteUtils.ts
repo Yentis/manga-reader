@@ -9,6 +9,7 @@ export const siteAliases = [
   { url: 'manganelo.com', site: SiteType.Manganato },
   { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
   { url: '1stkissmanga.com', site: SiteType.FirstKissManga },
+  { url: '1stkissmanga.io', site: SiteType.FirstKissManga },
   { url: Guya, site: SiteType.Cubari },
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
@@ -58,7 +59,7 @@ export function parseNum (elem?: string | null): number {
 export function matchNum (text: string | undefined) {
   if (!text) return 0
 
-  const pattern = /[\d]+[.,]*\b/gm
+  const pattern = /[0-9]{1,}([,.][0-9]*)?/gm
   let num = 0
   let match: RegExpExecArray | null
 

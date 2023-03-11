@@ -24,7 +24,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Volume 24 - Chapter 95 - World of Stars and Stripes - Outro'
-  desired.image = 'https://uploads.mangadex.org/covers/1044287a-73df-48d0-b0b2-5327f32dd651/9bfcc56c-f832-4d21-9fb0-cb8670894229.jpg'
+  desired.image = 'https://uploads.mangadex.org/covers/1044287a-73df-48d0-b0b2-5327f32dd651/ba4722fb-85c2-4071-8dc2-746da9a4bb0c.jpg'
   desired.title = 'JoJo\'s Bizarre Adventure Part 7 - Steel Ball Run (Official Colored)'
   desired.chapterUrl = 'https://mangadex.org/chapter/8a984365-fd9d-4f6e-85f9-0d58e0a592a3'
   desired.chapterNum = 95

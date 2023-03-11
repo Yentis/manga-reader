@@ -38,7 +38,10 @@ export default function useRefreshing (refreshProgress: Ref<number>) {
 
     const result = await getMangaInfo(manga.url, manga.site, manga.altSources)
     if (result instanceof Error) {
-      const notifyOptions = new NotifyOptions(`${getSiteNameByUrl(manga.site) || 'Unknown site'} | ${result.message}`, `Failed to refresh ${manga.title}`)
+      const errorMessage = (result.message.length === 0 ? result.stack : result.message) ?? 'Unknown'
+      const message = `${getSiteNameByUrl(manga.site) || 'Unknown site'} | ${errorMessage}`
+
+      const notifyOptions = new NotifyOptions(message, `Failed to refresh ${manga.title}`)
       notifyOptions.actions = [{
         label: 'Visit',
         handler: () => {

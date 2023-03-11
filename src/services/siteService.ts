@@ -8,9 +8,6 @@ import {
   Manganato
 } from '../classes/sites/manganato'
 import {
-  Genkan
-} from '../classes/sites/genkan'
-import {
   Webtoons
 } from '../classes/sites/webtoons'
 import {
@@ -53,7 +50,13 @@ import { ReaperScans } from 'src/classes/sites/reaperscans'
 import { TappyToon } from 'src/classes/sites/tappytoon'
 import { ScyllaScans } from 'src/classes/sites/scyllascans'
 
-const requestQueue = new PQueue({ interval: 1000, intervalCap: 20 })
+const globalRequestQueue = new PQueue({
+  interval: 1000,
+  intervalCap: 20,
+  timeout: 30000,
+  throwOnTimeout: true
+})
+
 const mangaDex = new MangaDex()
 const siteMap = new Map<string, BaseSite>([
   [SiteType.Manganato, new Manganato()],
@@ -71,7 +74,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],
   [SiteType.ZeroScans, new ZeroScans()],
-  [SiteType.LynxScans, new Genkan(SiteType.LynxScans)],
   [SiteType.Batoto, new Batoto()],
   [SiteType.FlameScans, new Madara(SiteType.FlameScans)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
@@ -128,7 +130,13 @@ export async function getMangaInfo (
 
   if (site) {
     const finalSite = site
-    const result = await requestQueue.add(() => finalSite.readUrl(url))
+    let result: Manga | Error
+
+    try {
+      result = await globalRequestQueue.add(() => finalSite.readUrl(url))
+    } catch (error) {
+      result = error as Error
+    }
 
     if (result instanceof Manga) return result
     if (result.message.startsWith(constants.REDIRECT_PREFIX) && redirectCount < 5) {
@@ -140,8 +148,13 @@ export async function getMangaInfo (
   for (const [urlSource, url] of Object.entries(altSources)) {
     const site = siteMap.get(urlSource)
     if (!site) continue
+    let result: Manga | Error
 
-    const result = await requestQueue.add(() => site.readUrl(url))
+    try {
+      result = await globalRequestQueue.add(() => site.readUrl(url))
+    } catch (error) {
+      result = error as Error
+    }
     if (!(result instanceof Error)) return result
   }
 
@@ -149,7 +162,7 @@ export async function getMangaInfo (
 }
 
 export function searchManga (query: string, siteType: SiteType | LinkingSiteType | undefined = undefined): Promise <Manga[]> {
-  return requestQueue.add(async () => {
+  return globalRequestQueue.add(async () => {
     if (siteType) {
       const site = siteMap.get(siteType) || linkingSiteMap.get(siteType)
       const result = await createRace(site?.search(query) || Promise.reject(Error('Invalid site type')))

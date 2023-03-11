@@ -81,6 +81,8 @@ export class WordPress extends BaseSite {
       format = 'MMMM DD, YYYY'
     } else if (chapterDateText?.includes('-')) {
       format = 'DD-MM-YYYY'
+    } else if (chapterDateText?.length === 6) {
+      format = 'MMM DD'
     } else {
       format = 'Do MMMM YYYY'
     }
@@ -293,7 +295,7 @@ export class WordPress extends BaseSite {
   getTestUrl (): string {
     switch (this.siteType) {
       case SiteType.FirstKissManga:
-        return `${this.getUrl()}/manga/ripples-of-love/`
+        return `${this.getUrl()}/manga/the-elegant-sea-of-savagery/`
       case SiteType.MangaKomi:
         return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
@@ -305,7 +307,7 @@ export class WordPress extends BaseSite {
       case SiteType.SleepingKnightScans:
         return `${this.getUrl()}/manga/chronicles-of-the-martial-gods-return/`
       case SiteType.ResetScans:
-        return `${this.getUrl()}/manga/madou-no-keifu/`
+        return `${this.getUrl()}/manga/the-unwanted-undead-adventurer/`
     }
 
     return this.getUrl()

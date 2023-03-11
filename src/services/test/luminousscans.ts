@@ -22,7 +22,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter Epilogue Ch 03 [End]'
   desired.image = 'https://luminousscans.com/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg'
   desired.title = 'My Office Noona’s Story'
-  desired.chapterUrl = 'https://luminousscans.com/1658218624-my-office-noonas-story-epilogue-chapter-03/'
+  desired.chapterUrl = 'https://luminousscans.com/1677679234-my-office-noonas-story-epilogue-chapter-03/'
   desired.chapterNum = 64
   desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 
@@ -33,8 +33,8 @@ async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://luminousscans.com/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif'
-  desired.chapter = '130'
-  desired.url = 'https://luminousscans.com/series/1653732347-legend-of-the-northern-blade/'
+  desired.chapter = '147'
+  desired.url = 'https://luminousscans.com/series/1677679234-legend-of-the-northern-blade/'
 
   return searchValid(results, desired, QUERY)
 }

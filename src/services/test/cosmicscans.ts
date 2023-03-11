@@ -20,7 +20,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 9'
-  desired.image = 'https://cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg'
+  desired.image = 'https://i3.wp.com/cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg'
   desired.title = 'I Have Max Level Luck'
   desired.chapterUrl = 'https://cosmicscans.com/i-have-max-level-luck-chapter-9/'
   desired.chapterNum = 9

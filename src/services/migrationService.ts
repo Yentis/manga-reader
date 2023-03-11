@@ -93,10 +93,6 @@ async function doMigration (mangaList: MigrationManga[]) {
       delete item.completed
     }
 
-    if (item.site === 'secretscans.co') {
-      item.site = SiteType.LynxScans
-    }
-
     if (item.site === SiteType.MangaDex) {
       const split = item.url.replace(`${MangaDex.getUrl()}/title/`, '').split('/')
       const id = split[0]
