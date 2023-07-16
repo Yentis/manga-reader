@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'FFF-Class Trashero'
   desired.chapterUrl = 'https://reaperscans.com/comics/7346-fff-class-trashero/chapters/71166040-chapter-66'
   desired.chapterNum = 66
-  desired.chapterDate = '5 months ago'
+  desired.chapterDate = '9 months ago'
 
   mangaEqual(manga, desired)
 }

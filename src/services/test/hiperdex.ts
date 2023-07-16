@@ -47,7 +47,7 @@ async function search (site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg'
   desired.chapter = '44 [END]'
-  desired.url = 'https://hiperdex.com/manga/cabalistin/'
+  desired.url = 'https://hiperdex.com/manga/cabalist/'
 
   return searchValid(results, desired, QUERY)
 }

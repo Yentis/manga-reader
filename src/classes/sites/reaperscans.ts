@@ -32,7 +32,7 @@ export class ReaperScans extends BaseSite {
     const doc = await SiteUtils.parseHtmlFromString(response.data)
     const data = new BaseData(url)
 
-    const titleContainer = doc.querySelectorAll('main>div:nth-child(2)>div>div')[0]
+    const titleContainer = doc.querySelectorAll('div[aria-label="card"]')[0]
     const chapterContainer = doc.querySelectorAll('div>div>div>ul li')[0]
     const [chapter, date] = chapterContainer?.querySelectorAll('p') ?? []
 

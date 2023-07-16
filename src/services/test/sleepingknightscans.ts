@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Chronicles of the Martial God’s Return'
   desired.chapterUrl = 'https://skscans.com/manga/chronicles-of-the-martial-gods-return/chapter-45/'
   desired.chapterNum = 45
-  desired.chapterDate = '4 months ago'
+  desired.chapterDate = '8 months ago'
 
   mangaEqual(manga, desired)
 }

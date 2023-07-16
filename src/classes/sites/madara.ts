@@ -8,6 +8,7 @@ import { requestHandler } from 'src/services/requestService'
 import { ContentType } from 'src/enums/contentTypeEnum'
 import { parseHtmlFromString, parseNum, titleContainsQuery } from '../../utils/siteUtils'
 import qs from 'qs'
+import HttpResponse from 'src/interfaces/httpResponse'
 
 interface MadaraSearch {
   series: {
@@ -19,6 +20,10 @@ interface MadaraSearch {
       'post_link': string
     }[]
   }[]
+}
+
+interface MadaraBookmarks {
+  data: string,
 }
 
 class MadaraData extends BaseData {
@@ -69,6 +74,10 @@ export class Madara extends BaseSite {
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
+    if (url.includes('/?p=') && this.siteType === SiteType.LuminousScans) {
+      return this.getMangaById(url)
+    }
+
     const request: HttpRequest = { method: 'GET', url }
     const response = await requestHandler.sendRequest(request)
 
@@ -94,16 +103,27 @@ export class Madara extends BaseSite {
     return this.buildManga(data)
   }
 
-  protected async searchImpl (query: string): Promise<Error | Manga[]> {
-    const data = `action=ts_ac_do_search&ts_ac_query=${encodeURIComponent(query)}`
-    const request: HttpRequest = {
-      method: 'POST',
-      url: `${this.getUrl()}/wp-admin/admin-ajax.php`,
-      headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
-      data
-    }
-    const response = await requestHandler.sendRequest(request, true)
+  private async getMangaById (inputUrl: string): Promise<Error | Manga> {
+    const id = inputUrl.split('?p=')[1]
+    if (!id) return new Error('ID not found')
 
+    const response = await this.sendAdminRequest('bookmark_get&ids[]=5424')
+    const bookmarkData = JSON.parse(response.data) as MadaraBookmarks
+
+    const doc = await parseHtmlFromString(bookmarkData.data)
+
+    const url = doc.querySelectorAll('a')[0]?.getAttribute('href')
+    if (!url) return new Error('URL not found')
+
+    const manga = await this.readUrlImpl(url)
+    if (manga instanceof Error) return manga
+
+    manga.url = inputUrl
+    return manga
+  }
+
+  protected async searchImpl (query: string): Promise<Error | Manga[]> {
+    const response = await this.sendAdminRequest(`ts_ac_do_search&ts_ac_query=${encodeURIComponent(query)}`)
     if (response.status >= 400) {
       return await this.searchFallback(query)
     }
@@ -129,6 +149,17 @@ export class Madara extends BaseSite {
     }
 
     return mangaList
+  }
+
+  private async sendAdminRequest (action: string): Promise<HttpResponse> {
+    const request: HttpRequest = {
+      method: 'POST',
+      url: `${this.getUrl()}/wp-admin/admin-ajax.php`,
+      headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
+      data: `action=${action}`
+    }
+
+    return await requestHandler.sendRequest(request, true)
   }
 
   private async searchFallback (query: string): Promise<Error | Manga[]> {

@@ -147,27 +147,27 @@ export async function searchValid (
 ): Promise<void> {
   const matchingManga = results.filter((manga) => {
     if (manga.site !== desired.site) {
-      console.log(`Site did not match: ${manga.site} | ${desired.site}`)
+      console.error(`Site did not match: ${manga.site} | ${desired.site}`)
       return false
     }
 
     if (manga.title.toLowerCase() !== query.toLowerCase()) {
-      console.log(`Title did not match: ${manga.title.toLowerCase()} | ${query.toLowerCase()}`)
+      console.error(`Title did not match: ${manga.title.toLowerCase()} | ${query.toLowerCase()}`)
       return false
     }
 
     if (!manga.image.includes(desired.image)) {
-      console.log(`Image did not match: ${manga.image} | ${desired.image}`)
+      console.error(`Image did not match: ${manga.image} | ${desired.image}`)
       return false
     }
 
     if (desired.chapter !== 'Unknown' && manga.chapter !== desired.chapter) {
-      console.log(`Chapter did not match: ${manga.chapter} | ${desired.chapter}`)
+      console.error(`Chapter did not match: ${manga.chapter} | ${desired.chapter}`)
       return false
     }
 
     if (manga.url !== desired.url) {
-      console.log(`URL did not match: ${manga.url} | ${desired.url}`)
+      console.error(`URL did not match: ${manga.url} | ${desired.url}`)
       return false
     }
 

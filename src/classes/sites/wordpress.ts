@@ -162,8 +162,13 @@ export class WordPress extends BaseSite {
 
     doc.querySelectorAll('.c-tabs-item__content').forEach((elem) => {
       const imageElem = elem.querySelectorAll('a')[0]
-      const manga = new Manga(imageElem?.getAttribute('href') || '', this.siteType)
 
+      const url = imageElem?.getAttribute('href') ?? ''
+      const regex = /\/manga\/(\d*-).*\//gm
+      const prefixNumbers = regex.exec(url)?.[1] ?? ''
+      const cleanUrl = url.replace(prefixNumbers, '')
+
+      const manga = new Manga(cleanUrl, this.siteType)
       manga.image = this.getImageSrc(imageElem?.querySelectorAll('img')[0])
       manga.title = elem.querySelectorAll('.post-title')[0]?.textContent?.trim() || ''
       manga.chapter = elem.querySelectorAll('.font-meta.chapter')[0]?.textContent?.trim() || 'Unknown'

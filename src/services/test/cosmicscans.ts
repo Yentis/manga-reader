@@ -32,9 +32,9 @@ async function readUrl (site: BaseSite): Promise<void> {
 async function search (site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://i3.wp.com/cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg?resize=65,85'
+  desired.image = 'https://cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck-222x300.jpeg'
   desired.chapter = '9'
-  desired.url = 'https://cosmicscans.com/manga/i-have-max-level-luck/'
+  desired.url = 'https://cosmicscans.com/?p=1201'
 
   return searchValid(results, desired, QUERY)
 }

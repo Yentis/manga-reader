@@ -10,8 +10,12 @@ import { HEADER_USER_AGENT } from '../requests/baseRequest'
 import { getRssChapter, getRssChapterDate, getRssChapterUrl, getRssData, getRssImage, getRssTitle } from 'src/utils/rssUtils'
 
 interface WebtoonsSearch {
-  query: string[]
-  items: string[][][][]
+  result: {
+    searchedList: {
+      title: string,
+      titleNo: number
+    }[]
+  }
 }
 
 export class Webtoons extends BaseSite {
@@ -94,28 +98,19 @@ export class Webtoons extends BaseSite {
   }
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
-    const queryString = qs.stringify({
-      q: `en^${query}`,
-      st: 1
-    })
-    const request: HttpRequest = { method: 'GET', url: `https://ac.${this.siteType}/ac?${queryString}` }
+    const queryString = qs.stringify({ keyword: query })
+    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/en/search/immediate?${queryString}` }
     const response = await requestHandler.sendRequest(request)
 
     const searchData = JSON.parse(response.data) as WebtoonsSearch
     const promises: Promise<Error | Manga>[] = []
 
-    for (const firstIndent of searchData.items) {
-      for (const item of firstIndent) {
-        const title = item[0]?.[0]
-        if (!titleContainsQuery(query, title)) continue
+    searchData.result.searchedList.forEach((result) => {
+      if (!titleContainsQuery(query, result.title)) return
 
-        const titleNo = item[3]?.[0]
-        if (!titleNo) continue
-
-        const url = `${this.getUrl()}/episodeList?titleNo=${titleNo}`
-        promises.push(this.readUrl(url))
-      }
-    }
+      const url = `${this.getUrl()}/episodeList?titleNo=${result.titleNo}`
+      promises.push(this.readUrl(url))
+    })
 
     const mangaList = await Promise.all(promises)
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]

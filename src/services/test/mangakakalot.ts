@@ -23,7 +23,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = 'Osananajimi ni najimitai'
   desired.chapterUrl = 'https://mangakakalot.com/chapter/osananajimi_ni_najimitai/chapter_24'
   desired.chapterNum = 24
-  desired.chapterDate = '3 years ago'
+  desired.chapterDate = '4 years ago'
 
   mangaEqual(manga, desired)
 }

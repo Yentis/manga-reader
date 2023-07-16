@@ -18,12 +18,14 @@ export async function testBiliBiliComics (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = '669 With All Your Strength (1)'
+  const chapter = 672
+
+  desired.chapter = `${chapter} Sudden Changes (2)`
   desired.image = 'https://i0.hdslb.com/bfs/comic-static/58c0cc6a498b2d8c74e5ca1f283393cd26501e71.png@300w.webp'
   desired.title = 'Tales of Demons and Gods'
-  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/350659'
-  desired.chapterNum = 669
-  desired.chapterDate = '3 months ago'
+  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/374992'
+  desired.chapterNum = chapter
+  desired.chapterDate = '2 days ago'
 
   mangaEqual(manga, desired, false)
 }

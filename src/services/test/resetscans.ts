@@ -18,12 +18,14 @@ export async function testResetScans (): Promise<void> {
 async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga('https://reset-scans.com/manga/the-unwanted-undead-adventurer/', SITE_TYPE)
-  desired.chapter = 'Chapter 51'
-  desired.image = 'https://reset-scans.com/wp-content/uploads/2023/02/UNWANTED-UNDEAD.png'
+  const chapter = 54
+
+  desired.chapter = `Chapter ${chapter}`
+  desired.image = 'https://reset-scans.com/wp-content/uploads/2021/06/UNWANTED-UNDEAD-200x300-1.png'
   desired.title = 'The Unwanted Undead Adventurer'
-  desired.chapterUrl = 'https://reset-scans.com/manga/the-unwanted-undead-adventurer/chapter-51/'
-  desired.chapterNum = 51
-  desired.chapterDate = '15 days ago'
+  desired.chapterUrl = `https://reset-scans.com/manga/the-unwanted-undead-adventurer/chapter-${chapter}/`
+  desired.chapterNum = chapter
+  desired.chapterDate = '12 days ago'
 
   mangaEqual(manga, desired)
 }

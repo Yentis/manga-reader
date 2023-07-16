@@ -206,7 +206,7 @@ export class MangaDex extends BaseSite {
     const queryString = qs.stringify({
       title: query
     })
-    const request: HttpRequest = { method: 'GET', url: `https://api.${this.siteType}/manga?${queryString}` }
+    const request: HttpRequest = { method: 'GET', url: `https://api.${this.siteType}/manga?title=${queryString}` }
     const response = await requestHandler.sendRequest(request)
     const mangaData = JSON.parse(response.data) as SearchResponse
     const promises: Promise<Error | Manga>[] = []
