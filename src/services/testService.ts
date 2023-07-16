@@ -15,7 +15,6 @@ import { testMangakakalot } from './test/mangakakalot'
 import { testMangaKomi } from './test/mangakomi'
 import { testManganato } from './test/manganato'
 import { testMangaTx } from './test/mangatx'
-import { testManhwaClub } from './test/manhwaclub'
 import { testReaperScans } from './test/reaperscans'
 import { testResetScans } from './test/resetscans'
 import { testSleepingKnightScans } from './test/sleepingknightscans'
@@ -90,9 +89,6 @@ export default async function testAll (
   }))
   promises.push(testMangaTx().catch((error) => {
     errors.push({ site: SiteType.MangaTx, error: error })
-  }))
-  promises.push(testManhwaClub().catch((error) => {
-    errors.push({ site: SiteType.ManhwaClub, error: error })
   }))
   promises.push(testReaperScans().catch((error) => {
     errors.push({ site: SiteType.ReaperScans, error: error })

@@ -39,7 +39,6 @@ import {
 } from '../enums/linkingSiteEnum'
 import PQueue from 'p-queue'
 import constants from 'src/classes/constants'
-import { ManhwaClub } from 'src/classes/sites/manhwaclub'
 import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
 import { getSiteByUrl } from 'src/utils/siteUtils'
 import { Cubari } from 'src/classes/sites/cubari'
@@ -67,7 +66,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new ReaperScans()],
   [SiteType.AsuraScans, new Madara(SiteType.AsuraScans)],
-  [SiteType.ManhwaClub, new ManhwaClub()],
   [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
   [SiteType.SleepingKnightScans, new WordPress(SiteType.SleepingKnightScans)],

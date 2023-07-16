@@ -122,7 +122,11 @@ async function tryRefreshAccessToken (): Promise<void> {
 }
 
 function getRedirectUrl (): string {
-  const baseUrl = getPlatform() !== Platform.Static ? 'http://localhost/' : `${document.location.href}`
+  const baseUrl = getPlatform() !== Platform.Static
+    ? 'http://localhost/'
+    : `${document.location.origin + document.location.pathname}`
+
+  if (baseUrl.includes('/redirect')) return baseUrl
   return baseUrl.endsWith('/') ? `${baseUrl}redirect` : `${baseUrl}/redirect`
 }
 

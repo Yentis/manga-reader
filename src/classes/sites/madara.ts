@@ -12,6 +12,7 @@ import qs from 'qs'
 interface MadaraSearch {
   series: {
     all: {
+      ID: number,
       'post_title': string,
       'post_image': string,
       'post_latest': string,
@@ -64,7 +65,7 @@ export class Madara extends BaseSite {
   }
 
   protected getImage (data: BaseData): string {
-    return data.image?.getAttribute('content') || ''
+    return data.image?.getAttribute('content') ?? data.image?.getAttribute('src') ?? ''
   }
 
   protected async readUrlImpl (url: string): Promise<Error | Manga> {
@@ -86,7 +87,7 @@ export class Madara extends BaseSite {
     const imageElements = doc.querySelectorAll('meta[property="og:image"]')
     let image: Element | undefined
     if (imageElements.length === 0) {
-      image = doc.querySelectorAll('meta[name="twitter:image"]')[0]
+      image = doc.querySelectorAll('meta[name="twitter:image"]')[0] ?? doc.querySelectorAll('.wp-post-image')[0]
     } else image = imageElements[0]
     data.image = image
 
@@ -121,7 +122,7 @@ export class Madara extends BaseSite {
         manga.title = entryItem.post_title
         manga.image = entryItem.post_image
         manga.chapter = entryItem.post_latest
-        manga.url = entryItem.post_link
+        manga.url = `${this.getUrl()}/?p=${entryItem.ID}`
 
         mangaList.push(manga)
       }
@@ -167,13 +168,13 @@ export class Madara extends BaseSite {
   getTestUrl () : string {
     switch (this.siteType) {
       case SiteType.AsuraScans:
-        return `${this.getUrl()}/manga/mookhyang-the-origin/`
+        return `${this.getUrl()}/?p=36483`
       case SiteType.FlameScans:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
       case SiteType.CosmicScans:
         return `${this.getUrl()}/manga/i-have-max-level-luck/`
       case SiteType.LuminousScans:
-        return `${this.getUrl()}/series/1677679234-my-office-noonas-story/`
+        return `${this.getUrl()}/series/1680246102-my-office-noonas-story/`
     }
 
     return this.getUrl()
