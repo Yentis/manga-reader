@@ -8,6 +8,7 @@
           icon="add"
           @click="onAddManga"
         />
+
         <q-btn
           color="primary"
           icon="refresh"
@@ -23,6 +24,7 @@
           :disable="importing"
           @click="onExportList"
         />
+
         <q-btn
           color="primary"
           icon="cloud_download"
@@ -51,6 +53,7 @@
             v-if="searchValue === ''"
             name="search"
           />
+          
           <q-icon
             v-else
             name="clear"
@@ -117,10 +120,14 @@ export default defineComponent({
     refreshProgress: {
       type: Number,
       required: true
+    },
+    currentUrl: {
+      type: String,
+      required: true
     }
   },
 
-  emits: ['update:refreshProgress'],
+  emits: ['update:refreshProgress', 'update:currentUrl'],
 
   setup (props, context) {
     const { importList, exportList } = useCloudSync()
@@ -138,12 +145,17 @@ export default defineComponent({
       set: (val) => { context.emit('update:refreshProgress', val) }
     })
 
+    const currentUrl = computed({
+      get: () => props.currentUrl,
+      set: (val) => { context.emit('update:currentUrl', val) }
+    })
+
     const {
       refreshing,
       refreshTimer,
       startRefreshTimer,
       refreshAllManga
-    } = useRefreshing(refreshProgress)
+    } = useRefreshing(refreshProgress, currentUrl)
 
     const doFullRefresh = () => {
       if (refreshTimer.value) clearTimeout(refreshTimer.value)

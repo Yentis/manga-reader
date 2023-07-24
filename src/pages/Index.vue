@@ -2,8 +2,10 @@
   <q-page class="q-ma-sm">
     <MangaHeader
       v-model:refresh-progress="refreshProgress"
+      v-model:current-url="currentUrl"
     />
 
+    <p>{{ currentUrl }}</p>
     <q-linear-progress
       v-if="refreshing"
       :indeterminate="refreshProgress === 0"
@@ -55,8 +57,10 @@ export default defineComponent({
     const $store = useStore()
     const { settings } = useSettings()
     const { searchValue } = useSearchValue()
+
     const refreshProgress = ref(0)
-    const { refreshing } = useRefreshing(refreshProgress)
+    const currentUrl = ref('')
+    const { refreshing } = useRefreshing(refreshProgress, currentUrl)
     const { mangaMap } = useMangaList()
 
     const mangaUrls = computed(() => {
@@ -113,7 +117,8 @@ export default defineComponent({
     return {
       mangaUrls,
       refreshing,
-      refreshProgress
+      refreshProgress,
+      currentUrl
     }
   }
 })
