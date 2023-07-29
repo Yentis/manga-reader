@@ -53,7 +53,7 @@
             v-if="searchValue === ''"
             name="search"
           />
-          
+
           <q-icon
             v-else
             name="clear"

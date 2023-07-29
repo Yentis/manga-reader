@@ -10,12 +10,18 @@ interface Runtime {
     extensionId: string,
     message: HttpRequest | string,
     responseCallback: (response?: HttpResponse | Error | string) => void
-  ) => void,
+  ) => void
   lastError?: { message: string }
 }
 
-function getRuntime (): Runtime | null {
-  const chromeWindow = (window as unknown) as Record<string, unknown>
+export interface BrowserHttpRequest extends HttpRequest {
+  id: string
+  name?: string
+  value?: unknown
+}
+
+function getRuntime(): Runtime | null {
+  const chromeWindow = window as unknown as Record<string, unknown>
   if (typeof chromeWindow.chrome !== 'object') return null
   const chrome = chromeWindow.chrome as Record<string, unknown>
 
@@ -23,7 +29,7 @@ function getRuntime (): Runtime | null {
   return chrome.runtime as Runtime
 }
 
-export async function hasExtension (): Promise<boolean> {
+export async function hasExtension(): Promise<boolean> {
   const runtime = getRuntime()
   if (!runtime) return false
 
@@ -40,7 +46,7 @@ export async function hasExtension (): Promise<boolean> {
 }
 
 export default class BrowserRequest extends BaseRequest {
-  async sendRequest (request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
+  async sendRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     request.headers = request.headers || {}
     if (request.headers['Content-Type'] === ContentType.URLENCODED && typeof request.data === 'string') {
       request.data = this.convertToUrlEncoded(request.data)
@@ -53,48 +59,45 @@ export default class BrowserRequest extends BaseRequest {
     if (!runtime) return this.doFallbackRequest(request, ignoreErrorStatus)
 
     const result = await new Promise<HttpResponse | undefined>((resolve, reject) => {
-      runtime.sendMessage(
-        EXTENSION_ID,
-        request,
-        (response) => {
-          if (runtime.lastError) {
-            console.error(Error(`Could not send extension message: ${runtime.lastError.message}`))
-            resolve(undefined)
-            return
-          }
-
-          if (response instanceof Error) {
-            reject(response)
-            return
-          }
-
-          if (typeof response === 'string') {
-            reject(Error(`Invalid response received: ${response}`))
-            return
-          }
-
-          if (!response) {
-            resolve(response)
-            return
-          }
-
-          if (!ignoreErrorStatus && response.status >= 400) {
-            reject(Error(`Status Code ${response.status} ${response.statusText}`.trim()))
-          }
-
-          resolve(response)
+      runtime.sendMessage(EXTENSION_ID, request, (response) => {
+        if (runtime.lastError) {
+          console.error(Error(`Could not send extension message: ${runtime.lastError.message}`))
+          resolve(undefined)
+          return
         }
-      )
+
+        if (response instanceof Error) {
+          reject(response)
+          return
+        }
+
+        if (typeof response === 'string') {
+          reject(Error(`Invalid response received: ${response}`))
+          return
+        }
+
+        if (!response) {
+          resolve(response)
+          return
+        }
+
+        if (!ignoreErrorStatus && response.status >= 400) {
+          reject(Error(`Status Code ${response.status} ${response.statusText}`.trim()))
+          return
+        }
+
+        resolve(response)
+      })
     })
 
     return result || this.doFallbackRequest(request, ignoreErrorStatus)
   }
 
-  private async doFallbackRequest (request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
+  private async doFallbackRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     const response = await fetch(request.url, {
       method: request.method,
       body: request.data,
-      headers: request.headers
+      headers: request.headers,
     })
 
     if (!ignoreErrorStatus && response.status >= 400) {
@@ -122,7 +125,7 @@ export default class BrowserRequest extends BaseRequest {
       headers,
       data,
       status: response.status,
-      statusText: response.statusText
+      statusText: response.statusText,
     }
   }
 }

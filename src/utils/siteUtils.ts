@@ -14,38 +14,41 @@ export const siteAliases = [
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
   { url: 'asurascans.com', site: SiteType.AsuraScans },
-  { url: 'leviatanscans.com', site: SiteType.LeviatanScans }
+  { url: 'leviatanscans.com', site: SiteType.LeviatanScans },
 ]
 
-export function getUrl (url: string) {
+export function getUrl(url: string) {
   return `https://${url}`
 }
 
-export function parseHtmlFromString (
+export function parseHtmlFromString(
   html: string,
   parser?: DOMParser,
   type: DOMParserSupportedType = 'text/html'
 ): Promise<Document> {
-  const chromeWindow = (window as unknown) as ChromeWindow
+  const chromeWindow = window as unknown as ChromeWindow
 
   return new Promise((resolve) => {
-    chromeWindow.requestIdleCallback(() => {
-      resolve((parser || new DOMParser()).parseFromString(html, type))
-    }, { timeout: 1000 })
+    chromeWindow.requestIdleCallback(
+      () => {
+        resolve((parser || new DOMParser()).parseFromString(html, type))
+      },
+      { timeout: 1000 }
+    )
   })
 }
 
-export function titleContainsQuery (query: string, title?: string): boolean {
+export function titleContainsQuery(query: string, title?: string): boolean {
   if (title === undefined) return false
 
-  query = query.replace('’', '\'')
-  title = title.replace('’', '\'')
+  query = query.replace('’', "'")
+  title = title.replace('’', "'")
   const querySplit = query.toLowerCase().split(' ')
 
-  return querySplit.every(word => title?.toLowerCase().includes(word))
+  return querySplit.every((word) => title?.toLowerCase().includes(word))
 }
 
-export function parseNum (elem?: string | null): number {
+export function parseNum(elem?: string | null): number {
   if (typeof elem !== 'string') return 0
   const parsedInt = parseFloat(elem)
 
@@ -56,7 +59,7 @@ export function parseNum (elem?: string | null): number {
   }
 }
 
-export function matchNum (text: string | undefined) {
+export function matchNum(text: string | undefined) {
   if (!text) return 0
 
   const pattern = /[0-9]{1,}([,.][0-9]*)?/gm
@@ -77,7 +80,7 @@ export function matchNum (text: string | undefined) {
   return num
 }
 
-export function getDateFromNow (input?: string | null): string {
+export function getDateFromNow(input?: string | null): string {
   const date = moment()
   const chapterDate = input?.trim().split(' ') || []
   let amount = -1
@@ -110,7 +113,7 @@ export function getDateFromNow (input?: string | null): string {
   return ''
 }
 
-export function getSiteByUrl (url: string): SiteType | undefined {
+export function getSiteByUrl(url: string): SiteType | undefined {
   const site = Object.values(SiteType).find((site) => url.includes(site))
   if (site !== undefined) return site
 
@@ -118,7 +121,7 @@ export function getSiteByUrl (url: string): SiteType | undefined {
   return siteAlias
 }
 
-export function getSiteNameByUrl (url: string): SiteName | undefined {
+export function getSiteNameByUrl(url: string): SiteName | undefined {
   let siteType: LinkingSiteType | SiteType | undefined = getSiteByUrl(url)
   if (siteType === undefined) {
     siteType = Object.values(LinkingSiteType).find((site) => url.includes(site))

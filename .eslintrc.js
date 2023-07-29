@@ -1,4 +1,4 @@
-const { resolve } = require('path');
+const { resolve } = require('path')
 module.exports = {
   // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
   // This option interrupts the configuration hierarchy at this file
@@ -17,12 +17,12 @@ module.exports = {
     project: resolve(__dirname, './tsconfig.json'),
     tsconfigRootDir: __dirname,
     ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module' // Allows for the use of imports
+    sourceType: 'module', // Allows for the use of imports
   },
 
   env: {
     browser: true,
-    mocha: true
+    mocha: true,
   },
 
   // Rules order is important, please avoid shuffling them
@@ -43,8 +43,7 @@ module.exports = {
     // 'plugin:vue/strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
     'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
-    'standard'
-
+    'standard',
   ],
 
   plugins: [
@@ -54,7 +53,6 @@ module.exports = {
     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-file
     // required to lint *.vue files
     'vue',
-
   ],
 
   globals: {
@@ -63,7 +61,7 @@ module.exports = {
     __statics: true,
     process: true,
     Capacitor: true,
-    chrome: true
+    chrome: true,
   },
 
   // add your custom rules here
@@ -83,6 +81,8 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'prefer-promise-reject-errors': 'off',
+    'space-before-function-paren': 'off',
+    'comma-dangle': 'off',
 
     // TypeScript
     quotes: ['warn', 'single', { avoidEscape: true }],
@@ -95,6 +95,6 @@ module.exports = {
     'no-void': 'off',
     'import/no-webpack-loader-syntax': 'off',
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['warn']
-  }
+    '@typescript-eslint/no-unused-vars': ['warn'],
+  },
 }
