@@ -13,7 +13,7 @@ import usePushNotification from 'src/composables/usePushNotification'
 import { getSiteNameByUrl } from 'src/utils/siteUtils'
 import ChromeWindow from 'src/interfaces/chromeWindow'
 
-export default function useRefreshing(refreshProgress: Ref<number>, currentUrl?: Ref<string>) {
+export default function useRefreshing(refreshProgress: Ref<number>) {
   const autoRefreshing = ref(false)
   const { storeManga, updateManga } = useMangaList()
   const { notification } = useNotification()
@@ -95,26 +95,7 @@ export default function useRefreshing(refreshProgress: Ref<number>, currentUrl?:
     })
 
     const step = filteredMangaUrlList.length > 0 ? 1 / filteredMangaUrlList.length : 0
-    const workingUrls: Record<string, boolean> = {}
-
-    if (filteredMangaUrlList[0] && currentUrl) {
-      console.log('Value:', filteredMangaUrlList[0])
-      currentUrl.value = filteredMangaUrlList[0]
-    }
-
-    const promises = filteredMangaUrlList.map((url) => {
-      workingUrls[url] = true
-
-      return refreshManga(url, step).finally(() => {
-        delete workingUrls[url]
-
-        const nextUrl = Object.keys(workingUrls)[0]
-        if (!nextUrl || !currentUrl) return
-
-        console.log('Value:', nextUrl)
-        currentUrl.value = nextUrl
-      })
-    })
+    const promises = filteredMangaUrlList.map((url) => refreshManga(url, step))
 
     try {
       await Promise.all(promises)
@@ -123,8 +104,6 @@ export default function useRefreshing(refreshProgress: Ref<number>, currentUrl?:
       autoRefreshing.value = false
       refreshing.value = false
       refreshProgress.value = 0
-
-      if (currentUrl) currentUrl.value = ''
     }
   }
 

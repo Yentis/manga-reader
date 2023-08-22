@@ -1,11 +1,7 @@
 <template>
   <q-page class="q-ma-sm">
-    <MangaHeader
-      v-model:refresh-progress="refreshProgress"
-      v-model:current-url="currentUrl"
-    />
+    <MangaHeader v-model:refresh-progress="refreshProgress" />
 
-    <p>{{ currentUrl }}</p>
     <q-linear-progress
       v-if="refreshing"
       :indeterminate="refreshProgress === 0"
@@ -21,9 +17,7 @@
         :key="url"
         class="q-mb-xs full-width manga-item"
       >
-        <MangaItem
-          :url="url"
-        />
+        <MangaItem :url="url" />
       </q-intersection>
     </div>
   </q-page>
@@ -37,7 +31,12 @@ import useSettings from '../composables/useSettings'
 import useSearchValue from '../composables/useSearchValue'
 import useRefreshing from '../composables/useRefreshing'
 import { getSiteNameByUrl } from '../utils/siteUtils'
-import { useAppInitialized, useCordovaInitialized, useElectronInitialized, useStaticInitialized } from '../composables/useInitialized'
+import {
+  useAppInitialized,
+  useCordovaInitialized,
+  useElectronInitialized,
+  useStaticInitialized,
+} from '../composables/useInitialized'
 import { getPlatform } from '../services/platformService'
 import { Platform } from '../enums/platformEnum'
 import { useStore } from '../store'
@@ -48,19 +47,17 @@ import useMangaList from 'src/composables/useMangaList'
 export default defineComponent({
   components: {
     MangaHeader,
-    MangaItem
+    MangaItem,
   },
 
-  setup () {
+  setup() {
     useAppInitialized()
 
     const $store = useStore()
     const { settings } = useSettings()
     const { searchValue } = useSearchValue()
-
     const refreshProgress = ref(0)
-    const currentUrl = ref('')
-    const { refreshing } = useRefreshing(refreshProgress, currentUrl)
+    const { refreshing } = useRefreshing(refreshProgress)
     const { mangaMap } = useMangaList()
 
     const mangaUrls = computed(() => {
@@ -97,9 +94,11 @@ export default defineComponent({
         matchedManga.push(manga)
       })
 
-      return matchedManga.sort((a, b) => {
-        return mangaSort(a, b, $store.state.reader.settings.sortedBy)
-      }).map((manga) => manga.url)
+      return matchedManga
+        .sort((a, b) => {
+          return mangaSort(a, b, $store.state.reader.settings.sortedBy)
+        })
+        .map((manga) => manga.url)
     })
 
     switch (getPlatform()) {
@@ -118,14 +117,12 @@ export default defineComponent({
       mangaUrls,
       refreshing,
       refreshProgress,
-      currentUrl
     }
-  }
+  },
 })
 </script>
 
 <style lang="scss">
-
 .flex-column-between {
   display: flex;
   flex-direction: column;
@@ -144,5 +141,4 @@ a {
 .manga-item {
   min-height: 11rem;
 }
-
 </style>
