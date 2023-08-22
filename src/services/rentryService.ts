@@ -6,44 +6,46 @@ import { UrlNavigation } from '../classes/urlNavigation'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { ContentType } from 'src/enums/contentTypeEnum'
 import { getCookies } from 'src/classes/requests/baseRequest'
+import { Data64URIWriter, TextReader, ZipWriter } from '@zip.js/zip.js'
 
 const URL = 'https://rentry.co'
 
 interface RentryResponse {
-  status: string,
-  content: string,
-  url: string,
-  'edit_code': string
+  status: string
+  content: string
+  url: string
+  // eslint-disable-next-line camelcase
+  edit_code: string
 }
 
-export function getShareId (): string {
+export function getShareId(): string {
   const shareId = LocalStorage.getItem(constants.SHARE_ID)
   if (typeof shareId !== 'string') return ''
 
   return shareId
 }
 
-export function setShareId (id?: string) {
+export function setShareId(id?: string) {
   if (id === undefined) return
   LocalStorage.set(constants.SHARE_ID, id)
 }
 
-export function getEditCode (): string {
+export function getEditCode(): string {
   const shareEditCode = LocalStorage.getItem(constants.SHARE_EDIT_CODE)
   if (typeof shareEditCode !== 'string') return ''
 
   return shareEditCode
 }
 
-export function setEditCode (code?: string) {
+export function setEditCode(code?: string) {
   if (code === undefined) return
   LocalStorage.set(constants.SHARE_EDIT_CODE, code)
 }
 
-export async function getCsrfToken (): Promise<string> {
+export async function getCsrfToken(): Promise<string> {
   const response = await requestHandler.sendRequest({
     method: 'GET',
-    url: URL
+    url: URL,
   })
 
   const cookies = getCookies(response)
@@ -54,7 +56,18 @@ export async function getCsrfToken (): Promise<string> {
   return cookies.csrftoken
 }
 
-export async function createList (list: string, url?: string): Promise<string> {
+async function zipData(data: string): Promise<string> {
+  const zipFileWriter = new Data64URIWriter()
+  const listReader = new TextReader(data)
+  const zipWriter = new ZipWriter(zipFileWriter)
+
+  await zipWriter.add('list.txt', listReader)
+  await zipWriter.close()
+
+  return zipFileWriter.getData()
+}
+
+export async function createList(list: string, url?: string): Promise<string> {
   const shareId = getShareId()
   const editCode = getEditCode()
   if (shareId && editCode) {
@@ -62,19 +75,21 @@ export async function createList (list: string, url?: string): Promise<string> {
   }
 
   const csrfToken = await getCsrfToken()
+  const zippedList = await zipData(list)
+
   const response = await requestHandler.sendRequest({
     method: 'POST',
     data: JSON.stringify({
       csrfmiddlewaretoken: csrfToken,
-      text: list,
-      url
+      text: zippedList,
+      url,
     }),
     url: `${URL}/api/new`,
     headers: {
       Referer: URL,
       'Content-Type': ContentType.URLENCODED,
-      cookie: `csrftoken=${csrfToken}`
-    }
+      cookie: `csrftoken=${csrfToken}`,
+    },
   })
 
   const data = JSON.parse(response.data) as RentryResponse
@@ -94,7 +109,7 @@ export async function createList (list: string, url?: string): Promise<string> {
   return id
 }
 
-export async function updateList (list: string): Promise<void> {
+export async function updateList(list: string): Promise<void> {
   const shareId = getShareId()
   if (!shareId) return Promise.resolve()
 
@@ -105,37 +120,42 @@ export async function updateList (list: string): Promise<void> {
   }
 
   const csrfToken = await getCsrfToken()
-  await requestHandler.sendRequest({
+  const zippedList = await zipData(list)
+
+  const response = await requestHandler.sendRequest({
     method: 'POST',
     data: JSON.stringify({
       csrfmiddlewaretoken: csrfToken,
-      text: list,
-      edit_code: editCode
+      text: zippedList,
+      edit_code: editCode,
     }),
     url: `${URL}/api/edit/${shareId}`,
     headers: {
       Referer: URL,
       'Content-Type': ContentType.URLENCODED,
-      cookie: `csrftoken=${csrfToken}`
-    }
+      cookie: `csrftoken=${csrfToken}`,
+    },
   })
+
+  const responseData = JSON.parse(response.data) as { status?: string; errors?: string }
+  if (responseData.errors) throw new Error(`Status: ${responseData.status ?? 'unknown'}, ${responseData.errors}`)
 }
 
-export function getNotifyOptions (error: unknown, urlNavigation: Ref<UrlNavigation | undefined>) {
+export function getNotifyOptions(error: unknown, urlNavigation: Ref<UrlNavigation | undefined>) {
   let description = JSON.stringify(error)
   if (error instanceof Error) {
     description = error.message
   }
 
   const notifyOptions = new NotifyOptions(description, 'Failed to set share URL')
-  notifyOptions.actions = [(
+  notifyOptions.actions = [
     {
       label: 'Visit',
       handler: () => {
         urlNavigation.value = new UrlNavigation(URL, false)
       },
-      color: 'white'
-    }
-  )]
+      color: 'white',
+    },
+  ]
   return notifyOptions
 }
