@@ -47,7 +47,7 @@ chrome.runtime.onMessageExternal.addListener((request, _sender, sendResponse) =>
 function onRequest(request, sendResponse) {
   if (typeof request === 'string') {
     if (request === 'ping') {
-      sendResponse('1.1')
+      sendResponse('1.2')
     }
 
     sendResponse(new Error(`Unknown request: ${request}`))
@@ -55,7 +55,9 @@ function onRequest(request, sendResponse) {
   }
 
   if (request.name === 'setCookieNames' && Array.isArray(request.value)) {
-    cookieNames = request.value
+    /** @type {string[]} */
+    const newCookieNames = request.value
+    cookieNames = newCookieNames
     sendResponse('ok')
 
     return
@@ -132,10 +134,10 @@ async function doRequest(request) {
  */
 function getResponseHeaders(request) {
   /** @type {chrome.webRequest.HttpHeader[] | undefined} */
-  let receivedResponseHeaders = undefined
+  let receivedResponseHeaders
 
   /** @type {((headers: chrome.webRequest.HttpHeader[]) => void) | undefined} */
-  let resolveCallback = undefined
+  let resolveCallback
 
   responseListeners.set(request.id, (url, responseHeaders) => {
     const adjustedUrl = getAdjustedUrl(request.url, url)
@@ -177,10 +179,10 @@ function setRequestHeaders(request, cookies) {
     })
 
   /** @type {chrome.webRequest.HttpHeader[] | undefined} */
-  let receivedRequestHeaders = undefined
+  let receivedRequestHeaders
 
   /** @type {(() => void) | undefined} */
-  let resolveCallback = undefined
+  let resolveCallback
 
   requestListeners.set(request.id, (url, requestHeaders) => {
     const adjustedUrl = getAdjustedUrl(request.url, url)
