@@ -13,17 +13,17 @@ import HttpResponse from 'src/interfaces/httpResponse'
 interface MadaraSearch {
   series: {
     all: {
-      ID: number,
-      'post_title': string,
-      'post_image': string,
-      'post_latest': string,
-      'post_link': string
+      ID: number
+      // eslint-disable-next-line camelcase
+      post_title: string
+      // eslint-disable-next-line camelcase
+      post_image: string
+      // eslint-disable-next-line camelcase
+      post_latest: string
+      // eslint-disable-next-line camelcase
+      post_link: string
     }[]
   }[]
-}
-
-interface MadaraBookmarks {
-  data: string,
 }
 
 class MadaraData extends BaseData {
@@ -33,7 +33,7 @@ class MadaraData extends BaseData {
 export class Madara extends BaseSite {
   siteType: SiteType
 
-  constructor (siteType: SiteType) {
+  constructor(siteType: SiteType) {
     super()
     this.siteType = siteType
 
@@ -42,7 +42,7 @@ export class Madara extends BaseSite {
     }
   }
 
-  protected getChapterNum (data: MadaraData): number {
+  protected getChapterNum(data: MadaraData): number {
     const chapterNum = parseNum(data.chapterNum?.getAttribute('data-num'))
     if (chapterNum !== 0) return chapterNum
 
@@ -60,7 +60,7 @@ export class Madara extends BaseSite {
     return 0
   }
 
-  protected getChapterDate (data: BaseData): string {
+  protected getChapterDate(data: BaseData): string {
     const chapterDate = moment(data.chapterDate?.textContent, 'MMMM DD, YYYY')
     if (chapterDate.isValid()) {
       return chapterDate.fromNow()
@@ -69,15 +69,11 @@ export class Madara extends BaseSite {
     }
   }
 
-  protected getImage (data: BaseData): string {
+  protected getImage(data: BaseData): string {
     return data.image?.getAttribute('content') ?? data.image?.getAttribute('src') ?? ''
   }
 
-  protected async readUrlImpl (url: string): Promise<Error | Manga> {
-    if (url.includes('/?p=') && this.siteType === SiteType.LuminousScans) {
-      return this.getMangaById(url)
-    }
-
+  protected async readUrlImpl(url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
     const response = await requestHandler.sendRequest(request)
 
@@ -103,26 +99,7 @@ export class Madara extends BaseSite {
     return this.buildManga(data)
   }
 
-  private async getMangaById (inputUrl: string): Promise<Error | Manga> {
-    const id = inputUrl.split('?p=')[1]
-    if (!id) return new Error('ID not found')
-
-    const response = await this.sendAdminRequest('bookmark_get&ids[]=5424')
-    const bookmarkData = JSON.parse(response.data) as MadaraBookmarks
-
-    const doc = await parseHtmlFromString(bookmarkData.data)
-
-    const url = doc.querySelectorAll('a')[0]?.getAttribute('href')
-    if (!url) return new Error('URL not found')
-
-    const manga = await this.readUrlImpl(url)
-    if (manga instanceof Error) return manga
-
-    manga.url = inputUrl
-    return manga
-  }
-
-  protected async searchImpl (query: string): Promise<Error | Manga[]> {
+  protected async searchImpl(query: string): Promise<Error | Manga[]> {
     const response = await this.sendAdminRequest(`ts_ac_do_search&ts_ac_query=${encodeURIComponent(query)}`)
     if (response.status >= 400) {
       return await this.searchFallback(query)
@@ -142,7 +119,14 @@ export class Madara extends BaseSite {
         manga.title = entryItem.post_title
         manga.image = entryItem.post_image
         manga.chapter = entryItem.post_latest
-        manga.url = `${this.getUrl()}/?p=${entryItem.ID}`
+
+        let queryParam: string
+        if (this.siteType === SiteType.LuminousScans) {
+          queryParam = 'series?p'
+        } else {
+          queryParam = '?p'
+        }
+        manga.url = `${this.getUrl()}/${queryParam}=${entryItem.ID}`
 
         mangaList.push(manga)
       }
@@ -151,23 +135,23 @@ export class Madara extends BaseSite {
     return mangaList
   }
 
-  private async sendAdminRequest (action: string): Promise<HttpResponse> {
+  private async sendAdminRequest(action: string): Promise<HttpResponse> {
     const request: HttpRequest = {
       method: 'POST',
       url: `${this.getUrl()}/wp-admin/admin-ajax.php`,
       headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
-      data: `action=${action}`
+      data: `action=${action}`,
     }
 
     return await requestHandler.sendRequest(request, true)
   }
 
-  private async searchFallback (query: string): Promise<Error | Manga[]> {
+  private async searchFallback(query: string): Promise<Error | Manga[]> {
     const queryString = qs.stringify({ s: query })
     const request: HttpRequest = {
       method: 'GET',
       url: `${this.getUrl()}/?${queryString}`,
-      headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` }
+      headers: { 'Content-Type': `${ContentType.URLENCODED}; charset=UTF-8` },
     }
 
     const response = await requestHandler.sendRequest(request)
@@ -196,7 +180,7 @@ export class Madara extends BaseSite {
     return mangaList
   }
 
-  getTestUrl () : string {
+  getTestUrl(): string {
     switch (this.siteType) {
       case SiteType.AsuraScans:
         return `${this.getUrl()}/?p=36483`
@@ -205,7 +189,7 @@ export class Madara extends BaseSite {
       case SiteType.CosmicScans:
         return `${this.getUrl()}/manga/i-have-max-level-luck/`
       case SiteType.LuminousScans:
-        return `${this.getUrl()}/series/1680246102-my-office-noonas-story/`
+        return `${this.getUrl()}/series?p=70`
     }
 
     return this.getUrl()

@@ -14,6 +14,7 @@ export const siteAliases = [
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
   { url: 'asurascans.com', site: SiteType.AsuraScans },
+  { url: 'asura.gg', site: SiteType.AsuraScans },
   { url: 'leviatanscans.com', site: SiteType.LeviatanScans },
 ]
 

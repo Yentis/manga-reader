@@ -13,13 +13,9 @@ import usePushNotification from 'src/composables/usePushNotification'
 import { getSiteNameByUrl } from 'src/utils/siteUtils'
 import ChromeWindow from 'src/interfaces/chromeWindow'
 
-export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?: Ref<string>) {
-  console.error('Refreshing', currentUrl)
+export default function useRefreshing(refreshProgress: Ref<number>, currentUrl?: Ref<string>) {
   const autoRefreshing = ref(false)
-  const {
-    storeManga,
-    updateManga
-  } = useMangaList()
+  const { storeManga, updateManga } = useMangaList()
   const { notification } = useNotification()
   const { urlNavigation } = useUrlNavigation()
   const { sendPushNotification } = usePushNotification()
@@ -27,7 +23,7 @@ export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?
   const $store = useStore()
   const refreshing = computed({
     get: () => $store.state.reader.refreshing,
-    set: (val) => $store.commit('reader/updateRefreshing', val)
+    set: (val) => $store.commit('reader/updateRefreshing', val),
   })
 
   const refreshManga = async (url: string, step?: number) => {
@@ -43,13 +39,15 @@ export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?
       const message = `${getSiteNameByUrl(manga.site) || 'Unknown site'} | ${errorMessage}`
 
       const notifyOptions = new NotifyOptions(message, `Failed to refresh ${manga.title}`)
-      notifyOptions.actions = [{
-        label: 'Visit',
-        handler: () => {
-          urlNavigation.value = new UrlNavigation(manga.url, true)
+      notifyOptions.actions = [
+        {
+          label: 'Visit',
+          handler: () => {
+            urlNavigation.value = new UrlNavigation(manga.url, true)
+          },
+          color: 'white',
         },
-        color: 'white'
-      }]
+      ]
 
       notification.value = notifyOptions
 
@@ -67,22 +65,24 @@ export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?
       chapterUrl: result.chapterUrl,
       chapterNum: result.chapterNum,
       chapterDate: result.chapterDate,
-      image: result.image
+      image: result.image,
     })
 
     if (step !== undefined) refreshProgress.value += step
     await new Promise<void>((resolve) => {
-      const chromeWindow = (window as unknown) as ChromeWindow
+      const chromeWindow = window as unknown as ChromeWindow
 
-      chromeWindow.requestIdleCallback(() => {
-        updateManga(manga.url, newManga)
-        resolve()
-      }, { timeout: 2000 })
+      chromeWindow.requestIdleCallback(
+        () => {
+          updateManga(manga.url, newManga)
+          resolve()
+        },
+        { timeout: 2000 }
+      )
     })
   }
 
   const refreshAllManga = async (): Promise<void> => {
-    console.error('Doing refresh', currentUrl)
     if (refreshing.value) return
     refreshProgress.value = 0.01
     refreshing.value = true
@@ -94,7 +94,7 @@ export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?
       filteredMangaUrlList.push(url)
     })
 
-    const step = filteredMangaUrlList.length > 0 ? (1 / filteredMangaUrlList.length) : 0
+    const step = filteredMangaUrlList.length > 0 ? 1 / filteredMangaUrlList.length : 0
     const workingUrls: Record<string, boolean> = {}
 
     if (filteredMangaUrlList[0] && currentUrl) {
@@ -153,6 +153,6 @@ export default function useRefreshing (refreshProgress: Ref<number>, currentUrl?
     refreshTimer,
     startRefreshTimer,
     refreshManga,
-    refreshAllManga
+    refreshAllManga,
   }
 }

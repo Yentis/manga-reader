@@ -8,7 +8,7 @@ import { mangaEqual, searchValid } from '../testService'
 const SITE_TYPE = SiteType.LuminousScans
 const QUERY = 'legend of the northern blade'
 
-export async function testLuminousScans (): Promise<void> {
+export async function testLuminousScans(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -16,25 +16,25 @@ export async function testLuminousScans (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter Epilogue Ch 03 [End]'
   desired.image = 'https://luminousscans.com/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg'
   desired.title = 'My Office Noona’s Story'
-  desired.chapterUrl = 'https://luminousscans.com/1680246102-my-office-noonas-story-epilogue-chapter-03/'
+  desired.chapterUrl = 'https://luminousscans.com/1692730801-my-office-noonas-story-epilogue-chapter-03/'
   desired.chapterNum = 64
   desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://luminousscans.com/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif'
   desired.chapter = '161'
-  desired.url = 'https://luminousscans.com/?p=5424'
+  desired.url = 'https://luminousscans.com/series?p=5424'
 
-  return searchValid(results, desired, QUERY)
+  await searchValid(results, desired, QUERY)
 }
