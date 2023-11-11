@@ -8,7 +8,7 @@ import { mangaEqual, searchValid } from '../testService'
 const SITE_TYPE = SiteType.CosmicScans
 const QUERY = 'i have max level luck'
 
-export async function testCosmicScans (): Promise<void> {
+export async function testCosmicScans(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -16,25 +16,25 @@ export async function testCosmicScans (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 9'
-  desired.image = 'https://i3.wp.com/cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg'
+  desired.image = 'https://cosmic-scans.com/wp-content/uploads/2022/06/i-have-max-level-luck.jpeg'
   desired.title = 'I Have Max Level Luck'
-  desired.chapterUrl = 'https://cosmicscans.com/i-have-max-level-luck-chapter-9/'
+  desired.chapterUrl = 'https://cosmic-scans.com/i-have-max-level-luck-chapter-9/'
   desired.chapterNum = 9
   desired.chapterDate = moment('25/06/2022', 'DD/MM/YYYY').fromNow()
 
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://cosmicscans.com/wp-content/uploads/2022/06/i-have-max-level-luck-222x300.jpeg'
+  desired.image = 'https://cosmic-scans.com/wp-content/uploads/2022/06/i-have-max-level-luck-222x300.jpeg'
   desired.chapter = '9'
-  desired.url = 'https://cosmicscans.com/?p=1201'
+  desired.url = 'https://cosmic-scans.com/?p=1201'
 
   return searchValid(results, desired, QUERY)
 }

@@ -16,7 +16,7 @@ export class BaseData {
   image?: Element
   title?: Element
 
-  constructor (url: string) {
+  constructor(url: string) {
     this.url = url
   }
 }
@@ -28,18 +28,19 @@ export abstract class BaseSite {
   loggedIn = true
   protected state = SiteState.REACHABLE
 
-  statusOK (): boolean {
+  statusOK(): boolean {
     return this.loggedIn && this.state === SiteState.REACHABLE
   }
 
-  hasSearch (): boolean {
+  hasSearch(): boolean {
     return true
   }
 
-  async checkState (): Promise<void> {
+  async checkState(): Promise<void> {
     try {
       const response = await this.readUrl(this.getTestUrl())
-      const results = response instanceof Error ? SiteState.OFFLINE : response.title === '' ? SiteState.INVALID : SiteState.REACHABLE
+      const results =
+        response instanceof Error ? SiteState.OFFLINE : response.title === '' ? SiteState.INVALID : SiteState.REACHABLE
 
       this.state = results
     } catch (error) {
@@ -48,84 +49,89 @@ export abstract class BaseSite {
     }
   }
 
-  checkLogin (): Promise<boolean> {
+  checkLogin(): Promise<boolean> {
     return Promise.resolve(true)
   }
 
-  openLogin ($q: QVueGlobals, store: Store<unknown>): Promise<boolean | Error> {
+  openLogin($q: QVueGlobals, store: Store<unknown>): Promise<boolean | Error> {
     store.commit('reader/pushUrlNavigation', new UrlNavigation(this.getLoginUrl(), true))
     return Promise.resolve(false)
   }
 
-  getMangaId ($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
+  getMangaId($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
     const parsedUrl = parseInt(url)
     if (!isNaN(parsedUrl)) return Promise.resolve(parsedUrl)
 
     return Promise.resolve(-1)
   }
 
-  syncReadChapter (mangaId: number, chapterNum: number): Promise<void | Error> {
+  syncReadChapter(mangaId: number, chapterNum: number): Promise<void | Error> {
     console.info(`Sync not implemented, ${mangaId}: ${chapterNum}`)
     return Promise.resolve()
   }
 
-  protected getChapter (data: BaseData): string {
-    return data.chapter?.textContent?.replace(/\n/gm, ' ').trim() || 'Unknown'
+  protected getChapter(data: BaseData): string {
+    return (
+      data.chapter?.textContent
+        ?.replace(/[\n\t]/gm, ' ')
+        .replace(/ {2,}/gm, ' ')
+        .trim() || 'Unknown'
+    )
   }
 
-  protected getChapterUrl (data: BaseData): string {
+  protected getChapterUrl(data: BaseData): string {
     const url = (data.chapterUrl ?? data.chapter)?.getAttribute('href') || ''
     if (url.startsWith('/')) return `${this.getUrl()}${url}`
 
     return url
   }
 
-  protected getChapterNum (data: BaseData): number {
+  protected getChapterNum(data: BaseData): number {
     return SiteUtils.parseNum(data.chapterNum?.textContent?.trim())
   }
 
-  protected getChapterDate (data: BaseData): string {
+  protected getChapterDate(data: BaseData): string {
     return SiteUtils.getDateFromNow(data.chapterDate?.textContent)
   }
 
-  protected getImage (data: BaseData): string {
+  protected getImage(data: BaseData): string {
     const url = data.image?.getAttribute('src') || ''
     if (url.startsWith('/')) return `${this.getUrl()}${url}`
 
     return url
   }
 
-  protected getTitle (data: BaseData): string {
+  protected getTitle(data: BaseData): string {
     return data.title?.textContent?.trim() || ''
   }
 
-  protected static getUrl (siteType: SiteType | LinkingSiteType): string {
+  protected static getUrl(siteType: SiteType | LinkingSiteType): string {
     return SiteUtils.getUrl(siteType)
   }
 
-  getUrl (): string {
+  getUrl(): string {
     return BaseSite.getUrl(this.siteType)
   }
 
-  getLoginUrl (): string {
+  getLoginUrl(): string {
     return `${this.getUrl()}/login`
   }
 
-  readUrl (url: string): Promise<Error | Manga> {
+  readUrl(url: string): Promise<Error | Manga> {
     return this.addToQueue(() => this.readUrlImpl(url))
   }
 
-  protected abstract readUrlImpl (url: string): Promise<Error | Manga>
+  protected abstract readUrlImpl(url: string): Promise<Error | Manga>
 
-  search (query: string): Promise<Error | Manga[]> {
+  search(query: string): Promise<Error | Manga[]> {
     return this.addToQueue(() => this.searchImpl(query))
   }
 
-  protected abstract searchImpl (query: string): Promise<Error | Manga[]>
+  protected abstract searchImpl(query: string): Promise<Error | Manga[]>
 
   abstract getTestUrl(): string
 
-  compare (b: BaseSite): number {
+  compare(b: BaseSite): number {
     if (this.state === SiteState.INVALID && b.state !== SiteState.INVALID) {
       return -1
     } else if (b.state === SiteState.INVALID && this.state !== SiteState.INVALID) {
@@ -150,7 +156,7 @@ export abstract class BaseSite {
     }
   }
 
-  protected addToQueue<T> (task: (() => PromiseLike<T | Error>)): Promise<T | Error> {
+  protected addToQueue<T>(task: () => PromiseLike<T | Error>): Promise<T | Error> {
     return this.requestQueue.add(async () => {
       try {
         return await task()
@@ -164,7 +170,7 @@ export abstract class BaseSite {
     })
   }
 
-  protected buildManga (data: BaseData): Manga {
+  protected buildManga(data: BaseData): Manga {
     const manga = new Manga(data.url, this.siteType)
     manga.chapter = this.getChapter(data)
     manga.chapterUrl = this.getChapterUrl(data)

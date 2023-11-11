@@ -40,7 +40,7 @@ export async function hasExtension(): Promise<boolean> {
         return
       }
 
-      resolve(response === '1.1')
+      resolve(response === '1.2')
     })
   })
 }

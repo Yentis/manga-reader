@@ -184,7 +184,7 @@ export class Madara extends BaseSite {
     switch (this.siteType) {
       case SiteType.AsuraScans:
         return `${this.getUrl()}/?p=36483`
-      case SiteType.FlameScans:
+      case SiteType.FlameComics:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
       case SiteType.CosmicScans:
         return `${this.getUrl()}/manga/i-have-max-level-luck/`

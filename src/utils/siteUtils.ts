@@ -7,15 +7,21 @@ type DOMParserSupportedType = 'text/html' | 'text/xml'
 
 export const siteAliases = [
   { url: 'manganelo.com', site: SiteType.Manganato },
-  { url: '1stkissmanga.love', site: SiteType.FirstKissManga },
-  { url: '1stkissmanga.com', site: SiteType.FirstKissManga },
-  { url: '1stkissmanga.io', site: SiteType.FirstKissManga },
+  { url: '1stkissmanga.love', site: SiteType.LikeManga },
+  { url: '1stkissmanga.com', site: SiteType.LikeManga },
+  { url: '1stkissmanga.io', site: SiteType.LikeManga },
+  { url: '1stkissmanga.me', site: SiteType.LikeManga },
   { url: Guya, site: SiteType.Cubari },
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
   { url: 'asurascans.com', site: SiteType.AsuraScans },
   { url: 'asura.gg', site: SiteType.AsuraScans },
-  { url: 'leviatanscans.com', site: SiteType.LeviatanScans },
+  { url: 'asura.nacm.xyz', site: SiteType.AsuraScans },
+  { url: 'leviatanscans.com', site: SiteType.LSComic },
+  { url: 'en.leviatanscans.com', site: SiteType.LSComic },
+  { url: 'cosmicscans.com', site: SiteType.CosmicScans },
+  { url: 'flamescans.org', site: SiteType.FlameComics },
+  { url: 'luminousscans.com', site: SiteType.LuminousScans },
 ]
 
 export function getUrl(url: string) {

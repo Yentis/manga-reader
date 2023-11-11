@@ -7,7 +7,7 @@ import { mangaEqual, searchValid } from '../testService'
 const SITE_TYPE = SiteType.HiperDEX
 const QUERY = 'cabalist'
 
-export async function testHiperDEX (): Promise<void> {
+export async function testHiperDEX(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -16,7 +16,7 @@ export async function testHiperDEX (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 84 - [END]'
@@ -24,12 +24,12 @@ async function readUrl (site: BaseSite): Promise<void> {
   desired.title = '10 Years in the Friend Zone'
   desired.chapterUrl = 'https://hiperdex.com/manga/10-years-in-the-friend-zone/chapter-84/'
   desired.chapterNum = 84
-  desired.chapterDate = 'a year ago'
+  desired.chapterDate = '2 years ago'
 
   mangaEqual(manga, desired)
 }
 
-async function readUrl2 (): Promise<void> {
+async function readUrl2(): Promise<void> {
   const manga = await getMangaInfo('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   const desired = new Manga('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   desired.chapter = '109.3'
@@ -37,12 +37,12 @@ async function readUrl2 (): Promise<void> {
   desired.title = 'Touch On'
   desired.chapterUrl = 'https://hiperdex.com/manga/touchon191222/109-3/'
   desired.chapterNum = 109.3
-  desired.chapterDate = 'a year ago'
+  desired.chapterDate = '2 years ago'
 
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg'

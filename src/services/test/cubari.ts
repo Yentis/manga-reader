@@ -7,7 +7,7 @@ import * as SiteUtils from 'src/utils/siteUtils'
 
 const SITE_TYPE = SiteType.Cubari
 
-export async function testCubari (): Promise<void> {
+export async function testCubari(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -16,22 +16,23 @@ export async function testCubari (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 188
+  const chapter = 195
 
-  desired.chapter = `Chapter ${chapter}: Appraisal`
-  desired.image = 'https://services.f-ck.me/v1/image/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXR0YWNobWVudHMlMkY3NTQzOTAyNDU4NjAwNDg5MDAlMkY4MTQzMDgxOTY2MjA2OTc2NDAlMkYyM18tX3AwMDBfLV9hS3JhYS5qcGc='
+  desired.chapter = `Chapter ${chapter}: Tenninto`
+  desired.image =
+    'https://services.f-ck.me/v1/image/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20vYXR0YWNobWVudHMlMkY3NTQzOTAyNDU4NjAwNDg5MDAlMkY4MTQzMDgxOTY2MjA2OTc2NDAlMkYyM18tX3AwMDBfLV9hS3JhYS5qcGc='
   desired.title = 'One Punch Man'
   desired.chapterUrl = `https://cubari.moe/read/gist/OPM/${chapter}/1/`
   desired.chapterNum = chapter
-  desired.chapterDate = '4 days ago'
+  desired.chapterDate = '9 days ago'
 
   mangaEqual(manga, desired)
 }
 
-async function readUrlGuya (): Promise<void> {
+async function readUrlGuya(): Promise<void> {
   const manga = await getMangaInfo('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   const desired = new Manga('https://guya.moe/read/manga/Kaguya-Wants-To-Be-Confessed-To/', SITE_TYPE)
   desired.chapter = 'Vol 28 Extras'
@@ -44,7 +45,7 @@ async function readUrlGuya (): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga('kaguya-sama love is war', SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://guya.moe/media/manga/Kaguya-Wants-To-Be-Confessed-To/volume_covers/28/87307.webp'

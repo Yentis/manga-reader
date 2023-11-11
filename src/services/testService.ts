@@ -5,10 +5,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfoByUrl } from './siteService'
 import { testAsuraScans } from './test/asurascans'
 import { testBatoto } from './test/batoto'
-import { testFirstKissManga } from './test/firstkissmanga'
-import { testFlameScans } from './test/flamescans'
+import { testLikeManga } from './test/likemanga'
+import { testFlameComics } from './test/flamecomics'
 import { testHiperDEX } from './test/hiperdex'
-import { testLeviatanScans } from './test/leviatanscans'
+import { testLSComic } from './test/lscomic'
 import { testMangaDex } from './test/mangadex'
 import { testMangago } from './test/mangago'
 import { testMangakakalot } from './test/mangakakalot'
@@ -17,7 +17,6 @@ import { testManganato } from './test/manganato'
 import { testMangaTx } from './test/mangatx'
 import { testReaperScans } from './test/reaperscans'
 import { testResetScans } from './test/resetscans'
-import { testSleepingKnightScans } from './test/sleepingknightscans'
 import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 import { testBiliBiliComics } from './test/bilibilicomics'
@@ -30,121 +29,181 @@ import { testComikey } from './test/comikey'
 import { testTappytoon } from './test/tappytoon'
 import { testScyllaScans } from './test/scyllascans'
 
-export default async function testAll (
+export default async function testAll(
   $q: QVueGlobals
-): Promise<{ site: SiteType | LinkingSiteType, error: unknown }[]> {
+): Promise<{ site: SiteType | LinkingSiteType; error: unknown }[]> {
   const promises: Promise<void>[] = []
-  const errors: { site: SiteType | LinkingSiteType, error: unknown }[] = []
+  const errors: { site: SiteType | LinkingSiteType; error: unknown }[] = []
 
-  promises.push(testCosmicScans().catch((error) => {
-    errors.push({ site: SiteType.CosmicScans, error: error })
-  }))
-  promises.push(testAsuraScans().catch((error) => {
-    errors.push({ site: SiteType.AsuraScans, error: error })
-  }))
-  promises.push(testBatoto().catch((error) => {
-    errors.push({ site: SiteType.Batoto, error: error })
-  }))
-  promises.push(testBiliBiliComics().catch((error) => {
-    errors.push({ site: SiteType.BiliBiliComics, error: error })
-  }))
-  promises.push(testComikey().catch((error) => {
-    errors.push({ site: SiteType.Comikey, error: error })
-  }))
-  promises.push(testCubari().catch((error) => {
-    errors.push({ site: SiteType.Cubari, error: error })
-  }))
-  promises.push(testFirstKissManga().catch((error) => {
-    errors.push({ site: SiteType.FirstKissManga, error: error })
-  }))
-  promises.push(testFlameScans().catch((error) => {
-    errors.push({ site: SiteType.FlameScans, error: error })
-  }))
-  promises.push(testHiperDEX().catch((error) => {
-    errors.push({ site: SiteType.HiperDEX, error: error })
-  }))
-  promises.push(testKitsu($q).catch((error) => {
-    errors.push({ site: LinkingSiteType.Kitsu, error: error })
-  }))
-  promises.push(testLeviatanScans().catch((error) => {
-    errors.push({ site: SiteType.LeviatanScans, error: error })
-  }))
-  promises.push(testLuminousScans().catch((error) => {
-    errors.push({ site: SiteType.LuminousScans, error: error })
-  }))
-  promises.push(testMangaDex().catch((error) => {
-    errors.push({ site: SiteType.MangaDex, error: error })
-  }))
-  promises.push(testMangago().catch((error) => {
-    errors.push({ site: SiteType.Mangago, error: error })
-  }))
-  promises.push(testMangakakalot().catch((error) => {
-    errors.push({ site: SiteType.Mangakakalot, error: error })
-  }))
-  promises.push(testMangaKomi().catch((error) => {
-    errors.push({ site: SiteType.MangaKomi, error: error })
-  }))
-  promises.push(testManganato().catch((error) => {
-    errors.push({ site: SiteType.Manganato, error: error })
-  }))
-  promises.push(testMangaTx().catch((error) => {
-    errors.push({ site: SiteType.MangaTx, error: error })
-  }))
-  promises.push(testReaperScans().catch((error) => {
-    errors.push({ site: SiteType.ReaperScans, error: error })
-  }))
-  promises.push(testResetScans().catch((error) => {
-    errors.push({ site: SiteType.ResetScans, error: error })
-  }))
-  promises.push(testScyllaScans().catch((error) => {
-    errors.push({ site: SiteType.ScyllaScans, error: error })
-  }))
-  promises.push(testSleepingKnightScans().catch((error) => {
-    errors.push({ site: SiteType.SleepingKnightScans, error: error })
-  }))
-  promises.push(testTapas().catch((error) => {
-    errors.push({ site: SiteType.Tapas, error: error })
-  }))
-  promises.push(testTappytoon().catch((error) => {
-    errors.push({ site: SiteType.Tappytoon, error: error })
-  }))
-  promises.push(testWebtoons().catch((error) => {
-    errors.push({ site: SiteType.Webtoons, error: error })
-  }))
-  promises.push(testZeroScans().catch((error) => {
-    errors.push({ site: SiteType.ZeroScans, error: error })
-  }))
+  promises.push(
+    testCosmicScans().catch((error) => {
+      errors.push({ site: SiteType.CosmicScans, error: error })
+    })
+  )
+  promises.push(
+    testAsuraScans().catch((error) => {
+      errors.push({ site: SiteType.AsuraScans, error: error })
+    })
+  )
+  promises.push(
+    testBatoto().catch((error) => {
+      errors.push({ site: SiteType.Batoto, error: error })
+    })
+  )
+  promises.push(
+    testBiliBiliComics().catch((error) => {
+      errors.push({ site: SiteType.BiliBiliComics, error: error })
+    })
+  )
+  promises.push(
+    testComikey().catch((error) => {
+      errors.push({ site: SiteType.Comikey, error: error })
+    })
+  )
+  promises.push(
+    testCubari().catch((error) => {
+      errors.push({ site: SiteType.Cubari, error: error })
+    })
+  )
+  promises.push(
+    testLikeManga().catch((error) => {
+      errors.push({ site: SiteType.LikeManga, error: error })
+    })
+  )
+  promises.push(
+    testFlameComics().catch((error) => {
+      errors.push({ site: SiteType.FlameComics, error: error })
+    })
+  )
+  promises.push(
+    testHiperDEX().catch((error) => {
+      errors.push({ site: SiteType.HiperDEX, error: error })
+    })
+  )
+  promises.push(
+    testKitsu($q).catch((error) => {
+      errors.push({ site: LinkingSiteType.Kitsu, error: error })
+    })
+  )
+  promises.push(
+    testLSComic().catch((error) => {
+      errors.push({ site: SiteType.LSComic, error: error })
+    })
+  )
+  promises.push(
+    testLuminousScans().catch((error) => {
+      errors.push({ site: SiteType.LuminousScans, error: error })
+    })
+  )
+  promises.push(
+    testMangaDex().catch((error) => {
+      errors.push({ site: SiteType.MangaDex, error: error })
+    })
+  )
+  promises.push(
+    testMangago().catch((error) => {
+      errors.push({ site: SiteType.Mangago, error: error })
+    })
+  )
+  promises.push(
+    testMangakakalot().catch((error) => {
+      errors.push({ site: SiteType.Mangakakalot, error: error })
+    })
+  )
+  promises.push(
+    testMangaKomi().catch((error) => {
+      errors.push({ site: SiteType.MangaKomi, error: error })
+    })
+  )
+  promises.push(
+    testManganato().catch((error) => {
+      errors.push({ site: SiteType.Manganato, error: error })
+    })
+  )
+  promises.push(
+    testMangaTx().catch((error) => {
+      errors.push({ site: SiteType.MangaTx, error: error })
+    })
+  )
+  promises.push(
+    testReaperScans().catch((error) => {
+      errors.push({ site: SiteType.ReaperScans, error: error })
+    })
+  )
+  promises.push(
+    testResetScans().catch((error) => {
+      errors.push({ site: SiteType.ResetScans, error: error })
+    })
+  )
+  promises.push(
+    testScyllaScans().catch((error) => {
+      errors.push({ site: SiteType.ScyllaScans, error: error })
+    })
+  )
+  promises.push(
+    testTapas().catch((error) => {
+      errors.push({ site: SiteType.Tapas, error: error })
+    })
+  )
+  promises.push(
+    testTappytoon().catch((error) => {
+      errors.push({ site: SiteType.Tappytoon, error: error })
+    })
+  )
+  promises.push(
+    testWebtoons().catch((error) => {
+      errors.push({ site: SiteType.Webtoons, error: error })
+    })
+  )
+  promises.push(
+    testZeroScans().catch((error) => {
+      errors.push({ site: SiteType.ZeroScans, error: error })
+    })
+  )
 
   await Promise.all(promises)
   return errors
 }
 
-export function mangaEqual (
-  actual: Manga | Error,
-  desired: Manga,
-  checkDate = true
-): void {
+export function mangaEqual(actual: Manga | Error, desired: Manga, checkDate = true): void {
   if (actual instanceof Error) throw actual
 
-  if (actual.url !== desired.url) throw Error(`Failed ${desired.url}\nExpected url: ${desired.url}\nActual: ${actual.url}`)
-  else if (actual.site !== desired.site) throw Error(`Failed ${desired.url}\nExpected site: ${desired.site}\nActual: ${actual.site}`)
-  else if (actual.chapter !== desired.chapter) throw Error(`Failed ${desired.url}\nExpected chapter: ${desired.chapter}\nActual: ${actual.chapter}`)
-  else if (!actual.image.includes(desired.image)) throw Error(`Failed ${desired.url}\nExpected image: ${desired.image}\nActual: ${actual.image}`)
-  else if (actual.title !== desired.title) throw Error(`Failed ${desired.url}\nExpected title: ${desired.title}\nActual: ${actual.title}`)
-  else if (actual.chapterUrl !== desired.chapterUrl) throw Error(`Failed ${desired.url}\nExpected chapter url: ${desired.chapterUrl}\nActual: ${actual.chapterUrl}`)
-  else if (actual.read !== desired.read) throw Error(`Failed ${desired.url}\nExpected read: ${desired.read || 'undefined'}\nActual: ${actual.read || 'undefined'}`)
-  else if (actual.readUrl !== desired.read) throw Error(`Failed ${desired.url}\nExpected read url: ${desired.readUrl || 'undefined'}\nActual: ${actual.readUrl || 'undefined'}`)
-  else if (desired.chapterDate && actual.chapterDate !== desired.chapterDate) {
-    throw Error(`Failed ${desired.chapterDate}\nExpected chapter date: ${desired.chapterDate || 'undefined'}\nActual: ${actual.chapterDate || 'undefined'}`)
-  } else if (checkDate && !actual.chapterDate.includes('ago')) throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
-  else if (actual.chapterNum !== desired.chapterNum) throw Error(`Failed ${desired.url}\nExpected chapter num: ${desired.chapterNum}\nActual: ${actual.chapterNum}`)
+  if (actual.url !== desired.url) {
+    throw Error(`Failed ${desired.url}\nExpected url: ${desired.url}\nActual: ${actual.url}`)
+  } else if (actual.site !== desired.site) {
+    throw Error(`Failed ${desired.url}\nExpected site: ${desired.site}\nActual: ${actual.site}`)
+  } else if (actual.chapter !== desired.chapter) {
+    throw Error(`Failed ${desired.url}\nExpected chapter: ${desired.chapter}\nActual: ${actual.chapter}`)
+  } else if (!actual.image.includes(desired.image)) {
+    throw Error(`Failed ${desired.url}\nExpected image: ${desired.image}\nActual: ${actual.image}`)
+  } else if (actual.title !== desired.title) {
+    throw Error(`Failed ${desired.url}\nExpected title: ${desired.title}\nActual: ${actual.title}`)
+  } else if (actual.chapterUrl !== desired.chapterUrl) {
+    throw Error(`Failed ${desired.url}\nExpected chapter url: ${desired.chapterUrl}\nActual: ${actual.chapterUrl}`)
+  } else if (actual.read !== desired.read) {
+    throw Error(
+      `Failed ${desired.url}\nExpected read: ${desired.read || 'undefined'}\nActual: ${actual.read || 'undefined'}`
+    )
+  } else if (actual.readUrl !== desired.read) {
+    throw Error(
+      `Failed ${desired.url}\nExpected read url: ${desired.readUrl || 'undefined'}\nActual: ${
+        actual.readUrl || 'undefined'
+      }`
+    )
+  } else if (desired.chapterDate && actual.chapterDate !== desired.chapterDate) {
+    throw Error(
+      `Failed ${desired.chapterDate}\nExpected chapter date: ${desired.chapterDate || 'undefined'}\nActual: ${
+        actual.chapterDate || 'undefined'
+      }`
+    )
+  } else if (checkDate && !actual.chapterDate.includes('ago')) {
+    throw Error(`Failed ${desired.url}\nChapter date not valid: ${actual.chapterDate}`)
+  } else if (actual.chapterNum !== desired.chapterNum) {
+    throw Error(`Failed ${desired.url}\nExpected chapter num: ${desired.chapterNum}\nActual: ${actual.chapterNum}`)
+  }
 }
 
-export async function searchValid (
-  results: Manga[],
-  desired: Manga,
-  query: string
-): Promise<void> {
+export async function searchValid(results: Manga[], desired: Manga, query: string): Promise<void> {
   const matchingManga = results.filter((manga) => {
     if (manga.site !== desired.site) {
       console.error(`Site did not match: ${manga.site} | ${desired.site}`)
@@ -175,8 +234,17 @@ export async function searchValid (
   })
 
   const resultManga = matchingManga[0]
-  if (!resultManga) throw Error(`Failed ${desired.url}\nNo matching results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
-  else if (matchingManga.length > 1) throw Error(`Failed ${desired.url}\nToo many results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`)
+  if (!resultManga) {
+    throw Error(
+      `Failed ${desired.url}\nNo matching results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(
+        results
+      )}`
+    )
+  } else if (matchingManga.length > 1) {
+    throw Error(
+      `Failed ${desired.url}\nToo many results, expected\n[${JSON.stringify(desired)}] got\n${JSON.stringify(results)}`
+    )
+  }
 
   const linkingSiteTypeUrls: string[] = Object.values(LinkingSiteType)
   if (linkingSiteTypeUrls.includes(resultManga.site)) return

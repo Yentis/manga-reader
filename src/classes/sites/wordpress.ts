@@ -19,9 +19,9 @@ class WordPressData extends BaseData {
 }
 
 export class WordPress extends BaseSite {
-  siteType: SiteType;
+  siteType: SiteType
 
-  constructor (siteType: SiteType) {
+  constructor(siteType: SiteType) {
     super()
     this.siteType = siteType
 
@@ -30,7 +30,7 @@ export class WordPress extends BaseSite {
     }
   }
 
-  getChapter (data: WordPressData): string {
+  getChapter(data: WordPressData): string {
     const volume = data.volume?.textContent?.trim() || 'Vol.01'
     const chapterDate = data.chapterDate?.textContent?.trim() || ''
     const chapter = data.chapterText?.replace(chapterDate, '').trim()
@@ -44,14 +44,12 @@ export class WordPress extends BaseSite {
     }
   }
 
-  getChapterNum (data: WordPressData): number {
+  getChapterNum(data: WordPressData): number {
     if (data.volumeList?.length === 0) return this.getSimpleChapterNum(this.getChapter(data))
     let chapterNum = 0
 
     data.volumeList?.forEach((element, index) => {
-      const matchingChapter = this.getMatchingChapter(
-        Array.from(element.querySelectorAll('.wp-manga-chapter a') ?? [])
-      )
+      const matchingChapter = this.getMatchingChapter(Array.from(element.querySelectorAll('.wp-manga-chapter a') ?? []))
 
       const chapterText = matchingChapter?.text
       const chapterOfVolume = this.getSimpleChapterNum(chapterText)
@@ -67,11 +65,11 @@ export class WordPress extends BaseSite {
     return chapterNum
   }
 
-  private getSimpleChapterNum (chapter: string | undefined): number {
+  private getSimpleChapterNum(chapter: string | undefined): number {
     return matchNum(chapter)
   }
 
-  getChapterDate (data: BaseData): string {
+  getChapterDate(data: BaseData): string {
     const chapterDateText = data.chapterDate?.textContent?.trim()
 
     let format
@@ -91,19 +89,27 @@ export class WordPress extends BaseSite {
     if (!chapterDateText?.endsWith('ago') && chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {
-      return getDateFromNow(data.chapterDate?.textContent) || getDateFromNow(data.chapterDate?.querySelectorAll('a')[0]?.getAttribute('title'))
+      return (
+        getDateFromNow(data.chapterDate?.textContent) ||
+        getDateFromNow(data.chapterDate?.querySelectorAll('a')[0]?.getAttribute('title'))
+      )
     }
   }
 
-  getImage (data: BaseData): string {
+  getImage(data: BaseData): string {
     return this.getImageSrc(data.image)
   }
 
-  getTitle (data: BaseData): string {
-    return data.title?.getAttribute('content') || ''
+  getTitle(data: BaseData): string {
+    let title = data.title?.getAttribute('content') || ''
+    if (this.siteType === SiteType.LikeManga) {
+      title = title.replace('LIKE MANGA', '').trim()
+    }
+
+    return title
   }
 
-  protected async readUrlImpl (url: string): Promise<Error | Manga> {
+  protected async readUrlImpl(url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
     this.trySetUserAgent(request)
 
@@ -141,22 +147,29 @@ export class WordPress extends BaseSite {
     return this.buildManga(data)
   }
 
-  protected async searchImpl (query: string): Promise<Error | Manga[]> {
+  protected async searchImpl(query: string): Promise<Error | Manga[]> {
     let queryParam = ''
     query.split(' ').forEach((word, index) => {
-      if (index > 0) { queryParam += '+' }
+      if (index > 0) {
+        queryParam += '+'
+      }
       queryParam += word
     })
 
-    const queryString = qs.stringify({
-      s: queryParam,
-      post_type: 'wp-manga'
-    })
+    const queryString =
+      this.siteType === SiteType.LikeManga
+        ? qs.stringify({ act: 'ajax', code: 'search_manga', keyword: query })
+        : qs.stringify({ s: queryParam, post_type: 'wp-manga' })
+
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/?${queryString}` }
     this.trySetUserAgent(request)
 
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
+
+    if (this.siteType === SiteType.LikeManga) {
+      return this.searchLikeManga(doc, query)
+    }
 
     const mangaList: Manga[] = []
 
@@ -181,13 +194,45 @@ export class WordPress extends BaseSite {
     return mangaList
   }
 
-  private async readChapters (mangaId: string, data: WordPressData, chapterPath: string): Promise<WordPressData | Error> {
+  private searchLikeManga(doc: Document, query: string): Manga[] {
+    const mangaList: Manga[] = []
+
+    doc.querySelectorAll('li').forEach((elem) => {
+      const imageElem = elem.querySelectorAll('a')[0]
+
+      let url = imageElem?.getAttribute('href') ?? ''
+      url = `${this.getUrl()}${url}`
+
+      const regex = /\/manga\/(\d*-).*\//gm
+      const prefixNumbers = regex.exec(url)?.[1] ?? ''
+      const cleanUrl = url.replace(prefixNumbers, '')
+
+      const manga = new Manga(cleanUrl, this.siteType)
+      manga.image = this.getImageSrc(imageElem?.querySelectorAll('img')[0])
+      manga.image = `${this.getUrl()}/${manga.image}`
+
+      manga.title = elem.querySelectorAll('h3')[0]?.textContent?.trim() || ''
+      manga.chapter = elem.querySelectorAll('h4 i b')[0]?.textContent?.trim() || 'Unknown'
+
+      if (titleContainsQuery(query, manga.title)) {
+        mangaList.push(manga)
+      }
+    })
+
+    return mangaList
+  }
+
+  private async readChapters(
+    mangaId: string,
+    data: WordPressData,
+    chapterPath: string
+  ): Promise<WordPressData | Error> {
     const parser = new DOMParser()
     let doc: Document
 
     const requestData = {
       action: 'manga_get_chapters',
-      manga: mangaId
+      manga: mangaId,
     }
 
     try {
@@ -195,7 +240,7 @@ export class WordPress extends BaseSite {
         method: 'POST',
         url: chapterPath,
         data: JSON.stringify(requestData),
-        headers: { 'Content-Type': ContentType.URLENCODED }
+        headers: { 'Content-Type': ContentType.URLENCODED },
       }
       this.trySetUserAgent(request)
 
@@ -213,7 +258,7 @@ export class WordPress extends BaseSite {
     return newData
   }
 
-  private trySetUserAgent (request: HttpRequest) {
+  private trySetUserAgent(request: HttpRequest) {
     const headers = request.headers || {}
 
     if (getPlatform() === Platform.Cordova) {
@@ -225,9 +270,9 @@ export class WordPress extends BaseSite {
     request.headers = headers
   }
 
-  private setVolume (doc: Document, data: WordPressData): WordPressData {
+  private setVolume(doc: Document, data: WordPressData): WordPressData {
     const volumes = doc.querySelectorAll('.parent.has-child .has-child')
-    let volume: { element: Element, number: number } | undefined
+    let volume: { element: Element; number: number } | undefined
 
     volumes.forEach((element) => {
       const text = element.textContent?.trim()
@@ -245,15 +290,13 @@ export class WordPress extends BaseSite {
     return data
   }
 
-  private setChapter (doc: Document, data: WordPressData): WordPressData {
+  private setChapter(doc: Document, data: WordPressData): WordPressData {
     const chapterSelector = '.wp-manga-chapter a'
     const chapterDateSelector = '.chapter-release-date'
 
     if (data.volume) {
       const volumeParent = data.volume.parentElement
-      const matchingChapter = this.getMatchingChapter(
-        Array.from(volumeParent?.querySelectorAll(chapterSelector) ?? [])
-      )
+      const matchingChapter = this.getMatchingChapter(Array.from(volumeParent?.querySelectorAll(chapterSelector) ?? []))
 
       data.chapter = matchingChapter?.element
       data.chapterText = matchingChapter?.text
@@ -263,9 +306,7 @@ export class WordPress extends BaseSite {
       return data
     }
 
-    const matchingChapter = this.getMatchingChapter(
-      Array.from(doc.querySelectorAll(chapterSelector) ?? [])
-    )
+    const matchingChapter = this.getMatchingChapter(Array.from(doc.querySelectorAll(chapterSelector) ?? []))
 
     data.chapter = matchingChapter?.element
     data.chapterText = matchingChapter?.text
@@ -275,14 +316,20 @@ export class WordPress extends BaseSite {
     return data
   }
 
-  private getImageSrc (elem: Element | undefined) {
-    let url = elem?.getAttribute('content') || elem?.getAttribute('data-src') || elem?.getAttribute('data-lazy-src') || elem?.getAttribute('data-cfsrc') || elem?.getAttribute('src') || ''
+  private getImageSrc(elem: Element | undefined) {
+    let url =
+      elem?.getAttribute('content') ||
+      elem?.getAttribute('data-src') ||
+      elem?.getAttribute('data-lazy-src') ||
+      elem?.getAttribute('data-cfsrc') ||
+      elem?.getAttribute('src') ||
+      ''
     if (url.startsWith('//')) url = `https:${url}`
 
     return url
   }
 
-  private getMatchingChapter (elements: Element[] | undefined): ({ element: Element, text: string }) | undefined {
+  private getMatchingChapter(elements: Element[] | undefined): { element: Element; text: string } | undefined {
     if (!elements) return undefined
 
     for (const element of elements) {
@@ -293,24 +340,22 @@ export class WordPress extends BaseSite {
     return undefined
   }
 
-  getLoginUrl (): string {
+  getLoginUrl(): string {
     return this.getUrl()
   }
 
-  getTestUrl (): string {
+  getTestUrl(): string {
     switch (this.siteType) {
-      case SiteType.FirstKissManga:
-        return `${this.getUrl()}/manga/the-elegant-sea-of-savagery/`
+      case SiteType.LikeManga:
+        return `${this.getUrl()}/the-elegant-sea-of-savagery-1615/`
       case SiteType.MangaKomi:
         return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${this.getUrl()}/manga/10-years-in-the-friend-zone/`
       case SiteType.MangaTx:
         return `${this.getUrl()}/manga/grandest-wedding/`
-      case SiteType.LeviatanScans:
+      case SiteType.LSComic:
         return `${this.getUrl()}/manga/trash-of-the-counts-family/`
-      case SiteType.SleepingKnightScans:
-        return `${this.getUrl()}/manga/chronicles-of-the-martial-gods-return/`
       case SiteType.ResetScans:
         return `${this.getUrl()}/manga/the-unwanted-undead-adventurer/`
     }

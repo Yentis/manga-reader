@@ -9,12 +9,8 @@
       @click="testAllSites"
     />
 
-    <q-card-actions
-      class="q-mt-sm q-pa-none"
-    >
-      <q-btn-dropdown
-        :label="`Site ${selectedSite}`"
-      >
+    <q-card-actions class="q-mt-sm q-pa-none">
+      <q-btn-dropdown :label="`Site ${selectedSite}`">
         <q-list
           v-for="site in sortedSites"
           :key="site"
@@ -38,9 +34,7 @@
       />
     </q-card-actions>
 
-    <p
-      class="q-mt-sm q-mb-none message"
-    >
+    <p class="q-mt-sm q-mb-none message">
       {{ message }}
     </p>
   </q-card-actions>
@@ -53,9 +47,9 @@ import testAll from '../services/testService'
 import { SiteType } from '../enums/siteEnum'
 import { testAsuraScans } from '../services/test/asurascans'
 import { testBatoto } from '../services/test/batoto'
-import { testFirstKissManga } from '../services/test/firstkissmanga'
+import { testLikeManga } from '../services/test/likemanga'
 import { testHiperDEX } from '../services/test/hiperdex'
-import { testLeviatanScans } from '../services/test/leviatanscans'
+import { testLSComic } from '../services/test/lscomic'
 import { testMangaDex } from '../services/test/mangadex'
 import { testMangago } from '../services/test/mangago'
 import { testMangakakalot } from '../services/test/mangakakalot'
@@ -63,10 +57,9 @@ import { testMangaKomi } from '../services/test/mangakomi'
 import { testManganato } from '../services/test/manganato'
 import { testMangaTx } from '../services/test/mangatx'
 import { testReaperScans } from '../services/test/reaperscans'
-import { testSleepingKnightScans } from '../services/test/sleepingknightscans'
 import { testWebtoons } from '../services/test/webtoons'
 import { testZeroScans } from '../services/test/zeroscans'
-import { testFlameScans } from '../services/test/flamescans'
+import { testFlameComics } from '../services/test/flamecomics'
 import { useQuasar } from 'quasar'
 import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
@@ -83,48 +76,53 @@ import { testScyllaScans } from 'src/services/test/scyllascans'
 export default defineComponent({
   name: 'MangaTest',
 
-  setup () {
+  setup() {
     const $q = useQuasar()
     const testing = ref(false)
     const message = ref('')
 
     let sortedSites: (SiteType | LinkingSiteType)[] = Object.values(SiteType)
-    sortedSites = sortedSites.concat(Object.values(LinkingSiteType).filter((site) => !sortedSites.includes(site))).sort()
+    sortedSites = sortedSites
+      .concat(Object.values(LinkingSiteType).filter((site) => !sortedSites.includes(site)))
+      .sort()
     const selectedSite: Ref<SiteType | LinkingSiteType | undefined> = ref(sortedSites[0])
 
     const testAllSites = () => {
       testing.value = true
       message.value = ''
 
-      testAll($q).then((errors) => {
-        if (errors.length === 0) {
-          message.value = 'All tests passed!'
-          return
-        }
-
-        let messageBuilder = ''
-        errors.forEach((item, i) => {
-          console.error(item.error)
-          if (i > 0) messageBuilder += '\n\n'
-
-          if (item.error instanceof Error) {
-            messageBuilder += `${item.site}: ${item.error.message}`
-            return
-          }
-          if (typeof item.error === 'string') {
-            messageBuilder += `${item.site}: ${item.error}`
+      testAll($q)
+        .then((errors) => {
+          if (errors.length === 0) {
+            message.value = 'All tests passed!'
             return
           }
 
-          messageBuilder += `${item.site}: See console`
+          let messageBuilder = ''
+          errors.forEach((item, i) => {
+            console.error(item.error)
+            if (i > 0) messageBuilder += '\n\n'
+
+            if (item.error instanceof Error) {
+              messageBuilder += `${item.site}: ${item.error.message}`
+              return
+            }
+            if (typeof item.error === 'string') {
+              messageBuilder += `${item.site}: ${item.error}`
+              return
+            }
+
+            messageBuilder += `${item.site}: See console`
+          })
+
+          message.value = messageBuilder
         })
-
-        message.value = messageBuilder
-      }).catch((error) => {
-        handleError(error)
-      }).finally(() => {
-        testing.value = false
-      })
+        .catch((error) => {
+          handleError(error)
+        })
+        .finally(() => {
+          testing.value = false
+        })
     }
 
     const testSite = async () => {
@@ -147,11 +145,11 @@ export default defineComponent({
         case SiteType.Cubari:
           await doTest(testCubari)
           break
-        case SiteType.FirstKissManga:
-          await doTest(testFirstKissManga)
+        case SiteType.LikeManga:
+          await doTest(testLikeManga)
           break
-        case SiteType.FlameScans:
-          await doTest(testFlameScans)
+        case SiteType.FlameComics:
+          await doTest(testFlameComics)
           break
         case SiteType.HiperDEX:
           await doTest(testHiperDEX)
@@ -159,8 +157,8 @@ export default defineComponent({
         case LinkingSiteType.Kitsu:
           await doTest(testKitsu($q))
           break
-        case SiteType.LeviatanScans:
-          await doTest(testLeviatanScans)
+        case SiteType.LSComic:
+          await doTest(testLSComic)
           break
         case SiteType.LuminousScans:
           await doTest(testLuminousScans)
@@ -188,9 +186,6 @@ export default defineComponent({
           break
         case SiteType.ResetScans:
           await doTest(testResetScans)
-          break
-        case SiteType.SleepingKnightScans:
-          await doTest(testSleepingKnightScans)
           break
         case SiteType.Tapas:
           await doTest(testTapas)
@@ -251,16 +246,14 @@ export default defineComponent({
       message,
       selectedSite,
       testAllSites,
-      testSite
+      testSite,
     }
-  }
+  },
 })
 </script>
 
 <style lang="scss" scoped>
-
 .message {
   white-space: pre-line;
 }
-
 </style>

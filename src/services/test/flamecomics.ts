@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.FlameScans
+const SITE_TYPE = SiteType.FlameComics
 const QUERY = 'berserk of gluttony'
 
-export async function testFlameScans (): Promise<void> {
+export async function testFlameComics(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -15,25 +15,25 @@ export async function testFlameScans (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 89'
   desired.image = 'https://flamescans.org/wp-content/uploads/2021/11/whhvol9cover.png'
   desired.title = 'The Way of the Househusband'
-  desired.chapterUrl = 'https://flamescans.org/1689501661-the-way-of-the-househusband-chapter-89/'
+  desired.chapterUrl = 'https://flamecomics.com/the-way-of-the-househusband-chapter-89/'
   desired.chapterNum = 89
-  desired.chapterDate = 'a year ago'
+  desired.chapterDate = '2 years ago'
 
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://flamescans.org/wp-content/uploads/2021/01/berserk-of-gluttony-cover-1-237x350.png'
+  desired.image = 'https://flamecomics.com/wp-content/uploads/2021/01/berserk-of-gluttony-cover-1-237x350.png'
   desired.chapter = '39'
-  desired.url = 'https://flamescans.org/?p=509'
+  desired.url = 'https://flamecomics.com/?p=509'
 
   return searchValid(results, desired, QUERY)
 }

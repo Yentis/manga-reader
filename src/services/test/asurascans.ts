@@ -20,9 +20,10 @@ async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 47'
-  desired.image = 'https://asura.nacm.xyz/wp-content/uploads/2021/02/ponytail_boy_.png'
+  desired.image =
+    'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/ponytail_boy_.png'
   desired.title = 'Mookhyang The Origin'
-  desired.chapterUrl = 'https://asura.nacm.xyz/2678590577-mookhyang-the-origin-chapter-47/'
+  desired.chapterUrl = 'https://asuratoon.com/2970937220-mookhyang-the-origin-chapter-47/'
   desired.chapterNum = 47
   desired.chapterDate = '2 years ago'
 
@@ -30,13 +31,14 @@ async function readUrl(site: BaseSite): Promise<void> {
 }
 
 async function readUrlAdvanced(): Promise<void> {
-  const testUrl = 'https://asura.nacm.xyz/?p=36093'
+  const testUrl = 'https://asuratoon.com/?p=36093'
   const manga = await getMangaInfo(testUrl, SITE_TYPE)
   const desired = new Manga(testUrl, SITE_TYPE)
   desired.chapter = 'Chapter 88'
-  desired.image = 'https://asura.nacm.xyz/wp-content/uploads/2021/02/cover4.gif'
+  desired.image =
+    'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/cover4.gif'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://asura.nacm.xyz/2678590577-solo-bug-player-chapter-88/'
+  desired.chapterUrl = 'https://asuratoon.com/2970937220-solo-bug-player-chapter-88/'
   desired.chapterNum = 88
 
   mangaEqual(manga, desired)
@@ -45,9 +47,9 @@ async function readUrlAdvanced(): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://asura.nacm.xyz/wp-content/uploads/2021/02/ponytail_boy_-222x300.png'
+  desired.image = 'https://asuratoon.com/wp-content/uploads/2021/02/ponytail_boy_-222x300.png'
   desired.chapter = '47'
-  desired.url = 'https://asura.nacm.xyz/?p=36483'
+  desired.url = 'https://asuratoon.com/?p=36483'
 
   return searchValid(results, desired, QUERY)
 }

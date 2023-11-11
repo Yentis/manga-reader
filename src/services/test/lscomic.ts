@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.LeviatanScans
+const SITE_TYPE = SiteType.LSComic
 const QUERY = 'volcanic age'
 
-export async function testLeviatanScans (): Promise<void> {
+export async function testLSComic(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -16,42 +16,42 @@ export async function testLeviatanScans (): Promise<void> {
   await search(site)
 }
 
-async function readUrl (site: BaseSite): Promise<void> {
+async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 94
+  const chapter = 108
 
   desired.chapter = `Chapter ${chapter}`
-  desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2023/04/bannerTCF.jpg'
+  desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/bannerTCF.jpg'
   desired.title = 'Trash of the Count’s Family'
-  desired.chapterUrl = `https://en.leviatanscans.com/manga/trash-of-the-counts-family/chapter-${chapter}/`
+  desired.chapterUrl = `https://lscomic.com/manga/trash-of-the-counts-family/chapter-${chapter}/`
   desired.chapterNum = chapter
-  desired.chapterDate = '3 days ago'
+  desired.chapterDate = '2 days ago'
 
   mangaEqual(manga, desired)
 }
 
-async function readUrlCorrectSeasonOrder (): Promise<void> {
-  const url = 'https://en.leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
+async function readUrlCorrectSeasonOrder(): Promise<void> {
+  const url = 'https://lscomic.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  const chapter = 164
+  const chapter = 181
 
   desired.chapter = `Chapter ${chapter}`
-  desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2023/04/bannerTSRC.jpg'
+  desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/bannerTSRC.jpg'
   desired.title = 'Tale of a Scribe Who Retires to the Countryside'
-  desired.chapterUrl = `https://en.leviatanscans.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-${chapter}/`
+  desired.chapterUrl = `https://lscomic.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/chapter-${chapter}/`
   desired.chapterNum = chapter
 
   mangaEqual(manga, desired)
 }
 
-async function search (site: BaseSite): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://en.leviatanscans.com/wp-content/uploads/2023/04/coverVA-193x278.jpg'
-  desired.chapter = 'Chapter 240'
-  desired.url = 'https://en.leviatanscans.com/manga/volcanic-age/'
+  desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/coverS5-193x278.jpg'
+  desired.chapter = 'Chapter 254'
+  desired.url = 'https://lscomic.com/manga/volcanic-age/'
 
   return searchValid(results, desired, QUERY)
 }
