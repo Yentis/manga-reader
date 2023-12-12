@@ -21,6 +21,7 @@ export interface BrowserHttpRequest extends HttpRequest {
 }
 
 function getRuntime(): Runtime | null {
+  if (process.env.SERVER) return null
   const chromeWindow = window as unknown as Record<string, unknown>
   if (typeof chromeWindow.chrome !== 'object') return null
   const chrome = chromeWindow.chrome as Record<string, unknown>

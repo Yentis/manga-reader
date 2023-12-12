@@ -40,7 +40,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new ReaperScans()],
   [SiteType.AsuraScans, new Madara(SiteType.AsuraScans)],
-  [SiteType.MangaTx, new WordPress(SiteType.MangaTx)],
   [SiteType.Mangago, new Mangago()],
   [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.Batoto, new Batoto()],

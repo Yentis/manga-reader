@@ -22,6 +22,9 @@ export const siteAliases = [
   { url: 'cosmicscans.com', site: SiteType.CosmicScans },
   { url: 'flamescans.org', site: SiteType.FlameComics },
   { url: 'luminousscans.com', site: SiteType.LuminousScans },
+  { url: 'luminousscans.gg', site: SiteType.LuminousScans },
+  { url: 'reaperscans.com', site: SiteType.ReaperScans },
+  { url: 'reset-scans.com', site: SiteType.ResetScans },
 ]
 
 export function getUrl(url: string) {

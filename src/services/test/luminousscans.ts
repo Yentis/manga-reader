@@ -20,9 +20,9 @@ async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter Epilogue Ch 03 [End]'
-  desired.image = 'https://luminousscans.gg/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg'
+  desired.image = `${site.getUrl()}/wp-content/uploads/2021/05/My_Office_Noona_Story_Title-1.jpg`
   desired.title = 'My Office Noona’s Story'
-  desired.chapterUrl = 'https://luminousscans.gg/1699689601-my-office-noonas-story-epilogue-chapter-03/'
+  desired.chapterUrl = `${site.getUrl()}/1702368001-my-office-noonas-story-epilogue-chapter-03/`
   desired.chapterNum = 64
   desired.chapterDate = moment('November 1, 2021', 'MMMM DD, YYYY').fromNow()
 
@@ -32,9 +32,9 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://luminousscans.gg/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif'
-  desired.chapter = '168'
-  desired.url = 'https://luminousscans.gg/series?p=5424'
+  desired.image = `${site.getUrl()}/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif`
+  desired.chapter = '171'
+  desired.url = `${site.getUrl()}/series?p=5424`
 
   await searchValid(results, desired, QUERY)
 }

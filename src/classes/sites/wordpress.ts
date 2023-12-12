@@ -352,8 +352,6 @@ export class WordPress extends BaseSite {
         return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${this.getUrl()}/manga/10-years-in-the-friend-zone/`
-      case SiteType.MangaTx:
-        return `${this.getUrl()}/manga/grandest-wedding/`
       case SiteType.LSComic:
         return `${this.getUrl()}/manga/trash-of-the-counts-family/`
       case SiteType.ResetScans:
