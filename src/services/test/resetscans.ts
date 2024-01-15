@@ -5,7 +5,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.ResetScans
-const QUERY = 'zoo in the dorm'
+const QUERY = 'karate baka isekai'
 
 export async function testResetScans(): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -25,7 +25,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'The Unwanted Undead Adventurer'
   desired.chapterUrl = `${site.getUrl()}/manga/the-unwanted-undead-adventurer/chapter-${chapter}/`
   desired.chapterNum = chapter
-  desired.chapterDate = 'a month ago'
+  desired.chapterDate = '2 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -33,9 +33,9 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = `${site.getUrl()}/wp-content/uploads/2021/05/Zoo-Dorm-193x278.png`
-  desired.chapter = 'Chapter 18'
-  desired.url = `${site.getUrl()}/manga/zoo-in-the-dormitory-01/`
+  desired.image = `${site.getUrl()}/wp-content/uploads/2022/11/Karate-Baka-Isekai-193x278.webp`
+  desired.chapter = 'Chapter 24.2'
+  desired.url = `${site.getUrl()}/manga/karate-baka-isekai/`
 
   return searchValid(results, desired, QUERY)
 }

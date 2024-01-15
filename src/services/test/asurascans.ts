@@ -23,7 +23,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.image =
     'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/ponytail_boy_.png'
   desired.title = 'Mookhyang The Origin'
-  desired.chapterUrl = 'https://asuratoon.com/2970937220-mookhyang-the-origin-chapter-47/'
+  desired.chapterUrl = 'https://asuratoon.com/0873280421-mookhyang-the-origin-chapter-47/'
   desired.chapterNum = 47
   desired.chapterDate = '2 years ago'
 
@@ -38,7 +38,7 @@ async function readUrlAdvanced(): Promise<void> {
   desired.image =
     'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/cover4.gif'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://asuratoon.com/2970937220-solo-bug-player-chapter-88/'
+  desired.chapterUrl = 'https://asuratoon.com/0873280421-solo-bug-player-chapter-88/'
   desired.chapterNum = 88
 
   mangaEqual(manga, desired)

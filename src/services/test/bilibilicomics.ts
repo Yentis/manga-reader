@@ -18,14 +18,14 @@ export async function testBiliBiliComics(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 693
+  const chapter = 696
 
-  desired.chapter = `${chapter} Healing (1)`
+  desired.chapter = `${chapter} Array of Illusionary Spirits (2)`
   desired.image = 'https://i0.hdslb.com/bfs/comic-static/58c0cc6a498b2d8c74e5ca1f283393cd26501e71.png@300w.webp'
   desired.title = 'Tales of Demons and Gods'
-  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/873795'
+  desired.chapterUrl = 'https://www.bilibilicomics.com/mc215/874172'
   desired.chapterNum = chapter
-  desired.chapterDate = '14 hours ago'
+  desired.chapterDate = '2 days ago'
 
   mangaEqual(manga, desired, false)
 }

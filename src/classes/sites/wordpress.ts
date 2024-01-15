@@ -85,7 +85,12 @@ export class WordPress extends BaseSite {
       format = 'Do MMMM YYYY'
     }
 
-    const chapterDate = moment(chapterDateText, format)
+    let chapterDate = moment(chapterDateText, format)
+    if (chapterDate.isAfter(moment.now()) && format === 'MMM DD') {
+      const year = new Date().getFullYear()
+      chapterDate = chapterDate.year(year - 1)
+    }
+
     if (!chapterDateText?.endsWith('ago') && chapterDate.isValid()) {
       return chapterDate.fromNow()
     } else {

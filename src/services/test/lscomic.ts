@@ -19,7 +19,7 @@ export async function testLSComic(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 108
+  const chapter = 115
 
   desired.chapter = `Chapter ${chapter}`
   desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/bannerTCF.jpg'
@@ -35,7 +35,7 @@ async function readUrlCorrectSeasonOrder(): Promise<void> {
   const url = 'https://lscomic.com/manga/tale-of-a-scribe-who-retires-to-the-countryside/'
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  const chapter = 181
+  const chapter = 189
 
   desired.chapter = `Chapter ${chapter}`
   desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/bannerTSRC.jpg'
@@ -50,7 +50,7 @@ async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://lscomic.com/wp-content/uploads/2023/09/coverS5-193x278.jpg'
-  desired.chapter = 'Chapter 254'
+  desired.chapter = 'Chapter 260'
   desired.url = 'https://lscomic.com/manga/volcanic-age/'
 
   return searchValid(results, desired, QUERY)
