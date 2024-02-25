@@ -27,7 +27,9 @@ export const siteAliases = [
   { url: 'luminousscans.gg', site: SiteType.LuminousScans },
   { url: 'reapercomics.com', site: SiteType.ReaperScans },
   { url: 'reset-scans.com', site: SiteType.ResetScans },
+  { url: 'reset-scans.us', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
+  { url: 'luminousscans.net', site: SiteType.LuminousScans },
 ]
 
 export function getUrl(url: string) {
