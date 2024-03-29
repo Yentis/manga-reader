@@ -13,7 +13,6 @@ import { Kitsu } from '../classes/sites/kitsu'
 import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import PQueue from 'p-queue'
 import constants from 'src/classes/constants'
-import { BiliBiliComics } from 'src/classes/sites/bilibilicomics'
 import { getSiteByUrl } from 'src/utils/siteUtils'
 import { Cubari } from 'src/classes/sites/cubari'
 import { Tapas } from 'src/classes/sites/tapas'
@@ -45,7 +44,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Batoto, new Batoto()],
   [SiteType.FlameComics, new Madara(SiteType.FlameComics)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
-  [SiteType.BiliBiliComics, new BiliBiliComics()],
   [SiteType.Cubari, new Cubari()],
   [SiteType.LuminousScans, new Madara(SiteType.LuminousScans)],
   [SiteType.Tapas, new Tapas()],

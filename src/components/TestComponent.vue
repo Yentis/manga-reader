@@ -62,7 +62,6 @@ import { testFlameComics } from '../services/test/flamecomics'
 import { useQuasar } from 'quasar'
 import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
-import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
 import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
@@ -130,9 +129,6 @@ export default defineComponent({
           break
         case SiteType.Batoto:
           await doTest(testBatoto)
-          break
-        case SiteType.BiliBiliComics:
-          await doTest(testBiliBiliComics)
           break
         case SiteType.Comikey:
           await doTest(testComikey)
