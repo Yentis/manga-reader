@@ -1,4 +1,3 @@
-import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
@@ -10,68 +9,58 @@ import * as SiteUtils from 'src/utils/siteUtils'
 export class ScyllaScans extends BaseSite {
   siteType = SiteType.ScyllaScans
 
-  protected getChapterNum (data: BaseData): number {
-    const chapterNum = data.chapterNum?.textContent?.trim().replace('#', '')
-    return SiteUtils.parseNum(chapterNum)
+  protected getChapterNum(data: BaseData): number {
+    return SiteUtils.parseNum(data.chapterNum?.textContent?.trim().split(' ')[1])
   }
 
-  protected getChapterDate (data: BaseData): string {
-    const chapterDateText = data.chapterDate?.textContent
-    if (!chapterDateText) return ''
-
-    const chapterDate = moment(new Date(chapterDateText))
-    if (chapterDate.isValid()) {
-      return chapterDate.fromNow()
-    } else {
-      return ''
-    }
+  protected override getTitle(data: BaseData): string {
+    return data.title?.childNodes[0]?.textContent?.trim() ?? ''
   }
 
-  protected getImage (data: BaseData): string {
-    return data.image?.getAttribute('content') || ''
-  }
-
-  protected async readUrlImpl (url: string): Promise<Error | Manga> {
+  protected async readUrlImpl(url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
     const data = new BaseData(url)
 
-    const chapterElement = doc.querySelectorAll('[class^=Chapter__ChapterItem]')[0]
-    data.chapter = chapterElement?.querySelectorAll('[class^=styles__ChapterTitle]')[0]
-    data.chapterUrl = chapterElement
-    data.chapterNum = chapterElement?.querySelectorAll('[class^=styles__ChapterNum]')[0]
-    data.chapterDate = chapterElement?.querySelectorAll('[class^=Chapter__ChapterLastUpdate]')[0]
-    data.image = doc.querySelectorAll('meta[property="og:image"]')[0]
-    data.title = doc.querySelectorAll('h4')[0]
+    const chaptersList = doc.querySelectorAll('#chapters-list')[0]
+    data.chapter = chaptersList?.querySelectorAll('span')[0]
+    data.chapterUrl = chaptersList?.querySelectorAll('a')[0]
+    data.chapterNum = data.chapter
+    data.chapterDate = chaptersList?.querySelectorAll('span')[1]
+
+    data.title = doc.querySelectorAll('h2')[0]
+    const title = this.getTitle(data)
+    data.image = doc.querySelectorAll(`img[alt="${title}"]`)[0]
+    console.log('Title:', title)
 
     return this.buildManga(data)
   }
 
-  protected async searchImpl (query: string): Promise<Error | Manga[]> {
-    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/work/all?q=${encodeURIComponent(query)}` }
+  protected async searchImpl(query: string): Promise<Error | Manga[]> {
+    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/manga?title=${encodeURIComponent(query)}` }
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)
     const promises: Promise<Manga | Error>[] = []
 
-    doc.querySelectorAll('[class^=WorkItem__ListItem]').forEach((elem) => {
-      const titleElem = elem.querySelectorAll('[class^=WorkItem__ListContent]')[0]
-      const title = titleElem?.textContent?.trim() || ''
+    doc.querySelectorAll('#card-real').forEach((elem) => {
+      const titleElem = elem.querySelectorAll('img')[0]
+      const title = titleElem?.getAttribute('alt')?.trim() ?? ''
       if (!titleContainsQuery(query, title)) return
 
-      const relativeUrl = titleElem?.querySelectorAll('a')[0]?.getAttribute('as')
-      if (!relativeUrl) return
+      const url = elem.querySelectorAll('a')[0]?.href ?? ''
+      if (!url) return
 
-      promises.push(this.readUrl(`${this.getUrl()}${relativeUrl}`))
+      promises.push(this.readUrl(url))
     })
 
     const mangaList = await Promise.all(promises)
-    return mangaList.filter(manga => manga instanceof Manga) as Manga[]
+    return mangaList.filter((manga) => manga instanceof Manga) as Manga[]
   }
 
-  getTestUrl (): string {
-    return `${this.getUrl()}/work/en/one_in_a_hundred_`
+  getTestUrl(): string {
+    return `${this.getUrl()}/manga/one-in-a-hundred`
   }
 }
