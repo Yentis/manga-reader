@@ -22,7 +22,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 84 - [END]'
   desired.image = 'https://hiperdex.com/wp-content/uploads/2022/01/10-Years-in-the-Friend-Zone.webp'
   desired.title = '10 Years in the Friend Zone'
-  desired.chapterUrl = 'https://hiperdex.com/manga/10-years-in-the-friend-zone/chapter-84/'
+  desired.chapterUrl = 'https://hiperdex.com/mangas/10-years-in-the-friend-zone/chapter-84/'
   desired.chapterNum = 84
   desired.chapterDate = '2 years ago'
 
@@ -35,7 +35,7 @@ async function readUrl2(): Promise<void> {
   desired.chapter = '109.3'
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/06/Touch-On-193x278.jpg'
   desired.title = 'Touch On'
-  desired.chapterUrl = 'https://hiperdex.com/manga/touchon191222/109-3/'
+  desired.chapterUrl = 'https://hiperdex.com/mangas/touchon191222/109-3/'
   desired.chapterNum = 109.3
   desired.chapterDate = '2 years ago'
 
@@ -47,7 +47,7 @@ async function search(site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://hiperdex.com/wp-content/uploads/2020/04/Cabalist-193x278.jpg'
   desired.chapter = '44 [END]'
-  desired.url = 'https://hiperdex.com/manga/cabalist/'
+  desired.url = 'https://hiperdex.com/mangas/1603231576-cabalist/'
 
   return searchValid(results, desired, QUERY)
 }

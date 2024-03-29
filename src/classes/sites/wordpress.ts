@@ -109,6 +109,8 @@ export class WordPress extends BaseSite {
     let title = data.title?.getAttribute('content') || ''
     if (this.siteType === SiteType.LikeManga) {
       title = title.replace('LIKE MANGA', '').trim()
+    } else if (this.siteType === SiteType.HiperDEX) {
+      title = title.replace('» Hiperdex', '').trim()
     }
 
     return title
