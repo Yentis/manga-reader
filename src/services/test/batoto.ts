@@ -18,13 +18,15 @@ export async function testBatoto(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 143 [END]'
+  const chapter = 1
+
+  desired.chapter = `Sequel ${1}`
   desired.title = 'Doctor Elise: The Royal Lady with the Lamp'
   desired.image =
-    'https://xfs-s104.batcg.org/thumb/W600/ampi/bab/babb58b5b128acf2a01d5710f77d67e1af8a6fe7_420_610_328588.jpeg'
-  desired.chapterUrl = 'https://bato.to/chapter/1629009'
-  desired.chapterNum = 143
-  desired.chapterDate = '3 years ago'
+    'https://xfs-n14.xfsbb.com/thumb/W600/ampi/6c5/6c5a266892eee0a9aa82b7acbf5447a8f3c1cbf1_294_427_94286.jpeg'
+  desired.chapterUrl = 'https://bato.to/chapter/2765669'
+  desired.chapterNum = chapter
+  desired.chapterDate = '6 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -33,7 +35,7 @@ async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image =
-    'https://xfs-s106.batcg.org/thumb/W300/ampi/cd4/cd43759af3efabf4e16729443a0244b9d76df0fe_420_610_295421.jpg'
+    'https://xfs-n06.xfsbb.com/thumb/W300/ampi/cd4/cd43759af3efabf4e16729443a0244b9d76df0fe_420_610_295421.jpg'
   desired.chapter = 'Ch.88'
   desired.url = 'https://bato.to/series/75371/i-found-somebody-to-love'
 

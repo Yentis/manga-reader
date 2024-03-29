@@ -23,7 +23,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'All Heavenly Days'
   desired.chapterUrl = `${site.getUrl()}/comics/all-heavenly-days/384`
   desired.chapterNum = 48
-  desired.chapterDate = 'a year ago'
+  desired.chapterDate = '2 years ago'
 
   mangaEqual(manga, desired)
 }

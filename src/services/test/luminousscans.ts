@@ -33,7 +33,7 @@ async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = `${site.getUrl()}/wp-content/uploads/2021/07/LONBAnimGif1-212x300.gif`
-  desired.chapter = '178.5'
+  desired.chapter = '182'
   desired.url = `${site.getUrl()}/series?p=5424`
 
   await searchValid(results, desired, QUERY)

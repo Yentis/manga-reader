@@ -5,7 +5,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.Tappytoon
-const QUERY = 'return survival'
+const QUERY = "the reason why raeliana ended up at the duke's mansion"
 
 export async function testTappytoon(): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -25,7 +25,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'Return Survival'
   desired.chapterUrl = 'https://www.tappytoon.com/en/chapters/157346352'
   desired.chapterNum = chapter
-  desired.chapterDate = 'a month ago'
+  desired.chapterDate = '4 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -33,9 +33,9 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://d1ed0vta5mrb00.cloudfront.net/comics/482/thumbnails/b9e789c4-d9c7-4273-bdfd-2c01ec69aedc.jpg'
-  desired.chapter = 'Episode 109'
-  desired.url = 'https://www.tappytoon.com/en/book/return-survival'
+  desired.image = 'https://image-repository-cdn.tappytoon.com/series/163/ccfd0062-a4bc-44d5-80ce-22f570dc058b.jpg'
+  desired.chapter = 'Epilogue 11: Finale'
+  desired.url = 'https://www.tappytoon.com/en/book/raeliana'
 
   return searchValid(results, desired, QUERY)
 }
