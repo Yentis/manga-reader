@@ -64,7 +64,6 @@ import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
 import { testBiliBiliComics } from '../services/test/bilibilicomics'
 import { testKitsu } from '../services/test/kitsu'
-import { testCosmicScans } from '../services/test/cosmicscans'
 import { testCubari } from '../services/test/cubari'
 import { testLuminousScans } from 'src/services/test/luminousscans'
 import { testTapas } from 'src/services/test/tapas'
@@ -137,9 +136,6 @@ export default defineComponent({
           break
         case SiteType.Comikey:
           await doTest(testComikey)
-          break
-        case SiteType.CosmicScans:
-          await doTest(testCosmicScans)
           break
         case SiteType.Cubari:
           await doTest(testCubari)

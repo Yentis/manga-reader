@@ -186,8 +186,6 @@ export class Madara extends BaseSite {
         return `${this.getUrl()}/?p=36483`
       case SiteType.FlameComics:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
-      case SiteType.CosmicScans:
-        return `${this.getUrl()}/manga/i-have-max-level-luck/`
       case SiteType.LuminousScans:
         return `${this.getUrl()}/series?p=70`
     }

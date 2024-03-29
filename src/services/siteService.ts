@@ -46,7 +46,6 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.FlameComics, new Madara(SiteType.FlameComics)],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
   [SiteType.BiliBiliComics, new BiliBiliComics()],
-  [SiteType.CosmicScans, new Madara(SiteType.CosmicScans)],
   [SiteType.Cubari, new Cubari()],
   [SiteType.LuminousScans, new Madara(SiteType.LuminousScans)],
   [SiteType.Tapas, new Tapas()],

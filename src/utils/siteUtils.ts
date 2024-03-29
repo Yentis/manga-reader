@@ -21,7 +21,6 @@ export const siteAliases = [
   { url: 'asura.nacm.xyz', site: SiteType.AsuraScans },
   { url: 'leviatanscans.com', site: SiteType.LSComic },
   { url: 'en.leviatanscans.com', site: SiteType.LSComic },
-  { url: 'cosmicscans.com', site: SiteType.CosmicScans },
   { url: 'flamescans.org', site: SiteType.FlameComics },
   { url: 'luminousscans.com', site: SiteType.LuminousScans },
   { url: 'luminousscans.gg', site: SiteType.LuminousScans },
