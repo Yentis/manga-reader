@@ -33,7 +33,6 @@ export class ScyllaScans extends BaseSite {
     data.title = doc.querySelectorAll('h2')[0]
     const title = this.getTitle(data)
     data.image = doc.querySelectorAll(`img[alt="${title}"]`)[0]
-    console.log('Title:', title)
 
     return this.buildManga(data)
   }

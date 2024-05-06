@@ -17,11 +17,11 @@ export enum SiteType {
   FlameComics = 'flamecomics.com',
   ResetScans = 'reset-scans.xyz',
   Cubari = 'cubari.moe',
-  LuminousScans = 'lumitoon.com',
+  LuminousScans = 'luminouscomics.org',
   Tapas = 'tapas.io',
   Comikey = 'comikey.com',
   Tappytoon = 'tappytoon.com',
-  ScyllaScans = 'scyllascans.org',
+  ScyllaScans = 'scyllacomics.xyz',
 }
 
 export enum SiteName {
@@ -42,11 +42,11 @@ export enum SiteName {
   'flamecomics.com' = 'Flame Comics',
   'reset-scans.xyz' = 'Reset Scans',
   'cubari.moe' = 'Cubari / Guya',
-  'lumitoon.com' = 'Luminous Scans',
+  'luminouscomics.org' = 'Luminous Scans',
   'tapas.io' = 'Tapas',
   'comikey.com' = 'Comikey',
   'tappytoon.com' = 'Tappytoon',
-  'scyllascans.org' = 'Scylla Scans',
+  'scyllacomics.xyz' = 'Scylla Scans',
 }
 
 export enum SiteState {
