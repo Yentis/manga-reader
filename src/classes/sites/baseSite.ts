@@ -6,6 +6,8 @@ import PQueue from 'p-queue'
 import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
 import * as SiteUtils from 'src/utils/siteUtils'
+import HttpRequest from 'src/interfaces/httpRequest'
+import { HEADER_USER_AGENT } from '../requests/baseRequest'
 
 export class BaseData {
   url: string
@@ -183,5 +185,12 @@ export abstract class BaseSite {
       throw Error('Could not parse site')
     }
     return manga
+  }
+
+  protected trySetUserAgent(request: HttpRequest) {
+    const headers = request.headers || {}
+    headers[HEADER_USER_AGENT] = navigator.userAgent
+
+    request.headers = headers
   }
 }

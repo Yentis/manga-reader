@@ -4,15 +4,15 @@ import HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest, { getCookies } from './baseRequest'
 
 interface CordovaHttpResponse {
-  status: number,
-  data: string,
-  error?: string,
+  status: number
+  data: string
+  error?: string
   headers: Record<string, string>
 }
 
 interface HttpOptions {
-  method: string,
-  data?: string,
+  method: string
+  data?: string
   headers?: Record<string, string>
 }
 
@@ -24,10 +24,10 @@ interface CordovaHttp {
         options: HttpOptions,
         callback: (response: CordovaHttpResponse) => void,
         error: (response: CordovaHttpResponse) => void
-      ) => void,
+      ) => void
       setDataSerializer: (type: string) => void
     }
-  },
+  }
   plugins: {
     CookiesPlugin: {
       getCookie: (
@@ -42,14 +42,14 @@ interface CordovaHttp {
 const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
 
 export default class CordovaRequest extends BaseRequest {
-  constructor () {
+  constructor() {
     super()
-    const plugins = ((cordova as unknown) as CordovaHttp).plugin
+    const plugins = (cordova as unknown as CordovaHttp).plugin
     plugins.http.setDataSerializer('utf8')
   }
 
-  async sendRequest (request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
-    const localCordova = (cordova as unknown) as CordovaHttp
+  async sendRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
+    const localCordova = cordova as unknown as CordovaHttp
     const headers = request.headers || {}
 
     if (headers['Content-Type'] === ContentType.URLENCODED) {
@@ -80,7 +80,7 @@ export default class CordovaRequest extends BaseRequest {
           headers: response.headers,
           data: response.data || response.error || '',
           status: response.status,
-          statusText: ''
+          statusText: '',
         })
       }
 
@@ -89,7 +89,7 @@ export default class CordovaRequest extends BaseRequest {
         {
           method: request.method.toLowerCase(),
           data: request.data,
-          headers: request.headers
+          headers: request.headers,
         },
         onResponse,
         onResponse

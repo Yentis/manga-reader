@@ -8,9 +8,6 @@ import { Manga } from 'src/classes/manga'
 import qs from 'qs'
 import moment from 'moment'
 import { getDateFromNow, matchNum, parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
-import { getPlatform } from 'src/services/platformService'
-import { Platform } from 'src/enums/platformEnum'
-import { HEADER_USER_AGENT, MOBILE_USER_AGENT } from '../requests/baseRequest'
 
 class WordPressData extends BaseData {
   volume?: Element
@@ -263,18 +260,6 @@ export class WordPress extends BaseSite {
     newData = this.setChapter(doc, newData)
 
     return newData
-  }
-
-  private trySetUserAgent(request: HttpRequest) {
-    const headers = request.headers || {}
-
-    if (getPlatform() === Platform.Cordova) {
-      headers[HEADER_USER_AGENT] = MOBILE_USER_AGENT
-    } else {
-      headers[HEADER_USER_AGENT] = navigator.userAgent
-    }
-
-    request.headers = headers
   }
 
   private setVolume(doc: Document, data: WordPressData): WordPressData {

@@ -20,6 +20,7 @@
     "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-firebasex": "^13.0.0",
+    "cordova-plugin-ionic-webview": "^5.0.1",
     "cordova-plugin-local-notification": "github:timkellypa/cordova-plugin-local-notifications",
     "cordova-plugin-splashscreen": "^6.0.0",
     "cordova-plugin-statusbar": "^2.4.3",
@@ -60,7 +61,8 @@
       "cordova-plugin-advanced-http": {
         "ANDROIDBLACKLISTSECURESOCKETPROTOCOLS": "SSLv3,TLSv1"
       },
-      "cordova-plugin-cookies": {}
+      "cordova-plugin-cookies": {},
+      "cordova-plugin-ionic-webview": {}
     },
     "platforms": [
       "android"

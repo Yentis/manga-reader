@@ -9,24 +9,23 @@ import { BaseData, BaseSite } from './baseSite'
 export class ReaperScans extends BaseSite {
   siteType = SiteType.ReaperScans
 
-  constructor () {
+  constructor() {
     super()
     this.requestQueue = new PQueue({ interval: 1500, intervalCap: 1 })
   }
 
-  protected getChapterNum (data: BaseData): number {
+  protected getChapterNum(data: BaseData): number {
     const chapter = this.getChapter(data)
     return SiteUtils.matchNum(chapter)
   }
 
-  protected getChapterDate (data: BaseData): string {
-    return SiteUtils.getDateFromNow(
-      data.chapterDate?.textContent?.toLowerCase().replace(/released/m, '')
-    )
+  protected getChapterDate(data: BaseData): string {
+    return SiteUtils.getDateFromNow(data.chapterDate?.textContent?.toLowerCase().replace(/released/m, ''))
   }
 
-  protected async readUrlImpl (url: string): Promise<Error | Manga> {
+  protected async readUrlImpl(url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
+    this.trySetUserAgent(request)
     const response = await requestHandler.sendRequest(request)
 
     const doc = await SiteUtils.parseHtmlFromString(response.data)
@@ -37,7 +36,7 @@ export class ReaperScans extends BaseSite {
     const [chapter, date] = chapterContainer?.querySelectorAll('p') ?? []
 
     data.title = titleContainer?.querySelectorAll('h1')[0]
-    data.image = titleContainer?.querySelectorAll('img')[0]
+    data.image = titleContainer?.querySelectorAll('img[src]')[0]
     data.chapter = chapter
     data.chapterUrl = chapterContainer?.querySelectorAll('a')[0]
     data.chapterDate = date
@@ -45,7 +44,7 @@ export class ReaperScans extends BaseSite {
     return this.buildManga(data)
   }
 
-  protected async searchImpl (query: string): Promise<Error | Manga[]> {
+  protected async searchImpl(query: string): Promise<Error | Manga[]> {
     let page = 1
     let count = 30
     const mangaList: Manga[] = []
@@ -61,7 +60,7 @@ export class ReaperScans extends BaseSite {
     return mangaList
   }
 
-  private async searchPage (query: string, page: number): Promise<{ manga: Manga[], count: number }> {
+  private async searchPage(query: string, page: number): Promise<{ manga: Manga[]; count: number }> {
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/comics?page=${page}` }
     const response = await requestHandler.sendRequest(request)
 
@@ -90,7 +89,7 @@ export class ReaperScans extends BaseSite {
     return { manga: mangaList, count: comics.length }
   }
 
-  getTestUrl (): string {
+  getTestUrl(): string {
     return `${this.getUrl()}/comics/7346-fff-class-trashero`
   }
 }

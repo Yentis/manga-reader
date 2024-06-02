@@ -12,7 +12,7 @@ try {
   if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
-} catch (_) { }
+} catch (_) {}
 
 /**
  * Set `__statics` path to static files in production;
@@ -28,29 +28,35 @@ let mainWindow: BrowserWindow | undefined
 let queryString: qs.ParsedQs | undefined
 let oauthType: string | undefined
 
-app.userAgentFallback = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) old-airport-include/1.0.0 Chrome Electron/7.1.7 Safari/537.36'
+app.userAgentFallback =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) old-airport-include/1.0.0 Chrome Electron/7.1.7 Safari/537.36'
 
-function createWindow () {
-  const menu = Menu.buildFromTemplate([{
-    label: '<',
-    click: (_item, window) => {
-      window?.webContents.goBack()
-    }
-  }, {
-    label: '>',
-    click: (_item, window) => {
-      window?.webContents.goForward()
-    }
-  }, {
-    label: 'Manga list',
-    click: (_item, window) => {
-      window?.webContents.goToIndex(0)
-    }
-  }, {
-    label: '',
-    role: 'toggleDevTools',
-    visible: false
-  }])
+function createWindow() {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: '<',
+      click: (_item, window) => {
+        window?.webContents.goBack()
+      },
+    },
+    {
+      label: '>',
+      click: (_item, window) => {
+        window?.webContents.goForward()
+      },
+    },
+    {
+      label: 'Manga list',
+      click: (_item, window) => {
+        window?.webContents.goToIndex(0)
+      },
+    },
+    {
+      label: '',
+      role: 'toggleDevTools',
+      visible: false,
+    },
+  ])
 
   const nodeIntegration = process.env.QUASAR_NODE_INTEGRATION === 'true'
   const preloadFile = process.env.QUASAR_ELECTRON_PRELOAD
@@ -74,27 +80,33 @@ function createWindow () {
       sandbox: false,
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
-      preload
-    }
+      preload,
+    },
   })
 
   mainWindow.setMenu(menu)
 
-  ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then(blocker => {
-    blocker.enableBlockingInSession(session.defaultSession)
-  }).catch((error) => console.error(error))
+  ElectronBlocker.fromPrebuiltAdsAndTracking(fetch)
+    .then((blocker) => {
+      blocker.enableBlockingInSession(session.defaultSession)
+    })
+    .catch((error) => console.error(error))
 
-  session.defaultSession.cookies.set({
-    url: 'https://www.webtoons.com/',
-    name: 'pagGDPR',
-    value: 'true'
-  }).catch((error) => console.error(error))
+  session.defaultSession.cookies
+    .set({
+      url: 'https://www.webtoons.com/',
+      name: 'pagGDPR',
+      value: 'true',
+    })
+    .catch((error) => console.error(error))
 
-  session.defaultSession.cookies.set({
-    url: 'https://www.webtoons.com/',
-    name: 'timezoneOffset',
-    value: (moment().utcOffset() / 60).toString()
-  }).catch((error) => console.error(error))
+  session.defaultSession.cookies
+    .set({
+      url: 'https://www.webtoons.com/',
+      name: 'timezoneOffset',
+      value: (moment().utcOffset() / 60).toString(),
+    })
+    .catch((error) => console.error(error))
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
     onNavigation(event, url)
@@ -111,20 +123,20 @@ function createWindow () {
   })
 }
 
-function loadAppUrl () {
+function loadAppUrl() {
   if (!process.env.APP_URL) {
     console.error(Error('APP_URL environment variable not found!'))
     return
   }
-  mainWindow?.loadURL(process.env.APP_URL).catch(error => console.error(error))
+  mainWindow?.loadURL(process.env.APP_URL).catch((error) => console.error(error))
 }
 
-function onNavigation (event: Event, url: string) {
+function onNavigation(event: Event, url: string) {
   if (!url.startsWith('http://localhost/redirect?')) return
   handleDropboxOAuth(event, url)
 }
 
-function handleDropboxOAuth (event: Event, url: string) {
+function handleDropboxOAuth(event: Event, url: string) {
   event.preventDefault()
   queryString = qs.parse(url.replace('http://localhost/redirect?', ''))
   oauthType = 'dropbox'
@@ -133,7 +145,7 @@ function handleDropboxOAuth (event: Event, url: string) {
   mainWindow?.webContents.on('did-finish-load', onFinishLoad)
 }
 
-function onFinishLoad () {
+function onFinishLoad() {
   if (!queryString || !oauthType) return
 
   mainWindow?.webContents.send(`${oauthType}-token`, queryString)
@@ -158,27 +170,27 @@ app.on('activate', () => {
 
 const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
 
-ipcMain.handle('net-request', async (
-  _event,
-  options: HttpRequest
-): Promise<HttpResponse> => {
+ipcMain.handle('net-request', async (_event, options: HttpRequest): Promise<HttpResponse> => {
   await app.whenReady()
   const headers = options.headers || {}
 
-  const cookies = await session.defaultSession.cookies.get({ url: options.url })
-  cookies.filter((cookie) => COOKIE_NAMES.includes(cookie.name)).forEach((cookie) => {
-    if (!cookie) return
-    if (!headers.cookie) {
-      headers.cookie = `${cookie.name}=${cookie.value}`
-      return
-    }
+  const domain = new URL(options.url).hostname
+  const cookies = await session.defaultSession.cookies.get({ domain })
+  cookies
+    .filter((cookie) => COOKIE_NAMES.includes(cookie.name))
+    .forEach((cookie) => {
+      if (!cookie) return
+      if (!headers.cookie) {
+        headers.cookie = `${cookie.name}=${cookie.value}`
+        return
+      }
 
-    headers.cookie += `;${cookie.name}=${cookie.value}`
-  })
+      headers.cookie += `;${cookie.name}=${cookie.value}`
+    })
 
   const request = net.request({
     method: options.method,
-    url: options.url
+    url: options.url,
   })
 
   return new Promise((resolve, reject) => {
@@ -198,7 +210,7 @@ ipcMain.handle('net-request', async (
           headers: response.headers,
           data,
           status: response.statusCode,
-          statusText: response.statusMessage
+          statusText: response.statusMessage,
         }
 
         answered = true

@@ -47,7 +47,7 @@ chrome.runtime.onMessageExternal.addListener((request, _sender, sendResponse) =>
 function onRequest(request, sendResponse) {
   if (typeof request === 'string') {
     if (request === 'ping') {
-      sendResponse('1.2')
+      sendResponse(chrome.runtime.getManifest().version)
     }
 
     sendResponse(new Error(`Unknown request: ${request}`))
@@ -223,9 +223,22 @@ function setRequestHeaders(request, cookies) {
  * @param {HttpRequest} request
  * @returns {Promise<chrome.cookies.Cookie[]>}
  */
-function getCookies(request) {
+async function getCookies(request) {
+  // @ts-expect-error partitionKey doesn't exist in the types
+  const partitionCookies = getCookiesBase({ partitionKey: { topLevelSite: request.url } })
+  const regularCookies = getCookiesBase({ url: request.url })
+
+  const cookieArrays = await Promise.all([partitionCookies, regularCookies])
+  return cookieArrays.flat()
+}
+
+/**
+ * @param {chrome.cookies.GetAllDetails} options
+ * @returns {Promise<chrome.cookies.Cookie[]>}
+ */
+function getCookiesBase(options) {
   return new Promise((resolve) => {
-    chrome.cookies.getAll({ url: request.url }, resolve)
+    chrome.cookies.getAll(options, resolve)
   })
 }
 

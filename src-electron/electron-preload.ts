@@ -2,13 +2,9 @@ import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from 'electron'
 import HttpRequest from 'src/interfaces/httpRequest'
 import qs from 'qs'
 
-const whitelist = [
-  'http://localhost',
-  'file:///',
-  'dropbox.com/oauth2/authorize'
-]
+const whitelist = ['http://localhost', 'file:///', 'dropbox.com/oauth2/authorize']
 
-const matchingItem = whitelist.find(item => window.location.href.includes(item))
+const matchingItem = whitelist.find((item) => window.location.href.includes(item))
 if (!matchingItem) {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -37,5 +33,5 @@ contextBridge.exposeInMainWorld('mangaReader', {
 
   sendRequest: (options: HttpRequest) => {
     return ipcRenderer.invoke('net-request', options)
-  }
+  },
 })

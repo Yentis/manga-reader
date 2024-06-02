@@ -6,7 +6,8 @@
     "typeRoots": ["node_modules/@types", "./typings"],
     "esModuleInterop": true,
     "types": ["quasar"],
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "lib": ["ES2019", "DOM", "DOM.Iterable"]
   },
   "exclude": ["node_modules", ".quasar", "dist", "public", "src-cordova"],
   "ts-node": {
