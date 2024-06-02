@@ -2,7 +2,6 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest from './baseRequest'
 import { ContentType } from 'src/enums/contentTypeEnum'
-import manifest from '../../../src-extension/manifest.json'
 
 const EXTENSION_ID = 'fjjhciamaplkcedanpphbkakidghlnji'
 
@@ -42,7 +41,7 @@ export async function hasExtension(): Promise<boolean> {
         return
       }
 
-      resolve(response === manifest.version)
+      resolve(response === '1.3')
     })
   })
 }
