@@ -27,11 +27,12 @@ export const siteAliases = [
   { url: 'reset-scans.us', site: SiteType.ResetScans },
   { url: 'reset-scans.xyz', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
+  { url: 'scyllascans.org', site: SiteType.ScyllaScans },
   { url: 'luminousscans.com', site: SiteType.LuminousScans },
   { url: 'luminousscans.gg', site: SiteType.LuminousScans },
   { url: 'luminousscans.net', site: SiteType.LuminousScans },
   { url: 'lumitoon.com', site: SiteType.LuminousScans },
-  { url: 'scyllascans.org', site: SiteType.ScyllaScans },
+  { url: 'luminouscomics.org', site: SiteType.LuminousScans },
 ]
 
 export function getUrl(url: string) {
