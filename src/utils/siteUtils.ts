@@ -18,6 +18,7 @@ export const siteAliases = [
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
   { url: 'asurascans.com', site: SiteType.AsuraScans },
   { url: 'asura.gg', site: SiteType.AsuraScans },
+  { url: 'asuratoon.com', site: SiteType.AsuraScans },
   { url: 'asura.nacm.xyz', site: SiteType.AsuraScans },
   { url: 'leviatanscans.com', site: SiteType.LSComic },
   { url: 'en.leviatanscans.com', site: SiteType.LSComic },
@@ -26,6 +27,7 @@ export const siteAliases = [
   { url: 'reset-scans.com', site: SiteType.ResetScans },
   { url: 'reset-scans.us', site: SiteType.ResetScans },
   { url: 'reset-scans.xyz', site: SiteType.ResetScans },
+  { url: 'resetscan.com', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
   { url: 'scyllascans.org', site: SiteType.ScyllaScans },
   { url: 'luminousscans.com', site: SiteType.LuminousScans },
@@ -59,8 +61,8 @@ export function parseHtmlFromString(
 export function titleContainsQuery(query: string, title?: string): boolean {
   if (title === undefined) return false
 
-  query = query.replace('’', "'")
-  title = title.replace('’', "'")
+  query = query.replace(/’/g, "'")
+  title = title.replace(/’/g, "'")
   const querySplit = query.toLowerCase().split(' ')
 
   return querySplit.every((word) => title?.toLowerCase().includes(word))

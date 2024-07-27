@@ -1,6 +1,5 @@
 import { BaseData, BaseSite } from './baseSite'
 import { SiteType } from 'src/enums/siteEnum'
-import PQueue from 'p-queue'
 import moment from 'moment'
 import { Manga } from 'src/classes/manga'
 import HttpRequest from 'src/interfaces/httpRequest'
@@ -36,10 +35,6 @@ export class Madara extends BaseSite {
   constructor(siteType: SiteType) {
     super()
     this.siteType = siteType
-
-    if (siteType === SiteType.AsuraScans) {
-      this.requestQueue = new PQueue({ interval: 2000, intervalCap: 1 })
-    }
   }
 
   protected getChapterNum(data: MadaraData): number {
@@ -182,8 +177,6 @@ export class Madara extends BaseSite {
 
   getTestUrl(): string {
     switch (this.siteType) {
-      case SiteType.AsuraScans:
-        return `${this.getUrl()}/?p=36483`
       case SiteType.FlameComics:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
       case SiteType.LuminousScans:

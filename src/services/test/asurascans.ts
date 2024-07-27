@@ -12,7 +12,7 @@ export async function testAsuraScans(): Promise<void> {
   if (!site) throw Error('Site not found')
 
   await readUrl(site)
-  await readUrlAdvanced()
+  await readUrlAdvanced(site)
   await search(site)
 }
 
@@ -20,25 +20,23 @@ async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 47'
-  desired.image =
-    'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/ponytail_boy_.png'
+  desired.image = 'https://gg.asuracomic.net/storage/media/114/conversions/367e3d17-optimized.webp'
   desired.title = 'Mookhyang The Origin'
-  desired.chapterUrl = 'https://asuratoon.com/4631981187-mookhyang-the-origin-chapter-47/'
+  desired.chapterUrl = 'https://asuracomic.net/series/mookhyang-the-origin-105d9ca4/chapter/47'
   desired.chapterNum = 47
   desired.chapterDate = '3 years ago'
 
   mangaEqual(manga, desired)
 }
 
-async function readUrlAdvanced(): Promise<void> {
-  const testUrl = 'https://asuratoon.com/?p=36093'
+async function readUrlAdvanced(site: BaseSite): Promise<void> {
+  const testUrl = `${site.getUrl()}/series/solo-bug-player-e800d15b`
   const manga = await getMangaInfo(testUrl, SITE_TYPE)
   const desired = new Manga(testUrl, SITE_TYPE)
   desired.chapter = 'Chapter 88'
-  desired.image =
-    'https://img.asuracomics.com/unsafe/fit-in/720x936/https://asuratoon.com/wp-content/uploads/2021/02/cover4.gif'
+  desired.image = 'https://gg.asuracomic.net/storage/media/245/01J3BAR5EFJJSB84FC5GDZYSW7.webp'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://asuratoon.com/4631981187-solo-bug-player-chapter-88/'
+  desired.chapterUrl = 'https://asuracomic.net/series/solo-bug-player-e800d15b/chapter/88'
   desired.chapterNum = 88
 
   mangaEqual(manga, desired)
@@ -47,9 +45,9 @@ async function readUrlAdvanced(): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://asuratoon.com/wp-content/uploads/2021/02/ponytail_boy_-222x300.png'
-  desired.chapter = '47'
-  desired.url = 'https://asuratoon.com/?p=36483'
+  desired.image = 'https://gg.asuracomic.net/storage/media/114/conversions/367e3d17-thumb-small.webp'
+  desired.chapter = 'Chapter 45'
+  desired.url = 'https://asuracomic.net/series/mookhyang-the-origin-105d9ca4'
 
   return searchValid(results, desired, QUERY)
 }

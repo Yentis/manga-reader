@@ -21,6 +21,7 @@ import { Comikey } from 'src/classes/sites/comikey'
 import { ReaperScans } from 'src/classes/sites/reaperscans'
 import { TappyToon } from 'src/classes/sites/tappytoon'
 import { ScyllaScans } from 'src/classes/sites/scyllascans'
+import { AsuraScans } from 'src/classes/sites/asurascans'
 
 const globalRequestQueue = new PQueue({
   interval: 1000,
@@ -38,7 +39,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LSComic, new WordPress(SiteType.LSComic)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new ReaperScans()],
-  [SiteType.AsuraScans, new Madara(SiteType.AsuraScans)],
+  [SiteType.AsuraScans, new AsuraScans()],
   [SiteType.Mangago, new Mangago()],
   [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.Batoto, new Batoto()],
