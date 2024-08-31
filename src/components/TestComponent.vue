@@ -64,7 +64,7 @@ import { LinkingSiteType } from '../enums/linkingSiteEnum'
 import { testResetScans } from '../services/test/resetscans'
 import { testKitsu } from '../services/test/kitsu'
 import { testCubari } from '../services/test/cubari'
-import { testLuminousScans } from 'src/services/test/luminousscans'
+import { testRadiantScans } from 'src/services/test/radiantscans'
 import { testTapas } from 'src/services/test/tapas'
 import { testComikey } from 'src/services/test/comikey'
 import { testTappytoon } from 'src/services/test/tappytoon'
@@ -151,8 +151,8 @@ export default defineComponent({
         case SiteType.LSComic:
           await doTest(testLSComic)
           break
-        case SiteType.LuminousScans:
-          await doTest(testLuminousScans)
+        case SiteType.RadiantScans:
+          await doTest(testRadiantScans)
           break
         case SiteType.MangaDex:
           await doTest(testMangaDex)

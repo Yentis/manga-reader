@@ -30,11 +30,12 @@ export const siteAliases = [
   { url: 'resetscan.com', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
   { url: 'scyllascans.org', site: SiteType.ScyllaScans },
-  { url: 'luminousscans.com', site: SiteType.LuminousScans },
-  { url: 'luminousscans.gg', site: SiteType.LuminousScans },
-  { url: 'luminousscans.net', site: SiteType.LuminousScans },
-  { url: 'lumitoon.com', site: SiteType.LuminousScans },
-  { url: 'luminouscomics.org', site: SiteType.LuminousScans },
+  { url: 'luminousscans.com', site: SiteType.RadiantScans },
+  { url: 'luminousscans.gg', site: SiteType.RadiantScans },
+  { url: 'luminousscans.net', site: SiteType.RadiantScans },
+  { url: 'lumitoon.com', site: SiteType.RadiantScans },
+  { url: 'luminouscomics.org', site: SiteType.RadiantScans },
+  { url: 'luminous-scans.com', site: SiteType.RadiantScans },
 ]
 
 export function getUrl(url: string) {

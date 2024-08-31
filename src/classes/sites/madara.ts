@@ -116,7 +116,7 @@ export class Madara extends BaseSite {
         manga.chapter = entryItem.post_latest
 
         let queryParam: string
-        if (this.siteType === SiteType.LuminousScans) {
+        if (this.siteType === SiteType.RadiantScans) {
           queryParam = 'series?p'
         } else {
           queryParam = '?p'
@@ -179,7 +179,7 @@ export class Madara extends BaseSite {
     switch (this.siteType) {
       case SiteType.FlameComics:
         return `${this.getUrl()}/series/the-way-of-the-househusband/`
-      case SiteType.LuminousScans:
+      case SiteType.RadiantScans:
         return `${this.getUrl()}/series?p=70`
     }
 

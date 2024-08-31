@@ -4,10 +4,10 @@ import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
-const SITE_TYPE = SiteType.LuminousScans
+const SITE_TYPE = SiteType.RadiantScans
 const QUERY = 'legend of the northern blade'
 
-export async function testLuminousScans(): Promise<void> {
+export async function testRadiantScans(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
