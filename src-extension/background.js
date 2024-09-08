@@ -225,11 +225,23 @@ function setRequestHeaders(request, cookies) {
  */
 async function getCookies(request) {
   // @ts-expect-error partitionKey doesn't exist in the types
-  const partitionCookies = getCookiesBase({ partitionKey: { topLevelSite: request.url } })
+  const partitionCookies = getCookiesBase({ partitionKey: {} })
   const regularCookies = getCookiesBase({ url: request.url })
+  const [partitionArray, cookieArray] = await Promise.all([partitionCookies, regularCookies])
 
-  const cookieArrays = await Promise.all([partitionCookies, regularCookies])
-  return cookieArrays.flat()
+  // topLevelSite filtering doesn't work so we do it manually
+  partitionArray.forEach((cookie) => {
+    // @ts-expect-error partitionKey doesn't exist in the types
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const topLevelSite = cookie.partitionKey?.topLevelSite
+    if (!topLevelSite) return
+
+    if (request.url.startsWith(topLevelSite)) {
+      cookieArray.push(cookie)
+    }
+  })
+
+  return cookieArray
 }
 
 /**

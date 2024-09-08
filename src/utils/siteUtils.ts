@@ -23,6 +23,7 @@ export const siteAliases = [
   { url: 'leviatanscans.com', site: SiteType.LSComic },
   { url: 'en.leviatanscans.com', site: SiteType.LSComic },
   { url: 'flamescans.org', site: SiteType.FlameComics },
+  { url: 'flamecomics.com', site: SiteType.FlameComics },
   { url: 'reapercomics.com', site: SiteType.ReaperScans },
   { url: 'reset-scans.com', site: SiteType.ResetScans },
   { url: 'reset-scans.us', site: SiteType.ResetScans },
