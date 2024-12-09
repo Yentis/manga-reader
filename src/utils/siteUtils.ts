@@ -13,6 +13,7 @@ export const siteAliases = [
   { url: '1stkissmanga.com', site: SiteType.LikeManga },
   { url: '1stkissmanga.io', site: SiteType.LikeManga },
   { url: '1stkissmanga.me', site: SiteType.LikeManga },
+  { url: 'likemanga.io', site: SiteType.LikeManga },
   { url: Guya, site: SiteType.Cubari },
   { url: 'mangakomi.com', site: SiteType.MangaKomi },
   { url: 'www.asurascans.com', site: SiteType.AsuraScans },
@@ -31,12 +32,6 @@ export const siteAliases = [
   { url: 'resetscan.com', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
   { url: 'scyllascans.org', site: SiteType.ScyllaScans },
-  { url: 'luminousscans.com', site: SiteType.RadiantScans },
-  { url: 'luminousscans.gg', site: SiteType.RadiantScans },
-  { url: 'luminousscans.net', site: SiteType.RadiantScans },
-  { url: 'lumitoon.com', site: SiteType.RadiantScans },
-  { url: 'luminouscomics.org', site: SiteType.RadiantScans },
-  { url: 'luminous-scans.com', site: SiteType.RadiantScans },
 ]
 
 export function getUrl(url: string) {

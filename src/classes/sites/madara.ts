@@ -115,12 +115,7 @@ export class Madara extends BaseSite {
         manga.image = entryItem.post_image
         manga.chapter = entryItem.post_latest
 
-        let queryParam: string
-        if (this.siteType === SiteType.RadiantScans) {
-          queryParam = 'series?p'
-        } else {
-          queryParam = '?p'
-        }
+        const queryParam = '?p'
         manga.url = `${this.getUrl()}/${queryParam}=${entryItem.ID}`
 
         mangaList.push(manga)
@@ -176,13 +171,6 @@ export class Madara extends BaseSite {
   }
 
   getTestUrl(): string {
-    switch (this.siteType) {
-      case SiteType.FlameComics:
-        return `${this.getUrl()}/series/the-way-of-the-househusband/`
-      case SiteType.RadiantScans:
-        return `${this.getUrl()}/series?p=70`
-    }
-
-    return this.getUrl()
+    return `${this.getUrl()}/series/the-way-of-the-househusband/`
   }
 }

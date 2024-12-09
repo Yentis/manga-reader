@@ -20,7 +20,6 @@ import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
 import { testKitsu } from './test/kitsu'
 import { testCubari } from './test/cubari'
-import { testRadiantScans } from './test/radiantscans'
 import { testTapas } from './test/tapas'
 import { testComikey } from './test/comikey'
 import { testTappytoon } from './test/tappytoon'
@@ -75,11 +74,6 @@ export default async function testAll(
   promises.push(
     testLSComic().catch((error) => {
       errors.push({ site: SiteType.LSComic, error: error })
-    })
-  )
-  promises.push(
-    testRadiantScans().catch((error) => {
-      errors.push({ site: SiteType.RadiantScans, error: error })
     })
   )
   promises.push(

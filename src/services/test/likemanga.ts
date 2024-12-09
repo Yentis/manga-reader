@@ -18,15 +18,15 @@ export async function testLikeManga(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 62
+  const chapter = 74
 
   desired.chapter = `Chapter ${chapter}`
   desired.image =
-    'https://likemanga.io/upload/pages/2023/08/1691374019-64d051c30c110-theelegantseaofsavagery1215331872193x278.jpg'
+    'https://likemanga.in/wp-content/uploads/images/1691374019-64d051c30c110-theelegantseaofsavagery1215331872193x278-51839-193x278.jpg'
   desired.title = 'The Elegant Sea of Savagery'
-  desired.chapterUrl = 'https://likemanga.io/the-elegant-sea-of-savagery-1615/chapter-62-992773/'
+  desired.chapterUrl = 'https://likemanga.in/manga/the-elegant-sea-of-savagery/chapter-74/'
   desired.chapterNum = chapter
-  desired.chapterDate = '4 days ago'
+  desired.chapterDate = '20 days ago'
 
   mangaEqual(manga, desired)
 }
@@ -35,9 +35,9 @@ async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image =
-    'https://likemanga.io/upload/pages/2023/08/1691374019-64d051c30c110-theelegantseaofsavagery1215331872193x278.jpg'
-  desired.chapter = 'Chapter 62'
-  desired.url = 'https://likemanga.io/the-elegant-sea-of-savagery-1615/'
+    'https://likemanga.in/wp-content/uploads/images/1691374019-64d051c30c110-theelegantseaofsavagery1215331872193x278-51839-193x278.jpg'
+  desired.chapter = 'Chapter 74'
+  desired.url = 'https://likemanga.in/manga/the-elegant-sea-of-savagery/'
 
   return searchValid(results, desired, QUERY)
 }

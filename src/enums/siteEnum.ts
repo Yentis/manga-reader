@@ -3,7 +3,7 @@ export const Guya = 'guya.moe'
 export enum SiteType {
   Manganato = 'manganato.com',
   Webtoons = 'webtoons.com',
-  LikeManga = 'likemanga.io',
+  LikeManga = 'likemanga.in',
   Mangakakalot = 'mangakakalot.com',
   MangaDex = 'mangadex.org',
   MangaKomi = 'mangakomi.io',
@@ -17,7 +17,6 @@ export enum SiteType {
   FlameComics = 'flamecomics.me',
   ResetScans = 'reset-scans.co',
   Cubari = 'cubari.moe',
-  RadiantScans = 'radiantscans.com',
   Tapas = 'tapas.io',
   Comikey = 'comikey.com',
   Tappytoon = 'tappytoon.com',
@@ -27,7 +26,7 @@ export enum SiteType {
 export enum SiteName {
   'manganato.com' = 'Manganato',
   'webtoons.com' = 'Webtoons',
-  'likemanga.io' = 'LikeManga',
+  'likemanga.in' = 'LikeManga',
   'mangakakalot.com' = 'Mangakakalot',
   'mangadex.org' = 'MangaDex',
   'mangakomi.io' = 'Manga Komi',
@@ -42,7 +41,6 @@ export enum SiteName {
   'flamecomics.me' = 'Flame Comics',
   'reset-scans.co' = 'Reset Scans',
   'cubari.moe' = 'Cubari / Guya',
-  'radiantscans.com' = 'Radiant Scans',
   'tapas.io' = 'Tapas',
   'comikey.com' = 'Comikey',
   'tappytoon.com' = 'Tappytoon',
