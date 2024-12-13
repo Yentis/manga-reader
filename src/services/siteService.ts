@@ -6,7 +6,7 @@ import { Mangakakalot } from '../classes/sites/mangakakalot'
 import { MangaDex } from '../classes/sites/mangadex'
 import { WordPress } from '../classes/sites/wordpress'
 import { BaseSite } from '../classes/sites/baseSite'
-import { Madara } from '../classes/sites/madara'
+import { FlameComics } from '../classes/sites/flamecomics'
 import { Mangago } from '../classes/sites/mangago'
 import { Batoto } from '../classes/sites/batoto'
 import { Kitsu } from '../classes/sites/kitsu'
@@ -36,14 +36,13 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Mangakakalot, new Mangakakalot()],
   [SiteType.MangaDex, mangaDex],
   [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
-  [SiteType.LSComic, new WordPress(SiteType.LSComic)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
   [SiteType.ReaperScans, new ReaperScans()],
   [SiteType.AsuraScans, new AsuraScans()],
   [SiteType.Mangago, new Mangago()],
   [SiteType.ZeroScans, new ZeroScans()],
   [SiteType.Batoto, new Batoto()],
-  [SiteType.FlameComics, new Madara(SiteType.FlameComics)],
+  [SiteType.FlameComics, new FlameComics()],
   [SiteType.ResetScans, new WordPress(SiteType.ResetScans)],
   [SiteType.Cubari, new Cubari()],
   [SiteType.Tapas, new Tapas()],

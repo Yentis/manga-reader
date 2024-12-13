@@ -1,4 +1,4 @@
-import { useStore } from '../store/index'
+import { useStore } from 'src/store'
 import { computed, onMounted, watch } from 'vue'
 import useSharing from './useSharing'
 import { getChangelog } from '../services/updateService'
@@ -94,12 +94,12 @@ export function useStaticInitialized () {
       componentProps: {
         title: 'Extension missing or outdated',
         content: `To use this page it is required you download the latest Manga Reader chrome extension version
-        
+
         After downloading:
         Open the extensions page
         Enable developer mode
         Extract the downloaded extension and select it with "Load unpacked"
-        
+
         `,
         link: 'https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2FYentis%2Fmanga-reader%2Ftree%2Fmaster%2Fsrc-extension',
         linkText: 'Download here',

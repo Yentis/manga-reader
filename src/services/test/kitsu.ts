@@ -96,7 +96,7 @@ async function testSyncReadChapter (site: Kitsu) {
 async function testSearch () {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga('https://kitsu.io/manga/yancha-gal-no-anjou-san', SITE_TYPE)
-  desired.image = 'https://media.kitsu.io/manga/poster_images/40927/small.jpg'
+  desired.image = 'https://media.kitsu.app/manga/poster_images/40927/small.jpg'
   desired.url = `https://kitsu.io/api/edge/library-entries/${TARGET_LIBRARY_ID}`
 
   return searchValid(results, desired, QUERY)

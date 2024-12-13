@@ -5,7 +5,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.Comikey
-const QUERY = 'to be winner'
+const QUERY = 'fire-hot aunt'
 
 export async function testComikey(): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -24,7 +24,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'To Be Winner'
   desired.chapterUrl = 'https://comikey.com/read/to-be-winner-webtoon/dowAND/episode-113/'
   desired.chapterNum = 113
-  desired.chapterDate = '2 years ago'
+  desired.chapterDate = '3 years ago'
 
   mangaEqual(manga, desired)
 }
@@ -44,9 +44,9 @@ async function readUrlChapter(): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://media.comikey.com/gazo/480/jpg/comics/4orPDQ/e58968bd8239.jpg'
-  desired.chapter = 'Episode 113'
-  desired.url = 'https://comikey.com/comics/to-be-winner-webtoon/23/'
+  desired.image = 'https://media.comikey.com/gazo/480/jpg/comics/yk7Eve/127326e97187.png'
+  desired.chapter = 'Volume 11: Chapters 41 to 44'
+  desired.url = 'https://comikey.com/comics/fire-hot-aunt-manga/563/'
 
   return searchValid(results, desired, QUERY)
 }

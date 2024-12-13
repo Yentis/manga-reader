@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, session, Menu, ipcMain, net, Event } from 'electron'
+import { app, BrowserWindow, Event, ipcMain, Menu, nativeTheme, net, session } from 'electron'
 import { ElectronBlocker } from '@cliqz/adblocker-electron'
 import qs from 'qs'
 import fetch from 'isomorphic-fetch'
@@ -9,7 +9,7 @@ import HttpRequest from 'src/interfaces/httpRequest'
 import HttpResponse from 'src/interfaces/httpResponse'
 
 try {
-  if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors === true) {
+  if (process.platform === 'win32' && nativeTheme.shouldUseDarkColors) {
     fs.unlinkSync(path.join(app.getPath('userData'), 'DevTools Extensions'))
   }
 } catch (_) {}
@@ -36,19 +36,25 @@ function createWindow() {
     {
       label: '<',
       click: (_item, window) => {
-        window?.webContents.goBack()
+        if (window instanceof BrowserWindow) {
+          window.webContents.navigationHistory.goBack()
+        }
       },
     },
     {
       label: '>',
       click: (_item, window) => {
-        window?.webContents.goForward()
+        if (window instanceof BrowserWindow) {
+          window.webContents.navigationHistory.goForward()
+        }
       },
     },
     {
       label: 'Manga list',
       click: (_item, window) => {
-        window?.webContents.goToIndex(0)
+        if (window instanceof BrowserWindow) {
+          window.webContents.navigationHistory.goToIndex(0)
+        }
       },
     },
     {

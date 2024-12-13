@@ -184,6 +184,7 @@ export abstract class BaseSite {
     if (manga.title === '' || manga.chapter === 'Unknown') {
       throw Error('Could not parse site')
     }
+
     return manga
   }
 

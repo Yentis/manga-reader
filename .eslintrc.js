@@ -1,8 +1,9 @@
-const { resolve } = require('path')
+const { resolve } = require('path');
+
 module.exports = {
   // https://eslint.org/docs/user-guide/configuring#configuration-cascading-and-hierarchy
   // This option interrupts the configuration hierarchy at this file
-  // Remove this if you have an higher level ESLint config file (it usually happens into a monorepos)
+  // Remove this if you have a higher level ESLint config file (it usually happens into a monorepos)
   root: true,
 
   // https://eslint.vuejs.org/user-guide/#how-to-use-custom-parser
@@ -42,13 +43,12 @@ module.exports = {
     // 'plugin:vue/essential', // Priority A: Essential (Error Prevention)
     // 'plugin:vue/strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
     'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
-
-    'standard',
   ],
 
   plugins: [
     // required to apply rules which need type information
     '@typescript-eslint',
+    'import',
 
     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-file
     // required to lint *.vue files
@@ -82,7 +82,6 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'prefer-promise-reject-errors': 'off',
     'space-before-function-paren': 'off',
-    'comma-dangle': 'off',
 
     // TypeScript
     quotes: ['warn', 'single', { avoidEscape: true }],
@@ -94,7 +93,14 @@ module.exports = {
 
     'no-void': 'off',
     'import/no-webpack-loader-syntax': 'off',
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['warn'],
+    '@typescript-eslint/no-unused-vars': ['warn', {
+      "args": "all",
+      "argsIgnorePattern": "^_",
+      "caughtErrors": "all",
+      "caughtErrorsIgnorePattern": "^_",
+      "destructuredArrayIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
   },
-}
+};

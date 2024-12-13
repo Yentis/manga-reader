@@ -20,7 +20,7 @@ async function readUrl (site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Vol.1 Ch.5  : : Love Supplication Guidance'
-  desired.image = 'https://i1.mangapicgallery.com/r/coverlink/rROHYUm8aBnzo-L7jmKxeVpVAcPItlyo_7uFcU_twRCXnD7oAOrY_iGWGe5a5RDJz46jsLM.jpg?4'
+  desired.image = 'https://i4.mangapicgallery.com/r/coverlink/rROHYYKHa8HfkSK8mmW4eWJBGaTgrnCog_d0Y_sc68XnD0ocHUlXfyDZTt-I5lBX9PK.jpg?4'
   desired.title = '...curtain'
   desired.chapterUrl = 'https://www.mangago.me/read-manga/curtain/mf/v01/c005/'
   desired.chapterNum = 5

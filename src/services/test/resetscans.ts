@@ -5,7 +5,7 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.ResetScans
-const QUERY = 'karate baka isekai'
+const QUERY = 'control master'
 
 export async function testResetScans(): Promise<void> {
   const site = getSite(SITE_TYPE)
@@ -18,14 +18,14 @@ export async function testResetScans(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(`${site.getUrl()}/manga/the-unwanted-undead-adventurer/`, SITE_TYPE)
-  const chapter = 61
+  const chapter = 63
 
   desired.chapter = `Chapter ${chapter}`
-  desired.image = `${site.getUrl()}/wp-content/uploads/2021/06/UNWANTED-UNDEAD-350x476.webp`
+  desired.image = 'https://reset-scans.co/wp-content/uploads/2024/10/The-Unwanted-Undead-Adventurer-350x476.webp'
   desired.title = 'The Unwanted Undead Adventurer'
   desired.chapterUrl = `${site.getUrl()}/manga/the-unwanted-undead-adventurer/chapter-${chapter}/`
   desired.chapterNum = chapter
-  desired.chapterDate = '12 days ago'
+  desired.chapterDate = '2 months ago'
 
   mangaEqual(manga, desired)
 }
@@ -33,9 +33,9 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = `${site.getUrl()}/wp-content/uploads/2022/11/Karate-Baka-Isekai-193x278.webp`
-  desired.chapter = 'Chapter 26'
-  desired.url = `${site.getUrl()}/manga/karate-baka-isekai/`
+  desired.image = 'https://reset-scans.co/wp-content/uploads/2024/12/Control-Player-193x278.webp'
+  desired.chapter = 'Chapter 34'
+  desired.url = 'https://reset-scans.co/manga/control-master/'
 
   return searchValid(results, desired, QUERY)
 }

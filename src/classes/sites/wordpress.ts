@@ -74,10 +74,12 @@ export class WordPress extends BaseSite {
       format = 'DD/MM/YYYY'
     } else if (chapterDateText?.includes(',')) {
       format = 'MMMM DD, YYYY'
-    } else if (chapterDateText?.includes('-')) {
-      format = 'DD-MM-YYYY'
+    } else if (chapterDateText?.length === 6 && chapterDateText?.includes('-')) {
+      format = 'DD-MMM'
     } else if (chapterDateText?.length === 6) {
       format = 'MMM DD'
+    } else if (chapterDateText?.includes('-')) {
+      format = 'DD-MM-YYYY'
     } else {
       format = 'Do MMMM YYYY'
     }
@@ -309,8 +311,6 @@ export class WordPress extends BaseSite {
         return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${this.getUrl()}/manga/10-years-in-the-friend-zone/`
-      case SiteType.LSComic:
-        return `${this.getUrl()}/manga/trash-of-the-counts-family/`
       case SiteType.ResetScans:
         return `${this.getUrl()}/manga/the-unwanted-undead-adventurer/`
     }

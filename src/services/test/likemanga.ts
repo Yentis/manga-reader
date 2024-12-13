@@ -26,7 +26,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'The Elegant Sea of Savagery'
   desired.chapterUrl = 'https://likemanga.in/manga/the-elegant-sea-of-savagery/chapter-74/'
   desired.chapterNum = chapter
-  desired.chapterDate = '20 days ago'
+  desired.chapterDate = '24 days ago'
 
   mangaEqual(manga, desired)
 }

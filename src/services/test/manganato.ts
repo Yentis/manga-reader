@@ -20,7 +20,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Vol.6 Chapter 57: The Final Chapter'
-  desired.image = 'https://avt.mkklcdnv6temp.com/8/x/18-1583497426.jpg'
+  desired.image = 'https://avt.mkklcdnv6temp.com/fld/54/u/9-1732795289-nw.webp'
   desired.title = 'Kudan No Gotoshi'
   desired.chapterUrl = 'https://chapmanganato.to/manga-dt981276/chapter-57'
   desired.chapterNum = 57
@@ -32,7 +32,7 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image = 'https://avt.mkklcdnv6temp.com/48/l/21-1597329685.jpg'
+  desired.image = 'https://avt.mkklcdnv6temp.com/fld/33/v/11-1732805839-nw.webp'
   desired.chapter = "Chapter 2: That’s what's unfair about you! [END]"
   desired.url = 'https://manganato.com/manga-iu986229'
 

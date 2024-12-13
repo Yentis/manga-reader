@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import MangaHeader from '../components/Header.vue'
 import MangaItem from '../components/manga-item/MangaItem.vue'
 import useSettings from '../composables/useSettings'
