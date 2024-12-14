@@ -2,31 +2,14 @@ import { Manga } from '../classes/manga'
 import { UrlNavigation } from '../classes/urlNavigation'
 import useSettings from './useSettings'
 import useUrlNavigation from './useUrlNavigation'
-import { watch, computed } from 'vue'
+import { computed, watch } from 'vue'
 import { Settings } from 'src/classes/settings'
 import { getPlatform } from 'src/services/platformService'
 import { Platform } from 'src/enums/platformEnum'
 import useMangaList from './useMangaList'
 import { useStore } from 'src/store'
+import { LocalNotifications } from '../../src-capacitor/node_modules/@capacitor/local-notifications'
 
-interface CordovaNotificationOptions {
-  id: number
-  title: string
-  text: string
-  icon: string
-  smallIcon: string
-  foreground: boolean
-}
-
-interface CordovaNotification {
-  notification: {
-    local: {
-      schedule: (options: CordovaNotificationOptions) => void
-      cancel: (id: number, callback: () => void) => void
-      on: (event: string, callback: (notification?: CordovaNotificationOptions) => void) => void
-    }
-  }
-}
 
 export default function usePushNotification () {
   const $store = useStore()
@@ -35,18 +18,20 @@ export default function usePushNotification () {
   const pushNotifications = computed(() => $store.state.reader.pushNotifications)
   const sendPushNotification = (manga: Manga) => {
     const randomNum = Math.random().toString()
-    const id = parseInt(randomNum.substring(randomNum.indexOf('.') + 1))
+    // Substring first 9 chars to stay under Java max int
+    const id = parseInt(randomNum.substring(randomNum.indexOf('.') + 1).substring(0, 9))
 
-    if (getPlatform() === Platform.Cordova) {
-      const plugins = cordova.plugins as CordovaNotification
-      plugins.notification.local.schedule({
-        id,
-        title: manga.title,
-        text: manga.chapter,
-        smallIcon: 'res://notification_icon',
-        icon: manga.image,
-        foreground: true
-      })
+    if (getPlatform() === Platform.Capacitor) {
+      LocalNotifications.schedule({
+        notifications: [{
+          id,
+          title: manga.title,
+          smallIcon: 'notification_icon',
+          // TODO: Patched https://github.com/ionic-team/capacitor-plugins/issues/430
+          largeIcon: manga.image,
+          body: manga.chapter,
+        }]
+      }).catch(console.error)
     } else {
       const notification = new Notification(manga.title, {
         body: manga.chapter,
@@ -65,8 +50,8 @@ export default function usePushNotification () {
     const id = pushNotifications.value.get(url)
     if (!id) return
 
-    if (getPlatform() === Platform.Cordova) {
-      (cordova.plugins as CordovaNotification).notification.local.cancel(id, () => { /* Do nothing */ })
+    if (getPlatform() === Platform.Capacitor) {
+      LocalNotifications.cancel({ notifications: [{ id }] }).catch(console.error)
     }
 
     $store.commit('reader/removePushNotification', url)
@@ -98,12 +83,10 @@ export function useAppPushNotification () {
     removePushNotification
   } = usePushNotification()
 
-  if (getPlatform() === Platform.Cordova) {
-    const plugins = cordova.plugins as CordovaNotification
-    plugins.notification.local.on('clear', (notification) => {
-      if (!notification) return
-      removePushNotification(notification.id)
-    })
+  if (getPlatform() === Platform.Capacitor) {
+    LocalNotifications.addListener('localNotificationActionPerformed', (actionPerformed) => {
+      removePushNotification(actionPerformed.notification.id)
+    }).catch(console.error)
   }
 
   watch(settings, (newSettings: Settings) => {

@@ -65,11 +65,12 @@ export class AsuraScans extends BaseSite {
     const doc = await parseHtmlFromString(response.data)
     const chapterList = doc.querySelectorAll('.scrollbar-thumb-themecolor')[0]
     const chapterItem = chapterList?.querySelectorAll('div')[0]
+    const chapter = chapterItem?.querySelectorAll('a')[0]
 
     const data = new AsuraData(url)
-    data.chapter = chapterItem?.querySelectorAll('a')[0]
-    data.chapterUrl = data.chapter
-    data.chapterNum = data.chapter
+    data.chapter = chapter?.querySelectorAll('h3')[0]
+    data.chapterUrl = chapter
+    data.chapterNum = chapter?.querySelectorAll('h3')[0]
     data.chapterDate = chapterItem?.querySelectorAll('h3')[1]
     data.chapterList = chapterList
     data.title = doc.querySelectorAll('.text-xl')[0]

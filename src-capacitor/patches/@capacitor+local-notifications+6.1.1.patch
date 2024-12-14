@@ -1,0 +1,43 @@
+diff --git a/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotification.java b/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotification.java
+index 7463256..1d80883 100644
+--- a/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotification.java
++++ b/node_modules/@capacitor/local-notifications/android/src/main/java/com/capacitorjs/plugins/localnotifications/LocalNotification.java
+@@ -9,6 +9,9 @@ import com.getcapacitor.JSObject;
+ import com.getcapacitor.Logger;
+ import com.getcapacitor.PluginCall;
+ import com.getcapacitor.plugin.util.AssetUtil;
++
++import java.io.IOException;
++import java.net.URL;
+ import java.text.ParseException;
+ import java.util.ArrayList;
+ import java.util.List;
+@@ -107,7 +110,7 @@ public class LocalNotification {
+     }
+ 
+     public void setLargeIcon(String largeIcon) {
+-        this.largeIcon = AssetUtil.getResourceBaseName(largeIcon);
++        this.largeIcon = largeIcon;
+     }
+ 
+     public void setInboxList(List<String> inboxList) {
+@@ -345,12 +348,14 @@ public class LocalNotification {
+     }
+ 
+     public Bitmap getLargeIcon(Context context) {
+-        if (largeIcon != null) {
+-            int resId = AssetUtil.getResourceID(context, largeIcon, "drawable");
+-            return BitmapFactory.decodeResource(context.getResources(), resId);
+-        }
++        if (largeIcon == null) return null;
+ 
+-        return null;
++        try {
++          URL url = new URL(largeIcon);
++          return BitmapFactory.decodeStream(url.openConnection().getInputStream());
++        } catch(IOException ignored) {
++          return null;
++        }
+     }
+ 
+     public boolean isScheduled() {

@@ -1,15 +1,15 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.23.17",
+  "version": "2.24.0",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis#5218",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m android",
-    "build:ios": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m ios",
-    "sign:android": "jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore ./dist/cordova/android/apk/release/app-release-unsigned.apk manga_reader",
+    "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m capacitor -T android",
+    "build:ios": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m capacitor -T ios",
+    "sign:android": "apksigner sign --verbose --ks my-release-key.keystore --ks-key-alias manga_reader ./dist/capacitor/android/apk/release/app-release-unsigned.apk",
     "build:electron": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m electron",
     "build:ssg": "quasar ssg generate",
     "serve:ssg": "quasar ssg serve dist/ssg"

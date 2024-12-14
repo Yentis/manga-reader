@@ -43,7 +43,7 @@ export class Mangago extends BaseSite {
     const doc = await parseHtmlFromString(response.data)
     const data = new BaseData(url)
 
-    if (getPlatform() !== Platform.Cordova) {
+    if (getPlatform() !== Platform.Capacitor) {
       const listingElem = doc.querySelectorAll('.listing tbody tr')[0]
 
       data.chapter = listingElem?.querySelectorAll('a')[0]

@@ -20,7 +20,7 @@ export default function useUpdate () {
     notifyOptions.actions = [{
       label: 'Download',
       handler: () => {
-        if (platform === Platform.Cordova) {
+        if (platform === Platform.Capacitor) {
           const apkAsset = getApkAsset(githubRelease)
           if (!apkAsset) return
           window.location.href = apkAsset.browser_download_url

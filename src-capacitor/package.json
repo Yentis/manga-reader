@@ -1,0 +1,22 @@
+{
+  "name": "quasar-manga-reader",
+  "version": "2.24.0",
+  "description": "Manga reader that scrapes manga sites for updates",
+  "author": "Yentis#5218",
+  "private": true,
+  "scripts": {
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/local-notifications": "^6.1.1",
+    "cordova-plugin-inappbrowser": "^6.0.0"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0"
+  }
+}

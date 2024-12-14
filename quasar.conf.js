@@ -201,6 +201,10 @@ module.exports = configure(function (ctx) {
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration
       nodeIntegration: true
+    },
+
+    bin: {
+      windowsAndroidStudio: 'C:\\Program Files\\JetBrains\\IntelliJIdea2024.2\\bin\\idea64.exe'
     }
   }
 })

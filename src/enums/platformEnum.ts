@@ -1,5 +1,5 @@
 export enum Platform {
-  Cordova,
+  Capacitor,
   Electron,
   Static
 }

@@ -17,10 +17,12 @@ class WordPressData extends BaseData {
 
 export class WordPress extends BaseSite {
   siteType: SiteType
+  userAgent: string
 
   constructor(siteType: SiteType) {
     super()
     this.siteType = siteType
+    this.userAgent = siteType === SiteType.LikeManga ? 'Lorem Ipsum' : navigator.userAgent
 
     if (siteType === SiteType.HiperDEX) {
       this.requestQueue = new PQueue({ interval: 1000, intervalCap: 1 })
@@ -117,7 +119,7 @@ export class WordPress extends BaseSite {
 
   protected async readUrlImpl(url: string): Promise<Error | Manga> {
     const request: HttpRequest = { method: 'GET', url }
-    this.trySetUserAgent(request)
+    this.trySetUserAgent(request, this.userAgent)
 
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
@@ -165,7 +167,7 @@ export class WordPress extends BaseSite {
     const queryString = qs.stringify({ s: queryParam, post_type: 'wp-manga' })
 
     const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/?${queryString}` }
-    this.trySetUserAgent(request)
+    this.trySetUserAgent(request, this.userAgent)
 
     const response = await requestHandler.sendRequest(request)
     const doc = await parseHtmlFromString(response.data)
@@ -213,7 +215,7 @@ export class WordPress extends BaseSite {
         data: JSON.stringify(requestData),
         headers: { 'Content-Type': ContentType.URLENCODED },
       }
-      this.trySetUserAgent(request)
+      this.trySetUserAgent(request, this.userAgent)
 
       const response = await requestHandler.sendRequest(request)
       if (response.data === '0') throw Error('Invalid chapter data')

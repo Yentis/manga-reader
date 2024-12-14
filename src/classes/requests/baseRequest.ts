@@ -10,7 +10,8 @@ export function getCookies(data: HttpResponse | string): Record<string, string |
   if (typeof data === 'string') {
     cookieData = data
   } else {
-    cookieData = data.headers['set-cookie'] || ''
+    const key = Object.keys(data.headers).find((key) => key.toLowerCase() === 'set-cookie')
+    cookieData = (key ? data.headers[key] : '') ?? ''
   }
 
   let cookieString: string

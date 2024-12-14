@@ -33,7 +33,7 @@ import useRefreshing from '../composables/useRefreshing'
 import { getSiteNameByUrl } from '../utils/siteUtils'
 import {
   useAppInitialized,
-  useCordovaInitialized,
+  useCapacitorInitialized,
   useElectronInitialized,
   useStaticInitialized,
 } from '../composables/useInitialized'
@@ -102,8 +102,8 @@ export default defineComponent({
     })
 
     switch (getPlatform()) {
-      case Platform.Cordova:
-        useCordovaInitialized()
+      case Platform.Capacitor:
+        useCapacitorInitialized()
         break
       case Platform.Electron:
         useElectronInitialized()

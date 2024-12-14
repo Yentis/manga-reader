@@ -188,9 +188,9 @@ export abstract class BaseSite {
     return manga
   }
 
-  protected trySetUserAgent(request: HttpRequest) {
+  protected trySetUserAgent(request: HttpRequest, userAgent = navigator.userAgent) {
     const headers = request.headers || {}
-    headers[HEADER_USER_AGENT] = navigator.userAgent
+    headers[HEADER_USER_AGENT] = userAgent
 
     request.headers = headers
   }

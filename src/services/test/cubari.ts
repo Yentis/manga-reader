@@ -26,7 +26,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'One Punch Man'
   desired.chapterUrl = `https://cubari.moe/read/gist/OPM/${chapter}/1/`
   desired.chapterNum = chapter
-  desired.chapterDate = 'a day ago'
+  desired.chapterDate = '2 days ago'
 
   mangaEqual(manga, desired)
 }

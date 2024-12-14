@@ -67,7 +67,7 @@ export function useAppInitialized () {
   watch(main, checkInitialize)
 }
 
-export function useCordovaInitialized () {
+export function useCapacitorInitialized () {
   const { main, clearInitialized } = useInitialized()
 
   onMounted(() => {

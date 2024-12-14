@@ -41,7 +41,7 @@ export function useElectronAuth () {
   })
 }
 
-export function useCordovaAuth () {
+export function useCapacitorAuth () {
   const onUrlLoadStart = (url: string): qs.ParsedQs | null => {
     if (url.startsWith('http://localhost') && url.includes('code=')) {
       const queryString = qs.parse(url.substring(url.indexOf('code=')))

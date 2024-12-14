@@ -5,7 +5,7 @@ import { computed, watch } from 'vue'
 import { UrlNavigation } from '../classes/urlNavigation'
 import { openURL } from 'quasar'
 import useSettings from './useSettings'
-import { useAuth, useCordovaAuth } from './useAuthCallback'
+import { useAuth, useCapacitorAuth } from './useAuthCallback'
 import ElectronWindow from 'src/interfaces/electronWindow'
 import { checkSites } from 'src/services/siteService'
 import { getPlatform } from 'src/services/platformService'
@@ -32,12 +32,12 @@ export function useAppUrlNavigation () {
   const platform = getPlatform()
 
   const openInApp = (url: string, forced: boolean) => {
-    if (platform !== Platform.Cordova) {
+    if (platform !== Platform.Capacitor) {
       window.location.href = url
       return
     }
 
-    const { onUrlLoadStart } = useCordovaAuth()
+    const { onUrlLoadStart } = useCapacitorAuth()
     const browser = cordova.InAppBrowser.open(url, '_blank')
     if (!forced) return
 
@@ -65,7 +65,7 @@ export function useAppUrlNavigation () {
 
     if (target.openInApp || !openInBrowser) {
       openInApp(target.url, target.openInApp)
-    } else if (platform === Platform.Cordova) {
+    } else if (platform === Platform.Capacitor) {
       window.location.href = target.url
     } else if (platform === Platform.Electron) {
       const electronWindow = window as unknown as ElectronWindow
