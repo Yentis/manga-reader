@@ -44,6 +44,7 @@ export class Webtoons extends BaseSite {
     const queryString = chapterUrl.substring(chapterUrl.indexOf('?'))
     const query = qs.parse(queryString)
 
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     const episodeText = query.episode_no?.toString()
     if (!episodeText) return 0
 

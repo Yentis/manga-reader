@@ -1,5 +1,5 @@
 import { useStore } from '../store/index'
-import { onMounted, computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Manga } from '../classes/manga'
 import { tryMigrateMangaList } from '../services/migrationService'
 import { LocalStorage, useQuasar } from 'quasar'
@@ -167,10 +167,10 @@ export default function useMangaList () {
       notifyOptions.type = 'positive'
       notification.value = notifyOptions
 
-      findManga(siteType, query, excludedUrls).catch((error) => {
+      findManga(siteType, query, excludedUrls).catch((error: Error) => {
         notification.value = new NotifyOptions(error)
       })
-    }).catch((error) => {
+    }).catch((error: Error) => {
       notification.value = new NotifyOptions(error)
     })
 
@@ -179,8 +179,11 @@ export default function useMangaList () {
 
   const { searchResults } = useSearchResults()
   const findManga = async (siteTypeName: string, query: string, excludedUrls: string[]): Promise<boolean> => {
-    const siteType = Object.values(SiteType).find(siteType => siteTypeName === siteType) ||
-                     Object.values(LinkingSiteType).find(siteType => siteTypeName === siteType)
+    const siteType = Object.values(SiteType).find((siteType) => {
+      return siteTypeName === siteType.toString()
+    }) || Object.values(LinkingSiteType).find((siteType) => {
+      return siteTypeName === siteType.toString()
+    })
 
     if (siteTypeName !== '') {
       if (siteType === undefined) return false

@@ -1,7 +1,7 @@
 import { Manga } from '../manga'
 import { UrlNavigation } from '../urlNavigation'
-import { LinkingSiteType } from '../../enums/linkingSiteEnum'
-import { SiteState, SiteType } from '../../enums/siteEnum'
+import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { SiteState, SiteType } from 'src/enums/siteEnum'
 import PQueue from 'p-queue'
 import { QVueGlobals } from 'quasar/dist/types'
 import { Store } from 'vuex'
@@ -41,10 +41,7 @@ export abstract class BaseSite {
   async checkState(): Promise<void> {
     try {
       const response = await this.readUrl(this.getTestUrl())
-      const results =
-        response instanceof Error ? SiteState.OFFLINE : response.title === '' ? SiteState.INVALID : SiteState.REACHABLE
-
-      this.state = results
+      this.state = response instanceof Error ? SiteState.OFFLINE : response.title === '' ? SiteState.INVALID : SiteState.REACHABLE
     } catch (error) {
       console.error(error)
       this.state = SiteState.OFFLINE
@@ -55,12 +52,12 @@ export abstract class BaseSite {
     return Promise.resolve(true)
   }
 
-  openLogin($q: QVueGlobals, store: Store<unknown>): Promise<boolean | Error> {
+  openLogin(_$q: QVueGlobals, store: Store<unknown>): Promise<boolean | Error> {
     store.commit('reader/pushUrlNavigation', new UrlNavigation(this.getLoginUrl(), true))
     return Promise.resolve(false)
   }
 
-  getMangaId($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
+  getMangaId(_$q: QVueGlobals, _store: Store<unknown>, url: string): Promise<number | Error> {
     const parsedUrl = parseInt(url)
     if (!isNaN(parsedUrl)) return Promise.resolve(parsedUrl)
 

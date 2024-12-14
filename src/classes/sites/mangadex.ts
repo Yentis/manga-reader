@@ -78,7 +78,6 @@ export class MangaDex extends BaseSite {
   siteType = MangaDex.siteType
   requestQueue = new PQueue({ interval: 1000, intervalCap: 5 })
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   syncReadChapter (_mangaId: number, _chapterNum: number): Promise<void | Error> {
     return Promise.resolve(Error('MangaDex syncing is currently not functional'))
   }
@@ -228,7 +227,7 @@ export class MangaDex extends BaseSite {
     return mangaList.filter(manga => manga instanceof Manga) as Manga[]
   }
 
-  getMangaId ($q: QVueGlobals, store: Store<unknown>, url: string): Promise<number | Error> {
+  getMangaId (_$q: QVueGlobals, _store: Store<unknown>, url: string): Promise<number | Error> {
     const matches = /\/title\/(\d*)/gm.exec(url) || []
     let mangaId = -1
 

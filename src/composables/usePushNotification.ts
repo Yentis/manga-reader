@@ -8,8 +8,7 @@ import { getPlatform } from 'src/services/platformService'
 import { Platform } from 'src/enums/platformEnum'
 import useMangaList from './useMangaList'
 import { useStore } from 'src/store'
-import { LocalNotifications } from '../../src-capacitor/node_modules/@capacitor/local-notifications'
-
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 export default function usePushNotification () {
   const $store = useStore()

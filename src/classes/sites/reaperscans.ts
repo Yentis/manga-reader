@@ -9,11 +9,8 @@ import moment from 'moment'
 import qs from 'qs'
 
 interface ChapterData {
-  // eslint-disable-next-line camelcase
   chapter_name: string
-  // eslint-disable-next-line camelcase
   chapter_slug: string
-  // eslint-disable-next-line camelcase
   created_at: string
 }
 
@@ -25,14 +22,11 @@ interface SearchResponse {
   data: {
     id: number
     title: string
-    // eslint-disable-next-line camelcase
     series_slug: string
     thumbnail: string
-    // eslint-disable-next-line camelcase
     free_chapters: ChapterData[]
   }[]
   meta: {
-    // eslint-disable-next-line camelcase
     next_page_url: string | null
   }
 }

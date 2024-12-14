@@ -14,7 +14,6 @@ interface RentryResponse {
   status: string
   content: string
   url: string
-  // eslint-disable-next-line camelcase
   edit_code: string
 }
 

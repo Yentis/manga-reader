@@ -115,7 +115,7 @@ import useSharing from '../composables/useSharing'
 import { getPlatform } from '../services/platformService'
 import { Platform } from '../enums/platformEnum'
 import { getShareId } from '../services/rentryService'
-import { LocalNotifications } from '../../src-capacitor/node_modules/@capacitor/local-notifications'
+import { LocalNotifications } from '@capacitor/local-notifications'
 
 export default defineComponent({
   components: { TestComponent },
@@ -159,7 +159,7 @@ export default defineComponent({
           notifyOptions.type = 'positive'
           notification.value = notifyOptions
         })
-        .catch(error => {
+        .catch((error: Error) => {
           notification.value = new NotifyOptions(error, 'Failed to copy to clipboard')
         })
     }

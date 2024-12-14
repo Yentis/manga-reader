@@ -2,7 +2,7 @@ import { ContentType } from 'src/enums/contentTypeEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest from './baseRequest'
-import { CapacitorCookies, CapacitorHttp } from '../../../src-capacitor/node_modules/@capacitor/core'
+import { CapacitorCookies, CapacitorHttp } from '@capacitor/core'
 
 const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
 
@@ -47,7 +47,7 @@ export default class CapacitorRequest extends BaseRequest {
       status: capacitorResponse.status,
       statusText: '',
     }
-    
+
     if (!ignoreErrorStatus && response.status >= 400) {
       throw Error(`Status Code ${response.status} ${response.statusText}`.trim())
     }

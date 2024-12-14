@@ -93,7 +93,7 @@ async function doMigration (mangaList: MigrationManga[]) {
       delete item.completed
     }
 
-    if (item.site === SiteType.MangaDex) {
+    if (item.site === SiteType.MangaDex.toString()) {
       const split = item.url.replace(`${MangaDex.getUrl()}/title/`, '').split('/')
       const id = split[0]
 

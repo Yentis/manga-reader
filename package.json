@@ -6,7 +6,7 @@
   "author": "Yentis#5218",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
+    "lint": "eslint ./",
     "build:android": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m capacitor -T android",
     "build:ios": "node --max-old-space-size=8192 node_modules/@quasar/cli/bin/quasar build -m capacitor -T ios",
     "sign:android": "apksigner sign --verbose --ks my-release-key.keystore --ks-key-alias manga_reader ./dist/capacitor/android/apk/release/app-release-unsigned.apk",
@@ -44,6 +44,11 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/eslint-parser": "^7.25.9",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/local-notifications": "^6.1.1",
+    "@eslint/compat": "^1.2.4",
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.17.0",
     "@quasar/app-webpack": "^3.15.1",
     "@types/chrome": "^0.0.268",
     "@types/isomorphic-fetch": "0.0.35",
@@ -66,9 +71,10 @@
     "eslint-plugin-promise": "^7.2.1",
     "eslint-plugin-vue": "^9.32.0",
     "eslint-webpack-plugin": "^4.2.0",
+    "globals": "^15.13.0",
     "jsdom": "^25.0.1",
     "jsdom-global": "^3.0.2",
-    "quasar-app-extension-ssg": "^3.0.5",
+    "quasar-app-extension-ssg": "^5.2.0",
     "ts-node": "^8.10.2",
     "typescript": "4.9.4",
     "webpack": "^5.97.1"

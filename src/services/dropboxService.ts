@@ -1,4 +1,4 @@
-import { Dropbox, DropboxAuth, DropboxResponse, DropboxResponseError } from 'dropbox'
+import { Dropbox, DropboxAuth, DropboxResponse } from 'dropbox'
 import { Manga } from 'src/classes/manga'
 import { migrateInput } from './migrationService'
 import { LocalStorage } from 'quasar'
@@ -17,6 +17,15 @@ interface ShareContents {
 export interface ReadListResponse {
   mangaList: Manga[]
   shareContents?: ShareContents
+}
+
+export class DropboxResponseError extends Error {
+  public status: number
+
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
 }
 
 const UPLOAD_FILE_SIZE_LIMIT = 150 * 1024 * 1024
@@ -45,8 +54,7 @@ export function getAuth (): qs.ParsedQs | undefined {
   const dropboxAuth = LocalStorage.getItem(constants.DROPBOX_AUTH)
   if (typeof dropboxAuth !== 'object') return undefined
 
-  const queryString = dropboxAuth as qs.ParsedQs
-  return queryString
+  return dropboxAuth as qs.ParsedQs
 }
 
 export function setAuth (queryString: Record<string, unknown> | undefined) {
@@ -107,7 +115,7 @@ async function initAuth (): Promise<Dropbox | undefined> {
 
 async function tryRefreshAccessToken (): Promise<void> {
   const refreshPromise = (dropboxAuth.checkAndRefreshAccessToken() as unknown)
-  await refreshPromise as Promise<unknown>
+  await (refreshPromise as Promise<unknown>)
 
   const accessToken = dropboxAuth.getAccessToken()
   const accessTokenExpiresAt = dropboxAuth.getAccessTokenExpiresAt()
@@ -132,7 +140,7 @@ function getRedirectUrl (): string {
 
 export async function saveList (mangaList: Manga[]): Promise<void> {
   const dropbox = dropboxSession || await initAuth()
-  if (!dropbox) throw new DropboxResponseError(401, {}, Error('Failed to init auth'))
+  if (!dropbox) throw new DropboxResponseError(401, 'Failed to init auth')
   await tryRefreshAccessToken()
 
   const contents = JSON.stringify(mangaList)
@@ -178,7 +186,7 @@ export async function saveList (mangaList: Manga[]): Promise<void> {
 
 export async function readList (): Promise<ReadListResponse> {
   const dropbox = dropboxSession || await initAuth()
-  if (!dropbox) throw new DropboxResponseError(401, {}, Error('Failed to init auth'))
+  if (!dropbox) throw new DropboxResponseError(401, 'Failed to init auth')
   await tryRefreshAccessToken()
 
   const shareText = await readFile(`/${constants.SHARE_FILENAME}`, dropbox)

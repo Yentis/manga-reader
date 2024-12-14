@@ -1,7 +1,7 @@
 import { useQuasar } from 'quasar'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { UrlNavigation } from 'src/classes/urlNavigation'
-import { getAuth, getAuthUrl, readList, saveList } from 'src/services/dropboxService'
+import { DropboxResponseError, getAuth, getAuthUrl, readList, saveList } from 'src/services/dropboxService'
 import useNotification from './useNotification'
 import useUrlNavigation from './useUrlNavigation'
 import ConfirmationDialog from '../components/ConfirmationDialog.vue'
@@ -9,7 +9,6 @@ import useMangaList from './useMangaList'
 import { ReadListResponse } from '../services/dropboxService'
 import { setEditCode, setShareId } from 'src/services/rentryService'
 import { useStore } from 'src/store'
-import { DropboxResponseError } from 'dropbox'
 
 export default function useCloudSync () {
   const $q = useQuasar()
@@ -21,7 +20,7 @@ export default function useCloudSync () {
   const openDropboxLogin = () => {
     getAuthUrl().then((authUrl) => {
       urlNavigation.value = new UrlNavigation(authUrl, true)
-    }).catch((error) => {
+    }).catch((error: Error) => {
       notification.value = new NotifyOptions(error, 'Failed to get auth url')
     })
   }
@@ -42,7 +41,7 @@ export default function useCloudSync () {
           return
         }
 
-        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error.error)}`)
+        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error)}`)
       } else if (error instanceof Error) {
         notification.value = new NotifyOptions(error)
       } else {
@@ -119,7 +118,7 @@ export default function useCloudSync () {
           return
         }
 
-        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error.error)}`)
+        notification.value = new NotifyOptions(`${error.status}: ${JSON.stringify(error)}`)
       } else if (error instanceof Error) {
         notification.value = new NotifyOptions(error)
       } else {

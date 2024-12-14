@@ -35,7 +35,7 @@ export class Manga {
         const newAltSources: Record<string, string> = {}
 
         Object.entries(initialAltSources).forEach(([key, value]) => {
-          if (key === newManga.site) return
+          if (key === newManga.site.toString()) return
           newAltSources[key] = value
         })
 

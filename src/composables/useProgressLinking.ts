@@ -43,7 +43,7 @@ export default function useProgressLinking (
       curLinkedSites[siteType] = mangaId
 
       newLinkedSites.value = curLinkedSites
-    }).catch(error => {
+    }).catch((error: Error) => {
       notification.value = new NotifyOptions(error, failMessage)
     })
   }
@@ -97,7 +97,7 @@ export default function useProgressLinking (
       const notifyOptions = new NotifyOptions(`Synced with ${getSiteNameByUrl(site.siteType) || 'unknown site'}`)
       notifyOptions.type = 'positive'
       notification.value = notifyOptions
-    }).catch(error => {
+    }).catch((error: Error) => {
       showSyncError(error, site, mangaId, chapterNum)
     })
   }
@@ -107,13 +107,18 @@ export default function useProgressLinking (
 
     notifyOptions.actions = [{
       label: 'Relog',
-      handler: async () => {
-        const loggedIn = await site.openLogin($q, $store)
-        if (loggedIn instanceof Error) {
-          notification.value = new NotifyOptions(loggedIn, 'Failed to log in')
-        } else if (loggedIn === true) {
+      handler: () => {
+        site.openLogin($q, $store).then((loggedIn) => {
+          if (loggedIn instanceof Error) {
+            notification.value = new NotifyOptions(loggedIn, 'Failed to log in')
+            return
+          }
+          if (!loggedIn) return
+
           syncSite(site, mangaId, chapterNum)
-        }
+        }).catch((error: Error) => {
+          notification.value = new NotifyOptions(error, 'Failed to log in')
+        })
       },
       color: 'white'
     }]

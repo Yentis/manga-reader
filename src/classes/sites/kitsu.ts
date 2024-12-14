@@ -72,7 +72,7 @@ export class Kitsu extends BaseSite {
     return new Promise((resolve, reject) => {
       this.getUserId().then(id => {
         resolve(typeof id === 'string')
-      }).catch(error => {
+      }).catch((error: Error) => {
         reject(error)
       })
     })
@@ -105,11 +105,11 @@ export class Kitsu extends BaseSite {
           this.checkLogin().then(loggedIn => {
             this.loggedIn = loggedIn
             resolve(loggedIn)
-          }).catch(error => {
+          }).catch((error: Error) => {
             this.loggedIn = false
             resolve(error)
           })
-        }).catch((error) => {
+        }).catch((error: Error) => {
           resolve(error)
         }).finally(() => {
           $q.loading.hide()
@@ -155,7 +155,7 @@ export class Kitsu extends BaseSite {
       // Ask to log in if we're not already
       const loggedIn = await this.openLogin($q, store)
       if (loggedIn instanceof Error) return loggedIn
-      if (loggedIn === false) return userId
+      if (!loggedIn) return userId
 
       $q.loading.show({
         delay: 100
