@@ -1,5 +1,4 @@
 import moment from 'moment'
-import { ContentType } from 'src/enums/contentTypeEnum'
 import { SiteType } from 'src/enums/siteEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
@@ -7,13 +6,6 @@ import { getDateFromNow, parseHtmlFromString, titleContainsQuery } from 'src/uti
 import constants from '../constants'
 import { Manga } from '../manga'
 import { BaseData, BaseSite } from './baseSite'
-
-interface MangakakalotSearch {
-  name: string
-  image: string
-  lastchapter: string
-  'story_link': string
-}
 
 export class Mangakakalot extends BaseSite {
   siteType = SiteType.Mangakakalot
@@ -63,27 +55,26 @@ export class Mangakakalot extends BaseSite {
 
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
     const request: HttpRequest = {
-      method: 'POST',
-      url: `${this.getUrl()}/home_json_search`,
-      data: JSON.stringify({ searchword: query }),
-      headers: { 'Content-Type': ContentType.URLENCODED }
+      method: 'GET',
+      url: `${this.getUrl()}/search/story/${encodeURIComponent(query)}`,
     }
     const response = await requestHandler.sendRequest(request)
 
-    const searchData = JSON.parse(response.data) as MangakakalotSearch[]
+    const doc = await parseHtmlFromString(response.data)
+    const searchItems = doc.querySelectorAll('.story_item')
     const mangaList = []
-    const parser = new DOMParser()
 
-    for (const entry of searchData) {
-      const manga = new Manga('', this.siteType)
-      const docElement = (await parseHtmlFromString(entry.name, parser)).documentElement
+    for (const item of searchItems) {
+      const url = item.querySelectorAll('a')[0]?.getAttribute('href')
+      if (!url) continue
 
-      manga.title = docElement.textContent || ''
+      const data = new BaseData(url)
+      data.title = item.querySelectorAll('.story_name')[0]
+      data.image = item.querySelectorAll('img')[0]
+      data.chapter = item.querySelectorAll('.story_chapter')[0]
+
+      const manga = this.buildManga(data)
       if (!titleContainsQuery(query, manga.title)) continue
-
-      manga.image = entry.image
-      manga.chapter = entry.lastchapter
-      manga.url = entry.story_link
 
       mangaList.push(manga)
     }
@@ -91,11 +82,15 @@ export class Mangakakalot extends BaseSite {
     return mangaList
   }
 
+  getUrl (): string {
+    return `https://www.${this.siteType}`
+  }
+
   getLoginUrl (): string {
     return 'https://user.manganelo.com/login?l=mangakakalot'
   }
 
   getTestUrl (): string {
-    return `${this.getUrl()}/read-mm1rb158504859793`
+    return `${this.getUrl()}/manga/osananajimi-ni-najimitai`
   }
 }

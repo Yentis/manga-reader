@@ -91,7 +91,7 @@ export class ReaperScans extends BaseSite {
 
     const chapterRequest: HttpRequest = {
       method: 'GET',
-      url: `https://api.reaperscans.com/chapter/query?page=1&perPage=30&series_id=${seriesId}`,
+      url: `https://api.reaperscans.com/chapters/${seriesId}?page=1&perPage=30`,
     }
     this.trySetUserAgent(chapterRequest)
 

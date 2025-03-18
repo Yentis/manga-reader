@@ -53,7 +53,6 @@ import { testMangaDex } from '../services/test/mangadex'
 import { testMangago } from '../services/test/mangago'
 import { testMangakakalot } from '../services/test/mangakakalot'
 import { testMangaKomi } from '../services/test/mangakomi'
-import { testManganato } from '../services/test/manganato'
 import { testReaperScans } from '../services/test/reaperscans'
 import { testWebtoons } from '../services/test/webtoons'
 import { testZeroScans } from '../services/test/zeroscans'
@@ -157,9 +156,6 @@ export default defineComponent({
           break
         case SiteType.MangaKomi:
           await doTest(testMangaKomi)
-          break
-        case SiteType.Manganato:
-          await doTest(testManganato)
           break
         case SiteType.ReaperScans:
           await doTest(testReaperScans)

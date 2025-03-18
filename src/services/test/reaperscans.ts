@@ -20,7 +20,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 66'
   desired.image =
-    'https://media.reaperscans.com/file/4SRBHm/comics/e80bc5cb-8a5a-4a8c-9b0e-b7d897251c3c/jKsllTU5dccCWwq6R7AbPpwHRRkAFMKY6vuW5Fln.png'
+    'https://reaperscans.com/_next/image?url=https%3A%2F%2Fmedia.reaperscans.com%2Ffile%2F4SRBHm%2Fcomics%2Fe80bc5cb-8a5a-4a8c-9b0e-b7d897251c3c%2FjKsllTU5dccCWwq6R7AbPpwHRRkAFMKY6vuW5Fln.png&w=640&q=75'
   desired.title = 'FFF-Class Trashero'
   desired.chapterUrl = `${site.getUrl()}/series/fff-class-trashero/chapter-66`
   desired.chapterNum = 66

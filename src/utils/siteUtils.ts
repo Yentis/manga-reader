@@ -6,9 +6,6 @@ import ChromeWindow from 'src/interfaces/chromeWindow'
 type DOMParserSupportedType = 'text/html' | 'text/xml'
 
 export const siteAliases = [
-  { url: 'manganelo.com', site: SiteType.Manganato },
-  { url: 'readmanganato.com', site: SiteType.Manganato },
-  { url: 'chapmanganato.to', site: SiteType.Manganato },
   { url: '1stkissmanga.love', site: SiteType.LikeManga },
   { url: '1stkissmanga.com', site: SiteType.LikeManga },
   { url: '1stkissmanga.io', site: SiteType.LikeManga },
@@ -31,6 +28,7 @@ export const siteAliases = [
   { url: 'resetscan.com', site: SiteType.ResetScans },
   { url: 'zeroscans.com', site: SiteType.ZeroScans },
   { url: 'scyllascans.org', site: SiteType.ScyllaScans },
+  { url: 'mangakakalot.com', site: SiteType.Mangakakalot },
 ]
 
 export function getUrl(url: string) {

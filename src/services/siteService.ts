@@ -1,6 +1,5 @@
 import { Manga } from '../classes/manga'
 import { SiteType } from '../enums/siteEnum'
-import { Manganato } from '../classes/sites/manganato'
 import { Webtoons } from '../classes/sites/webtoons'
 import { Mangakakalot } from '../classes/sites/mangakakalot'
 import { MangaDex } from '../classes/sites/mangadex'
@@ -30,7 +29,6 @@ const globalRequestQueue = new PQueue({
 
 const mangaDex = new MangaDex()
 const siteMap = new Map<string, BaseSite>([
-  [SiteType.Manganato, new Manganato()],
   [SiteType.Webtoons, new Webtoons()],
   [SiteType.LikeManga, new WordPress(SiteType.LikeManga)],
   [SiteType.Mangakakalot, new Mangakakalot()],
