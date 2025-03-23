@@ -395,7 +395,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { Status, StatusIcon } from '../../enums/statusEnum'
 import useMobileView from '../../composables/useMobileView'
 import useUrlNavigation from '../../composables/useUrlNavigation'
@@ -439,6 +439,7 @@ export default defineComponent({
     const hasLinkedSites = computed(() => {
       return Object.keys(manga.linkedSites.value).length > 0
     })
+
     const isUnread = computed(() => {
       return manga.status.value === Status.READING &&
       !isMangaRead(manga.chapter.value, manga.read.value)

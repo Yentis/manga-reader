@@ -1,5 +1,5 @@
 import useMangaList from './useMangaList'
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { Ref } from '@vue/runtime-core/dist/runtime-core'
 import { Manga } from '../classes/manga'
 import { SiteType } from '../enums/siteEnum'
@@ -8,12 +8,13 @@ import ConfirmationDialog from '../components/ConfirmationDialog.vue'
 import useProgressLinking from './useProgressLinking'
 import { Status } from 'src/enums/statusEnum'
 import useAltSources from './useAltSources'
-import { getMangaInfoByUrl } from 'src/services/siteService'
+import { getMangaInfoByUrl, getSite } from 'src/services/siteService'
 import useNotification from './useNotification'
 import { NotifyOptions } from 'src/classes/notifyOptions'
 import { useStore } from 'src/store'
 import usePushNotification from './usePushNotification'
 import { isMangaRead } from 'src/services/sortService'
+import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
 
 export default function useManga (curUrl: string) {
   const $store = useStore()
@@ -32,6 +33,7 @@ export default function useManga (curUrl: string) {
     updateMangaRating,
     updateMangaShouldUpdate
   } = useMangaList()
+
   const manga = computed(() => {
     return $store.state.reader.mangaMap.get(curUrl) || new Manga(curUrl, SiteType.AsuraScans)
   })
@@ -105,7 +107,15 @@ export default function useManga (curUrl: string) {
   })
 
   const title = computed(() => manga.value.title)
-  const image = computed(() => manga.value.image)
+
+  const { readImage } = useMangaImage()
+
+  const image = ref('')
+  watchEffect(() => {
+    readImage(manga.value.site, manga.value.image).then((data) => {
+      image.value = data
+    }).catch(console.error)
+  })
 
   const $q = useQuasar()
   const showDeleteMangaDialog = (): Promise<boolean> => {
@@ -115,7 +125,7 @@ export default function useManga (curUrl: string) {
         componentProps: {
           title: 'Delete manga',
           content: `Are you sure you want to delete ${title.value}?`,
-          imageUrl: image.value
+          imageUrl: image.value,
         }
       }).onOk(() => {
         resolve(true)
@@ -297,5 +307,16 @@ export function useMangaItem (url: string) {
     newLinkedSites,
     newSources,
     saveManga
+  }
+}
+
+export function useMangaImage () {
+  const readImage = async (siteType: SiteType | LinkingSiteType, url: string) => {
+    const site = getSite(siteType)
+    return (await site?.readImage(url)) ?? url
+  }
+
+  return {
+    readImage
   }
 }

@@ -2,7 +2,7 @@ import { ContentType } from 'src/enums/contentTypeEnum'
 import HttpRequest from 'src/interfaces/httpRequest'
 import HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest from './baseRequest'
-import { CapacitorCookies, CapacitorHttp } from '@capacitor/core'
+import { CapacitorCookies, CapacitorHttp, HttpResponseType } from '@capacitor/core'
 
 const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark']
 
@@ -35,6 +35,7 @@ export default class CapacitorRequest extends BaseRequest {
       method: request.method,
       data: request.data,
       headers: request.headers,
+      responseType: headers.responseType as HttpResponseType | undefined,
     })
 
     const data = typeof capacitorResponse.data === 'string'

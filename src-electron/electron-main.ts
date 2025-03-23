@@ -203,18 +203,26 @@ ipcMain.handle('net-request', async (_event, options: HttpRequest): Promise<Http
     let answered = false
 
     request.on('response', (response) => {
-      let data = ''
+      let data = new Uint8Array()
 
       response.on('data', (chunk) => {
-        data += chunk.toString()
+        const mergedData = new Uint8Array(data.length + chunk.length);
+        mergedData.set(data);
+        mergedData.set(chunk, data.length);
+
+        data = mergedData
       })
 
       response.on('end', () => {
         if (answered) return
 
+        const resultData = headers.responseType === 'arraybuffer'
+          ? Buffer.from(data).toString('base64')
+          : Buffer.from(data).toString()
+
         const result: HttpResponse = {
           headers: response.headers,
-          data,
+          data: resultData,
           status: response.statusCode,
           statusText: response.statusMessage,
         }

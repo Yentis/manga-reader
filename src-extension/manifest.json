@@ -4,7 +4,7 @@
   "name": "Manga Reader",
   "description": "Extension to support usage of the browser version of Yentis' Manga Reader",
   "author": "Yentis#5218",
-  "version": "1.4",
+  "version": "1.5",
   "background": {
     "service_worker": "background.js"
   },

@@ -100,6 +100,10 @@ export abstract class BaseSite {
     return url
   }
 
+  public readImage(url: string): Promise<string> {
+    return Promise.resolve(url);
+  }
+
   protected getTitle(data: BaseData): string {
     return data.title?.textContent?.trim() || ''
   }

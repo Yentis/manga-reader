@@ -117,7 +117,28 @@ async function doRequest(request) {
     headerRecord[header.name] = header.value
   })
 
-  const data = await response.text()
+  let data
+
+  if (request.headers?.responseType === 'arraybuffer') {
+    const blob = await response.blob()
+
+    const promise = new Promise((resolve, reject) => {
+      try {
+        const reader = new FileReader()
+        reader.onload = () => { resolve(reader.result) }
+        reader.readAsDataURL(blob)
+      } catch(e) {
+        reject(e);
+      }
+    });
+
+    const base64 = await promise
+    data = base64.substring(base64.indexOf(',') + 1)
+  } else {
+    data = await response.text()
+  }
+
+  console.log(data)
 
   return {
     headers: headerRecord,

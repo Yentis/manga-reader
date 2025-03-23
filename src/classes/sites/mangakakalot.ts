@@ -10,6 +10,20 @@ import { BaseData, BaseSite } from './baseSite'
 export class Mangakakalot extends BaseSite {
   siteType = SiteType.Mangakakalot
 
+  public override async readImage(url: string): Promise<string> {
+    const request: HttpRequest = {
+      method: 'GET',
+      url,
+      headers: {
+        referer: `${this.getUrl()}/`,
+        responseType: 'arraybuffer',
+      },
+    }
+
+    const response = await requestHandler.sendRequest(request)
+    return `data:image/png;base64,${response.data}`
+  }
+
   getChapterNum (data: BaseData): number {
     const chapter = this.getChapter(data)
     const matches = /Chapter ([-+]?[0-9]*\.?[0-9]+)/gm.exec(chapter) || []
@@ -56,7 +70,10 @@ export class Mangakakalot extends BaseSite {
   protected async searchImpl (query: string): Promise<Error | Manga[]> {
     const request: HttpRequest = {
       method: 'GET',
-      url: `${this.getUrl()}/search/story/${encodeURIComponent(query)}`,
+      url: `${this.getUrl()}/search/story/${this.changeAlias(query)}`,
+      headers: {
+        referer: `${this.getUrl()}/`
+      },
     }
     const response = await requestHandler.sendRequest(request)
 
@@ -80,6 +97,23 @@ export class Mangakakalot extends BaseSite {
     }
 
     return mangaList
+  }
+
+  // Taken directly from the site
+  private changeAlias(alias: string) {
+    let str = alias;
+    str = str.toLowerCase();
+    str = str.replace(/Ã |Ã¡|áº¡|áº£|Ã£|Ã¢|áº§|áº¥|áº­|áº©|áº«|Äƒ|áº±|áº¯|áº·|áº³|áºµ/g, "a");
+    str = str.replace(/Ã¨|Ã©|áº¹|áº»|áº½|Ãª|á»|áº¿|á»‡|á»ƒ|á»…/g, "e");
+    str = str.replace(/Ã¬|Ã­|á»‹|á»‰|Ä©/g, "i");
+    str = str.replace(/Ã²|Ã³|á»|á»|Ãµ|Ã´|á»“|á»‘|á»™|á»•|á»—|Æ¡|á»|á»›|á»£|á»Ÿ|á»¡/g, "o");
+    str = str.replace(/Ã¹|Ãº|á»¥|á»§|Å©|Æ°|á»«|á»©|á»±|á»­|á»¯/g, "u");
+    str = str.replace(/á»³|Ã½|á»µ|á»·|á»¹/g, "y");
+    str = str.replace(/Ä‘/g, "d");
+    str = str.replace(/!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'| |\"|\&|\#|\[|\]|~|-|$|_/g, "_");
+    str = str.replace(/_+_/g, "_");
+    str = str.replace(/^\_+|\_+$/g, "");
+    return str;
   }
 
   getUrl (): string {

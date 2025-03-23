@@ -50,7 +50,7 @@
               <q-img
                 contain
                 class="manga-image-search"
-                :src="manga.image"
+                :src="images[manga.image]"
               />
             </q-item-section>
 
@@ -78,11 +78,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, Ref, watchEffect } from 'vue'
 import useMangaList from '../composables/useMangaList'
 import { useSearchResults } from '../composables/useSearchResults'
 import useMobileView from '../composables/useMobileView'
 import { getSiteNameByUrl } from '../utils/siteUtils'
+import { useMangaImage } from 'src/composables/useManga'
 
 export default defineComponent({
   name: 'MangaSearch',
@@ -123,6 +124,7 @@ export default defineComponent({
     const { findManga } = useMangaList()
     const { searchResults } = useSearchResults()
     const { mobileView } = useMobileView()
+    const { readImage } = useMangaImage()
     const excludedUrls = props.excludedUrls.filter((url) => typeof url === 'string') as string[]
 
     const onSearch = async (siteTypeName = '') => {
@@ -130,11 +132,24 @@ export default defineComponent({
       if (foundManga) searchDropdownShown.value = true
     }
 
+    const images: Ref<Record<string, string>> = ref({})
+    watchEffect(() => {
+      searchResults.value.forEach((result) => {
+        readImage(result.site, result.image).then((image) => {
+          images.value[result.image] = image
+        }).catch((error) => {
+          console.error(error)
+          images.value[result.image] = result.image
+        })
+      })
+    })
+
     return {
       search,
       mangaTitle,
       searchDropdownShown,
       searchResults,
+      images,
       mobileView,
       onSearch,
       getSiteNameByUrl

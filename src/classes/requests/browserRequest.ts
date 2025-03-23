@@ -41,7 +41,7 @@ export async function hasExtension(): Promise<boolean> {
         return
       }
 
-      resolve(response === '1.4')
+      resolve(response === '1.5')
     })
   })
 }
@@ -49,9 +49,11 @@ export async function hasExtension(): Promise<boolean> {
 export default class BrowserRequest extends BaseRequest {
   async sendRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     request.headers = request.headers || {}
+
     if (request.headers['Content-Type'] === ContentType.URLENCODED && typeof request.data === 'string') {
       request.data = this.convertToUrlEncoded(request.data)
     }
+
     if (!request.headers.cookie) {
       request.headers.cookie = ''
     }
