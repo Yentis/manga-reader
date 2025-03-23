@@ -78,12 +78,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, watchEffect } from 'vue'
+import { defineComponent, ref, watchEffect } from 'vue'
 import useMangaList from '../composables/useMangaList'
 import { useSearchResults } from '../composables/useSearchResults'
 import useMobileView from '../composables/useMobileView'
 import { getSiteNameByUrl } from '../utils/siteUtils'
-import { useMangaImage } from 'src/composables/useManga'
+import { SiteType } from 'src/enums/siteEnum'
+import { LinkingSiteType } from 'src/enums/linkingSiteEnum'
+import { getSite } from 'src/services/siteService'
 
 export default defineComponent({
   name: 'MangaSearch',
@@ -124,7 +126,6 @@ export default defineComponent({
     const { findManga } = useMangaList()
     const { searchResults } = useSearchResults()
     const { mobileView } = useMobileView()
-    const { readImage } = useMangaImage()
     const excludedUrls = props.excludedUrls.filter((url) => typeof url === 'string') as string[]
 
     const onSearch = async (siteTypeName = '') => {
@@ -132,7 +133,14 @@ export default defineComponent({
       if (foundManga) searchDropdownShown.value = true
     }
 
-    const images: Ref<Record<string, string>> = ref({})
+    const record: Record<string, string> = {}
+    const images = ref(record)
+
+    const readImage = async (siteType: SiteType | LinkingSiteType, url: string): Promise<string> => {
+      const site = getSite(siteType)
+      return (await site?.readImage(url)) ?? url
+    }
+
     watchEffect(() => {
       searchResults.value.forEach((result) => {
         readImage(result.site, result.image).then((image) => {

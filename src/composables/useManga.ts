@@ -107,10 +107,13 @@ export default function useManga (curUrl: string) {
   })
 
   const title = computed(() => manga.value.title)
-
-  const { readImage } = useMangaImage()
-
   const image = ref('')
+
+  const readImage = async (siteType: SiteType | LinkingSiteType, url: string): Promise<string> => {
+    const site = getSite(siteType)
+    return (await site?.readImage(url)) ?? url
+  }
+
   watchEffect(() => {
     readImage(manga.value.site, manga.value.image).then((data) => {
       image.value = data
@@ -307,16 +310,5 @@ export function useMangaItem (url: string) {
     newLinkedSites,
     newSources,
     saveManga
-  }
-}
-
-export function useMangaImage () {
-  const readImage = async (siteType: SiteType | LinkingSiteType, url: string) => {
-    const site = getSite(siteType)
-    return (await site?.readImage(url)) ?? url
-  }
-
-  return {
-    readImage
   }
 }
