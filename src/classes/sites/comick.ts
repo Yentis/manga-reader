@@ -108,7 +108,7 @@ export class ComicK extends BaseSite {
 
     const chaptersRequest: HttpRequest = {
       method: 'GET',
-      url: `https://api.comick.io/comic/${hid}/chapters`,
+      url: `https://api.comick.io/comic/${hid}/chapters?lang=en`,
       headers: {
         'Referer': this.getUrl(),
       },
