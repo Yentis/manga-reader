@@ -22,9 +22,9 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 47'
   desired.image = 'https://gg.asuracomic.net/storage/media/114/conversions/367e3d17-optimized.webp'
   desired.title = 'Mookhyang The Origin'
-  desired.chapterUrl = 'https://asuracomic.net/series/mookhyang-the-origin-db322c79/chapter/47'
+  desired.chapterUrl = 'https://asuracomic.net/series/mookhyang-the-origin-e2ee62b5/chapter/47'
   desired.chapterNum = 47
-  desired.chapterDate = '3 years ago'
+  desired.chapterDate = '4 years ago'
 
   mangaEqual(manga, desired)
 }
@@ -36,7 +36,7 @@ async function readUrlAdvanced(site: BaseSite): Promise<void> {
   desired.chapter = 'Chapter 88'
   desired.image = 'https://gg.asuracomic.net/storage/media/245/01J3BAR5EFJJSB84FC5GDZYSW7.webp'
   desired.title = 'Solo Bug Player'
-  desired.chapterUrl = 'https://asuracomic.net/series/solo-bug-player-801f11eb/chapter/88'
+  desired.chapterUrl = 'https://asuracomic.net/series/solo-bug-player-b94e6832/chapter/88'
   desired.chapterNum = 88
 
   mangaEqual(manga, desired)
@@ -47,7 +47,7 @@ async function search(site: BaseSite): Promise<void> {
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image = 'https://gg.asuracomic.net/storage/media/114/conversions/367e3d17-thumb-small.webp'
   desired.chapter = 'Chapter 47'
-  desired.url = 'https://asuracomic.net/series/mookhyang-the-origin-db322c79'
+  desired.url = 'https://asuracomic.net/series/mookhyang-the-origin-e2ee62b5'
 
   return searchValid(results, desired, QUERY)
 }

@@ -11,8 +11,6 @@ import { testHiperDEX } from './test/hiperdex'
 import { testMangaDex } from './test/mangadex'
 import { testMangago } from './test/mangago'
 import { testMangakakalot } from './test/mangakakalot'
-import { testMangaKomi } from './test/mangakomi'
-import { testReaperScans } from './test/reaperscans'
 import { testResetScans } from './test/resetscans'
 import { testWebtoons } from './test/webtoons'
 import { testZeroScans } from './test/zeroscans'
@@ -22,6 +20,7 @@ import { testTapas } from './test/tapas'
 import { testComikey } from './test/comikey'
 import { testTappytoon } from './test/tappytoon'
 import { testScyllaScans } from './test/scyllascans'
+import { testComicK } from 'src/services/test/comick'
 
 export default async function testAll(
   $q: QVueGlobals
@@ -37,6 +36,11 @@ export default async function testAll(
   promises.push(
     testBatoto().catch((error) => {
       errors.push({ site: SiteType.Batoto, error: error })
+    })
+  )
+  promises.push(
+    testComicK().catch((error) => {
+      errors.push({ site: SiteType.ComicK, error: error })
     })
   )
   promises.push(
@@ -82,16 +86,6 @@ export default async function testAll(
   promises.push(
     testMangakakalot().catch((error) => {
       errors.push({ site: SiteType.Mangakakalot, error: error })
-    })
-  )
-  promises.push(
-    testMangaKomi().catch((error) => {
-      errors.push({ site: SiteType.MangaKomi, error: error })
-    })
-  )
-  promises.push(
-    testReaperScans().catch((error) => {
-      errors.push({ site: SiteType.ReaperScans, error: error })
     })
   )
   promises.push(

@@ -17,10 +17,10 @@ import { Cubari } from 'src/classes/sites/cubari'
 import { Tapas } from 'src/classes/sites/tapas'
 import { ZeroScans } from 'src/classes/sites/zeroscans'
 import { Comikey } from 'src/classes/sites/comikey'
-import { ReaperScans } from 'src/classes/sites/reaperscans'
 import { TappyToon } from 'src/classes/sites/tappytoon'
 import { ScyllaScans } from 'src/classes/sites/scyllascans'
 import { AsuraScans } from 'src/classes/sites/asurascans'
+import { ComicK } from 'src/classes/sites/comick'
 
 const globalRequestQueue = new PQueue({
   interval: 1000,
@@ -33,9 +33,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.LikeManga, new WordPress(SiteType.LikeManga)],
   [SiteType.Mangakakalot, new Mangakakalot()],
   [SiteType.MangaDex, mangaDex],
-  [SiteType.MangaKomi, new WordPress(SiteType.MangaKomi)],
   [SiteType.HiperDEX, new WordPress(SiteType.HiperDEX)],
-  [SiteType.ReaperScans, new ReaperScans()],
   [SiteType.AsuraScans, new AsuraScans()],
   [SiteType.Mangago, new Mangago()],
   [SiteType.ZeroScans, new ZeroScans()],
@@ -47,6 +45,7 @@ const siteMap = new Map<string, BaseSite>([
   [SiteType.Comikey, new Comikey()],
   [SiteType.Tappytoon, new TappyToon()],
   [SiteType.ScyllaScans, new ScyllaScans()],
+  [SiteType.ComicK, new ComicK()],
 ])
 const linkingSiteMap = new Map<string, BaseSite>([
   [LinkingSiteType.MangaDex, mangaDex],
@@ -150,7 +149,11 @@ export function searchManga(
       let mangaResults: Manga[] = []
 
       for (const mangaList of results) {
-        if (mangaList instanceof Error) continue
+        if (mangaList instanceof Error) {
+          console.error(mangaList)
+          continue
+        }
+
         mangaResults = mangaResults.concat(mangaList)
       }
 

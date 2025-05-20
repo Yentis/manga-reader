@@ -3,6 +3,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import moment from 'moment'
 
 const SITE_TYPE = SiteType.Mangakakalot
 const QUERY = 'together with the rain'
@@ -23,7 +24,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'Osananajimi ni najimitai'
   desired.chapterUrl = `${site.getUrl()}/manga/osananajimi-ni-najimitai/chapter-24`
   desired.chapterNum = 24
-  desired.chapterDate = '5 months ago'
+  desired.chapterDate = moment('2024-10-27 20:40', 'YYYY-MM-DD hh:mm').fromNow()
 
   mangaEqual(manga, desired)
 }

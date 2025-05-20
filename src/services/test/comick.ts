@@ -3,11 +3,12 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import moment from 'moment'
 
-const SITE_TYPE = SiteType.ReaperScans
-const QUERY = 'fff-class trashero'
+const SITE_TYPE = SiteType.ComicK
+const QUERY = 'trophy husband'
 
-export async function testReaperScans(): Promise<void> {
+export async function testComicK(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
@@ -18,13 +19,12 @@ export async function testReaperScans(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.chapter = 'Chapter 66'
-  desired.image =
-    'https://reaperscans.com/_next/image?url=https%3A%2F%2Fmedia.reaperscans.com%2Ffile%2F4SRBHm%2Fcomics%2Fe80bc5cb-8a5a-4a8c-9b0e-b7d897251c3c%2FjKsllTU5dccCWwq6R7AbPpwHRRkAFMKY6vuW5Fln.png&w=640&q=75'
-  desired.title = 'FFF-Class Trashero'
-  desired.chapterUrl = `${site.getUrl()}/series/fff-class-trashero/chapter-66`
-  desired.chapterNum = 66
-  desired.chapterDate = '2 years ago'
+  desired.chapter = 'Ch. 55'
+  desired.image = 'https://meo.comick.pictures/br1Yoq.jpg'
+  desired.title = 'Trophy Husband'
+  desired.chapterUrl = `${site.getUrl()}/comic/02-trophy-husband/G8h61xDr`
+  desired.chapterNum = 55
+  desired.chapterDate = moment('2023-12-30T10:42:53Z').fromNow()
 
   mangaEqual(manga, desired)
 }
@@ -32,10 +32,9 @@ async function readUrl(site: BaseSite): Promise<void> {
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  desired.image =
-    'https://media.reaperscans.com/file/4SRBHm/comics/e80bc5cb-8a5a-4a8c-9b0e-b7d897251c3c/jKsllTU5dccCWwq6R7AbPpwHRRkAFMKY6vuW5Fln.png'
-  desired.chapter = 'Chapter 66'
-  desired.url = `${site.getUrl()}/series/fff-class-trashero`
+  desired.image = 'https://meo.comick.pictures/br1Yoq.jpg'
+  desired.chapter = 'Ch. 55'
+  desired.url = `${site.getUrl()}/comic/02-trophy-husband`
 
   return searchValid(results, desired, QUERY)
 }

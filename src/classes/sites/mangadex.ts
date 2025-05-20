@@ -170,7 +170,9 @@ export class MangaDex extends BaseSite {
     const chapterRequest: HttpRequest = { method: 'GET', url: `https://api.${this.siteType}/chapter?${chapterQueryString}` }
     const chapterResponse = await requestHandler.sendRequest(chapterRequest)
     const chapterData = JSON.parse(chapterResponse.data) as ChapterResponse
+
     const chapterResult = chapterData.data[0]
+    if (!chapterResult) return new Error('No chapters found')
 
     const mangaQueryString = qs.stringify({
       'includes[]': 'cover_art'
@@ -205,7 +207,8 @@ export class MangaDex extends BaseSite {
     const queryString = qs.stringify({
       title: query
     })
-    const request: HttpRequest = { method: 'GET', url: `https://api.${this.siteType}/manga?title=${queryString}` }
+
+    const request: HttpRequest = { method: 'GET', url: `https://api.${this.siteType}/manga?${queryString}` }
     const response = await requestHandler.sendRequest(request)
     const mangaData = JSON.parse(response.data) as SearchResponse
     const promises: Promise<Error | Manga>[] = []

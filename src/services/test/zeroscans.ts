@@ -3,6 +3,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import moment from 'moment'
 
 const SITE_TYPE = SiteType.ZeroScans
 const QUERY = 'all heavenly days'
@@ -23,7 +24,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'All Heavenly Days'
   desired.chapterUrl = `${site.getUrl()}/comics/all-heavenly-days/384`
   desired.chapterNum = 48
-  desired.chapterDate = '2 years ago'
+  desired.chapterDate = moment('2022-05-20', 'YYYY-MM-DD').fromNow()
 
   mangaEqual(manga, desired)
 }

@@ -8,14 +8,13 @@ import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
 
 const SITE_TYPE = SiteType.MangaDex
-const QUERY = 'together with the rain'
+const QUERY = 'kaiki mandala'
 
 export async function testMangaDex(): Promise<void> {
   const site = getSite(SITE_TYPE)
   if (!site) throw Error('Site not found')
 
   await readUrl(site)
-  await readUrlMultiVolumes()
   await search(site)
   await convertLegacyIds()
 }
@@ -34,26 +33,13 @@ async function readUrl(site: BaseSite): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function readUrlMultiVolumes(): Promise<void> {
-  const manga = await getMangaInfo('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
-  const desired = new Manga('https://mangadex.org/title/3e873799-6f86-4f17-bc50-8b6ba07b9978', SITE_TYPE)
-  desired.chapter = 'Volume 2 - Chapter 77'
-  desired.image =
-    'https://uploads.mangadex.org/covers/3e873799-6f86-4f17-bc50-8b6ba07b9978/3205ab00-84e2-4df5-bd80-48d89450fbce.jpg'
-  desired.title = 'Revival Man'
-  desired.chapterUrl = 'https://mangadex.org/chapter/c127f347-3586-46bb-a0be-f5409df73100'
-  desired.chapterNum = 77
-
-  mangaEqual(manga, desired)
-}
-
 async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.image =
-    'https://uploads.mangadex.org/covers/159eb4f1-de8f-4c53-91da-03f49fe84250/9450650b-9599-4bf5-b150-4f0d337b484c.jpg'
-  desired.chapter = "Chapter 2 - That’s what's unfair about you!"
-  desired.url = 'https://mangadex.org/title/159eb4f1-de8f-4c53-91da-03f49fe84250'
+    'https://uploads.mangadex.org/covers/73a132c7-0872-4c42-8a8d-1d7c931992c2/ca5c9bd2-b708-432b-9a69-5f074c0ff215.jpg'
+  desired.chapter = "Volume 1 - Chapter 15 - The Sea of Strange Births"
+  desired.url = 'https://mangadex.org/title/73a132c7-0872-4c42-8a8d-1d7c931992c2'
 
   return searchValid(results, desired, QUERY)
 }

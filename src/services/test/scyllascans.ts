@@ -3,6 +3,7 @@ import { BaseSite } from 'src/classes/sites/baseSite'
 import { SiteType } from 'src/enums/siteEnum'
 import { getMangaInfo, getSite, searchManga } from '../siteService'
 import { mangaEqual, searchValid } from '../testService'
+import moment from 'moment'
 
 const SITE_TYPE = SiteType.ScyllaScans
 const QUERY = 'one in a hundred'
@@ -23,7 +24,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'One in a Hundred'
   desired.chapterUrl = `${site.getUrl()}/manga/one-in-a-hundred/6`
   desired.chapterNum = 6
-  desired.chapterDate = '8 months ago'
+  desired.chapterDate = moment('2024-05-20', 'YYYY-MM-DD').fromNow()
 
   mangaEqual(manga, desired)
 }

@@ -20,7 +20,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
   desired.chapter = 'Chapter 84 - [END]'
-  desired.image = 'https://i0.wp.com/hiperdex.com/wp-content/uploads/2022/01/10-Years-in-the-Friend-Zone.webp?fit=250%2C333&quality=80&ssl=1'
+  desired.image = 'https://i0.wp.com/hiperdex.com/wp-content/uploads/2022/01/10-Years-in-the-Friend-Zone.webp?resize=193%2C278&quality=80&ssl=1'
   desired.title = '10 Years in the Friend Zone'
   desired.chapterUrl = 'https://hiperdex.com/manga/10-years-in-the-friend-zone/chapter-84/'
   desired.chapterNum = 84
@@ -33,9 +33,9 @@ async function readUrl2(): Promise<void> {
   const manga = await getMangaInfo('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   const desired = new Manga('https://hiperdex.com/manga/touch-on/', SITE_TYPE)
   desired.chapter = '109.3'
-  desired.image = 'https://i0.wp.com/hiperdex.com/wp-content/uploads/2020/06/Touch-On.jpg?fit=250%2C333&quality=89&ssl=1'
+  desired.image = 'https://i0.wp.com/hiperdex.com/wp-content/uploads/2020/06/Touch-On.jpg?resize=193%2C278&quality=89&ssl=1'
   desired.title = 'Touch On'
-  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on/109-3/'
+  desired.chapterUrl = 'https://hiperdex.com/manga/touch-on-xyz/109-3/'
   desired.chapterNum = 109.3
   desired.chapterDate = '3 years ago'
 

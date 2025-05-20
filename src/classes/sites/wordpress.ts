@@ -87,7 +87,7 @@ export class WordPress extends BaseSite {
     }
 
     let chapterDate = moment(chapterDateText, format)
-    if (chapterDate.isAfter(moment.now()) && format === 'MMM DD') {
+    if (chapterDate.isAfter(moment.now()) && (format === 'MMM DD' || format === 'DD-MMM')) {
       const year = new Date().getFullYear()
       chapterDate = chapterDate.year(year - 1)
     }
@@ -111,7 +111,7 @@ export class WordPress extends BaseSite {
     if (this.siteType === SiteType.LikeManga) {
       title = title.replace('LIKE MANGA', '').trim()
     } else if (this.siteType === SiteType.HiperDEX) {
-      title = title.replace('» Hiperdex', '').trim()
+      title = title.replace('» Hiperdex', '').replace(' Manhwa Free Chapters | HiperDEX', '').trim()
     }
 
     return title
@@ -309,8 +309,6 @@ export class WordPress extends BaseSite {
     switch (this.siteType) {
       case SiteType.LikeManga:
         return `${this.getUrl()}/manga/the-elegant-sea-of-savagery/`
-      case SiteType.MangaKomi:
-        return `${this.getUrl()}/manga/good-night/`
       case SiteType.HiperDEX:
         return `${this.getUrl()}/manga/10-years-in-the-friend-zone/`
       case SiteType.ResetScans:

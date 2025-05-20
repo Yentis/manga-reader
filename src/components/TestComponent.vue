@@ -52,8 +52,6 @@ import { testHiperDEX } from '../services/test/hiperdex'
 import { testMangaDex } from '../services/test/mangadex'
 import { testMangago } from '../services/test/mangago'
 import { testMangakakalot } from '../services/test/mangakakalot'
-import { testMangaKomi } from '../services/test/mangakomi'
-import { testReaperScans } from '../services/test/reaperscans'
 import { testWebtoons } from '../services/test/webtoons'
 import { testZeroScans } from '../services/test/zeroscans'
 import { testFlameComics } from '../services/test/flamecomics'
@@ -66,6 +64,7 @@ import { testTapas } from 'src/services/test/tapas'
 import { testComikey } from 'src/services/test/comikey'
 import { testTappytoon } from 'src/services/test/tappytoon'
 import { testScyllaScans } from 'src/services/test/scyllascans'
+import { testComicK } from 'src/services/test/comick'
 
 export default defineComponent({
   name: 'MangaTest',
@@ -127,6 +126,9 @@ export default defineComponent({
         case SiteType.Batoto:
           await doTest(testBatoto)
           break
+        case SiteType.ComicK:
+          await doTest(testComicK)
+          break
         case SiteType.Comikey:
           await doTest(testComikey)
           break
@@ -153,12 +155,6 @@ export default defineComponent({
           break
         case SiteType.Mangakakalot:
           await doTest(testMangakakalot)
-          break
-        case SiteType.MangaKomi:
-          await doTest(testMangaKomi)
-          break
-        case SiteType.ReaperScans:
-          await doTest(testReaperScans)
           break
         case SiteType.ResetScans:
           await doTest(testResetScans)

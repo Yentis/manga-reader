@@ -24,7 +24,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.title = 'To Be Winner'
   desired.chapterUrl = 'https://comikey.com/read/to-be-winner-webtoon/dowAND/episode-113/'
   desired.chapterNum = 113
-  desired.chapterDate = '3 years ago'
+  desired.chapterDate = '4 years ago'
 
   mangaEqual(manga, desired)
 }
