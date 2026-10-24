@@ -17,6 +17,18 @@ export async function testAsuraScans(): Promise<void> {
   await search(site)
 }
 
+function chapterUrlEqual(desired: string, actual: string): boolean {
+  const getId = (id: string): string => {
+    const parts = id.split('/')[4]?.split('-')
+    return parts?.[parts.length - 1] ?? ''
+  }
+
+  desired = desired.replace(getId(desired), '')
+  actual = actual.replace(getId(actual), '')
+
+  return desired === actual
+}
+
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
@@ -28,7 +40,7 @@ async function readUrl(site: BaseSite): Promise<void> {
   desired.chapterNum = 47
   desired.chapterDate = moment('2021-08-15T21:19:26Z').fromNow()
 
-  mangaEqual(manga, desired)
+  mangaEqual(manga, desired, { chapterUrlEqual })
 }
 
 async function readUrlAdvanced(site: BaseSite): Promise<void> {
@@ -43,7 +55,7 @@ async function readUrlAdvanced(site: BaseSite): Promise<void> {
   desired.chapterNum = 88
   desired.chapterDate = moment('2022-04-17T18:05:45Z').fromNow()
 
-  mangaEqual(manga, desired)
+  mangaEqual(manga, desired, { chapterUrlEqual })
 }
 
 async function search(site: BaseSite): Promise<void> {

@@ -1,9 +1,9 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.27.4",
+  "version": "2.27.5",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
-  "author": "Yentis#5218",
+  "author": "Yentis",
   "private": true,
   "scripts": {
     "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,cjs,mjs,vue}\"",
@@ -19,7 +19,7 @@
   "@comments": {
     "devDependencies": {
       "@babel/core": "Peer dependency for @babel/eslint-parser",
-      "@types/node-fetch": "Peer dependency for dropbox",
+      "@types/node-fetch": "Peer dependency for Dropbox",
       "buffer": "Peer dependency for quasar-app-extension-ssg > crc",
       "jsdom": "Peer dependency for jsdom-global",
       "typescript": "Peer dependency for @typescript-eslint/eslint-plugin > tsutils",

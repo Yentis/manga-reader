@@ -26,12 +26,12 @@ export async function testTapas(): Promise<void> {
 async function readUrl(site: BaseSite): Promise<void> {
   const manga = await getMangaInfo(site.getTestUrl(), SITE_TYPE)
   const desired = new Manga(site.getTestUrl(), SITE_TYPE)
-  const chapter = 212
+  const chapter = 214
 
   desired.title = 'Villains Are Destined to Die'
-  desired.chapter = `${chapter}.`
+  desired.chapter = `${chapter}. The Ending`
   desired.chapterNum = chapter + 12
-  desired.chapterDate = moment('Jul 29, 2026', 'MMM DD, YYYY').fromNow()
+  desired.chapterDate = moment('Aug 12, 2026', 'MMM DD, YYYY').fromNow()
 
   mangaEqual(manga, desired, EQUALITY_OPTIONS)
 }

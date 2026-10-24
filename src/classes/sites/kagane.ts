@@ -6,6 +6,7 @@ import { requestHandler } from 'src/services/requestService'
 import { titleContainsQuery } from 'src/utils/siteUtils'
 import moment from 'moment'
 import { ContentType } from 'src/enums/contentTypeEnum'
+import qs from 'qs'
 
 interface KaganeManga {
   series_id: string
@@ -13,10 +14,13 @@ interface KaganeManga {
   series_alternate_titles: {
     title: string
   }[]
-  series_books: KaganeChapter[]
   series_covers: {
     image_id: string
   }[]
+}
+
+interface KaganeBooks {
+  items: KaganeChapter[]
 }
 
 interface KaganeChapter {
@@ -50,10 +54,12 @@ interface KaganeSource {
 
 class KaganeData extends BaseData {
   manga: KaganeManga
+  latestChapter?: KaganeChapter
 
-  constructor(manga: KaganeManga, url: string) {
+  constructor(manga: KaganeManga, latestChapter: KaganeChapter | undefined, url: string) {
     super(url)
     this.manga = manga
+    this.latestChapter = latestChapter
   }
 }
 
@@ -61,12 +67,8 @@ export class Kagane extends BaseSite {
   siteType = SiteType.Kagane
   private sources: Record<string, KaganeSource> = {}
 
-  private getKaganeChapter(data: KaganeData): KaganeChapter | undefined {
-    return data.manga.series_books[0]
-  }
-
   protected override getChapter(data: KaganeData): string {
-    const chapter = this.getKaganeChapter(data)
+    const chapter = data.latestChapter
     if (!chapter) return 'Unknown'
 
     if (chapter.title.trim() === '') {
@@ -77,18 +79,18 @@ export class Kagane extends BaseSite {
   }
 
   protected override getChapterUrl(data: KaganeData): string {
-    const chapterId = this.getKaganeChapter(data)?.book_id
+    const chapterId = data.latestChapter?.book_id
     if (!chapterId) return ''
 
     return `${this.getUrl()}/series/${data.manga.series_id}/reader/${chapterId}`
   }
 
   protected override getChapterNum(data: KaganeData): number {
-    return this.getKaganeChapter(data)?.sort_no ?? 0
+    return data.latestChapter?.sort_no ?? 0
   }
 
   protected override getChapterDate(data: KaganeData): string {
-    const chapter = this.getKaganeChapter(data)
+    const chapter = data.latestChapter
     if (!chapter) return ''
 
     const chapterDate = moment(chapter.published_on ?? chapter.created_at)
@@ -125,26 +127,38 @@ export class Kagane extends BaseSite {
   }
 
   private getImageById(imageId: string): string {
-    return `https://kagane.to/api/v2/image/${imageId}/compressed`
+    return `${this.getUrl()}/api/v2/image/${imageId}/compressed`
   }
 
   protected async readUrlImpl(url: string): Promise<Error | Manga> {
-    const seriesId = url.split('/series/')[1]
+    const seriesId = url.slice(-36)
     if (seriesId === undefined) return new Error('No series id found')
 
-    const request: HttpRequest = { method: 'GET', url: `https://kagane.to/api/v2/series/${seriesId}` }
+    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/api/v2/series/${seriesId}` }
     const response = await requestHandler.sendRequest(request)
-
     const mangaData = JSON.parse(response.data) as KaganeManga
-    mangaData.series_books.reverse()
 
-    return this.buildManga(new KaganeData(mangaData, url))
+    const queryString = qs.stringify({
+      sort: 'sort_no',
+      order: 'Desc',
+      limit: 1,
+    })
+
+    const booksRequest: HttpRequest = {
+      method: 'GET',
+      url: `${this.getUrl()}/api/v2/series/${seriesId}/books?${queryString}`,
+    }
+    const booksResponse = await requestHandler.sendRequest(booksRequest)
+    const booksData = JSON.parse(booksResponse.data) as KaganeBooks
+    const latestChapter = booksData.items[0]
+
+    return this.buildManga(new KaganeData(mangaData, latestChapter, url))
   }
 
   protected async searchImpl(query: string): Promise<Error | Manga[]> {
     const request: HttpRequest = {
       method: 'POST',
-      url: `https://kagane.to/api/v2/search/series?page=0&size=10&scanlations=true`,
+      url: `${this.getUrl()}/api/v2/search/series?page=0&size=10&scanlations=true`,
       data: `{ "title": "${query}" }`,
       headers: { 'Content-Type': ContentType.JSON },
     }
@@ -179,7 +193,7 @@ export class Kagane extends BaseSite {
   private async fetchSources(): Promise<void> {
     const sourcesRequest: HttpRequest = {
       method: 'POST',
-      url: 'https://kagane.to/api/v2/sources/list',
+      url: `${this.getUrl()}/api/v2/sources/list`,
       data: '{ "source_types": null }',
       headers: { 'Content-Type': ContentType.JSON },
     }
@@ -192,6 +206,6 @@ export class Kagane extends BaseSite {
   }
 
   getTestUrl(): string {
-    return `${this.getUrl()}/series/019c29bc-0812-7957-a697-94a6f70f09d6`
+    return `${this.getUrl()}/series/the-girl-i-like-forgot-her-glasses-019c29bc-0812-7957-a697-94a6f70f09d6`
   }
 }

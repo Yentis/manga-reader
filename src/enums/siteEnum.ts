@@ -12,7 +12,7 @@ export enum SiteType {
   Tapas = 'tapas.io',
   Comikey = 'comikey.com',
   Tappytoon = 'tappytoon.com',
-  Kagane = 'kagane.to',
+  Kagane = 'kagane.si',
 }
 
 export enum SiteName {
@@ -29,7 +29,7 @@ export enum SiteName {
   'tapas.io' = 'Tapas',
   'comikey.com' = 'Comikey',
   'tappytoon.com' = 'Tappytoon',
-  'kagane.to' = 'Kagane',
+  'kagane.si' = 'Kagane',
 }
 
 export enum SiteState {
