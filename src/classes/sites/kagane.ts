@@ -3,7 +3,7 @@ import { SiteType } from 'src/enums/siteEnum'
 import { Manga } from 'src/classes/manga'
 import type { HttpRequest } from 'src/interfaces/httpRequest'
 import { requestHandler } from 'src/services/requestService'
-import { titleContainsQuery } from 'src/utils/siteUtils'
+import { parseHtmlFromString, titleContainsQuery } from 'src/utils/siteUtils'
 import moment from 'moment'
 import { ContentType } from 'src/enums/contentTypeEnum'
 import qs from 'qs'
@@ -66,6 +66,7 @@ class KaganeData extends BaseData {
 export class Kagane extends BaseSite {
   siteType = SiteType.Kagane
   private sources: Record<string, KaganeSource> = {}
+  private mirrorUrl?: string
 
   protected override getChapter(data: KaganeData): string {
     const chapter = data.latestChapter
@@ -113,11 +114,12 @@ export class Kagane extends BaseSite {
   }
 
   public override async readImage(url: string): Promise<string> {
+    const siteUrl = await this.getUrlAsync()
     const request: HttpRequest = {
       method: 'GET',
       url,
       headers: {
-        referer: `${this.getUrl()}/`,
+        referer: `${siteUrl}/`,
         responseType: 'arraybuffer',
       },
     }
@@ -134,7 +136,8 @@ export class Kagane extends BaseSite {
     const seriesId = url.slice(-36)
     if (seriesId === undefined) return new Error('No series id found')
 
-    const request: HttpRequest = { method: 'GET', url: `${this.getUrl()}/api/v2/series/${seriesId}` }
+    const siteUrl = await this.getUrlAsync()
+    const request: HttpRequest = { method: 'GET', url: `${siteUrl}/api/v2/series/${seriesId}` }
     const response = await requestHandler.sendRequest(request)
     const mangaData = JSON.parse(response.data) as KaganeManga
 
@@ -146,7 +149,7 @@ export class Kagane extends BaseSite {
 
     const booksRequest: HttpRequest = {
       method: 'GET',
-      url: `${this.getUrl()}/api/v2/series/${seriesId}/books?${queryString}`,
+      url: `${siteUrl}/api/v2/series/${seriesId}/books?${queryString}`,
     }
     const booksResponse = await requestHandler.sendRequest(booksRequest)
     const booksData = JSON.parse(booksResponse.data) as KaganeBooks
@@ -156,9 +159,10 @@ export class Kagane extends BaseSite {
   }
 
   protected async searchImpl(query: string): Promise<Error | Manga[]> {
+    const siteUrl = await this.getUrlAsync()
     const request: HttpRequest = {
       method: 'POST',
-      url: `${this.getUrl()}/api/v2/search/series?page=0&size=10&scanlations=true`,
+      url: `${siteUrl}/api/v2/search/series?page=0&size=10&scanlations=true`,
       data: `{ "title": "${query}" }`,
       headers: { 'Content-Type': ContentType.JSON },
     }
@@ -171,13 +175,13 @@ export class Kagane extends BaseSite {
       await this.fetchSources()
     }
 
-    searchData.content.forEach((entry) => {
+    for (const entry of searchData.content) {
       const match = [entry.title, ...entry.alternate_titles].some((title) => {
         return titleContainsQuery(query, title)
       })
-      if (!match) return
+      if (!match) continue
 
-      const url = `${this.getUrl()}/series/${entry.series_id}`
+      const url = `${siteUrl}/series/${entry.series_id}`
       const manga = new Manga(url, this.siteType)
 
       manga.title = `${entry.title} (${this.sources[entry.source_id]?.title})`
@@ -185,15 +189,16 @@ export class Kagane extends BaseSite {
       manga.image = this.getImageById(entry.cover_image_id)
 
       mangaList.push(manga)
-    })
+    }
 
     return mangaList
   }
 
   private async fetchSources(): Promise<void> {
+    const siteUrl = await this.getUrlAsync()
     const sourcesRequest: HttpRequest = {
       method: 'POST',
-      url: `${this.getUrl()}/api/v2/sources/list`,
+      url: `${siteUrl}/api/v2/sources/list`,
       data: '{ "source_types": null }',
       headers: { 'Content-Type': ContentType.JSON },
     }
@@ -205,7 +210,32 @@ export class Kagane extends BaseSite {
     })
   }
 
+  override getUrl(): string {
+    return this.mirrorUrl ?? super.getUrl()
+  }
+
+  async getUrlAsync(): Promise<string> {
+    if (this.mirrorUrl) return this.mirrorUrl
+
+    try {
+      const mirrorsRequest: HttpRequest = { method: 'GET', url: 'https://kagane.org' }
+      const mirrorsResponse = await requestHandler.sendRequest(mirrorsRequest)
+
+      const doc = await parseHtmlFromString(mirrorsResponse.data)
+      let url = doc.querySelectorAll('li a')[0]?.getAttribute('href')
+
+      if (!url) return this.getUrl()
+      if (url.endsWith('/')) url = url.substring(0, url.length - 1)
+
+      this.mirrorUrl = url
+      return url
+    } catch (error) {
+      console.error(error)
+      return this.getUrl()
+    }
+  }
+
   getTestUrl(): string {
-    return `${this.getUrl()}/series/the-girl-i-like-forgot-her-glasses-019c29bc-0812-7957-a697-94a6f70f09d6`
+    return `${super.getUrl()}/series/the-girl-i-like-forgot-her-glasses-019c29bc-0812-7957-a697-94a6f70f09d6`
   }
 }
