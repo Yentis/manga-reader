@@ -15,7 +15,7 @@ Features:
 - Read manga in the app
 - Mark status, add notes, add ratings
 - Sort, filter and search
-- Link reading progress with MangaDex or Kitsu
+- Link reading progress with Kitsu
 - Share list using [Rentry](https://rentry.co/)
 - Export to / import from Dropbox
 - Dark mode, read in browser
@@ -35,7 +35,7 @@ https://github.com/Yentis/manga-reader/releases
 ![Preview](https://i.imgur.com/EHw91vu.png)
 
 # Support
-For support contact Yentis#5218 on Discord.  
+For support contact yentis on Discord.  
 
 # Building
 
