@@ -2,13 +2,14 @@ import type { HttpRequest } from 'src/interfaces/httpRequest'
 import type HttpResponse from 'src/interfaces/httpResponse'
 import BaseRequest from './baseRequest'
 import { ContentType } from 'src/enums/contentTypeEnum'
+import { COOKIE_NAMES } from 'src/services/requestService'
 
 const EXTENSION_ID = 'fjjhciamaplkcedanpphbkakidghlnji'
 
 interface Runtime {
   sendMessage: (
     extensionId: string,
-    message: HttpRequest | string,
+    message: HttpRequest | BasicRequest | string,
     options?: { includeTlsChannelId?: boolean },
   ) => Promise<HttpResponse | Error | string | undefined>
   lastError?: { message: string }
@@ -18,6 +19,11 @@ export interface BrowserHttpRequest extends HttpRequest {
   id: string
   name?: string
   value?: unknown
+}
+
+export interface BasicRequest {
+  name: string
+  value: unknown
 }
 
 function getRuntime(): Runtime | null {
@@ -39,6 +45,17 @@ export async function hasExtension(): Promise<boolean> {
 }
 
 export default class BrowserRequest extends BaseRequest {
+  constructor() {
+    super()
+
+    const request: BasicRequest = {
+      name: 'setCookieNames',
+      value: COOKIE_NAMES,
+    }
+
+    getRuntime()?.sendMessage(EXTENSION_ID, request).catch(console.error)
+  }
+
   async sendRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     request.headers = request.headers ?? {}
 

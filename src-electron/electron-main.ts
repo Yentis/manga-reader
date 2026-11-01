@@ -159,7 +159,11 @@ app.on('activate', () => {
   }
 })
 
-const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark', '__st']
+let cookieNames: string[] = []
+
+ipcMain.handle('cookie-names', (_event, newCookieNames: string[]) => {
+  cookieNames = newCookieNames
+})
 
 ipcMain.handle('net-request', async (_event, options: HttpRequest): Promise<HttpResponse> => {
   await app.whenReady()
@@ -168,7 +172,7 @@ ipcMain.handle('net-request', async (_event, options: HttpRequest): Promise<Http
   const domain = new URL(options.url).hostname
   const cookies = await session.defaultSession.cookies.get({ domain })
   cookies
-    .filter((cookie) => COOKIE_NAMES.includes(cookie.name))
+    .filter((cookie) => cookieNames.includes(cookie.name))
     .forEach((cookie) => {
       if (cookie === undefined || cookie === null) return
       if (!headers.cookie) {

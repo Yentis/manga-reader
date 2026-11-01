@@ -3,6 +3,7 @@
 /**
  * @typedef {Map<String, (url: String, headers: chrome.webRequest.HttpHeader[]) => void>} HttpListener
  * @typedef {import('../src/classes/requests/browserRequest').BrowserHttpRequest} HttpRequest
+ * @typedef {import('../src/classes/requests/browserRequest.ts').BasicRequest} BasicRequest
  * @typedef {import('../src/interfaces/httpResponse')} HttpResponse
  */
 
@@ -14,7 +15,8 @@ const responseListeners = new Map()
 /** @type {HttpListener} */
 const requestListeners = new Map()
 
-let cookieNames = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark', '__st']
+/** @type string[] */
+let cookieNames = []
 
 chrome.webRequest.onHeadersReceived.addListener(
   (details) => {
@@ -44,7 +46,7 @@ chrome.runtime.onMessageExternal.addListener((request, _sender, sendResponse) =>
 })
 
 /**
- * @param {HttpRequest | String} request
+ * @param {HttpRequest | BasicRequest | String} request
  * @param {(response?: unknown) => void} sendResponse
  */
 function onRequest(request, sendResponse) {
@@ -58,11 +60,13 @@ function onRequest(request, sendResponse) {
   }
 
   if (request.name === 'setCookieNames' && Array.isArray(request.value)) {
-    /** @type {string[]} */
-    const newCookieNames = request.value
-    cookieNames = newCookieNames
+    cookieNames = request.value
     sendResponse('ok')
 
+    return
+  }
+
+  if (!('id' in request)) {
     return
   }
 

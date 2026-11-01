@@ -35,7 +35,7 @@ export function useElectronAuth(): void {
   onMounted(() => {
     const electronWindow = window as unknown as ElectronWindow
 
-    electronWindow.mangaReader.onDropboxToken((_event: unknown, queryString?: qs.ParsedQs) => {
+    electronWindow.mangaReader.onDropboxToken((_event, queryString) => {
       onDropboxRedirect(queryString)
     })
   })

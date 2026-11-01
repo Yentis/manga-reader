@@ -2,6 +2,8 @@ import type { IpcRendererEvent } from 'electron'
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import type { HttpRequest } from 'src/interfaces/httpRequest'
 import type qs from 'qs'
+import type ElectronWindow from 'src/interfaces/electronWindow'
+import type HttpResponse from 'src/interfaces/httpResponse'
 
 const whitelist = ['http://localhost', 'file:///', 'dropbox.com/oauth2/authorize']
 
@@ -23,16 +25,22 @@ ipcRenderer.on('dropbox-token', (event: IpcRendererEvent, queryString?: qs.Parse
   dropboxTokenCallback(event, queryString)
 })
 
-contextBridge.exposeInMainWorld('mangaReader', {
-  onDropboxToken: (callback: (event: IpcRendererEvent, queryString?: qs.ParsedQs) => void) => {
+const publicMethods: ElectronWindow['mangaReader'] = {
+  onDropboxToken: (callback: (event: IpcRendererEvent, queryString?: qs.ParsedQs) => void): void => {
     dropboxTokenCallback = callback
   },
 
-  openURL: (url: string) => {
+  openURL: (url: string): void => {
     shell.openExternal(url).catch((error) => console.error(error))
   },
 
-  sendRequest: (options: HttpRequest) => {
+  sendRequest: (options: HttpRequest): Promise<HttpResponse> => {
     return ipcRenderer.invoke('net-request', options)
   },
-})
+
+  setCookieNames: (cookieNames: string[]): Promise<void> => {
+    return ipcRenderer.invoke('cookie-names', cookieNames)
+  },
+}
+
+contextBridge.exposeInMainWorld('mangaReader', publicMethods)

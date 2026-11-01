@@ -6,6 +6,7 @@ import { Platform } from 'src/enums/platformEnum'
 import { getPlatform } from './platformService'
 
 export let requestHandler: BaseRequest
+export const COOKIE_NAMES = ['cf_clearance', '__ddg1', '__ddg2', '__ddgid', '__ddgmark', '__st', 'MD-Edge-ID']
 
 export function init(): void {
   switch (getPlatform()) {

@@ -160,6 +160,19 @@ export class MangaDex extends BaseSite {
     return `https://uploads.${this.siteType}/covers/${mangaId}/${coverFileName}`
   }
 
+  public override async readImage(url: string): Promise<string> {
+    const request: HttpRequest = {
+      method: 'GET',
+      url,
+      headers: {
+        responseType: 'arraybuffer',
+      },
+    }
+    const response = await requestHandler.sendRequest(request)
+
+    return `data:image/jpg;base64,${response.data}`
+  }
+
   protected override getTitle(data: MangaDexData): string {
     // Use the first title we find
     return this.getTitlesFromAttributes(data.mangaResult.attributes)[0] ?? ''
