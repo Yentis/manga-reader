@@ -41,7 +41,7 @@ export async function hasExtension(): Promise<boolean> {
   if (!runtime) return false
 
   const response = await runtime.sendMessage(EXTENSION_ID, 'ping')
-  return response === '1.5.4'
+  return response === '1.6.0'
 }
 
 export default class BrowserRequest extends BaseRequest {
@@ -56,7 +56,7 @@ export default class BrowserRequest extends BaseRequest {
     getRuntime()?.sendMessage(EXTENSION_ID, request).catch(console.error)
   }
 
-  async sendRequest(request: HttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
+  async sendRequest(request: BrowserHttpRequest, ignoreErrorStatus?: boolean): Promise<HttpResponse> {
     request.headers = request.headers ?? {}
 
     if (request.headers['Content-Type'] === ContentType.URLENCODED && typeof request.data === 'string') {
@@ -68,7 +68,9 @@ export default class BrowserRequest extends BaseRequest {
     const runtime = getRuntime()
     if (!runtime) return this.doFallbackRequest(request, ignoreErrorStatus)
 
+    request.id = request.id ?? `${request.url}${Math.random().toString()}`
     const response = await runtime.sendMessage(EXTENSION_ID, request)
+
     if (runtime.lastError) {
       console.error(new Error(`Could not send extension message: ${runtime.lastError.message}`))
       return this.doFallbackRequest(request, ignoreErrorStatus)

@@ -110,7 +110,14 @@ export class AsuraScans extends BaseSite {
   }
 
   protected async readUrlImpl(url: string): Promise<Error | Manga> {
-    const request: HttpRequest = { method: 'GET', url }
+    const request: HttpRequest = {
+      method: 'GET',
+      url,
+      headers: {
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+    }
+
     const response = await requestHandler.sendRequest(request)
 
     const doc = await parseHtmlFromString(response.data)

@@ -1,4 +1,5 @@
 // @ts-check
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 /**
  * @typedef {Map<String, (url: String, headers: chrome.webRequest.HttpHeader[]) => void>} HttpListener
@@ -12,13 +13,13 @@ const FILTERS = { urls: ['https://*/*', 'http://*/*'] }
 /** @type {HttpListener} */
 const responseListeners = new Map()
 
-/** @type {HttpListener} */
-const requestListeners = new Map()
-
 /** @type string[] */
 let cookieNames = []
 
-chrome.webRequest.onHeadersReceived.addListener(
+/** @type Set<number> */
+let requestIds = new Set()
+
+browser.webRequest.onHeadersReceived.addListener(
   (details) => {
     const responseHeaders = details.responseHeaders ?? []
     responseListeners.forEach((listener) => listener(details.url, responseHeaders))
@@ -28,18 +29,7 @@ chrome.webRequest.onHeadersReceived.addListener(
   ['responseHeaders', 'extraHeaders'],
 )
 
-chrome.webRequest.onBeforeSendHeaders.addListener(
-  (details) => {
-    const requestHeaders = details.requestHeaders ?? []
-    requestListeners.forEach((listener) => listener(details.url, requestHeaders))
-
-    return { requestHeaders }
-  },
-  FILTERS,
-  ['requestHeaders', 'extraHeaders', 'blocking'],
-)
-
-chrome.runtime.onMessageExternal.addListener((request, _sender, sendResponse) => {
+browser.runtime.onMessageExternal.addListener((request, _sender, sendResponse) => {
   onRequest(request, sendResponse)
 
   return true
@@ -52,7 +42,7 @@ chrome.runtime.onMessageExternal.addListener((request, _sender, sendResponse) =>
 function onRequest(request, sendResponse) {
   if (typeof request === 'string') {
     if (request === 'ping') {
-      sendResponse(chrome.runtime.getManifest().version)
+      sendResponse(browser.runtime.getManifest().version)
     }
 
     sendResponse(new Error(`Unknown request: ${request}`))
@@ -70,8 +60,6 @@ function onRequest(request, sendResponse) {
     return
   }
 
-  request.id = `${request.url}${Math.random().toString()}`
-
   doRequest(request)
     .then((response) => sendResponse(response))
     .catch((error) => {
@@ -80,7 +68,6 @@ function onRequest(request, sendResponse) {
     })
     .finally(() => {
       responseListeners.delete(request.id)
-      requestListeners.delete(request.id)
     })
 }
 
@@ -90,69 +77,159 @@ function onRequest(request, sendResponse) {
  * @returns {Promise<HttpResponse>}
  */
 async function doRequest(request) {
-  const responsePromise = getResponseHeaders(request)
-  const requestPromise = setRequestHeaders(request, await getCookies(request))
+  const id = getNextId()
 
-  /** @type {Promise<void | chrome.webRequest.HttpHeader[]>[]} */
-  const promises = [responsePromise, requestPromise]
+  try {
+    const requestHeaders = request.headers ?? {}
+    const url = new URL(request.url)
 
-  const response = await fetch(request.url, {
-    method: request.method,
-    body: request.data,
-  })
+    await setRequestCookies(request)
+    await browser.declarativeNetRequest.updateDynamicRules({
+      addRules: [
+        {
+          id,
+          condition: {
+            initiatorDomains: [chrome.runtime.id],
+            urlFilter: request.url,
+          },
+          action: {
+            type: 'modifyHeaders',
+            requestHeaders: Object.entries(requestHeaders).map(([header, value]) => {
+              if (header.toLowerCase() === 'cookie') {
+                return {
+                  header,
+                  operation: 'append',
+                  value,
+                }
+              }
 
-  await Promise.all(promises)
-  const headers = await responsePromise
+              return {
+                header,
+                operation: 'set',
+                value,
+              }
+            }),
+          },
+        },
+      ],
+    })
 
-  /** @type {Record<string, string | string[]>} */
-  const headerRecord = {}
+    const responsePromise = getResponseHeaders(request)
+    const response = await fetch(request.url, {
+      method: request.method,
+      body: request.data,
+      redirect: 'manual',
+    })
 
-  headers.forEach((header) => {
-    if (!header.value) return
+    const headers = await responsePromise
+    if (response.type === 'opaqueredirect') {
+      const locationHeader = headers.find((header) => header.name.toLowerCase() === 'location')
+      let newUrl = locationHeader?.value
+      if (!newUrl) throw new Error('No location found for redirect')
 
-    const existingHeader = headerRecord[header.name]
-    if (existingHeader) {
-      if (Array.isArray(existingHeader)) {
-        existingHeader.push(header.value)
+      if (newUrl.startsWith('/')) {
+        newUrl = `${url.origin}${newUrl}`
+      }
+
+      request.url = newUrl
+      return doRequest(request)
+    }
+
+    /** @type {Record<string, string | string[]>} */
+    const headerRecord = {}
+
+    headers.forEach((header) => {
+      if (!header.value) return
+
+      const existingHeader = headerRecord[header.name]
+      if (existingHeader) {
+        if (Array.isArray(existingHeader)) {
+          existingHeader.push(header.value)
+          return
+        }
+
+        headerRecord[header.name] = [existingHeader, header.value]
         return
       }
 
-      headerRecord[header.name] = [existingHeader, header.value]
-      return
-    }
-
-    headerRecord[header.name] = header.value
-  })
-
-  let data
-
-  if (request.headers?.responseType === 'arraybuffer') {
-    const blob = await response.blob()
-
-    const promise = new Promise((resolve, reject) => {
-      try {
-        const reader = new FileReader()
-        reader.onload = () => {
-          resolve(reader.result)
-        }
-        reader.readAsDataURL(blob)
-      } catch (e) {
-        reject(e)
-      }
+      headerRecord[header.name] = header.value
     })
 
-    const base64 = await promise
-    data = base64.substring(base64.indexOf(',') + 1)
-  } else {
-    data = await response.text()
-  }
+    let data
 
-  return {
-    headers: headerRecord,
-    data,
-    status: response.status,
-    statusText: response.statusText,
+    if (request.headers?.responseType === 'arraybuffer') {
+      const blob = await response.blob()
+
+      const promise = new Promise((resolve, reject) => {
+        try {
+          const reader = new FileReader()
+          reader.onload = () => {
+            resolve(reader.result)
+          }
+          reader.readAsDataURL(blob)
+        } catch (e) {
+          reject(e)
+        }
+      })
+
+      const base64 = await promise
+      data = base64.substring(base64.indexOf(',') + 1)
+    } else {
+      data = await response.text()
+    }
+
+    return {
+      headers: headerRecord,
+      data,
+      status: response.status,
+      statusText: response.statusText,
+    }
+  } finally {
+    await removeRule(id)
   }
+}
+
+/**
+ * @returns {number}
+ */
+function getNextId() {
+  let id = 1
+  while (requestIds.has(id)) id++
+
+  requestIds.add(id)
+  return id
+}
+
+/**
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+async function removeRule(id) {
+  await browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [id] })
+  requestIds.delete(id)
+}
+
+/**
+ *
+ * @param {HttpRequest} request
+ * @returns {Promise<void>}
+ */
+async function setRequestCookies(request) {
+  const cookies = await getCookies(request)
+
+  cookies
+    .filter((cookie) => cookieNames.includes(cookie.name))
+    .forEach((cookie) => {
+      if (!cookie) return
+      request.headers = request.headers ?? {}
+
+      if (!request.headers.cookie) {
+        request.headers.cookie = `${cookie.name}=${cookie.value}`
+        return
+      }
+
+      request.headers.cookie += `;${cookie.name}=${cookie.value}`
+    })
 }
 
 /**
@@ -186,74 +263,12 @@ function getResponseHeaders(request) {
 }
 
 /**
- *
- * @param {HttpRequest} request
- * @param {chrome.cookies.Cookie[]} cookies
- * @returns {Promise<void>}
- */
-function setRequestHeaders(request, cookies) {
-  cookies
-    .filter((cookie) => cookieNames.includes(cookie.name))
-    .forEach((cookie) => {
-      if (!cookie) return
-      request.headers = request.headers ?? {}
-
-      if (!request.headers.cookie) {
-        request.headers.cookie = `${cookie.name}=${cookie.value}`
-        return
-      }
-
-      request.headers.cookie += `;${cookie.name}=${cookie.value}`
-    })
-
-  /** @type {chrome.webRequest.HttpHeader[] | undefined} */
-  let receivedRequestHeaders
-
-  /** @type {(() => void) | undefined} */
-  let resolveCallback
-
-  requestListeners.set(request.id, (url, requestHeaders) => {
-    const adjustedUrl = getAdjustedUrl(request.url, url)
-    if (url !== adjustedUrl) return
-
-    if (request.headers) {
-      Object.keys(request.headers).forEach((header) => {
-        const index =
-          requestHeaders?.findIndex((requestHeader) => {
-            return requestHeader.name.toLowerCase() === header.toLowerCase()
-          }) ?? -1
-
-        const newHeader = {
-          name: header,
-          value: request.headers?.[header],
-        }
-
-        if (index !== -1) requestHeaders[index] = newHeader
-        else requestHeaders.push(newHeader)
-      })
-    }
-
-    receivedRequestHeaders = requestHeaders
-    resolveCallback?.()
-  })
-
-  return new Promise((resolve) => {
-    if (receivedRequestHeaders) {
-      resolve()
-      return
-    }
-
-    resolveCallback = resolve
-  })
-}
-
-/**
  * @param {HttpRequest} request
  * @returns {Promise<chrome.cookies.Cookie[]>}
  */
 async function getCookies(request) {
-  const partitionCookies = getCookiesBase({ partitionKey: {} })
-  const regularCookies = getCookiesBase({ url: request.url })
+  const partitionCookies = browser.cookies.getAll({ partitionKey: {} })
+  const regularCookies = browser.cookies.getAll({ url: request.url })
   const [partitionArray, cookieArray] = await Promise.all([partitionCookies, regularCookies])
 
   // topLevelSite filtering doesn't work so we do it manually
@@ -267,16 +282,6 @@ async function getCookies(request) {
   })
 
   return cookieArray
-}
-
-/**
- * @param {chrome.cookies.GetAllDetails} options
- * @returns {Promise<chrome.cookies.Cookie[]>}
- */
-function getCookiesBase(options) {
-  return new Promise((resolve) => {
-    chrome.cookies.getAll(options, resolve)
-  })
 }
 
 /**

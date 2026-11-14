@@ -38,14 +38,14 @@ async function readUrlAlt(site: Kagane): Promise<void> {
   const url = `${siteUrl}/series/019c2a33-d3b2-777b-871b-a093e2cf7701`
   const manga = await getMangaInfo(url, SITE_TYPE)
   const desired = new Manga(url, SITE_TYPE)
-  const chapterNum = 80
+  const chapterNum = 81
 
   desired.chapter = `Chapter ${chapterNum}`
   desired.image = `${siteUrl}/api/v2/image/01a15500-e908-78c8-b99a-07ccc90e6e51/compressed`
   desired.title = 'All My Neighbors are Convinced the Female Knight from My Rice Field Is My Wife'
-  desired.chapterUrl = `${siteUrl}/series/019c2a33-d3b2-777b-871b-a093e2cf7701/reader/01a154ea-1551-77a1-963f-35276aa158d8`
+  desired.chapterUrl = `${siteUrl}/series/019c2a33-d3b2-777b-871b-a093e2cf7701/reader/01a183ef-f1fb-701f-a282-0ac853a15850`
   desired.chapterNum = chapterNum
-  desired.chapterDate = moment('2026-10-19T16:06:29.455825Z').fromNow()
+  desired.chapterDate = moment('2026-10-28T19:15:02.774967Z').fromNow()
 
   mangaEqual(manga, desired)
 }

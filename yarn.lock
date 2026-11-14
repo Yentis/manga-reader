@@ -2864,13 +2864,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chrome@npm:^0.1.33":
-  version: 0.1.33
-  resolution: "@types/chrome@npm:0.1.33"
+"@types/chrome@npm:^0.3.7":
+  version: 0.3.7
+  resolution: "@types/chrome@npm:0.3.7"
   dependencies:
-    "@types/filesystem": "npm:*"
     "@types/har-format": "npm:*"
-  checksum: 10c0/87242c378fdf638f80edd4f8f2ce9d5e0aa9d0a780c02a20fa295e38ceda2b2121bae6452d26fef0fdd5fcc4cebdfd9e13393db92fd02a3db6642dc8d199461c
+  checksum: 10c0/5019eec11d621f1bdc2152ab2566fac5ddbbdf7511f1d5efb560037c41e8e54fdf5f73fd253c61bdb7ac6c251f0d2962fe671af22b1ff50011c8dd396d20f95b
   languageName: node
   linkType: hard
 
@@ -12259,7 +12258,7 @@ __metadata:
     "@quasar/app-webpack": "npm:4.3.1"
     "@quasar/cli": "npm:2.5.0"
     "@quasar/extras": "npm:1.17.0"
-    "@types/chrome": "npm:^0.1.33"
+    "@types/chrome": "npm:^0.3.7"
     "@types/isomorphic-fetch": "npm:0.0.35"
     "@types/node": "npm:^24.10.1"
     "@types/node-fetch": "npm:^2.5.7"

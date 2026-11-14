@@ -13,7 +13,7 @@ export async function testMangakakalot(): Promise<void> {
   if (!site) throw Error('Site not found')
 
   await readUrl(site)
-  await search()
+  await search(site)
 }
 
 async function readUrl(site: BaseSite): Promise<void> {
@@ -29,21 +29,21 @@ async function readUrl(site: BaseSite): Promise<void> {
   mangaEqual(manga, desired)
 }
 
-async function search(): Promise<void> {
+async function search(site: BaseSite): Promise<void> {
   const results = await searchManga(QUERY, SITE_TYPE)
   const desired = new Manga('', SITE_TYPE)
   desired.image = 'https://imgs-2.2xstorage.com/thumb/together-with-the-rain.webp'
   desired.chapter = 'Chapter 2'
-  desired.url = 'https://www.mangakakalot.gg/manga/together-with-the-rain'
+  desired.url = `${site.getUrl()}/manga/together-with-the-rain`
 
   await searchValid(results, desired, QUERY)
 
   const query2 = 'this song is only for you'
   const results2 = await searchManga(query2, SITE_TYPE)
   const desired2 = new Manga('', SITE_TYPE)
-  desired2.image = 'https://imgs-2.2xstorage.com/thumb/this-song-is-only-for-you.webp'
+  desired2.image = 'https://img-r1.2xstorage.com/thumb/this-song-is-only-for-you.webp'
   desired2.chapter = 'Chapter 149.2'
-  desired2.url = 'https://www.mangakakalot.gg/manga/this-song-is-only-for-you'
+  desired2.url = `${site.getUrl()}/manga/this-song-is-only-for-you`
 
   return searchValid(results2, desired2, query2)
 }

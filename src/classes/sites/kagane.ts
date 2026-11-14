@@ -164,7 +164,11 @@ export class Kagane extends BaseSite {
       method: 'POST',
       url: `${siteUrl}/api/v2/search/series?page=0&size=10&scanlations=true`,
       data: `{ "title": "${query}" }`,
-      headers: { 'Content-Type': ContentType.JSON },
+      headers: {
+        'Content-Type': ContentType.JSON,
+        'Sec-Fetch-Site': 'same-origin',
+        Origin: this.getUrl(),
+      },
     }
 
     const response = await requestHandler.sendRequest(request)
@@ -200,7 +204,11 @@ export class Kagane extends BaseSite {
       method: 'POST',
       url: `${siteUrl}/api/v2/sources/list`,
       data: '{ "source_types": null }',
-      headers: { 'Content-Type': ContentType.JSON },
+      headers: {
+        'Content-Type': ContentType.JSON,
+        'Sec-Fetch-Site': 'same-origin',
+        Origin: this.getUrl(),
+      },
     }
 
     const sourcesResponse = await requestHandler.sendRequest(sourcesRequest)

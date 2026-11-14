@@ -1,6 +1,6 @@
 {
   "name": "quasar-manga-reader",
-  "version": "2.27.7",
+  "version": "2.27.8",
   "description": "Manga reader that scrapes manga sites for updates",
   "productName": "Manga Reader",
   "author": "Yentis",
@@ -51,7 +51,7 @@
     "@electron/packager": "^18.3.2",
     "@eslint/js": "^9.39.1",
     "@quasar/app-webpack": "4.3.1",
-    "@types/chrome": "^0.1.33",
+    "@types/chrome": "^0.3.7",
     "@types/isomorphic-fetch": "0.0.35",
     "@types/node": "^24.10.1",
     "@types/node-fetch": "^2.5.7",

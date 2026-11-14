@@ -16,6 +16,7 @@ export const siteAliases = [
   { url: 'flamecomics.com', site: SiteType.FlameComics },
   { url: 'flamecomics.me', site: SiteType.FlameComics },
   { url: 'mangakakalot.com', site: SiteType.Mangakakalot },
+  { url: 'mangakakalot.gg', site: SiteType.Mangakakalot },
   { url: 'kagane.cx', site: SiteType.Kagane },
   { url: 'kagane.moe', site: SiteType.Kagane },
   { url: 'kagane.net', site: SiteType.Kagane },
